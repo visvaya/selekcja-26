@@ -296,7 +296,7 @@ test("a finished version 3 report from other rules is shown frozen with the olde
     "Piotr Zieliński",
     "Robert Lewandowski",
   ]) {
-    await expect(page.locator(".squad-list")).toContainText(name);
+    await expect(page.locator(".squad-pill", { hasText: name })).toHaveCount(1);
   }
 
   await page.reload();
