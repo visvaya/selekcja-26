@@ -31,6 +31,7 @@
     "test": "node --import ./scripts/test-setup.mjs --experimental-strip-types --test \"src/**/*.test.ts\" \"scripts/**/*.test.mjs\"",
     "test:coverage": "node --import ./scripts/test-setup.mjs --experimental-strip-types --experimental-test-coverage --test-coverage-include=\"src/logic/**\" --test-coverage-include=\"src/data/**\" --test-coverage-exclude=\"**/*.test.ts\" --test-coverage-lines=90 --test-coverage-branches=71 --test-coverage-functions=70 --test \"src/**/*.test.ts\" \"scripts/**/*.test.mjs\"",
     "test:e2e": "playwright test",
+    "golden:update": "cross-env UPDATE_GOLDEN=1 node --import ./scripts/test-setup.mjs --experimental-strip-types --test src/logic/golden-master.test.ts",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint --deny-warnings .",
     "format": "prettier --write .",

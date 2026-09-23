@@ -1,5 +1,7 @@
 import { GAME_RULES } from "../data/constants.ts";
 import { detailedPositionMap, players, systems } from "../data/catalog.ts";
+import { EVENTS } from "../data/events.ts";
+import type { CampEvent } from "../data/events.ts";
 import type {
   DetailedPosition,
   GameState,
@@ -197,4 +199,15 @@ export function visiblePlayers(state: GameState): Player[] {
     name: (left, right) => left.name.localeCompare(right.name, "pl"),
   };
   return matching.sort(comparators[state.sort]);
+}
+
+// The first camp event whose threshold is reached and which is still unresolved. While it is
+// pending the player must decide before picking further players or closing the camp.
+export function pendingCampEvent(state: GameState): CampEvent | undefined {
+  return state.stage === "camp" && state.started
+    ? EVENTS.find(
+        (event) =>
+          state.selected.size >= event.atPlayers && !state.events.has(event.id),
+      )
+    : undefined;
 }

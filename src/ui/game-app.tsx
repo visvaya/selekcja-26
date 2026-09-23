@@ -7,7 +7,6 @@ import {
   systems,
 } from "../data/catalog.ts";
 import { APP_CONFIG, GAME_RULES } from "../data/constants.ts";
-import { EVENTS } from "../data/events.ts";
 import type {
   DetailedPosition,
   FinalReport,
@@ -16,7 +15,6 @@ import type {
   Player,
   SortId,
 } from "../data/types.ts";
-import { evaluateSquad } from "../logic/results.ts";
 import { fillSquadRandomly } from "../logic/random-squad.ts";
 import {
   experienceScore,
@@ -26,12 +24,13 @@ import {
 } from "../logic/scoring.ts";
 import { createInitialState, reduceGameState } from "../logic/state.ts";
 import { clearGame, loadGame, saveGame } from "../logic/storage.ts";
-import { tournamentStory } from "../logic/tournament.ts";
+import { buildFinalReport } from "../logic/report.ts";
 import {
   canFinalize,
   detailedCounts,
   detailedPositions,
   formationOutsiders,
+  pendingCampEvent,
   groupCounts,
   positionShort,
   preferredFoot,
@@ -549,14 +548,7 @@ export function GameApp() {
       </div>
     );
 
-  const pendingEvent =
-    state.stage === "camp" && state.started
-      ? EVENTS.find(
-          (event) =>
-            state.selected.size >= event.atPlayers &&
-            !state.events.has(event.id),
-        )
-      : undefined;
+  const pendingEvent = pendingCampEvent(state);
   const selected = selectedPlayers(state);
   const detailed = detailedCounts(state);
   const risk = riskLevel(state);
@@ -609,65 +601,8 @@ export function GameApp() {
       setModal({ kind: "campReport" });
       return;
     }
-    const evaluation = evaluateSquad(state);
-    const reasons = text.resultReasons;
-    const strengths = [
-      evaluation.quality >= GAME_RULES.tournament.qualityStrengthThresholdPoints
-        ? reasons.qualityHigh
-        : null,
-      evaluation.chem >= GAME_RULES.tournament.chemistryStrengthThresholdPoints
-        ? reasons.chemHigh
-        : null,
-      evaluation.testedPlayers >=
-      GAME_RULES.tournament.testedStrengthThresholdPlayers
-        ? reasons.testedHigh(evaluation.testedPlayers)
-        : null,
-      evaluation.coverage >= GAME_RULES.ratingMaximumPoints
-        ? reasons.coverageHigh
-        : null,
-      evaluation.fit >= GAME_RULES.tournament.fitnessStrengthThresholdPoints
-        ? reasons.fitnessHigh
-        : null,
-    ].filter((reason): reason is string => Boolean(reason));
-    const weak = [
-      evaluation.quality < GAME_RULES.tournament.qualityStrengthThresholdPoints
-        ? reasons.qualityLow
-        : null,
-      evaluation.chem < GAME_RULES.tournament.chemistryStrengthThresholdPoints
-        ? reasons.chemLow
-        : null,
-      evaluation.testedPlayers <
-      GAME_RULES.tournament.testedStrengthThresholdPlayers
-        ? reasons.testedLow(squadLimit(state) - evaluation.testedPlayers)
-        : null,
-      evaluation.coverage < GAME_RULES.ratingMaximumPoints
-        ? reasons.coverageLow
-        : null,
-      evaluation.fit < GAME_RULES.tournament.fitnessStrengthThresholdPoints
-        ? reasons.fitnessLow
-        : null,
-    ].filter((reason): reason is string => Boolean(reason));
-    const stage = text.outcomes[evaluation.outcome];
-    const story = tournamentStory(
-      stage,
-      evaluation.points,
-      evaluation.seed,
-      text.tournament,
-    );
-    const report: FinalReport = {
-      s: evaluation.squad,
-      quality: evaluation.quality,
-      chem: evaluation.chem,
-      coverage: evaluation.coverage,
-      luck: evaluation.luck,
-      points: evaluation.points,
-      stage,
-      grade: evaluation.grade,
-      strengths,
-      weak,
-      story,
-    };
-    dispatch({ type: "finish", report, seed: story.seed });
+    const { report, seed } = buildFinalReport(state, text);
+    dispatch({ type: "finish", report, seed });
     setModal(null);
     setExpanded(false);
   }

@@ -4,3 +4,4 @@ pnpm-lock.yaml
 test-results/
 playwright-report/
 blob-report/
+src/logic/golden/traces/

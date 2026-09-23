@@ -3,11 +3,13 @@ import type { Effects } from "./types.ts";
 
 export type EventId = "doctor" | "captain" | "scout";
 
-export const EVENTS: {
+export interface CampEvent {
   id: EventId;
   atPlayers: number;
   choices: [Partial<Effects>, Partial<Effects>];
-}[] = [
+}
+
+export const EVENTS: CampEvent[] = [
   {
     id: "doctor",
     atPlayers: GAME_RULES.eventThresholdPlayers.doctor,
