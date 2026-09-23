@@ -6,6 +6,13 @@ import {
   STORAGE_KEY,
   collectPageErrors,
   dialog,
+  expectSavedSchemaVersion,
+  patchRejectingRemoteStorage,
+  patchStorageFailures,
+  saveAlert,
+  saveBanner,
+  saveStatusRegion,
+  setStorageFailureMode,
   squadCount,
   text,
 } from "./helpers.ts";
@@ -340,6 +347,115 @@ test("?reset discards the saved game and removes the parameter", async ({
   await page.reload();
   await expect(
     page.getByRole("heading", { name: text.introTitle }),
+  ).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test("a quota-exceeded save shows a retry banner and recovers", async ({
+  page,
+}) => {
+  const errors = collectPageErrors(page);
+  await patchStorageFailures(page, STORAGE_KEY);
+  await page.goto("/");
+  await expect(
+    page.getByRole("heading", { name: text.introTitle }),
+  ).toBeVisible();
+
+  await setStorageFailureMode(page, "quota");
+  await page.getByRole("button", { name: text.start }).click();
+  await expect(
+    page.getByRole("heading", { name: text.stages.camp.heading }),
+  ).toBeVisible();
+
+  await expect(saveAlert(page)).toHaveText(text.save.messages.quota);
+  await expect(
+    saveBanner(page).getByRole("button", { name: text.save.retry }),
+  ).not.toBeFocused();
+
+  await setStorageFailureMode(page, "none");
+  await saveBanner(page).getByRole("button", { name: text.save.retry }).click();
+  await expect(saveAlert(page)).toHaveText("");
+  await expect(saveStatusRegion(page)).toHaveText(text.save.recovered);
+
+  await expectSavedSchemaVersion(page, 3);
+
+  await page.reload();
+  await expect(
+    page.getByRole("heading", { name: text.stages.camp.heading }),
+  ).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test("a generic save failure recovers after a later action without retry", async ({
+  page,
+}) => {
+  const errors = collectPageErrors(page);
+  await patchStorageFailures(page, STORAGE_KEY);
+  await page.goto("/");
+  await expect(
+    page.getByRole("heading", { name: text.introTitle }),
+  ).toBeVisible();
+
+  await setStorageFailureMode(page, "failed");
+  await page.getByRole("button", { name: text.start }).click();
+  await expect(
+    page.getByRole("heading", { name: text.stages.camp.heading }),
+  ).toBeVisible();
+  await expect(saveAlert(page)).toHaveText(text.save.messages.failed);
+
+  await setStorageFailureMode(page, "none");
+  await page.getByRole("button", { name: text.autoFill }).click();
+  await expect(dialog(page)).toHaveAccessibleName(text.events.doctor.title);
+  await dialog(page)
+    .getByRole("button", { name: text.events.doctor.choices[0]!.title })
+    .click();
+
+  await expect(saveAlert(page)).toHaveText("");
+  await expect(saveStatusRegion(page)).toHaveText(text.save.recovered);
+  expect(errors).toEqual([]);
+});
+
+test("unavailable storage shows a dismissible banner and keeps the game playable", async ({
+  page,
+}) => {
+  const errors = collectPageErrors(page);
+  await patchStorageFailures(page, STORAGE_KEY, "unavailable");
+  await page.goto("/");
+
+  await expect(saveAlert(page)).toHaveText(text.save.messages.unavailable);
+  await saveBanner(page).getByRole("button", { name: text.understood }).click();
+  await expect(saveAlert(page)).toHaveText("");
+
+  await page.getByRole("button", { name: text.start }).click();
+  await expect(
+    page.getByRole("heading", { name: text.stages.camp.heading }),
+  ).toBeVisible();
+  await expect(saveAlert(page)).toHaveText("");
+
+  await page.getByRole("button", { name: text.autoFill }).click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await expect(saveAlert(page)).toHaveText("");
+  expect(errors).toEqual([]);
+});
+
+test("a rejecting remote backend falls back to localStorage without a banner", async ({
+  page,
+}) => {
+  const errors = collectPageErrors(page);
+  await patchRejectingRemoteStorage(page);
+  await page.goto("/");
+  await page.getByRole("button", { name: text.start }).click();
+  await expect(
+    page.getByRole("heading", { name: text.stages.camp.heading }),
+  ).toBeVisible();
+
+  await expect(saveAlert(page)).toHaveText("");
+
+  await expectSavedSchemaVersion(page, 3);
+
+  await page.reload();
+  await expect(
+    page.getByRole("heading", { name: text.stages.camp.heading }),
   ).toBeVisible();
   expect(errors).toEqual([]);
 });

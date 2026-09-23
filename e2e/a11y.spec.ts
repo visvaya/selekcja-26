@@ -6,7 +6,11 @@ import {
   dialog,
   dockToggle,
   finalizeButton,
+  patchStorageFailures,
+  saveAlert,
+  setStorageFailureMode,
   squadCount,
+  STORAGE_KEY,
   text,
 } from "./helpers.ts";
 
@@ -24,6 +28,7 @@ const WCAG_TAGS = [
 const EXPECTED_STATES = [
   "intro",
   "camp list",
+  "save error banner",
   "profile dialog",
   "comparison dialog",
   "event dialog",
@@ -53,6 +58,7 @@ test("every screen and dialog passes an axe WCAG 2.2 AA scan", async ({
   // Nine full-page axe scans of a 61-card list take longer than a plain journey.
   test.setTimeout(300_000);
   const scanned = new Set<string>();
+  await patchStorageFailures(page, STORAGE_KEY);
   await page.goto("/");
   await expect(
     page.getByRole("heading", { name: text.introTitle }),
@@ -64,6 +70,16 @@ test("every screen and dialog passes an axe WCAG 2.2 AA scan", async ({
     page.getByRole("heading", { name: text.stages.camp.heading }),
   ).toBeVisible();
   await scan(page, "camp list", scanned);
+
+  await setStorageFailureMode(page, "failed");
+  await page.locator(".select-btn").first().click();
+  await expect(saveAlert(page)).toHaveText(text.save.messages.failed);
+  await scan(page, "save error banner", scanned);
+  await setStorageFailureMode(page, "none");
+  // Toggle the same player back off, restoring the earlier selection while forcing a
+  // successful save that clears the banner so the remaining states stay unaffected.
+  await page.locator(".select-btn").first().click();
+  await expect(saveAlert(page)).toHaveText("");
 
   await page.getByRole("button", { name: text.profile }).first().click();
   await expect(dialog(page)).toBeVisible();
