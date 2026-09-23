@@ -1,6 +1,6 @@
 # Selekcja 26
 
-A browser game about picking Poland's national squad for EURO 2028. The player, as head coach, narrows 61 candidates to a 23-player test camp and then to a 26-player tournament squad; a seeded simulation plays out the tournament. The game interface is in Polish.
+A browser game about picking Poland's national squad for EURO 2028. The player, as head coach, narrows 61 real Polish footballers to a 23-player test camp and then to a 26-player tournament squad; a seeded simulation plays out the tournament. The game interface is in Polish.
 
 The game runs in any modern browser on a phone or a desktop and builds to a static site. A public hosted version is not available yet; run it locally as described below.
 
@@ -53,7 +53,7 @@ A saved game can be discarded by opening the game with `?reset` added to its add
 
 ## Fiction and facts
 
-This is an unofficial fan game with no connection to PZPN or UEFA. Clubs, form, ratings and player availability belong to a fictional EURO 2028 scenario and are not scouting data. Only two rules come from real regulations: the 26-player limit and the minimum of three goalkeepers ([UEFA EURO 2026–28 regulations, Article 32.01](https://documents.uefa.com/r/Regulations-of-the-UEFA-European-Football-Championship-2026-28/Article-32-Player-lists-Online)). Requiring exactly three goalkeepers, the size of the test camp and all other limits are game assumptions.
+This is an unofficial fan game with no connection to PZPN, UEFA, the clubs or the players. The candidates are real Polish footballers, but the EURO 2028 scenario is fictional: ratings, form, roles and availability (injury risk, limited minutes) are game judgements, not scouting data or medical information, and clubs and ages reflect the roster's last update rather than live data. Only two rules come from real regulations: the 26-player limit and the minimum of three goalkeepers ([UEFA EURO 2026–28 regulations, Article 32.01](https://documents.uefa.com/r/Regulations-of-the-UEFA-European-Football-Championship-2026-28/Article-32-Player-lists-Online)). Requiring exactly three goalkeepers, the size of the test camp and all other limits are game assumptions.
 
 ## License
 
