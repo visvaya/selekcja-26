@@ -7,7 +7,6 @@ import {
   collectPageErrors,
   dialog,
   expectSavedSchemaVersion,
-  patchRejectingRemoteStorage,
   patchStorageFailures,
   saveAlert,
   saveBanner,
@@ -435,27 +434,5 @@ test("unavailable storage shows a dismissible banner and keeps the game playable
   await page.getByRole("button", { name: text.autoFill }).click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await expect(saveAlert(page)).toHaveText("");
-  expect(errors).toEqual([]);
-});
-
-test("a rejecting remote backend falls back to localStorage without a banner", async ({
-  page,
-}) => {
-  const errors = collectPageErrors(page);
-  await patchRejectingRemoteStorage(page);
-  await page.goto("/");
-  await page.getByRole("button", { name: text.start }).click();
-  await expect(
-    page.getByRole("heading", { name: text.stages.camp.heading }),
-  ).toBeVisible();
-
-  await expect(saveAlert(page)).toHaveText("");
-
-  await expectSavedSchemaVersion(page, 3);
-
-  await page.reload();
-  await expect(
-    page.getByRole("heading", { name: text.stages.camp.heading }),
-  ).toBeVisible();
   expect(errors).toEqual([]);
 });

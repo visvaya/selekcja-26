@@ -96,18 +96,6 @@ export async function setStorageFailureMode(
   }, mode);
 }
 
-// Installs a window.storage backend whose set() always rejects, so the local fallback backend
-// takes over silently.
-export async function patchRejectingRemoteStorage(page: Page): Promise<void> {
-  await page.addInitScript(() => {
-    window.storage = {
-      get: async () => null,
-      set: async () => Promise.reject(new Error("remote storage down")),
-      delete: async () => undefined,
-    };
-  });
-}
-
 export function squadCount(page: Page): Locator {
   return page.locator(".count-ring b");
 }
