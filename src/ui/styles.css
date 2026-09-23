@@ -129,12 +129,25 @@ input:focus-visible {
   justify-content: space-between;
   gap: var(--space-7);
 }
+.brand-group {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-5);
+  min-width: 0;
+}
 .brand {
   display: flex;
   align-items: center;
   gap: var(--space-5);
   font-weight: 900;
   letter-spacing: -0.04em;
+}
+.topbar-version {
+  flex: none;
+  font-size: var(--font-caption);
+  color: var(--muted);
+  font-weight: 700;
+  white-space: nowrap;
 }
 .brand-mark {
   width: 28px;
@@ -147,6 +160,7 @@ input:focus-visible {
   font-size: var(--font-caption);
 }
 .phase {
+  flex: none;
   font-size: var(--font-small);
   color: var(--muted);
   font-weight: 700;
@@ -723,6 +737,24 @@ input:focus-visible {
 }
 .report li {
   margin: 7px 0;
+}
+.changelog-version {
+  font-size: var(--font-caption);
+  color: var(--muted);
+  margin: 0 0 var(--space-5);
+}
+.changelog-toggle {
+  margin-top: var(--space-6);
+}
+.changelog-older {
+  margin-top: var(--space-7);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--line);
+}
+.changelog-entry + .changelog-entry {
+  margin-top: var(--space-7);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--line);
 }
 .squad-list {
   display: flex;

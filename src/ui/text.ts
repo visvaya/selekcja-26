@@ -11,6 +11,14 @@ import type {
 } from "../data/types.ts";
 import type { EventId } from "../data/events.ts";
 import type { SaveFailureReason } from "../logic/storage.ts";
+import type { ChangelogVersion } from "../data/changelog.ts";
+
+// Formats an ISO "YYYY-MM-DD" changelog date as Polish "DD.MM.YYYY". No Intl dependency: the
+// format is fixed and locale-independent from the caller's point of view.
+function formatChangelogDate(isoDate: string): string {
+  const [year, month, day] = isoDate.split("-");
+  return `${day}.${month}.${year}`;
+}
 
 export const UI_TEXT = {
   brand: "SELEKCJA",
@@ -409,4 +417,22 @@ export const UI_TEXT = {
     fitnessHigh: "Kadra ma dobry poziom dostępności i energii na trzy mecze.",
     fitnessLow: "Profil zdrowotny kadry może wymusić nieplanowane rotacje.",
   },
+  changelogTitle: "Co nowego",
+  changelogVersionLabel: (version: string, date: string) =>
+    `Wersja ${version} · ${formatChangelogDate(date)}`,
+  topBarVersion: (version: string) => `v${version}`,
+  topBarVersionAccessible: (version: string) => `Wersja ${version}`,
+  changelogShowOlder: (count: number) => `Wcześniejsze zmiany (${count})`,
+  changelogHideOlder: "Ukryj wcześniejsze zmiany",
+  changelogNotes: {
+    "0.1.1": [
+      "Gdy przeglądarka nie zapisze postępu, na górze ekranu pojawia się pasek z wyjaśnieniem. Przy braku miejsca albo błędzie zapisu można spróbować ponownie, a pasek znika po udanym zapisie.",
+      "Jeśli zmienią się zasady gry, ukończony raport zostaje jako historia z adnotacją, a niedokończonej selekcji nie da się wczytać. Gra mówi o tym wprost.",
+      "Selekcje zapisane w poprzedniej wersji wczytują się dalej bez utraty postępu. W najstarszych zapisach, sprzed wprowadzenia historii cofania, wcześniejszych decyzji nie da się cofnąć.",
+      "Numer wersji na górnym pasku i lista zmian na ekranie startowym.",
+    ],
+    "0.1.0": [
+      "Pierwsza wersja: marcowe zgrupowanie na 23 zawodników, kadra turniejowa na 26, trzy systemy gry, zdarzenia ze zgrupowania, cofanie decyzji i raport z turnieju.",
+    ],
+  } satisfies Record<ChangelogVersion, readonly string[]>,
 } as const;

@@ -1,6 +1,7 @@
 import { AxeBuilder } from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
+import { CHANGELOG } from "../src/data/changelog.ts";
 import {
   CAMP_EVENT_CHOICES,
   dialog,
@@ -27,6 +28,7 @@ const WCAG_TAGS = [
 // so a new state has to be added here instead of silently escaping the scan.
 const EXPECTED_STATES = [
   "intro",
+  "intro changelog expanded",
   "camp list",
   "save error banner",
   "profile dialog",
@@ -64,6 +66,18 @@ test("every screen and dialog passes an axe WCAG 2.2 AA scan", async ({
     page.getByRole("heading", { name: text.introTitle }),
   ).toBeVisible();
   await scan(page, "intro", scanned);
+
+  // Located by aria-controls rather than accessible name: the button's own label changes
+  // ("Wcześniejsze zmiany (N)" to "Ukryj wcześniejsze zmiany") when it toggles.
+  const changelogToggle = page.locator('[aria-controls="changelog-older"]');
+  await expect(changelogToggle).toHaveAccessibleName(
+    text.changelogShowOlder(CHANGELOG.length - 1),
+  );
+  await changelogToggle.click();
+  await expect(changelogToggle).toHaveAttribute("aria-expanded", "true");
+  await expect(changelogToggle).toHaveAccessibleName(text.changelogHideOlder);
+  await scan(page, "intro changelog expanded", scanned);
+  await changelogToggle.click();
 
   await page.getByRole("button", { name: text.start }).click();
   await expect(

@@ -7,6 +7,7 @@ import {
   systems,
 } from "../data/catalog.ts";
 import { APP_CONFIG, GAME_RULES, RULES_REVISION } from "../data/constants.ts";
+import { GAME_VERSION } from "../data/changelog.ts";
 import type {
   DetailedPosition,
   FinalReport,
@@ -29,6 +30,7 @@ import type { LoadedSave } from "../logic/save-format.ts";
 import { createLatestRequestTracker } from "../logic/latest-request.ts";
 import { initialSaveStatus, reduceSaveStatus } from "../logic/save-status.ts";
 import { SaveStatusBanner } from "./save-status-banner.tsx";
+import { ChangelogSection } from "./changelog-section.tsx";
 import { buildFinalReport } from "../logic/report.ts";
 import {
   canFinalize,
@@ -898,8 +900,16 @@ export function GameApp() {
       />
       <header className="topbar">
         <div className="topbar-inner">
-          <div className="brand">
-            <span className="brand-mark">26</span> {text.brand}
+          <div className="brand-group">
+            <div className="brand">
+              <span className="brand-mark">26</span> {text.brand}
+            </div>
+            <span className="topbar-version">
+              <span aria-hidden="true">{text.topBarVersion(GAME_VERSION)}</span>
+              <span className="visually-hidden">
+                {text.topBarVersionAccessible(GAME_VERSION)}
+              </span>
+            </span>
           </div>
           <div className="phase">
             {state.report
@@ -1001,6 +1011,7 @@ export function GameApp() {
               </button>
             )}
             <p className="fineprint">{text.disclaimer}</p>
+            <ChangelogSection />
           </section>
         ) : (
           <section>
