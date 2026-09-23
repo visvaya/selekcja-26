@@ -378,7 +378,7 @@ export const UI_TEXT = {
     quarterfinalStage: "Ćwierćfinał",
   },
   luck: {
-    positive: "Kilka kluczowych momentów ułożyło się po Twojej myśli.",
+    positive: "Kilka kluczowych momentów ułożyło się po twojej myśli.",
     negative: "Drobne zdarzenia boiskowe obróciły się przeciwko drużynie.",
     neutral:
       "Zespół uzyskał wynik odpowiadający jakości i przygotowaniu kadry.",
@@ -394,7 +394,7 @@ export const UI_TEXT = {
   restart: "Zagraj od początku",
   rulesChangedTitle: "Zmieniły się zasady gry",
   rulesChangedDiscarded:
-    "Od Twojej ostatniej wizyty zmieniły się zasady gry, więc niedokończonej selekcji nie da się wczytać. Zaczynasz od nowa.",
+    "Od twojej ostatniej wizyty zmieniły się zasady gry i nie ma możliwości wczytania niedokończonej selekcji. Zaczynasz od nowa.",
   reportFromOlderRules:
     "Ten raport powstał według wcześniejszej wersji zasad gry. Decyzji z tej selekcji nie można już cofnąć.",
   simulationDisclaimer:
@@ -407,7 +407,7 @@ export const UI_TEXT = {
     chemHigh: "Trzon zespołu powinien dobrze reagować na kryzysy w meczu.",
     chemLow: "Relacje i hierarchia mogą pęknąć pod presją wyniku.",
     testedHigh: (count: number) =>
-      `${count} powołanych przeszło wcześniejszy test w Twoim systemie.`,
+      `${count} powołanych przeszło wcześniejszy test w twoim systemie.`,
     testedLow: (count: number) =>
       `Aż ${count} zawodników jedzie na EURO bez testu w marcowym zgrupowaniu.`,
     coverageHigh:
