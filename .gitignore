@@ -2,3 +2,8 @@ node_modules/
 dist/
 .sites-runtime/
 *.tsbuildinfo
+test-results/
+playwright-report/
+blob-report/
+CLAUDE.local.md
+.claude/settings.local.json
