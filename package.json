@@ -1,12 +1,35 @@
 {
   "name": "selekcja-26",
+  "version": "0.1.0",
   "private": true,
+  "description": "Browser game about selecting Poland's squad for EURO 2028: a 23-player test camp, then a 26-player tournament squad.",
+  "keywords": [
+    "game",
+    "football",
+    "browser-game",
+    "react",
+    "typescript",
+    "vite",
+    "euro-2028",
+    "poland"
+  ],
+  "homepage": "https://github.com/visvaya/selekcja-26#readme",
+  "bugs": {
+    "url": "https://github.com/visvaya/selekcja-26/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/visvaya/selekcja-26.git"
+  },
+  "license": "MIT",
+  "author": "Maciej B. (https://github.com/visvaya)",
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "test": "node --experimental-strip-types --test src/**/*.test.ts",
+    "test": "node --import ./scripts/test-setup.mjs --experimental-strip-types --test \"src/**/*.test.ts\" \"scripts/**/*.test.mjs\"",
+    "test:coverage": "node --import ./scripts/test-setup.mjs --experimental-strip-types --experimental-test-coverage --test-coverage-include=\"src/logic/**\" --test-coverage-include=\"src/data/**\" --test-coverage-exclude=\"**/*.test.ts\" --test-coverage-lines=90 --test-coverage-branches=71 --test-coverage-functions=70 --test \"src/**/*.test.ts\" \"scripts/**/*.test.mjs\"",
     "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint --deny-warnings .",
@@ -14,8 +37,10 @@
     "format:check": "prettier --check .",
     "check:text": "node scripts/check-text.mjs",
     "check:conventions": "node scripts/check-conventions.mjs",
+    "quality:duplicates": "jscpd .",
+    "quality:dead": "cross-env KNIP_DISABLE_RAW_TRANSFER=1 knip",
     "quality": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm check:text && pnpm check:conventions",
-    "verify": "pnpm quality && pnpm test && pnpm build && git diff --check",
+    "verify": "pnpm quality && pnpm quality:duplicates && pnpm quality:dead && pnpm test:coverage && pnpm build && git diff --check",
     "verify:full": "pnpm verify && pnpm test:e2e",
     "prepare": "node scripts/install-git-hooks.mjs"
   },
@@ -28,13 +53,17 @@
     "react-dom": "^19.3.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@playwright/test": "^1.63.0",
     "@testing-library/react": "^16.3.3",
     "@types/jsdom": "^30.0.0",
     "@types/node": "^26.6.2",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "cross-env": "^10.1.0",
+    "jscpd": "^5.3.1",
     "jsdom": "^30.1.1",
+    "knip": "^6.37.0",
     "oxlint": "^1.85.0",
     "prettier": "^3.9.8",
     "typescript": "^7.0.2",

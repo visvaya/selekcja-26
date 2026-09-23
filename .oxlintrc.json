@@ -20,7 +20,12 @@
     "jsx-a11y/control-has-associated-label": "off",
     "unicorn/no-array-sort": "off",
     "unicorn/consistent-function-scoping": "off",
-    "import/no-unassigned-import": ["warn", { "allow": ["**/*.css"] }],
+    "import/no-unassigned-import": [
+      "warn",
+      {
+        "allow": ["**/*.css"]
+      }
+    ],
     "import/no-cycle": "error",
     "no-console": "error",
     "no-debugger": "error"
@@ -36,7 +41,24 @@
             "property": "random",
             "message": "Game logic must use the seeded generator in src/logic/random.ts."
           }
+        ],
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["**/ui/*", "../ui/*"],
+                "message": "src/logic and src/data must not depend on src/ui; pass UI copy in as a parameter."
+              }
+            ]
+          }
         ]
+      }
+    },
+    {
+      "files": ["src/**/*.test.ts"],
+      "rules": {
+        "no-restricted-imports": "off"
       }
     }
   ],

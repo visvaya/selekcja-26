@@ -11,7 +11,7 @@ declare global {
 }
 
 const STORAGE_KEY = "selekcja-26-game";
-export const SCHEMA_VERSION = 2;
+const SCHEMA_VERSION = 2;
 let pendingSave: Promise<void> = Promise.resolve();
 
 interface StorageBackend {

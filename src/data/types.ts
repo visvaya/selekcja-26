@@ -46,7 +46,7 @@ export interface System {
   fits: DetailedPosition[];
 }
 
-export interface TrialReport {
+interface TrialReport {
   delta: number;
   note: string;
 }

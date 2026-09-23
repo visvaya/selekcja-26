@@ -2,7 +2,8 @@
 // - file names in kebab-case (tool-mandated names excepted),
 // - no classes in src/ except Error subclasses and a React error boundary,
 // - CSS colors only as tokens inside :root blocks,
-// - inline React styles only for data-driven CSS custom properties.
+// - inline React styles only for data-driven CSS custom properties,
+// - no absolute local paths in code (they leak the machine layout and break portability).
 // Usage: node scripts/check-conventions.mjs
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
@@ -21,6 +22,8 @@ const ALLOWED_CLASS =
   /\bclass\s+[\w$]+\s+extends\s+(?:[\w$]*Error|(?:React\.)?Component)\b/;
 const COLOR_LITERAL = /#[0-9a-fA-F]{3,8}\b|\b(?:rgba?|hsla?|oklch|oklab)\(/;
 const INLINE_STYLE = /style=\{\{([^}]*)\}\}/g;
+const ABSOLUTE_PATH = /["'`](?:[A-Za-z]:[\\/]|\/home\/|\/Users\/)/;
+const CODE_FILE = /\.(?:[cm]?js|jsx|ts|tsx)$/;
 
 function listFiles() {
   return execFileSync(
@@ -88,9 +91,20 @@ function inlineStyleProblems(file, content) {
   });
 }
 
+function absolutePathProblems(file, lines) {
+  if (!CODE_FILE.test(file)) return [];
+  return lines.flatMap((line, index) =>
+    ABSOLUTE_PATH.test(line)
+      ? [
+          `${file}:${index + 1}: absolute local path; resolve it from the repository root instead`,
+        ]
+      : [],
+  );
+}
+
 const problems = listFiles().flatMap((file) => {
   const normalized = file.replaceAll("\\", "/");
-  const content = /\.(tsx?|css)$/.test(normalized)
+  const content = /\.(?:[cm]?js|jsx|tsx?|css)$/.test(normalized)
     ? readFileSync(file, "utf8")
     : "";
   const lines = content.split("\n");
@@ -99,6 +113,7 @@ const problems = listFiles().flatMap((file) => {
     ...classProblems(normalized, lines),
     ...cssColorProblems(normalized, lines),
     ...inlineStyleProblems(normalized, content),
+    ...absolutePathProblems(normalized, lines),
   ];
 });
 
