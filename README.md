@@ -2,7 +2,7 @@
 
 A browser game about picking Poland's national squad for EURO 2028. The player, as head coach, narrows 61 candidates to a 23-player test camp and then to a 26-player tournament squad; a seeded simulation plays out the tournament. The game interface is in Polish.
 
-[Play in the browser](https://old-deployment.invalid) on a phone or a desktop, no installation required.
+The game runs in any modern browser on a phone or a desktop and builds to a static site. A public hosted version is not available yet; run it locally as described below.
 
 ## Gameplay
 
@@ -19,10 +19,10 @@ Along the way the player can open profiles, compare two candidates, filter by 14
 - **Deterministic simulation.** Each new game gets its own seed and all game logic draws from a seeded generator. Undoing and re-confirming the same squad reproduces the same result; a saved report is restored, never re-simulated.
 - **Pure logic, thin UI.** Rules, scoring and the tournament are pure functions in `src/logic/`. Every state transition goes through one reducer with an undo history of up to 50 steps.
 - **Versioned saves.** Saved games carry a schema version; older saves are validated and migrated, and a corrupt save starts a fresh game instead of breaking it.
-- **Mobile first and accessible.** Full keyboard support, visible focus, focus-trapping dialogs, and correct `aria-pressed` and `aria-expanded` states.
-- **Two test layers.** Logic and UI tests run on `node --test`. Playwright journeys play the whole game on a narrow phone viewport and with the keyboard alone on a desktop.
+- **Mobile first and accessible.** Full keyboard support, visible focus, focus-trapping dialogs, landmarks, and correct `aria-pressed` and `aria-expanded` states. Every screen and dialog is scanned with axe against WCAG 2.2 AA.
+- **Tested at two levels.** Logic, UI and tooling tests run on `node --test` with coverage thresholds. Playwright plays the whole game on the production build: on a narrow phone in Chromium and WebKit, and with the keyboard alone on a desktop.
 
-**Stack:** React 19, TypeScript 7, Vite 8, Playwright, oxlint, Prettier. No state library and no backend; the build is a static site.
+**Stack:** React 19, TypeScript 7, Vite 8, Playwright with axe, oxlint, Prettier, jscpd, knip. No state library and no backend; the build is a static site.
 
 ## Getting started
 
@@ -32,10 +32,12 @@ Requires Node.js 24+ and pnpm.
 pnpm install --frozen-lockfile
 pnpm dev            # Vite dev server
 pnpm quality        # fast static checks: types, lint, formatting, text and convention rules
-pnpm verify         # quality plus tests and build
-pnpm verify:full    # full gate: verify plus browser journeys
-pnpm test:e2e       # browser journeys (first run: pnpm exec playwright install chromium)
+pnpm verify         # quality plus duplication, dead code, tests with coverage and build
+pnpm verify:full    # full gate: verify plus browser journeys and the accessibility scan
+pnpm test:e2e       # browser journeys (first run: pnpm exec playwright install chromium webkit)
 ```
+
+A saved game can be discarded by opening the game with `?reset` added to its address.
 
 | Directory    | Contents                                                          |
 | ------------ | ----------------------------------------------------------------- |
@@ -52,3 +54,7 @@ pnpm test:e2e       # browser journeys (first run: pnpm exec playwright install 
 ## Fiction and facts
 
 This is an unofficial fan game with no connection to PZPN or UEFA. Clubs, form, ratings and player availability belong to a fictional EURO 2028 scenario and are not scouting data. Only two rules come from real regulations: the 26-player limit and the minimum of three goalkeepers ([UEFA EURO 2026–28 regulations, Article 32.01](https://documents.uefa.com/r/Regulations-of-the-UEFA-European-Football-Championship-2026-28/Article-32-Player-lists-Online)). Requiring exactly three goalkeepers, the size of the test camp and all other limits are game assumptions.
+
+## License
+
+[MIT](LICENSE) © 2026 Maciej B.
