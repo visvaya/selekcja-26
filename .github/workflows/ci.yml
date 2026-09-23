@@ -24,11 +24,11 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Unit tests, typecheck, lint, format, text rules, build
+      - name: Static checks, unit tests with coverage, build
         run: pnpm verify
-      - name: Install Playwright Chromium
-        run: pnpm exec playwright install --with-deps chromium
-      - name: Browser journeys (phone and desktop keyboard)
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium webkit
+      - name: Browser journeys and accessibility scan
         run: pnpm test:e2e
       - uses: actions/upload-artifact@v7
         if: failure()
