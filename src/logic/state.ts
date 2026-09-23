@@ -1,0 +1,187 @@
+import { nextRandom } from "./random.ts";
+import { GAME_RULES } from "../data/constants.ts";
+import type {
+  Effects,
+  FinalReport,
+  GameState,
+  GameSnapshot,
+  Player,
+  PriorityId,
+  SortId,
+  SystemId,
+  DetailedPosition,
+} from "../data/types.ts";
+
+export type GameAction =
+  | { type: "setSystem"; value: SystemId }
+  | { type: "setPriority"; value: PriorityId }
+  | { type: "setFilter"; value: DetailedPosition | "ALL" }
+  | { type: "setQuery"; value: string }
+  | { type: "setSort"; value: SortId }
+  | { type: "start" }
+  | { type: "togglePlayer"; name: string; limit: number }
+  | { type: "autoFill"; selected: Set<string>; seed: number }
+  | { type: "undo" }
+  | { type: "toggleCompare"; name: string }
+  | { type: "clearCompare" }
+  | { type: "resolveEvent"; id: string; effects: Partial<Effects> }
+  | { type: "completeCamp"; squad: Player[] }
+  | { type: "finish"; report: FinalReport; seed: number }
+  | { type: "reset"; seed: number }
+  | { type: "hydrate"; state: GameState };
+
+export function createInitialState(seed = 2028): GameState {
+  return {
+    system: "4231",
+    priority: "balance",
+    stage: "camp",
+    started: false,
+    selected: new Set<string>(),
+    campSquad: new Set<string>(),
+    trial: {},
+    filter: "ALL",
+    query: "",
+    sort: "model",
+    events: new Set(),
+    effects: { chem: 0, fit: 0, quality: 0 },
+    compare: [],
+    seed: seed >>> 0,
+    report: null,
+    history: [],
+  };
+}
+
+function remember(previous: GameState, next: GameState): GameState {
+  const { history: _history, ...snapshot } = previous;
+  return {
+    ...next,
+    history: [...previous.history, snapshot as GameSnapshot].slice(
+      -GAME_RULES.undoHistoryLimitActions,
+    ),
+  };
+}
+
+export function reduceGameState(
+  state: GameState,
+  action: GameAction,
+): GameState {
+  switch (action.type) {
+    case "setSystem":
+      return action.value === state.system
+        ? state
+        : remember(state, { ...state, system: action.value });
+    case "setPriority":
+      return action.value === state.priority
+        ? state
+        : remember(state, { ...state, priority: action.value });
+    case "setFilter":
+      return { ...state, filter: action.value };
+    case "setQuery":
+      return { ...state, query: action.value };
+    case "setSort":
+      return { ...state, sort: action.value };
+    case "hydrate":
+      return action.state;
+    case "undo": {
+      const snapshot = state.history.at(-1);
+      return snapshot
+        ? {
+            ...snapshot,
+            filter: state.filter,
+            query: state.query,
+            sort: state.sort,
+            compare: state.compare,
+            history: state.history.slice(0, -1),
+          }
+        : state;
+    }
+    case "start":
+      return state.started
+        ? state
+        : remember(state, { ...state, started: true });
+    case "togglePlayer": {
+      const selected = new Set(state.selected);
+      if (selected.has(action.name)) selected.delete(action.name);
+      else if (selected.size < action.limit) selected.add(action.name);
+      return selected.size === state.selected.size &&
+        selected.has(action.name) === state.selected.has(action.name)
+        ? state
+        : remember(state, { ...state, selected });
+    }
+    case "autoFill":
+      return remember(state, {
+        ...state,
+        selected: new Set(action.selected),
+        seed: action.seed,
+      });
+    case "toggleCompare": {
+      const compare = state.compare.includes(action.name)
+        ? state.compare.filter((name) => name !== action.name)
+        : [...state.compare.slice(-1), action.name];
+      return { ...state, compare };
+    }
+    case "clearCompare":
+      return { ...state, compare: [] };
+    case "resolveEvent":
+      return remember(state, {
+        ...state,
+        events: new Set([...state.events, action.id]),
+        effects: {
+          chem: state.effects.chem + (action.effects.chem ?? 0),
+          fit: state.effects.fit + (action.effects.fit ?? 0),
+          quality: state.effects.quality + (action.effects.quality ?? 0),
+        },
+      });
+    case "completeCamp": {
+      const trial = { ...state.trial };
+      let seed = state.seed;
+      const rules = GAME_RULES.campTrial;
+      for (const player of action.squad) {
+        const draw = nextRandom(seed);
+        seed = draw.seed;
+        const delta = Math.max(
+          rules.minimumDeltaPoints,
+          Math.min(
+            rules.maximumDeltaPoints,
+            Math.round(
+              (player.form - rules.formBaselinePoints) /
+                rules.formDivisorPoints +
+                draw.value * rules.randomRangePoints -
+                rules.randomOffsetPoints,
+            ),
+          ),
+        );
+        trial[player.name] = {
+          delta,
+          note:
+            delta >= rules.impressedThresholdPoints
+              ? "impressed"
+              : delta >= rules.solidThresholdPoints
+                ? "solid"
+                : delta >= rules.uncertainThresholdPoints
+                  ? "uncertain"
+                  : "disappointed",
+        };
+      }
+      return remember(state, {
+        ...state,
+        seed,
+        trial,
+        stage: "final",
+        campSquad: new Set(state.selected),
+        selected: new Set<string>(),
+        compare: [],
+      });
+    }
+    case "finish":
+      return remember(state, {
+        ...state,
+        report: action.report,
+        seed: action.seed,
+      });
+    case "reset":
+      return createInitialState(action.seed);
+    default:
+      return state;
+  }
+}

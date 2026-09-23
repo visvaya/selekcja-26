@@ -1,0 +1,363 @@
+import type {
+  DetailedPosition,
+  GroupPosition,
+  OutcomeId,
+  PriorityId,
+  SortId,
+  Stage,
+  SystemId,
+} from "../data/types.ts";
+import type { EventId } from "../data/events.ts";
+
+export const UI_TEXT = {
+  brand: "SELEKCJA",
+  introPhase: "ODPRAWA",
+  resultPhase: "RAPORT",
+  loading: "Wczytywanie gry…",
+  introEyebrow: "Symulator selekcjonera • EURO 2028",
+  introTitle: "Jedna lista. Cały kraj ocenia.",
+  introLead:
+    "Wybierz 26 zawodników na mistrzostwa Europy. Nazwiska pomagają, ale turniej wygrywa kadra zbudowana pod plan – nie ranking popularności.",
+  briefTitle: "Notatka sztabu szkoleniowego",
+  candidateCount: "kandydatów",
+  campCount: "zgrupowania",
+  rosterTransition: "lista kontrolna i EURO",
+  groupMatches: "mecze w grupie",
+  systemChoice: "Wybierz model gry",
+  priorityChoice: "Ustal priorytet selekcji",
+  start: "Rozpocznij odprawę",
+  autoFill: "Dobierz losowo",
+  undo: "Cofnij",
+  autoFillErrors: {
+    full: "Kadra jest już pełna. Odwołaj zawodnika, aby zwolnić miejsce.",
+    insufficientSlots:
+      "Pozostało zbyt mało miejsc, aby spełnić wymagane proporcje. Odwołaj zawodników z nadliczbowych grup i spróbuj ponownie.",
+    candidateShortage:
+      "Nie ma wystarczającej liczby dostępnych zawodników w wymaganej grupie.",
+    tooManyGoalkeepers:
+      "W finałowej kadrze mogą być dokładnie trzej bramkarze. Odwołaj nadliczbowego bramkarza i spróbuj ponownie.",
+  },
+  autoFillErrorTitle: "Nie można dobrać kadry",
+  disclaimer:
+    "Nieoficjalna gra fanowska. Kluby, dostępność i oceny są elementem scenariusza EURO 2028 oraz autorskim modelem rozgrywki – nie rzeczywistym scoutingiem ani produktem PZPN/UEFA.",
+  systems: {
+    "4231": {
+      name: "4–2–3–1",
+      description: "Kontrola środka, skrzydła schodzące do półprzestrzeni.",
+    },
+    "3421": {
+      name: "3–4–2–1",
+      description: "Trzech stoperów, wahadła i dwóch graczy między liniami.",
+    },
+    "433": {
+      name: "4–3–3",
+      description: "Pressing, mobilna ósemka i szeroko ustawieni skrzydłowi.",
+    },
+  } satisfies Record<SystemId, { name: string; description: string }>,
+  priorities: {
+    balance: {
+      name: "Zrównoważony",
+      description:
+        "Najbliższy realizmowi: forma, rytm, doświadczenie, kadra, grupa i taktyka.",
+    },
+    form: {
+      name: "Liczy się dziś",
+      description: "Premia za obecną formę i rytm meczowy.",
+    },
+    quality: {
+      name: "Najlepsi piłkarze",
+      description: "Zaufanie do klasy, doświadczenia i sufitu.",
+    },
+  } satisfies Record<PriorityId, { name: string; description: string }>,
+  stages: {
+    camp: {
+      phase: "ZGRUPOWANIE 1/2",
+      eyebrow: "MARZEC 2028",
+      heading: "Wybierz 23 zawodników na test",
+      hint: "To moment na sprawdzenie wynalazków. Występ na zgrupowaniu ujawni dodatkową informację przed EURO.",
+      finalize: "Jedź na zgrupowanie",
+      completed: "Lista kontrolna gotowa",
+      suffix: "LISTA KONTROLNA",
+    },
+    final: {
+      phase: "ZGRUPOWANIE 2/2",
+      eyebrow: "CZERWIEC 2028",
+      heading: "Wybierz finałową kadrę 26",
+      hint: "Masz raport z marcowego zgrupowania. Możesz zaufać obserwacji albo powołać nieprzetestowanego zawodnika.",
+      finalize: "Zatwierdź",
+      completed: "Kadra jest kompletna",
+      suffix: "EURO",
+    },
+  } satisfies Record<
+    Stage,
+    {
+      phase: string;
+      eyebrow: string;
+      heading: string;
+      hint: string;
+      finalize: string;
+      completed: string;
+      suffix: string;
+    }
+  >,
+  kpis: { quality: "Jakość", fit: "Dopasowanie", risk: "Ryzyko" },
+  risk: { none: "Brak", low: "Niskie", medium: "Średnie", high: "Wysokie" },
+  emptyValue: "Brak",
+  searchPlaceholder: "Szukaj zawodnika lub klubu…",
+  searchLabel: "Szukaj zawodnika",
+  filterLabel: "Filtruj po pozycji",
+  sortLabel: "Sortuj zawodników",
+  allCandidates: "Wszyscy kandydaci",
+  noCandidates: "Brak zawodników spełniających kryteria.",
+  sort: {
+    model: "Ocena selekcyjna",
+    quality: "Jakość",
+    form: "Forma i rytm",
+    fitness: "Zdrowie",
+    tactics: "Dopasowanie taktyczne",
+    experience: "Doświadczenie",
+    group: "Wpływ na grupę",
+    young: "Wiek: najmłodsi",
+    old: "Wiek: najstarsi",
+    name: "Nazwisko A–Z",
+  } satisfies Record<SortId, string>,
+  positions: {
+    BR: "Bramkarz",
+    LO: "Lewy obrońca",
+    LŚO: "Lewy środkowy obrońca",
+    ŚO: "Środkowy obrońca",
+    PŚO: "Prawy środkowy obrońca",
+    PO: "Prawy obrońca",
+    LWO: "Lewy wahadłowy",
+    DP: "Defensywny pomocnik",
+    ŚP: "Środkowy pomocnik",
+    OP: "Ofensywny pomocnik",
+    PWO: "Prawy wahadłowy",
+    LS: "Lewe skrzydło",
+    N: "Napastnik",
+    PS: "Prawe skrzydło",
+  } satisfies Record<DetailedPosition, string>,
+  groups: {
+    BR: "Bramkarze",
+    OBR: "Obrońcy",
+    POM: "Pomocnicy",
+    ATA: "Napastnicy",
+  } satisfies Record<GroupPosition, string>,
+  filtersAll: "Wszyscy",
+  select: "Powołaj",
+  selected: "Powołany ✓",
+  profile: "Profil",
+  compare: "Porównaj",
+  compared: "Wybrany",
+  playerMetrics: {
+    quality: "Jakość",
+    form: "Forma",
+    fitness: "Zdrowie",
+    tactics: "Taktyka",
+  },
+  selectionScore: "Ocena selekcyjna",
+  yearsOld: "lat",
+  campResult: "Zgrupowanie",
+  trialNotes: {
+    impressed: "przekonał",
+    solid: "bez zarzutu",
+    uncertain: "niepewny",
+    disappointed: "rozczarował",
+  } as Record<string, string>,
+  foot: {
+    both: "Obunożny",
+    left: "Lewa",
+    right: "Prawa",
+    lead: "Wiodąca noga:",
+  },
+  profileMetrics: [
+    "Ocena selekcyjna",
+    "Jakość",
+    "Forma i rytm",
+    "Zdrowie",
+    "Taktyka",
+    "Doświadczenie",
+    "Zgranie kadrowe",
+    "Wpływ na grupę",
+  ],
+  removeFromSquad: "Odwołaj z kadry",
+  addToSquad: "Powołaj do kadry",
+  removeShort: "Odwołaj",
+  returnToList: "Wróć do listy",
+  fullSquadTitle: "Lista jest pełna",
+  fullSquadMessage:
+    "Aby powołać kolejnego zawodnika, najpierw zwolnij jedno miejsce.",
+  notice: "Uwaga",
+  understood: "Rozumiem",
+  comparisonEyebrow: "Analiza porównawcza",
+  comparisonTitle: "Dwóch kandydatów, jedno miejsce?",
+  clearComparison: "Wyczyść porównanie",
+  returnWithoutClearing: "Wróć bez czyszczenia",
+  outOfFormation: "Poza ustawieniem",
+  outOfFormationEyebrow: "Dopasowanie do ustawienia",
+  outOfFormationExplanation:
+    "Ci zawodnicy nie mają żadnej naturalnej pozycji w wybranej formacji. Możesz ich powołać, ale będzie to wymagało zmiany ustawienia lub gry poza nominalną rolą.",
+  returnToPitch: "Wróć do mapy",
+  availablePlayers: "liczba dostępnych",
+  pitchDescription:
+    "Liczby pokazują, ilu powołanych może grać na danej pozycji.",
+  dockOpen: "Dotknij, aby zobaczyć podział miejsc",
+  dockCoverage: "Dotknij, aby zobaczyć obsadę",
+  missing: (count: number, group: string) => `brakuje ${count} × ${group}`,
+  excess: (count: number, group: string) =>
+    `jest o ${count} × ${group} za dużo`,
+  remaining: (count: number) => `Zostało ${count} miejsc`,
+  outOfFormationCount: (count: number) => `${count} poza ustawieniem`,
+  outOfFormationTitle: (count: number) => `Poza ustawieniem: ${count}`,
+  occupied: (count: number, position: string) =>
+    `${position}: ${count} powołanych`,
+  exact: "dokładnie",
+  minimum: "min.",
+  missingShort: (count: number) => `Brakuje ${count}`,
+  excessShort: (count: number) => `O ${count} za dużo`,
+  fulfilled: "✓ Spełnione",
+  events: {
+    doctor: {
+      title: "Raport medyczny: przeciążenie",
+      description:
+        "Jeden z najbardziej doświadczonych zawodników może zagrać, ale sztab przewiduje podwyższone ryzyko urazu w trzecim meczu grupowym.",
+      choices: [
+        {
+          title: "Ogranicz jego minuty",
+          description: "Mniej jakości w pierwszym składzie, niższe ryzyko.",
+        },
+        {
+          title: "Zaufaj zawodnikowi",
+          description: "Zachowujesz pełną jakość, ale ryzyko rośnie.",
+        },
+      ],
+    },
+    captain: {
+      title: "Kapitan prosi o ciągłość",
+      description:
+        "Liderzy chcą zachować trzon znający automatyzmy. Analitycy wskazują jednak dwóch młodszych graczy w lepszej formie.",
+      choices: [
+        {
+          title: "Postaw na ciągłość",
+          description: "Wyższa chemia i odporność na presję.",
+        },
+        {
+          title: "Wybierz aktualną formę",
+          description: "Więcej dynamiki, ale mniej przewidywalna szatnia.",
+        },
+      ],
+    },
+    scout: {
+      title: "Ostatni raport obserwacyjny",
+      description:
+        "Młody skrzydłowy imponuje w treningu. Dane z krótkiej próby są świetne, lecz sztab nie wie, jak zareaguje na turniejową presję.",
+      choices: [
+        {
+          title: "Zostaw furtkę młodości",
+          description:
+            "Premia za nieprzewidywalność, większa wariancja wyniku.",
+        },
+        {
+          title: "Chroń strukturę kadry",
+          description: "Mniejszy sufit, stabilniejsze minimum.",
+        },
+      ],
+    },
+  } satisfies Record<
+    EventId,
+    {
+      title: string;
+      description: string;
+      choices: { title: string; description: string }[];
+    }
+  >,
+  eventEyebrow: "Sytuacja ze zgrupowania",
+  campReportEyebrow: "Raport po zgrupowaniu",
+  campReportTitle: "Masz więcej danych. Nie wszystkie są wygodne.",
+  campReportBody: (best: string, doubts: string) =>
+    `Najlepiej wypadli ${best}. Najwięcej wątpliwości zostawili ${doubts}. Ocena selekcyjna uwzględnia teraz występ i znajomość automatyzmów.`,
+  continueToFinal: "Przejdź do powołań na EURO",
+  reportEyebrow: "Raport turniejowy",
+  pointsInGroup: (count: number) => `Polska zdobyła ${count} pkt w grupie.`,
+  outcomes: {
+    champion: "Mistrz Europy",
+    runnerUp: "Wicemistrz Europy",
+    semifinal: "Półfinał",
+    quarterfinal: "Ćwierćfinał",
+    roundOf16: "1/8 finału",
+    group: "Faza grupowa",
+  } satisfies Record<OutcomeId, string>,
+  tournament: {
+    groupOpponents: [
+      "Dania",
+      "Szwajcaria",
+      "Serbia",
+      "Austria",
+      "Szkocja",
+      "Turcja",
+    ],
+    knockoutOpponents: [
+      "Francja",
+      "Hiszpania",
+      "Anglia",
+      "Niemcy",
+      "Portugalia",
+      "Włochy",
+      "Holandia",
+    ],
+    wins: ["2:0", "2:1", "1:0"],
+    losses: ["0:1", "1:2", "0:2"],
+    quarterfinalLosses: ["1:1, karne 3:4", "0:1", "1:2"],
+    groupExit: ["1:1", "0:1", "1:2"],
+    groupPoints: (points: number) => `Faza grupowa: ${points} pkt`,
+    match: (score: string, opponent: string) => `Polska ${score} ${opponent}`,
+    round: (name: string, match: string) => `${name}: ${match}`,
+    groupLast: (match: string) => `Ostatni mecz grupy: ${match}`,
+    groupOutcome: "Polska zakończyła udział w turnieju po fazie grupowej.",
+    championOutcome: "Polska została mistrzem Europy.",
+    runnerUpOutcome: "Polska została wicemistrzem Europy.",
+    eliminated: (stage: string) =>
+      `Polska odpadła w ${stage === "Półfinał" ? "półfinale" : stage === "Ćwierćfinał" ? "ćwierćfinale" : "1/8 finału"}.`,
+    rounds: ["1/8 finału", "Ćwierćfinał", "Półfinał", "Finał"],
+    groupStage: "Faza grupowa",
+    championStage: "Mistrz Europy",
+    runnerUpStage: "Wicemistrz Europy",
+    semifinalStage: "Półfinał",
+    quarterfinalStage: "Ćwierćfinał",
+  },
+  luck: {
+    positive: "Kilka kluczowych momentów ułożyło się po Twojej myśli.",
+    negative: "Drobne zdarzenia boiskowe obróciły się przeciwko drużynie.",
+    neutral:
+      "Zespół uzyskał wynik odpowiadający jakości i przygotowaniu kadry.",
+  },
+  reportKpis: { quality: "Jakość", chemistry: "Chemia", roles: "Role" },
+  tournamentProgress: "Przebieg turnieju",
+  lastMatch: "Ostatni mecz:",
+  strengths: "Co zadziałało",
+  weaknesses: "Ryzyka selekcji",
+  yourSquad: "Twoja kadra",
+  noStrengths: "Nie zbudowano wyraźnej przewagi strukturalnej.",
+  noWeaknesses: "Analiza nie wykryła krytycznej luki w konstrukcji kadry.",
+  restart: "Zagraj od początku",
+  simulationDisclaimer:
+    "Symulacja ocenia strukturę decyzji i zawiera kontrolowaną losowość. Nie jest prognozą rzeczywistego wyniku sportowego.",
+  resultReasons: {
+    qualityHigh:
+      "Wysoka jakość indywidualna daje rozwiązania przy zamkniętym meczu.",
+    qualityLow:
+      "Brakuje jakości do samodzielnego rozstrzygania trudnych spotkań.",
+    chemHigh: "Trzon zespołu powinien dobrze reagować na kryzysy w meczu.",
+    chemLow: "Relacje i hierarchia mogą pęknąć pod presją wyniku.",
+    testedHigh: (count: number) =>
+      `${count} powołanych przeszło wcześniejszy test w Twoim systemie.`,
+    testedLow: (count: number) =>
+      `Aż ${count} zawodników jedzie na EURO bez testu w marcowym zgrupowaniu.`,
+    coverageHigh:
+      "Każda kluczowa rola w modelu gry ma co najmniej jednego wykonawcę.",
+    coverageLow:
+      "Nie wszystkie role potrzebne w wybranym systemie zostały pokryte.",
+    fitnessHigh: "Kadra ma dobry poziom dostępności i energii na trzy mecze.",
+    fitnessLow: "Profil zdrowotny kadry może wymusić nieplanowane rotacje.",
+  },
+} as const;

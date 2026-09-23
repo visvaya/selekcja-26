@@ -1,0 +1,200 @@
+import { GAME_RULES } from "../data/constants.ts";
+import { detailedPositionMap, players, systems } from "../data/catalog.ts";
+import type {
+  DetailedPosition,
+  GameState,
+  GroupPosition,
+  Player,
+  SortId,
+} from "../data/types.ts";
+import { experienceScore, groupScore, modelScore } from "./scoring.ts";
+
+export const detailedPositions = (player: Player): DetailedPosition[] =>
+  player.pos === "BR" ? ["BR"] : (detailedPositionMap[player.name] ?? []);
+
+export const positionShort = (player: Player): string =>
+  detailedPositions(player).join(" / ");
+
+const leftFooted = new Set([
+  "Jakub Kiwior",
+  "Sebastian Szymański",
+  "Jakub Moder",
+  "Adam Buksa",
+  "Arkadiusz Reca",
+  "Tymoteusz Puchacz",
+  "Oskar Pietuszewski",
+  "Wojciech Mońka",
+  "Kacper Potulski",
+  "Mateusz Żukowski",
+  "Bartłomiej Wdowik",
+]);
+const twoFooted = new Set([
+  "Piotr Zieliński",
+  "Kacper Kozłowski",
+  "Nicola Zalewski",
+  "Michał Rakoczy",
+]);
+
+export function preferredFoot(player: Player): "both" | "left" | "right" {
+  return twoFooted.has(player.name)
+    ? "both"
+    : leftFooted.has(player.name)
+      ? "left"
+      : "right";
+}
+
+export function selectedPlayers(state: GameState): Player[] {
+  return players.filter((player) => state.selected.has(player.name));
+}
+
+export function groupCounts(state: GameState): Record<GroupPosition, number> {
+  const counts: Record<GroupPosition, number> = {
+    BR: 0,
+    OBR: 0,
+    POM: 0,
+    ATA: 0,
+  };
+  for (const player of selectedPlayers(state)) counts[player.pos] += 1;
+  return counts;
+}
+
+export function detailedCounts(
+  state: GameState,
+): Record<DetailedPosition, number> {
+  const counts = Object.fromEntries(
+    (
+      [
+        "BR",
+        "LO",
+        "LŚO",
+        "ŚO",
+        "PŚO",
+        "PO",
+        "LWO",
+        "DP",
+        "ŚP",
+        "OP",
+        "PWO",
+        "LS",
+        "N",
+        "PS",
+      ] as DetailedPosition[]
+    ).map((position) => [position, 0]),
+  ) as Record<DetailedPosition, number>;
+  for (const player of selectedPlayers(state))
+    for (const position of detailedPositions(player)) counts[position] += 1;
+  return counts;
+}
+
+export function squadLimit(state: GameState): number {
+  return GAME_RULES[state.stage].squadSizePlayers;
+}
+
+export function squadProblems(
+  state: GameState,
+): { group: GroupPosition; count: number; kind: "missing" | "excess" }[] {
+  const requirements = GAME_RULES[state.stage].minimumPlayersByGroup;
+  const counts = groupCounts(state);
+  const issues: {
+    group: GroupPosition;
+    count: number;
+    kind: "missing" | "excess";
+  }[] = [];
+  for (const group of Object.keys(requirements) as GroupPosition[]) {
+    if (counts[group] < requirements[group])
+      issues.push({
+        group,
+        count: requirements[group] - counts[group],
+        kind: "missing",
+      });
+  }
+  if (state.stage === "final" && counts.BR > requirements.BR)
+    issues.push({
+      group: "BR",
+      count: counts.BR - requirements.BR,
+      kind: "excess",
+    });
+  return issues;
+}
+
+export function canFinalize(state: GameState): boolean {
+  return (
+    state.selected.size === squadLimit(state) &&
+    squadProblems(state).length === 0
+  );
+}
+
+export function formationOutsiders(state: GameState): Player[] {
+  const system = systems.find((candidate) => candidate.id === state.system)!;
+  return selectedPlayers(state).filter(
+    (player) =>
+      !detailedPositions(player).some((position) =>
+        system.fits.includes(position),
+      ),
+  );
+}
+
+export function slotCount(
+  state: GameState,
+  position: DetailedPosition,
+): number {
+  const alternatives: DetailedPosition[] =
+    position === "LŚO"
+      ? ["LŚO", "ŚO"]
+      : position === "PŚO"
+        ? ["PŚO", "ŚO"]
+        : [position];
+  return selectedPlayers(state).filter((player) =>
+    detailedPositions(player).some((candidate) =>
+      alternatives.includes(candidate),
+    ),
+  ).length;
+}
+
+export function riskLevel(
+  state: GameState,
+): "none" | "low" | "medium" | "high" {
+  const squad = selectedPlayers(state);
+  if (!squad.length) return "none";
+  const rules = GAME_RULES.risk;
+  const risk =
+    squad.reduce(
+      (total, player) =>
+        total +
+        (GAME_RULES.ratingMaximumPoints - player.fit) +
+        (player.flags ? rules.flagPenaltyPoints : 0),
+      0,
+    ) /
+      squad.length -
+    state.effects.fit;
+  return risk < rules.lowThresholdPoints
+    ? "low"
+    : risk < rules.mediumThresholdPoints
+      ? "medium"
+      : "high";
+}
+
+export function visiblePlayers(state: GameState): Player[] {
+  const query = state.query.trim().toLocaleLowerCase("pl");
+  const matching = players.filter(
+    (player) =>
+      (state.filter === "ALL" ||
+        detailedPositions(player).includes(state.filter)) &&
+      `${player.name} ${player.club} ${detailedPositions(player).join(" ")}`
+        .toLocaleLowerCase("pl")
+        .includes(query),
+  );
+  const comparators: Record<SortId, (left: Player, right: Player) => number> = {
+    model: (left, right) => modelScore(right, state) - modelScore(left, state),
+    quality: (left, right) => right.ov - left.ov,
+    form: (left, right) => right.form - left.form,
+    fitness: (left, right) => right.fit - left.fit,
+    tactics: (left, right) => right.tact - left.tact,
+    experience: (left, right) => experienceScore(right) - experienceScore(left),
+    group: (left, right) => groupScore(right) - groupScore(left),
+    young: (left, right) => left.age - right.age,
+    old: (left, right) => right.age - left.age,
+    name: (left, right) => left.name.localeCompare(right.name, "pl"),
+  };
+  return matching.sort(comparators[state.sort]);
+}
