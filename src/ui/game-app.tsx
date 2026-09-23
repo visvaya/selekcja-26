@@ -13,6 +13,7 @@ import type {
   GameState,
   GroupPosition,
   Player,
+  PlayerId,
   SortId,
 } from "../data/types.ts";
 import { fillSquadRandomly } from "../logic/random-squad.ts";
@@ -32,6 +33,7 @@ import {
   formationOutsiders,
   pendingCampEvent,
   groupCounts,
+  playersByIds,
   positionShort,
   preferredFoot,
   riskLevel,
@@ -44,7 +46,7 @@ import {
 import { UI_TEXT as text } from "./text.ts";
 
 type ModalState =
-  | { kind: "profile"; name: string }
+  | { kind: "profile"; id: PlayerId }
   | { kind: "comparison" }
   | { kind: "outsiders" }
   | { kind: "campReport" }
@@ -84,7 +86,7 @@ async function loadOrResetGame(): Promise<GameState | null> {
 function randomSeed(): number {
   const value = new Uint32Array(1);
   globalThis.crypto?.getRandomValues(value);
-  return value[0] || 2028;
+  return value[0] || APP_CONFIG.fallbackSeed;
 }
 
 function GameDialog({
@@ -155,13 +157,13 @@ function PlayerCard({
 }: {
   player: Player;
   state: GameState;
-  onToggle: (name: string) => void;
-  onProfile: (name: string) => void;
-  onCompare: (name: string) => void;
+  onToggle: (id: PlayerId) => void;
+  onProfile: (id: PlayerId) => void;
+  onCompare: (id: PlayerId) => void;
 }) {
-  const chosen = state.selected.has(player.name);
-  const compared = state.compare.includes(player.name);
-  const trial = state.trial[player.name];
+  const chosen = state.selected.has(player.id);
+  const compared = state.compare.includes(player.id);
+  const trial = state.trial[player.id];
   const impact = trialImpact(player, state);
   const metrics = [
     [text.playerMetrics.quality, player.ov],
@@ -183,10 +185,14 @@ function PlayerCard({
           <div className="tags">
             {player.roles.slice(0, 3).map((role) => (
               <span className="tag" key={role}>
-                {role}
+                {text.roles[role]}
               </span>
             ))}
-            {player.flags && <span className="tag alert">{player.flags}</span>}
+            {player.flag && (
+              <span className="tag alert">
+                {text.availabilityFlags[player.flag]}
+              </span>
+            )}
             {state.stage === "final" && trial && (
               <span className={`tag ${impact < 0 ? "alert" : ""}`}>
                 {text.campResult}: {text.trialNotes[trial.note] ?? trial.note} (
@@ -219,17 +225,17 @@ function PlayerCard({
         <button
           className="select-btn"
           aria-pressed={chosen}
-          onClick={() => onToggle(player.name)}
+          onClick={() => onToggle(player.id)}
         >
           {chosen ? text.selected : text.select}
         </button>
-        <button className="profile-btn" onClick={() => onProfile(player.name)}>
+        <button className="profile-btn" onClick={() => onProfile(player.id)}>
           {text.profile}
         </button>
         <button
           className="compare-btn"
           aria-pressed={compared}
-          onClick={() => onCompare(player.name)}
+          onClick={() => onCompare(player.id)}
         >
           {compared ? text.compared : text.compare}
         </button>
@@ -487,7 +493,7 @@ function ReportScreen({
           <div className="squad-group" key={group}>
             <h3>{text.groups[group]}</h3>
             <div className="squad-list">
-              {report.s
+              {playersByIds(report.squadIds)
                 .filter((player) => player.pos === group)
                 .sort(
                   (left, right) =>
@@ -495,7 +501,7 @@ function ReportScreen({
                     positionOrder[detailedPositions(right)[0]!],
                 )
                 .map((player) => (
-                  <span className="squad-pill" key={player.name}>
+                  <span className="squad-pill" key={player.id}>
                     <b>{positionShort(player)}</b> {player.name}
                   </span>
                 ))}
@@ -556,8 +562,8 @@ export function GameApp() {
     ? { kind: "event" as const, event: pendingEvent }
     : modal;
 
-  function togglePlayer(name: string) {
-    if (!state.selected.has(name) && state.selected.size >= squadLimit(state)) {
+  function togglePlayer(id: PlayerId) {
+    if (!state.selected.has(id) && state.selected.size >= squadLimit(state)) {
       setModal({
         kind: "message",
         title: text.fullSquadTitle,
@@ -565,7 +571,7 @@ export function GameApp() {
       });
       return;
     }
-    dispatch({ type: "togglePlayer", name, limit: squadLimit(state) });
+    dispatch({ type: "togglePlayer", id, limit: squadLimit(state) });
   }
   function autoFill() {
     const result = fillSquadRandomly(state);
@@ -588,9 +594,9 @@ export function GameApp() {
     setModal(null);
     setExpanded(false);
   }
-  function comparePlayer(name: string) {
-    const willCompare = !state.compare.includes(name);
-    dispatch({ type: "toggleCompare", name });
+  function comparePlayer(id: PlayerId) {
+    const willCompare = !state.compare.includes(id);
+    dispatch({ type: "toggleCompare", id });
     if (willCompare) setModal({ kind: "comparison" });
   }
   function finishStage() {
@@ -651,11 +657,11 @@ export function GameApp() {
       );
     if (activeModal.kind === "campReport") {
       const ranked = players
-        .filter((player) => state.campSquad.has(player.name))
+        .filter((player) => state.campSquad.has(player.id))
         .sort(
           (left, right) =>
-            (state.trial[right.name]?.delta ?? 0) -
-            (state.trial[left.name]?.delta ?? 0),
+            (state.trial[right.id]?.delta ?? 0) -
+            (state.trial[left.id]?.delta ?? 0),
         );
       const best = ranked
           .slice(0, 3)
@@ -687,8 +693,8 @@ export function GameApp() {
           {outsiders.map((player) => (
             <button
               className="decision"
-              key={player.name}
-              onClick={() => setModal({ kind: "profile", name: player.name })}
+              key={player.id}
+              onClick={() => setModal({ kind: "profile", id: player.id })}
             >
               <b>{player.name}</b>
               <small>
@@ -704,11 +710,11 @@ export function GameApp() {
     }
     if (activeModal.kind === "profile") {
       const player = players.find(
-        (candidate) => candidate.name === activeModal.name,
+        (candidate) => candidate.id === activeModal.id,
       );
       if (!player) return null;
       const foot = preferredFoot(player),
-        trial = state.trial[player.name],
+        trial = state.trial[player.id],
         impact = trialImpact(player, state);
       const metrics = [
         modelScore(player, state),
@@ -743,10 +749,14 @@ export function GameApp() {
           <div className="tags">
             {player.roles.map((role) => (
               <span className="tag" key={role}>
-                {role}
+                {text.roles[role]}
               </span>
             ))}
-            {player.flags && <span className="tag alert">{player.flags}</span>}
+            {player.flag && (
+              <span className="tag alert">
+                {text.availabilityFlags[player.flag]}
+              </span>
+            )}
             {trial && (
               <span className={`tag ${impact < 0 ? "alert" : ""}`}>
                 {text.campResult}: {text.trialNotes[trial.note] ?? trial.note} •{" "}
@@ -765,9 +775,9 @@ export function GameApp() {
           </div>
           <button
             className="primary start-button"
-            onClick={() => togglePlayer(player.name)}
+            onClick={() => togglePlayer(player.id)}
           >
-            {state.selected.has(player.name)
+            {state.selected.has(player.id)
               ? text.removeFromSquad
               : text.addToSquad}
           </button>
@@ -778,8 +788,8 @@ export function GameApp() {
       );
     }
     if (activeModal.kind === "comparison" && state.compare.length === 2) {
-      const left = players.find((player) => player.name === state.compare[0]),
-        right = players.find((player) => player.name === state.compare[1]);
+      const left = players.find((player) => player.id === state.compare[0]),
+        right = players.find((player) => player.id === state.compare[1]);
       if (!left || !right) return null;
       const rows: [string, number, number][] = [
         [
@@ -800,15 +810,15 @@ export function GameApp() {
           <div className="eyebrow">{text.comparisonEyebrow}</div>
           <div className="compare-grid">
             {[left, right].map((player) => (
-              <div className="compare-card" key={player.name}>
+              <div className="compare-card" key={player.id}>
                 <span className="pos">{positionShort(player)}</span>
                 <h3>{player.name}</h3>
                 <small>{player.club}</small>
                 <button
                   className="select-btn compare-select"
-                  onClick={() => togglePlayer(player.name)}
+                  onClick={() => togglePlayer(player.id)}
                 >
-                  {state.selected.has(player.name)
+                  {state.selected.has(player.id)
                     ? text.removeShort
                     : text.select}
                 </button>
@@ -1062,11 +1072,11 @@ export function GameApp() {
             <div className="players">
               {visiblePlayers(state).map((player) => (
                 <PlayerCard
-                  key={player.name}
+                  key={player.id}
                   player={player}
                   state={state}
                   onToggle={togglePlayer}
-                  onProfile={(name) => setModal({ kind: "profile", name })}
+                  onProfile={(id) => setModal({ kind: "profile", id })}
                   onCompare={comparePlayer}
                 />
               ))}

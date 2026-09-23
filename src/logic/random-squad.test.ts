@@ -31,7 +31,7 @@ test("random selection fills final squad with exactly three goalkeepers", () => 
   assert.ok(canFinalize({ ...state, selected: result.selected }));
   assert.equal(
     players.filter(
-      (player) => player.pos === "BR" && result.selected.has(player.name),
+      (player) => player.pos === "BR" && result.selected.has(player.id),
     ).length,
     3,
   );
@@ -43,7 +43,7 @@ test("random selection rejects impossible proportions without changing state", (
     players
       .filter((player) => player.pos === "OBR")
       .slice(0, 18)
-      .map((player) => player.name),
+      .map((player) => player.id),
   );
   const result = fillSquadRandomly(state);
   assert.deepEqual(result, { ok: false, reason: "insufficientSlots" });

@@ -23,14 +23,14 @@ export function evaluateSquad(state: GameState): Evaluation {
   const squad = selectedPlayers(state);
   if (squad.length === 0) throw new Error("A squad is required for evaluation");
   const testedPlayers = squad.filter((player) =>
-    state.campSquad.has(player.name),
+    state.campSquad.has(player.id),
   ).length;
   const quality =
     squad.reduce((total, player) => total + player.ov, 0) / squad.length;
   const form =
     squad.reduce(
       (total, player) =>
-        total + player.form + (state.trial[player.name]?.delta ?? 0),
+        total + player.form + (state.trial[player.id]?.delta ?? 0),
       0,
     ) / squad.length;
   const fit =

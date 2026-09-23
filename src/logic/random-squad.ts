@@ -25,7 +25,7 @@ export function fillSquadRandomly(state: GameState): RandomSquadResult {
     groups.map((group) => [
       group,
       players.filter(
-        (player) => selected.has(player.name) && player.pos === group,
+        (player) => selected.has(player.id) && player.pos === group,
       ).length,
     ]),
   ) as Record<GroupPosition, number>;
@@ -50,22 +50,22 @@ export function fillSquadRandomly(state: GameState): RandomSquadResult {
     while (counts[group] < rules.minimumPlayersByGroup[group]) {
       const candidate = choose(
         players.filter(
-          (player) => player.pos === group && !selected.has(player.name),
+          (player) => player.pos === group && !selected.has(player.id),
         ),
       );
       if (!candidate) return { ok: false, reason: "candidateShortage" };
-      selected.add(candidate.name);
+      selected.add(candidate.id);
       counts[group] += 1;
     }
   }
   while (selected.size < rules.squadSizePlayers) {
     const candidate = choose(
       players.filter(
-        (player) => player.pos !== "BR" && !selected.has(player.name),
+        (player) => player.pos !== "BR" && !selected.has(player.id),
       ),
     );
     if (!candidate) return { ok: false, reason: "candidateShortage" };
-    selected.add(candidate.name);
+    selected.add(candidate.id);
   }
   return { ok: true, selected, seed };
 }

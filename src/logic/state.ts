@@ -1,11 +1,12 @@
 import { nextRandom } from "./random.ts";
-import { GAME_RULES } from "../data/constants.ts";
+import { APP_CONFIG, GAME_RULES } from "../data/constants.ts";
 import type {
   Effects,
   FinalReport,
   GameState,
   GameSnapshot,
   Player,
+  PlayerId,
   PriorityId,
   SortId,
   SystemId,
@@ -19,10 +20,10 @@ export type GameAction =
   | { type: "setQuery"; value: string }
   | { type: "setSort"; value: SortId }
   | { type: "start" }
-  | { type: "togglePlayer"; name: string; limit: number }
+  | { type: "togglePlayer"; id: PlayerId; limit: number }
   | { type: "autoFill"; selected: Set<string>; seed: number }
   | { type: "undo" }
-  | { type: "toggleCompare"; name: string }
+  | { type: "toggleCompare"; id: PlayerId }
   | { type: "clearCompare" }
   | { type: "resolveEvent"; id: string; effects: Partial<Effects> }
   | { type: "completeCamp"; squad: Player[] }
@@ -30,7 +31,9 @@ export type GameAction =
   | { type: "reset"; seed: number }
   | { type: "hydrate"; state: GameState };
 
-export function createInitialState(seed = 2028): GameState {
+export function createInitialState(
+  seed: number = APP_CONFIG.fallbackSeed,
+): GameState {
   return {
     system: "4231",
     priority: "balance",
@@ -101,10 +104,10 @@ export function reduceGameState(
         : remember(state, { ...state, started: true });
     case "togglePlayer": {
       const selected = new Set(state.selected);
-      if (selected.has(action.name)) selected.delete(action.name);
-      else if (selected.size < action.limit) selected.add(action.name);
+      if (selected.has(action.id)) selected.delete(action.id);
+      else if (selected.size < action.limit) selected.add(action.id);
       return selected.size === state.selected.size &&
-        selected.has(action.name) === state.selected.has(action.name)
+        selected.has(action.id) === state.selected.has(action.id)
         ? state
         : remember(state, { ...state, selected });
     }
@@ -115,9 +118,9 @@ export function reduceGameState(
         seed: action.seed,
       });
     case "toggleCompare": {
-      const compare = state.compare.includes(action.name)
-        ? state.compare.filter((name) => name !== action.name)
-        : [...state.compare.slice(-1), action.name];
+      const compare = state.compare.includes(action.id)
+        ? state.compare.filter((id) => id !== action.id)
+        : [...state.compare.slice(-1), action.id];
       return { ...state, compare };
     }
     case "clearCompare":
@@ -151,7 +154,7 @@ export function reduceGameState(
             ),
           ),
         );
-        trial[player.name] = {
+        trial[player.id] = {
           delta,
           note:
             delta >= rules.impressedThresholdPoints

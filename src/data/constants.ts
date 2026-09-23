@@ -42,7 +42,6 @@ export const GAME_RULES = Object.freeze({
     groupExperienceBonusPoints: 4,
     availabilityInjuryPenaltyPoints: 5,
     availabilityMinutesPenaltyPoints: 4,
-    availabilityOtherPenaltyPoints: 2,
     maximumScorePoints: 99,
     trialImpactMaximumPoints: 2,
     trialImpactMultiplier: 0.4,
@@ -135,9 +134,14 @@ export const GAME_RULES = Object.freeze({
   },
 });
 
-// Application configuration that is not a gameplay rule. See docs/future-scope.md for the
-// remaining literals (storage key, schema version, seed fallback) still to move here.
+// Application configuration that is not a gameplay rule.
 export const APP_CONFIG = Object.freeze({
   // Opening the game with ?reset in the URL discards the saved game and starts fresh.
   saveResetQueryParam: "reset",
+  // Saved games live under this key. Never rename it without a migration of existing saves.
+  storageKey: "selekcja-26-game",
+  // Shape of the saved game. Bump it only together with an explicit migration in src/logic.
+  saveSchemaVersion: 3,
+  // Used when the browser offers no crypto source for a fresh game seed.
+  fallbackSeed: 2028,
 });

@@ -1,4 +1,6 @@
-import type { GameSnapshot, GameState } from "../data/types.ts";
+import { APP_CONFIG } from "../data/constants.ts";
+import type { GameState } from "../data/types.ts";
+import { decodeSave, encodeSave } from "./save-format.ts";
 
 declare global {
   interface Window {
@@ -10,8 +12,7 @@ declare global {
   }
 }
 
-const STORAGE_KEY = "selekcja-26-game";
-const SCHEMA_VERSION = 2;
+const STORAGE_KEY = APP_CONFIG.storageKey;
 let pendingSave: Promise<void> = Promise.resolve();
 
 interface StorageBackend {
@@ -52,49 +53,14 @@ function getBackend(): StorageBackend | null {
 export async function loadGame(): Promise<GameState | null> {
   try {
     const raw = await getBackend()?.load();
-    if (!raw) return null;
-    const saved = JSON.parse(raw);
-    if (![1, SCHEMA_VERSION].includes(saved.schemaVersion) || !saved.state)
-      return null;
-    const state = saved.state;
-    if (
-      !["camp", "final"].includes(state.stage) ||
-      !Array.isArray(state.selected) ||
-      !Array.isArray(state.campSquad) ||
-      !Array.isArray(state.events) ||
-      typeof state.seed !== "number" ||
-      typeof state.system !== "string" ||
-      typeof state.priority !== "string" ||
-      !state.effects ||
-      !state.trial ||
-      !Array.isArray(state.compare)
-    )
-      return null;
-    if (saved.schemaVersion === SCHEMA_VERSION && !Array.isArray(state.history))
-      return null;
-    const history = saved.schemaVersion === 1 ? [] : state.history;
-    if (
-      history.length > 50 ||
-      history.some((snapshot: unknown) => !isSavedSnapshot(snapshot))
-    )
-      return null;
-    return {
-      ...restoreSnapshot(state),
-      history: history.map(restoreSnapshot),
-    };
+    return raw ? decodeSave(raw) : null;
   } catch {
     return null;
   }
 }
 
 export async function saveGame(state: GameState): Promise<void> {
-  const value = JSON.stringify({
-    schemaVersion: SCHEMA_VERSION,
-    state: {
-      ...serializeSnapshot(state),
-      history: state.history.map(serializeSnapshot),
-    },
-  });
+  const value = encodeSave(state);
   pendingSave = pendingSave.then(async () => {
     try {
       await getBackend()?.save(value);
@@ -103,37 +69,6 @@ export async function saveGame(state: GameState): Promise<void> {
     }
   });
   await pendingSave;
-}
-
-function isSavedSnapshot(value: unknown): value is GameSnapshot {
-  if (!value || typeof value !== "object") return false;
-  const snapshot = value as Record<string, unknown>;
-  return (
-    Array.isArray(snapshot.selected) &&
-    Array.isArray(snapshot.campSquad) &&
-    Array.isArray(snapshot.events) &&
-    typeof snapshot.seed === "number" &&
-    ["camp", "final"].includes(String(snapshot.stage))
-  );
-}
-
-function restoreSnapshot(value: GameSnapshot): GameSnapshot {
-  return {
-    ...value,
-    selected: new Set(value.selected),
-    campSquad: new Set(value.campSquad),
-    events: new Set(value.events),
-  };
-}
-
-function serializeSnapshot(value: GameSnapshot) {
-  const { history: _history, ...snapshot } = value as GameState;
-  return {
-    ...snapshot,
-    selected: [...snapshot.selected],
-    campSquad: [...snapshot.campSquad],
-    events: [...snapshot.events],
-  };
 }
 
 export async function clearGame(): Promise<void> {

@@ -25,7 +25,37 @@ export type OutcomeId =
   | "roundOf16"
   | "group";
 
+// Stable English identifiers. Polish labels for roles and flags live in src/ui/text.ts; saves
+// reference players by PlayerId only, so display names can change without a migration.
+export type PlayerId = string;
+export type RoleId =
+  | "aerial"
+  | "ballPlaying"
+  | "ballWinning"
+  | "boxPresence"
+  | "buildUp"
+  | "centreBack"
+  | "dribbling"
+  | "experience"
+  | "leader"
+  | "leftFoot"
+  | "linkUp"
+  | "longShots"
+  | "pace"
+  | "playmaker"
+  | "potential"
+  | "pressing"
+  | "reach"
+  | "reflexes"
+  | "rightBack"
+  | "setPieces"
+  | "striker"
+  | "winger"
+  | "wingBack";
+export type AvailabilityFlagId = "injuryRisk" | "minutesLimit";
+
 export interface Player {
+  id: PlayerId;
   name: string;
   pos: GroupPosition;
   club: string;
@@ -34,14 +64,14 @@ export interface Player {
   fit: number;
   tact: number;
   chem: number;
-  roles: string[];
+  roles: RoleId[];
   age: number;
-  flags: string;
+  flag: AvailabilityFlagId | null;
 }
 
 export interface System {
   id: SystemId;
-  needs: string[];
+  needs: RoleId[];
   shape: DetailedPosition[][];
   fits: DetailedPosition[];
 }
@@ -63,7 +93,7 @@ export interface TournamentStory {
 }
 
 export interface FinalReport {
-  s: Player[];
+  squadIds: PlayerId[];
   quality: number;
   chem: number;
   coverage: number;
@@ -81,15 +111,15 @@ export interface GameState {
   priority: PriorityId;
   stage: Stage;
   started: boolean;
-  selected: Set<string>;
-  campSquad: Set<string>;
-  trial: Record<string, TrialReport>;
+  selected: Set<PlayerId>;
+  campSquad: Set<PlayerId>;
+  trial: Record<PlayerId, TrialReport>;
   filter: "ALL" | DetailedPosition;
   query: string;
   sort: SortId;
   events: Set<string>;
   effects: Effects;
-  compare: string[];
+  compare: PlayerId[];
   seed: number;
   report: FinalReport | null;
   history: GameSnapshot[];

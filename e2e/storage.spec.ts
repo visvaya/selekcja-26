@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 import { players } from "../src/data/catalog.ts";
+import { APP_CONFIG } from "../src/data/constants.ts";
 import { STORAGE_KEY, collectPageErrors, squadCount, text } from "./helpers.ts";
 
 async function seedStorage(page: Page, value: string): Promise<void> {
@@ -60,7 +61,7 @@ test("a version 1 save is migrated without undo history", async ({ page }) => {
         STORAGE_KEY,
       ),
     )
-    .toBe(2);
+    .toBe(APP_CONFIG.saveSchemaVersion);
   await page.reload();
   await expect(squadCount(page)).toHaveText("10/23");
   expect(errors).toEqual([]);

@@ -13,10 +13,10 @@ export function experienceScore(player: Player): number {
           Math.max(0, player.age - rule.experienceYearsStartingAt),
         ) *
           rule.experiencePointsPerYear +
-        (player.roles.includes("Doświadczenie")
+        (player.roles.includes("experience")
           ? rule.experienceRoleBonusPoints
           : 0) +
-        (player.roles.includes("Lider") ? rule.leaderRoleBonusPoints : 0),
+        (player.roles.includes("leader") ? rule.leaderRoleBonusPoints : 0),
     ),
   );
 }
@@ -26,15 +26,15 @@ export function groupScore(player: Player): number {
   return Math.min(
     rule.groupMaximumPoints,
     player.chem +
-      (player.roles.includes("Lider") ? rule.groupLeaderBonusPoints : 0) +
-      (player.roles.includes("Doświadczenie")
+      (player.roles.includes("leader") ? rule.groupLeaderBonusPoints : 0) +
+      (player.roles.includes("experience")
         ? rule.groupExperienceBonusPoints
         : 0),
   );
 }
 
 export function trialImpact(player: Player, state: GameState): number {
-  const report = state.trial[player.name];
+  const report = state.trial[player.id];
   const limit = GAME_RULES.selection.trialImpactMaximumPoints;
   return report
     ? Math.max(
@@ -61,10 +61,10 @@ export function modelScore(player: Player, state: GameState): number {
     const national = Math.min(
       weights.nationalMaximumPoints,
       player.chem +
-        (player.roles.includes("Doświadczenie")
+        (player.roles.includes("experience")
           ? weights.nationalExperienceBonusPoints
           : 0) +
-        (player.roles.includes("Lider")
+        (player.roles.includes("leader")
           ? weights.nationalLeaderBonusPoints
           : 0),
     );
@@ -98,12 +98,11 @@ export function modelScore(player: Player, state: GameState): number {
         player.form * weights.qualityPriorityFormPenaltyWeight;
   }
   const rule = GAME_RULES.selection;
-  base -= player.flags.includes("Ryzyko urazu")
-    ? rule.availabilityInjuryPenaltyPoints
-    : player.flags.includes("Limit minut")
-      ? rule.availabilityMinutesPenaltyPoints
-      : player.flags
-        ? rule.availabilityOtherPenaltyPoints
+  base -=
+    player.flag === "injuryRisk"
+      ? rule.availabilityInjuryPenaltyPoints
+      : player.flag === "minutesLimit"
+        ? rule.availabilityMinutesPenaltyPoints
         : 0;
   if (state.stage === "final") base += trialImpact(player, state);
   return Math.min(rule.maximumScorePoints, Math.round(base));

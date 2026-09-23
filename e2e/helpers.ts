@@ -1,10 +1,11 @@
 import { expect } from "@playwright/test";
 import type { Locator, Page } from "@playwright/test";
+import { APP_CONFIG } from "../src/data/constants.ts";
 import { UI_TEXT as text } from "../src/ui/text.ts";
 
 export { text };
 
-export const STORAGE_KEY = "selekcja-26-game";
+export const STORAGE_KEY = APP_CONFIG.storageKey;
 
 export const CAMP_EVENT_CHOICES = [
   text.events.doctor.choices[0]!.title,

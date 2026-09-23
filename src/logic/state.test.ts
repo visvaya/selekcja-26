@@ -7,14 +7,14 @@ test("selection and comparison do not mutate previous state", () => {
   const initial = createInitialState(15);
   const selected = reduceGameState(initial, {
     type: "togglePlayer",
-    name: "A",
+    id: "A",
     limit: 23,
   });
   assert.equal(initial.selected.size, 0);
   assert.equal(selected.selected.size, 1);
   const compared = reduceGameState(selected, {
     type: "toggleCompare",
-    name: "A",
+    id: "A",
   });
   assert.deepEqual(selected.compare, []);
   assert.deepEqual(compared.compare, ["A"]);
@@ -23,7 +23,7 @@ test("selection and comparison do not mutate previous state", () => {
 test("camp results are reproducible from a seed", () => {
   const state = reduceGameState(createInitialState(42), {
     type: "togglePlayer",
-    name: "A",
+    id: "A",
     limit: 23,
   });
   const action = { type: "completeCamp" as const, squad: [players[0]!] };
@@ -38,7 +38,7 @@ test("undo reverses one decision at a time without tracking search", () => {
   const started = reduceGameState(createInitialState(4), { type: "start" });
   const picked = reduceGameState(started, {
     type: "togglePlayer",
-    name: "A",
+    id: "A",
     limit: 23,
   });
   const searched = reduceGameState(picked, { type: "setQuery", value: "A" });

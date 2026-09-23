@@ -34,7 +34,7 @@ export interface Scenario {
   steps: ScenarioStep[];
 }
 
-const playerKey = (player: { name: string }): string => player.name;
+const playerKey = (player: { id: string }): string => player.id;
 
 function ratings(state: GameState): Record<string, number> {
   return Object.fromEntries(
@@ -107,7 +107,7 @@ function applyStep(
       return {
         state: reduceGameState(state, {
           type: "togglePlayer",
-          name: playerKey(player),
+          id: playerKey(player),
           limit: squadLimit(state),
         }),
       };

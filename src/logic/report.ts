@@ -100,7 +100,7 @@ export function buildFinalReport(
   );
   return {
     report: {
-      s: evaluation.squad,
+      squadIds: evaluation.squad.map((player) => player.id),
       quality: evaluation.quality,
       chem: evaluation.chem,
       coverage: evaluation.coverage,

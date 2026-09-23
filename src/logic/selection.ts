@@ -7,46 +7,47 @@ import type {
   GameState,
   GroupPosition,
   Player,
+  PlayerId,
   SortId,
 } from "../data/types.ts";
 import { experienceScore, groupScore, modelScore } from "./scoring.ts";
 
 export const detailedPositions = (player: Player): DetailedPosition[] =>
-  player.pos === "BR" ? ["BR"] : (detailedPositionMap[player.name] ?? []);
+  player.pos === "BR" ? ["BR"] : (detailedPositionMap[player.id] ?? []);
 
 export const positionShort = (player: Player): string =>
   detailedPositions(player).join(" / ");
 
 const leftFooted = new Set([
-  "Jakub Kiwior",
-  "Sebastian Szymański",
-  "Jakub Moder",
-  "Adam Buksa",
-  "Arkadiusz Reca",
-  "Tymoteusz Puchacz",
-  "Oskar Pietuszewski",
-  "Wojciech Mońka",
-  "Kacper Potulski",
-  "Mateusz Żukowski",
-  "Bartłomiej Wdowik",
+  "jakub-kiwior",
+  "sebastian-szymanski",
+  "jakub-moder",
+  "adam-buksa",
+  "arkadiusz-reca",
+  "tymoteusz-puchacz",
+  "oskar-pietuszewski",
+  "wojciech-monka",
+  "kacper-potulski",
+  "mateusz-zukowski",
+  "bartlomiej-wdowik",
 ]);
 const twoFooted = new Set([
-  "Piotr Zieliński",
-  "Kacper Kozłowski",
-  "Nicola Zalewski",
-  "Michał Rakoczy",
+  "piotr-zielinski",
+  "kacper-kozlowski",
+  "nicola-zalewski",
+  "michal-rakoczy",
 ]);
 
 export function preferredFoot(player: Player): "both" | "left" | "right" {
-  return twoFooted.has(player.name)
+  return twoFooted.has(player.id)
     ? "both"
-    : leftFooted.has(player.name)
+    : leftFooted.has(player.id)
       ? "left"
       : "right";
 }
 
 export function selectedPlayers(state: GameState): Player[] {
-  return players.filter((player) => state.selected.has(player.name));
+  return players.filter((player) => state.selected.has(player.id));
 }
 
 export function groupCounts(state: GameState): Record<GroupPosition, number> {
@@ -164,7 +165,7 @@ export function riskLevel(
       (total, player) =>
         total +
         (GAME_RULES.ratingMaximumPoints - player.fit) +
-        (player.flags ? rules.flagPenaltyPoints : 0),
+        (player.flag ? rules.flagPenaltyPoints : 0),
       0,
     ) /
       squad.length -
@@ -210,4 +211,11 @@ export function pendingCampEvent(state: GameState): CampEvent | undefined {
           state.selected.size >= event.atPlayers && !state.events.has(event.id),
       )
     : undefined;
+}
+
+// Catalogue players for the given IDs in catalogue order. IDs that are no longer in the
+// catalogue are skipped, so a frozen report still renders after a player is removed.
+export function playersByIds(ids: readonly PlayerId[]): Player[] {
+  const wanted = new Set(ids);
+  return players.filter((player) => wanted.has(player.id));
 }
