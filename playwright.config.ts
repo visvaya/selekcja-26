@@ -16,23 +16,33 @@ export default defineConfig({
     locale: "pl-PL",
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
+    // Animations add timing noise; the reduced-motion path is the one under test.
+    contextOptions: { reducedMotion: "reduce" },
   },
   projects: [
     {
       name: "phone",
-      testMatch: /phone|storage/,
+      testMatch: /phone|storage|a11y/,
       use: { ...devices["Pixel 7"], viewport: PHONE_VIEWPORT },
     },
     {
+      // Mobile Safari handles focus, scrolling and sticky elements differently from Chromium.
+      name: "phone-webkit",
+      testMatch: /phone|storage/,
+      use: { ...devices["iPhone 13"], viewport: PHONE_VIEWPORT },
+    },
+    {
       name: "desktop-keyboard",
-      testMatch: /keyboard/,
+      testMatch: /keyboard|a11y/,
       use: { ...devices["Desktop Chrome"] },
     },
   ],
+  // Tests run against the production build, not the dev server, so they cover what ships
+  // and are free of dev-only behavior such as hot-module reloads.
   webServer: {
-    command: `pnpm exec vite --host 127.0.0.1 --port ${PORT} --strictPort`,
+    command: `pnpm build && pnpm exec vite preview --host 127.0.0.1 --port ${PORT} --strictPort`,
     url: `http://127.0.0.1:${PORT}`,
-    reuseExistingServer: !process.env.CI,
-    timeout: 60_000,
+    reuseExistingServer: false,
+    timeout: 120_000,
   },
 });
