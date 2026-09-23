@@ -26,6 +26,9 @@ import {
 import { createInitialState, reduceGameState } from "../logic/state.ts";
 import { clearGame, loadGame, saveGame } from "../logic/storage.ts";
 import type { LoadedSave } from "../logic/save-format.ts";
+import { createLatestRequestTracker } from "../logic/latest-request.ts";
+import { initialSaveStatus, reduceSaveStatus } from "../logic/save-status.ts";
+import { SaveStatusBanner } from "./save-status-banner.tsx";
 import { buildFinalReport } from "../logic/report.ts";
 import {
   canFinalize,
@@ -533,6 +536,22 @@ export function GameApp() {
   const [ready, setReady] = useState(false);
   const [modal, setModal] = useState<ModalState | null>(null);
   const [expanded, setExpanded] = useState(false);
+  const [saveStatus, dispatchSaveStatus] = useReducer(
+    reduceSaveStatus,
+    initialSaveStatus,
+  );
+  // Guards against an older save's result overwriting a newer one when two saves overlap
+  // (e.g. a slow failing save followed quickly by a retry): only the latest request's result
+  // is ever dispatched. Held in a ref so it is created once and stays stable across renders
+  // (a ref, unlike plain render-scope state, is exempt from the exhaustive-deps lint rule).
+  const saveRequestsRef = useRef(createLatestRequestTracker());
+
+  function runSave(nextState: GameState) {
+    const isLatest = saveRequestsRef.current.begin();
+    void saveGame(nextState).then((result) => {
+      if (isLatest()) dispatchSaveStatus({ type: "saveResult", result });
+    });
+  }
 
   useEffect(() => {
     let active = true;
@@ -553,7 +572,7 @@ export function GameApp() {
     };
   }, []);
   useEffect(() => {
-    if (ready) void saveGame(state);
+    if (ready) runSave(state);
   }, [state, ready]);
   useEffect(() => {
     if (ready) window.scrollTo(0, 0);
@@ -600,6 +619,12 @@ export function GameApp() {
       selected: result.selected,
       seed: result.seed,
     });
+  }
+  function retrySave() {
+    runSave(state);
+  }
+  function dismissSaveIssue() {
+    dispatchSaveStatus({ type: "dismiss" });
   }
   function undo() {
     dispatch({ type: "undo" });
@@ -866,6 +891,11 @@ export function GameApp() {
   const currentSystem = text.systems[state.system];
   return (
     <div className="app">
+      <SaveStatusBanner
+        status={saveStatus}
+        onRetry={retrySave}
+        onDismiss={dismissSaveIssue}
+      />
       <header className="topbar">
         <div className="topbar-inner">
           <div className="brand">

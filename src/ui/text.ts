@@ -10,6 +10,7 @@ import type {
   SystemId,
 } from "../data/types.ts";
 import type { EventId } from "../data/events.ts";
+import type { SaveFailureReason } from "../logic/storage.ts";
 
 export const UI_TEXT = {
   brand: "SELEKCJA",
@@ -220,6 +221,18 @@ export const UI_TEXT = {
     "Aby powołać kolejnego zawodnika, najpierw zwolnij jedno miejsce.",
   notice: "Uwaga",
   understood: "Rozumiem",
+  save: {
+    messages: {
+      failed:
+        "Nie udało się zapisać postępu. Ostatnie zmiany mogą przepaść po zamknięciu karty.",
+      quota:
+        "Nie udało się zapisać postępu: w pamięci przeglądarki brakuje miejsca. Zwolnij miejsce i spróbuj ponownie.",
+      unavailable:
+        "Postęp nie jest zapisywany: przeglądarka nie udostępnia pamięci (np. tryb prywatny). Możesz grać dalej, ale po zamknięciu karty gra zacznie się od nowa.",
+    } satisfies Record<SaveFailureReason, string>,
+    retry: "Spróbuj ponownie",
+    recovered: "Postęp zapisany.",
+  },
   comparisonEyebrow: "Analiza porównawcza",
   comparisonTitle: "Dwóch kandydatów, jedno miejsce?",
   clearComparison: "Wyczyść porównanie",

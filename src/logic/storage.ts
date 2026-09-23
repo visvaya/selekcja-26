@@ -16,7 +16,7 @@ declare global {
 const STORAGE_KEY = APP_CONFIG.storageKey;
 let pendingSave: Promise<unknown> = Promise.resolve();
 
-type SaveFailureReason = "unavailable" | "quota" | "failed";
+export type SaveFailureReason = "unavailable" | "quota" | "failed";
 export type SaveResult =
   | { readonly ok: true }
   | { readonly ok: false; readonly reason: SaveFailureReason };
