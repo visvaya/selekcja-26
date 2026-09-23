@@ -6,7 +6,7 @@ import {
   priorities,
   systems,
 } from "../data/catalog.ts";
-import { GAME_RULES } from "../data/constants.ts";
+import { APP_CONFIG, GAME_RULES } from "../data/constants.ts";
 import { EVENTS } from "../data/events.ts";
 import type {
   DetailedPosition,
@@ -25,7 +25,7 @@ import {
   trialImpact,
 } from "../logic/scoring.ts";
 import { createInitialState, reduceGameState } from "../logic/state.ts";
-import { loadGame, saveGame } from "../logic/storage.ts";
+import { clearGame, loadGame, saveGame } from "../logic/storage.ts";
 import { tournamentStory } from "../logic/tournament.ts";
 import {
   canFinalize,
@@ -69,6 +69,18 @@ const filterPositions: ("ALL" | DetailedPosition)[] = [
   "PS",
 ];
 const groupPositions: GroupPosition[] = ["BR", "OBR", "POM", "ATA"];
+
+// A player stuck with a broken save can open the game with ?reset to start over.
+// The parameter is removed only after the save is cleared, so a StrictMode re-run
+// cannot load the old save in between.
+async function loadOrResetGame(): Promise<GameState | null> {
+  const url = new URL(window.location.href);
+  if (!url.searchParams.has(APP_CONFIG.saveResetQueryParam)) return loadGame();
+  await clearGame();
+  url.searchParams.delete(APP_CONFIG.saveResetQueryParam);
+  window.history.replaceState(window.history.state, "", url);
+  return null;
+}
 
 function randomSeed(): number {
   const value = new Uint32Array(1);
@@ -303,7 +315,7 @@ function SquadDock({
     )
     .join(" • ");
   return (
-    <div className="dock">
+    <aside className="dock" aria-label={text.yourSquad}>
       <div
         className={`dock-breakdown ${expanded ? "" : "hidden"}`}
         id="dockBreakdown"
@@ -395,7 +407,7 @@ function SquadDock({
           {text.stages[state.stage].finalize}
         </button>
       </div>
-    </div>
+    </aside>
   );
 }
 
@@ -513,7 +525,7 @@ export function GameApp() {
 
   useEffect(() => {
     let active = true;
-    void loadGame().then((saved) => {
+    void loadOrResetGame().then((saved) => {
       if (active) {
         if (saved) dispatch({ type: "hydrate", state: saved });
         setReady(true);

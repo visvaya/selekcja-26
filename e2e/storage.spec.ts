@@ -75,3 +75,23 @@ test("a corrupt save starts a fresh game", async ({ page }) => {
   ).toBeVisible();
   expect(errors).toEqual([]);
 });
+
+test("?reset discards the saved game and removes the parameter", async ({
+  page,
+}) => {
+  const errors = collectPageErrors(page);
+  await page.goto("/");
+  await page.getByRole("button", { name: text.start }).click();
+  await page.getByRole("button", { name: text.autoFill }).click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await page.goto("/?reset");
+  await expect(
+    page.getByRole("heading", { name: text.introTitle }),
+  ).toBeVisible();
+  await expect(page).toHaveURL(/\/$/);
+  await page.reload();
+  await expect(
+    page.getByRole("heading", { name: text.introTitle }),
+  ).toBeVisible();
+  expect(errors).toEqual([]);
+});
