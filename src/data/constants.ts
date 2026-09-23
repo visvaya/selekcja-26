@@ -134,6 +134,16 @@ export const GAME_RULES = Object.freeze({
   },
 });
 
+// Revision of the game rules, independent of the save schema version and of any player-facing
+// version number. Bump it for every change that alters a result for the same seed and the same
+// decisions: squad limits and quotas, candidates and their ratings, formations and roles, camp
+// events, scoring, outcome bands, the random generator, and the score and opponent lists that
+// the tournament story is drawn from. Other UI copy does not bump it. The golden master
+// (src/logic/golden-master.test.ts) fails when traces change without a bump. A save from another
+// revision keeps only a finished report (frozen, no undo); an unfinished game is discarded with a
+// notice.
+export const RULES_REVISION = 1;
+
 // Application configuration that is not a gameplay rule.
 export const APP_CONFIG = Object.freeze({
   // Opening the game with ?reset in the URL discards the saved game and starts fresh.

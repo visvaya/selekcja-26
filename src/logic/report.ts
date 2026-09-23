@@ -1,4 +1,4 @@
-import { GAME_RULES } from "../data/constants.ts";
+import { GAME_RULES, RULES_REVISION } from "../data/constants.ts";
 import type { FinalReport, GameState, OutcomeId } from "../data/types.ts";
 import { evaluateSquad } from "./results.ts";
 import type { Evaluation } from "./results.ts";
@@ -100,6 +100,7 @@ export function buildFinalReport(
   );
   return {
     report: {
+      rulesRevision: RULES_REVISION,
       squadIds: evaluation.squad.map((player) => player.id),
       quality: evaluation.quality,
       chem: evaluation.chem,

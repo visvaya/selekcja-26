@@ -1,6 +1,7 @@
 import { APP_CONFIG } from "../data/constants.ts";
 import type { GameState } from "../data/types.ts";
 import { decodeSave, encodeSave } from "./save-format.ts";
+import type { LoadedSave } from "./save-format.ts";
 
 declare global {
   interface Window {
@@ -50,13 +51,14 @@ function getBackend(): StorageBackend | null {
   }
 }
 
-export async function loadGame(): Promise<GameState | null> {
+export async function loadGame(): Promise<LoadedSave> {
   try {
     const raw = await getBackend()?.load();
-    return raw ? decodeSave(raw) : null;
+    if (raw) return decodeSave(raw);
   } catch {
-    return null;
+    /* An unreadable backend behaves like an empty one. */
   }
+  return { state: null, discardedForRulesChange: false };
 }
 
 export async function saveGame(state: GameState): Promise<void> {

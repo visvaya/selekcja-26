@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { RULES_REVISION } from "../data/constants.ts";
 import { createInitialState, reduceGameState } from "./state.ts";
 import { loadGame, saveGame } from "./storage.ts";
 
@@ -46,8 +47,9 @@ test("state round-trips through the asynchronous storage adapter", async () => {
     await saveGame(state);
     const saved = JSON.parse(values.get(KEY)!);
     assert.equal(saved.schemaVersion, 3);
+    assert.equal(saved.rulesRevision, RULES_REVISION);
     assert.deepEqual(saved.state.selected, ["robert-lewandowski"]);
-    const restored = await loadGame();
+    const restored = (await loadGame()).state;
     assert.ok(restored?.selected.has("robert-lewandowski"));
     assert.equal(restored?.seed, 8);
     assert.equal(restored?.history.length, 1);
@@ -58,7 +60,7 @@ test("state round-trips through the asynchronous storage adapter", async () => {
 test("a version 1 save with a report migrates names to stable IDs", async () => {
   await withStorage(async (values) => {
     values.set(KEY, V1_REPORT_SAVE);
-    const state = await loadGame();
+    const state = (await loadGame()).state;
     assert.ok(state);
     assert.deepEqual(
       [...state.selected],
@@ -71,6 +73,7 @@ test("a version 1 save with a report migrates names to stable IDs", async () => 
     assert.deepEqual(state.compare, ["robert-lewandowski"]);
     assert.deepEqual(state.history, []);
     assert.deepEqual(state.report, {
+      rulesRevision: 1,
       squadIds: ["lukasz-skorupski", "robert-lewandowski"],
       quality: 80,
       chem: 80,
@@ -94,7 +97,7 @@ test("a version 1 save with a report migrates names to stable IDs", async () => 
 test("a version 2 save keeps its undo history with stable IDs", async () => {
   await withStorage(async (values) => {
     values.set(KEY, V2_FINAL_SAVE);
-    const state = await loadGame();
+    const state = (await loadGame()).state;
     assert.ok(state);
     assert.equal(state.stage, "final");
     assert.equal(state.filter, "LŚO");
@@ -145,7 +148,7 @@ test("unknown or malformed saves start a fresh game", async () => {
     ];
     for (const raw of invalid) {
       values.set(KEY, raw);
-      assert.equal(await loadGame(), null, raw.slice(0, 80));
+      assert.equal((await loadGame()).state, null, raw.slice(0, 80));
     }
     await saveGame(createInitialState(3));
     const valid = JSON.parse(values.get(KEY)!);
@@ -160,7 +163,78 @@ test("unknown or malformed saves start a fresh game", async () => {
     ];
     for (const state of corrupted) {
       values.set(KEY, JSON.stringify({ ...valid, state }));
-      assert.equal(await loadGame(), null, JSON.stringify(state).slice(0, 80));
+      assert.equal(
+        (await loadGame()).state,
+        null,
+        JSON.stringify(state).slice(0, 80),
+      );
+    }
+  });
+});
+
+async function savedWithRevision(
+  values: Map<string, string>,
+  rulesRevision: unknown,
+  finished: boolean,
+) {
+  let state = reduceGameState(createInitialState(5), { type: "start" });
+  if (finished)
+    state = {
+      ...state,
+      stage: "final",
+      report: {
+        rulesRevision: RULES_REVISION + 1,
+        squadIds: ["robert-lewandowski", "retired-player"],
+        quality: 80,
+        chem: 80,
+        coverage: 100,
+        luck: 0,
+        points: 5,
+        stage: "1/8 finału",
+        grade: "B",
+        strengths: [],
+        weak: [],
+        story: { matches: [], outcome: "", last: "", seed: 1 },
+      },
+    };
+  await saveGame(state);
+  const saved = JSON.parse(values.get(KEY)!);
+  values.set(KEY, JSON.stringify({ ...saved, rulesRevision }));
+  return state;
+}
+
+test("an unfinished game from other rules is discarded with a notice", async () => {
+  await withStorage(async (values) => {
+    await savedWithRevision(values, RULES_REVISION + 1, false);
+    assert.deepEqual(await loadGame(), {
+      state: null,
+      discardedForRulesChange: true,
+    });
+  });
+});
+
+test("a finished report from other rules is kept without undo", async () => {
+  await withStorage(async (values) => {
+    const saved = await savedWithRevision(values, RULES_REVISION + 1, true);
+    const loaded = await loadGame();
+    assert.equal(loaded.discardedForRulesChange, false);
+    assert.deepEqual(loaded.state?.report, saved.report);
+    assert.deepEqual(loaded.state?.history, []);
+    await saveGame(loaded.state!);
+    const again = await loadGame();
+    assert.equal(again.state?.report?.rulesRevision, RULES_REVISION + 1);
+    assert.equal(JSON.parse(values.get(KEY)!).rulesRevision, RULES_REVISION);
+  });
+});
+
+test("a version 3 save without a valid rules revision is rejected", async () => {
+  await withStorage(async (values) => {
+    for (const revision of [undefined, "1", 1.5, 0]) {
+      await savedWithRevision(values, revision, false);
+      assert.deepEqual(await loadGame(), {
+        state: null,
+        discardedForRulesChange: false,
+      });
     }
   });
 });

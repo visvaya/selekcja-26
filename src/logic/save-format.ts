@@ -6,7 +6,7 @@ import {
   priorities,
   systems,
 } from "../data/catalog.ts";
-import { APP_CONFIG, GAME_RULES } from "../data/constants.ts";
+import { APP_CONFIG, GAME_RULES, RULES_REVISION } from "../data/constants.ts";
 import { EVENTS } from "../data/events.ts";
 import type {
   GameSnapshot,
@@ -14,7 +14,7 @@ import type {
   SortId,
   FinalReport,
 } from "../data/types.ts";
-import { migrateLegacyState } from "./save-migration.ts";
+import { LEGACY_RULES_REVISION, migrateLegacyState } from "./save-migration.ts";
 
 type RawRecord = Record<string, unknown>;
 
@@ -42,6 +42,8 @@ const isRecord = (value: unknown): value is RawRecord =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 const isNumber = (value: unknown): value is number =>
   typeof value === "number" && Number.isFinite(value);
+const isRevision = (value: unknown): value is number =>
+  Number.isInteger(value) && (value as number) >= 1;
 const isStringArray = (value: unknown): value is string[] =>
   Array.isArray(value) && value.every((item) => typeof item === "string");
 const isPlayerIdArray = (value: unknown): value is string[] =>
@@ -66,6 +68,7 @@ function isReport(value: unknown): value is FinalReport {
   if (!isRecord(value)) return false;
   const story = value.story;
   return (
+    isRevision(value.rulesRevision) &&
     isStringArray(value.squadIds) &&
     ["quality", "chem", "coverage", "luck", "points"].every((key) =>
       isNumber(value[key]),
@@ -130,6 +133,7 @@ function serializeSnapshot(value: GameSnapshot) {
 export function encodeSave(state: GameState): string {
   return JSON.stringify({
     schemaVersion: APP_CONFIG.saveSchemaVersion,
+    rulesRevision: RULES_REVISION,
     state: {
       ...serializeSnapshot(state),
       history: state.history.map(serializeSnapshot),
@@ -137,25 +141,29 @@ export function encodeSave(state: GameState): string {
   });
 }
 
-function upgrade(saved: RawRecord): unknown {
-  if (saved.schemaVersion === 1 || saved.schemaVersion === 2)
-    return migrateLegacyState(saved.state, saved.schemaVersion);
-  return saved.schemaVersion === APP_CONFIG.saveSchemaVersion
-    ? saved.state
-    : null;
+export interface LoadedSave {
+  state: GameState | null;
+  // True when an unfinished game was dropped because it was saved under other rules.
+  discardedForRulesChange: boolean;
 }
 
-export function decodeSave(raw: string): GameState | null {
-  let saved: unknown;
-  try {
-    saved = JSON.parse(raw);
-  } catch {
-    return null;
-  }
-  if (!isRecord(saved)) return null;
-  const state = upgrade(saved);
-  if (!isSnapshot(state) || !isRecord(state)) return null;
-  const history = (state as RawRecord).history;
+const EMPTY: LoadedSave = { state: null, discardedForRulesChange: false };
+
+// Returns the state in the version 3 shape with the rules revision it was saved under.
+function upgrade(saved: RawRecord): { state: unknown; rulesRevision: unknown } {
+  if (saved.schemaVersion === 1 || saved.schemaVersion === 2)
+    return {
+      state: migrateLegacyState(saved.state, saved.schemaVersion),
+      rulesRevision: LEGACY_RULES_REVISION,
+    };
+  return saved.schemaVersion === APP_CONFIG.saveSchemaVersion
+    ? { state: saved.state, rulesRevision: saved.rulesRevision }
+    : { state: null, rulesRevision: null };
+}
+
+function restoreState(state: unknown): GameState | null {
+  if (!isSnapshot(state)) return null;
+  const history = (state as unknown as RawRecord).history;
   if (
     !Array.isArray(history) ||
     history.length > GAME_RULES.undoHistoryLimitActions ||
@@ -166,4 +174,24 @@ export function decodeSave(raw: string): GameState | null {
     ...restoreSnapshot(state),
     history: history.map(restoreSnapshot),
   };
+}
+
+// A save from other rules keeps a finished report as frozen history (no undo, because the
+// snapshots were computed under the old rules); an unfinished game is dropped with a notice.
+export function decodeSave(raw: string): LoadedSave {
+  let saved: unknown;
+  try {
+    saved = JSON.parse(raw);
+  } catch {
+    return EMPTY;
+  }
+  if (!isRecord(saved)) return EMPTY;
+  const upgraded = upgrade(saved);
+  const state = restoreState(upgraded.state);
+  if (!state || !isRevision(upgraded.rulesRevision)) return EMPTY;
+  if (upgraded.rulesRevision === RULES_REVISION)
+    return { state, discardedForRulesChange: false };
+  return state.report
+    ? { state: { ...state, history: [] }, discardedForRulesChange: false }
+    : { state: null, discardedForRulesChange: true };
 }

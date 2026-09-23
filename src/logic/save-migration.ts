@@ -70,6 +70,10 @@ const LEGACY_PLAYER_IDS_BY_NAME: Readonly<Record<string, PlayerId>> =
     "Bartłomiej Wdowik": "bartlomiej-wdowik",
   });
 
+// Versions 1 and 2 carried no rules revision. The rules did not change between the source
+// import and the introduction of RULES_REVISION, so those saves count as revision 1.
+export const LEGACY_RULES_REVISION = 1;
+
 type RawRecord = Record<string, unknown>;
 
 const isRecord = (value: unknown): value is RawRecord =>
@@ -94,6 +98,7 @@ function migrateReport(report: unknown): unknown {
   const { s: squad, ...rest } = report;
   return {
     ...rest,
+    rulesRevision: LEGACY_RULES_REVISION,
     squadIds: squad.map((player) => idFor(isRecord(player) && player.name)),
   };
 }

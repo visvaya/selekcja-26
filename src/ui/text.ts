@@ -371,6 +371,11 @@ export const UI_TEXT = {
   noStrengths: "Nie zbudowano wyraźnej przewagi strukturalnej.",
   noWeaknesses: "Analiza nie wykryła krytycznej luki w konstrukcji kadry.",
   restart: "Zagraj od początku",
+  rulesChangedTitle: "Zmieniły się zasady gry",
+  rulesChangedDiscarded:
+    "Od Twojej ostatniej wizyty zmieniły się zasady gry, więc niedokończonej selekcji nie da się wczytać. Zaczynasz od nowa.",
+  reportFromOlderRules:
+    "Ten raport powstał według wcześniejszej wersji zasad gry. Decyzji z tej selekcji nie można już cofnąć.",
   simulationDisclaimer:
     "Symulacja ocenia strukturę decyzji i zawiera kontrolowaną losowość. Nie jest prognozą rzeczywistego wyniku sportowego.",
   resultReasons: {

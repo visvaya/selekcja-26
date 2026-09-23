@@ -93,6 +93,8 @@ export interface TournamentStory {
 }
 
 export interface FinalReport {
+  // RULES_REVISION the report was computed under; older reports are shown as frozen history.
+  rulesRevision: number;
   squadIds: PlayerId[];
   quality: number;
   chem: number;

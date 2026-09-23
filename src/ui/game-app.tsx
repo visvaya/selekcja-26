@@ -6,7 +6,7 @@ import {
   priorities,
   systems,
 } from "../data/catalog.ts";
-import { APP_CONFIG, GAME_RULES } from "../data/constants.ts";
+import { APP_CONFIG, GAME_RULES, RULES_REVISION } from "../data/constants.ts";
 import type {
   DetailedPosition,
   FinalReport,
@@ -25,6 +25,7 @@ import {
 } from "../logic/scoring.ts";
 import { createInitialState, reduceGameState } from "../logic/state.ts";
 import { clearGame, loadGame, saveGame } from "../logic/storage.ts";
+import type { LoadedSave } from "../logic/save-format.ts";
 import { buildFinalReport } from "../logic/report.ts";
 import {
   canFinalize,
@@ -74,13 +75,13 @@ const groupPositions: GroupPosition[] = ["BR", "OBR", "POM", "ATA"];
 // A player stuck with a broken save can open the game with ?reset to start over.
 // The parameter is removed only after the save is cleared, so a StrictMode re-run
 // cannot load the old save in between.
-async function loadOrResetGame(): Promise<GameState | null> {
+async function loadOrResetGame(): Promise<LoadedSave> {
   const url = new URL(window.location.href);
   if (!url.searchParams.has(APP_CONFIG.saveResetQueryParam)) return loadGame();
   await clearGame();
   url.searchParams.delete(APP_CONFIG.saveResetQueryParam);
   window.history.replaceState(window.history.state, "", url);
-  return null;
+  return { state: null, discardedForRulesChange: false };
 }
 
 function randomSeed(): number {
@@ -418,10 +419,12 @@ function SquadDock({
 
 function ReportScreen({
   report,
+  canUndo,
   onRestart,
   onUndo,
 }: {
   report: FinalReport;
+  canUndo: boolean;
   onRestart: () => void;
   onUndo: () => void;
 }) {
@@ -509,7 +512,10 @@ function ReportScreen({
           </div>
         ))}
       </div>
-      <button className="action-button" onClick={onUndo}>
+      {report.rulesRevision !== RULES_REVISION && (
+        <p className="fineprint">{text.reportFromOlderRules}</p>
+      )}
+      <button className="action-button" disabled={!canUndo} onClick={onUndo}>
         {text.undo}
       </button>
       <button className="primary restart" onClick={onRestart}>
@@ -532,7 +538,13 @@ export function GameApp() {
     let active = true;
     void loadOrResetGame().then((saved) => {
       if (active) {
-        if (saved) dispatch({ type: "hydrate", state: saved });
+        if (saved.state) dispatch({ type: "hydrate", state: saved.state });
+        if (saved.discardedForRulesChange)
+          setModal({
+            kind: "message",
+            title: text.rulesChangedTitle,
+            description: text.rulesChangedDiscarded,
+          });
         setReady(true);
       }
     });
@@ -872,6 +884,7 @@ export function GameApp() {
         {state.report ? (
           <ReportScreen
             report={state.report}
+            canUndo={state.history.length > 0}
             onUndo={undo}
             onRestart={() => {
               dispatch({ type: "reset", seed: randomSeed() });

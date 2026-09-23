@@ -1,8 +1,14 @@
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 import { players } from "../src/data/catalog.ts";
-import { APP_CONFIG } from "../src/data/constants.ts";
-import { STORAGE_KEY, collectPageErrors, squadCount, text } from "./helpers.ts";
+import { APP_CONFIG, RULES_REVISION } from "../src/data/constants.ts";
+import {
+  STORAGE_KEY,
+  collectPageErrors,
+  dialog,
+  squadCount,
+  text,
+} from "./helpers.ts";
 
 async function seedStorage(page: Page, value: string): Promise<void> {
   await page.addInitScript(
@@ -62,8 +68,249 @@ test("a version 1 save is migrated without undo history", async ({ page }) => {
       ),
     )
     .toBe(APP_CONFIG.saveSchemaVersion);
+  const rewritten = await page.evaluate(
+    (key) => JSON.parse(localStorage.getItem(key) ?? "{}"),
+    STORAGE_KEY,
+  );
+  expect(rewritten.rulesRevision).toBe(RULES_REVISION);
+  expect(rewritten.state.selected).toEqual(
+    players.slice(0, 10).map((player) => player.id),
+  );
   await page.reload();
   await expect(squadCount(page)).toHaveText("10/23");
+  expect(errors).toEqual([]);
+});
+
+test("a version 2 save loads into the final stage and rewrites to version 3", async ({
+  page,
+}) => {
+  const errors = collectPageErrors(page);
+  await seedStorage(
+    page,
+    JSON.stringify({
+      schemaVersion: 2,
+      state: {
+        system: "3421",
+        priority: "balance",
+        stage: "final",
+        started: true,
+        selected: ["Jakub Kiwior", "Paweł Wszołek"],
+        campSquad: ["Jakub Kiwior", "Kamil Grosicki"],
+        trial: {
+          "Jakub Kiwior": { delta: 4, note: "impressed" },
+          "Kamil Grosicki": { delta: -3, note: "disappointed" },
+        },
+        filter: "ALL",
+        query: "",
+        sort: "model",
+        events: ["doctor", "captain", "scout"],
+        effects: { chem: 0, fit: 4, quality: 1 },
+        compare: ["Kamil Grosicki", "Jakub Kiwior"],
+        seed: 4242,
+        report: null,
+        history: [
+          {
+            system: "3421",
+            priority: "balance",
+            stage: "camp",
+            started: true,
+            selected: ["Jakub Kiwior", "Kamil Grosicki"],
+            campSquad: [],
+            trial: {},
+            filter: "ALL",
+            query: "",
+            sort: "model",
+            events: ["doctor"],
+            effects: { chem: 0, fit: 4, quality: -1 },
+            compare: [],
+            seed: 4000,
+            report: null,
+          },
+          {
+            system: "3421",
+            priority: "balance",
+            stage: "final",
+            started: true,
+            selected: ["Jakub Kiwior"],
+            campSquad: ["Jakub Kiwior", "Kamil Grosicki"],
+            trial: {
+              "Jakub Kiwior": { delta: 4, note: "impressed" },
+              "Kamil Grosicki": { delta: -3, note: "disappointed" },
+            },
+            filter: "ALL",
+            query: "",
+            sort: "model",
+            events: ["doctor", "captain", "scout"],
+            effects: { chem: 0, fit: 4, quality: 1 },
+            compare: ["Kamil Grosicki"],
+            seed: 4242,
+            report: null,
+          },
+        ],
+      },
+    }),
+  );
+  await page.goto("/");
+
+  await expect(
+    page.getByRole("heading", { name: text.stages.final.heading }),
+  ).toBeVisible();
+  await expect(squadCount(page)).toHaveText("2/26");
+  await expect(page.getByRole("button", { name: text.undo })).toBeEnabled();
+
+  await expect
+    .poll(() =>
+      page.evaluate(
+        (key) => JSON.parse(localStorage.getItem(key) ?? "{}").schemaVersion,
+        STORAGE_KEY,
+      ),
+    )
+    .toBe(3);
+  const saved = await page.evaluate(
+    (key) => JSON.parse(localStorage.getItem(key) ?? "{}"),
+    STORAGE_KEY,
+  );
+  expect(saved.rulesRevision).toBe(RULES_REVISION);
+  expect(saved.state.selected).toEqual(["jakub-kiwior", "pawel-wszolek"]);
+  expect(errors).toEqual([]);
+});
+
+function v3Snapshot(
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+  return {
+    system: "433",
+    priority: "balance",
+    stage: "camp",
+    started: true,
+    selected: ["robert-lewandowski"],
+    campSquad: [],
+    trial: {},
+    filter: "ALL",
+    query: "",
+    sort: "model",
+    events: [],
+    effects: { chem: 0, fit: 0, quality: 0 },
+    compare: [],
+    seed: 111,
+    report: null,
+    ...overrides,
+  };
+}
+
+test("an unfinished version 3 save from other rules is discarded with a notice", async ({
+  page,
+}) => {
+  const errors = collectPageErrors(page);
+  await seedStorage(
+    page,
+    JSON.stringify({
+      schemaVersion: 3,
+      rulesRevision: RULES_REVISION + 1,
+      state: { ...v3Snapshot(), history: [] },
+    }),
+  );
+  await page.goto("/");
+
+  await expect(dialog(page)).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: text.rulesChangedTitle }),
+  ).toBeVisible();
+  await expect(dialog(page)).toContainText(text.rulesChangedDiscarded);
+  await page.getByRole("button", { name: text.understood }).click();
+  await expect(dialog(page)).toBeHidden();
+  await expect(
+    page.getByRole("heading", { name: text.introTitle }),
+  ).toBeVisible();
+
+  await expect
+    .poll(() =>
+      page.evaluate(
+        (key) => JSON.parse(localStorage.getItem(key) ?? "{}").rulesRevision,
+        STORAGE_KEY,
+      ),
+    )
+    .toBe(RULES_REVISION);
+  const saved = await page.evaluate(
+    (key) => JSON.parse(localStorage.getItem(key) ?? "{}"),
+    STORAGE_KEY,
+  );
+  expect(saved.state.selected).toEqual([]);
+  expect(errors).toEqual([]);
+});
+
+test("a finished version 3 report from other rules is shown frozen with the older-rules note", async ({
+  page,
+}) => {
+  const errors = collectPageErrors(page);
+  const squadIds = [
+    "lukasz-skorupski",
+    "jakub-kiwior",
+    "piotr-zielinski",
+    "robert-lewandowski",
+  ];
+  await seedStorage(
+    page,
+    JSON.stringify({
+      schemaVersion: 3,
+      rulesRevision: RULES_REVISION + 1,
+      state: {
+        ...v3Snapshot({
+          stage: "final",
+          report: {
+            rulesRevision: RULES_REVISION + 1,
+            squadIds,
+            quality: 80,
+            chem: 78,
+            coverage: 92,
+            luck: 0,
+            points: 5,
+            stage: text.outcomes.roundOf16,
+            grade: "B",
+            strengths: [],
+            weak: [],
+            story: {
+              matches: [`${text.tournament.rounds[0]}: 5 pkt`],
+              outcome: "Polska odpadła w 1/8 finału.",
+              last: "Polska 0:1 Dania",
+              seed: 9,
+            },
+          },
+        }),
+        history: [],
+      },
+    }),
+  );
+  await page.goto("/");
+
+  await expect(
+    page.getByRole("heading", { name: text.outcomes.roundOf16 }),
+  ).toBeVisible();
+  await expect(page.locator(".fineprint").first()).toContainText(
+    text.reportFromOlderRules,
+  );
+  await expect(page.getByRole("button", { name: text.undo })).toBeDisabled();
+  for (const name of [
+    "Łukasz Skorupski",
+    "Jakub Kiwior",
+    "Piotr Zieliński",
+    "Robert Lewandowski",
+  ]) {
+    await expect(page.locator(".squad-list")).toContainText(name);
+  }
+
+  await page.reload();
+  await expect(
+    page.getByRole("heading", { name: text.outcomes.roundOf16 }),
+  ).toBeVisible();
+  await expect(page.locator(".fineprint").first()).toContainText(
+    text.reportFromOlderRules,
+  );
+
+  await page.getByRole("button", { name: text.restart }).click();
+  await expect(
+    page.getByRole("heading", { name: text.introTitle }),
+  ).toBeVisible();
   expect(errors).toEqual([]);
 });
 
