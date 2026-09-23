@@ -1,26 +1,47 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { RULES_REVISION } from "../data/constants.ts";
+import { encodeSave } from "./save-format.ts";
 import { createInitialState, reduceGameState } from "./state.ts";
-import { loadGame, saveGame } from "./storage.ts";
+import { clearGame, loadGame, saveGame } from "./storage.ts";
 
 const KEY = "selekcja-26-game";
 
-// Runs the body with a Map-backed localStorage installed on a fake window.
+interface PrimaryStub {
+  get: (key: string) => Promise<{ value: string } | null>;
+  set: (key: string, value: string) => Promise<unknown>;
+  delete?: (key: string) => Promise<unknown>;
+}
+
+interface WindowStub {
+  localStorage: {
+    getItem: (key: string) => string | null;
+    setItem: (key: string, value: string) => void;
+    removeItem: (key: string) => void;
+  };
+  storage?: PrimaryStub;
+}
+
+// Runs the body with a Map-backed localStorage installed on a fake window. An optional
+// `configure` callback can replace `localStorage` methods (e.g. to make `setItem` throw) or
+// install a fake `window.storage` primary backend before the body runs.
 async function withStorage(
   body: (values: Map<string, string>) => Promise<void>,
+  configure?: (stub: WindowStub, values: Map<string, string>) => void,
 ): Promise<void> {
   const values = new Map<string, string>();
+  const stub: WindowStub = {
+    localStorage: {
+      getItem: (key: string) => values.get(key) ?? null,
+      setItem: (key: string, value: string) => values.set(key, value),
+      removeItem: (key: string) => values.delete(key),
+    },
+  };
+  configure?.(stub, values);
   const previousWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
   Object.defineProperty(globalThis, "window", {
     configurable: true,
-    value: {
-      localStorage: {
-        getItem: (key: string) => values.get(key) ?? null,
-        setItem: (key: string, value: string) => values.set(key, value),
-        removeItem: (key: string) => values.delete(key),
-      },
-    },
+    value: stub,
   });
   try {
     await body(values);
@@ -29,6 +50,21 @@ async function withStorage(
       Object.defineProperty(globalThis, "window", previousWindow);
     else Reflect.deleteProperty(globalThis, "window");
   }
+}
+
+// A real DOMException, matching what browsers throw from setItem when storage is full.
+function quotaError(): DOMException {
+  return new DOMException("quota exceeded", "QuotaExceededError");
+}
+
+// Builds a primary backend stub with a mutable in-memory value and a `set` that always throws.
+function makeFailingPrimary(error: unknown): PrimaryStub {
+  return {
+    get: async () => null,
+    set: async () => {
+      throw error;
+    },
+  };
 }
 
 // Literal saves written by earlier versions of the game. They are inline JSON on purpose:
@@ -238,3 +274,218 @@ test("a version 3 save without a valid rules revision is rejected", async () => 
     }
   });
 });
+
+test("saveGame reports unavailable when neither backend can be used", async () => {
+  await withStorage(
+    async () => {
+      const result = await saveGame(createInitialState(1));
+      assert.deepEqual(result, { ok: false, reason: "unavailable" });
+    },
+    (stub) => {
+      stub.localStorage.setItem = () => {
+        throw new Error("no storage in this browser");
+      };
+    },
+  );
+});
+
+test("a localStorage quota error is reported as quota", async () => {
+  await withStorage(async (values) => {
+    const result = await saveGame(createInitialState(2));
+    assert.deepEqual(result, { ok: false, reason: "quota" });
+    assert.equal(values.has(KEY), false);
+  }, addFailingLocalWrite(quotaError()));
+});
+
+test("a generic localStorage error is reported as failed", async () => {
+  await withStorage(
+    async () => {
+      const result = await saveGame(createInitialState(3));
+      assert.deepEqual(result, { ok: false, reason: "failed" });
+    },
+    addFailingLocalWrite(new Error("disk error")),
+  );
+});
+
+test("a later successful save after a failure recovers with the latest state", async () => {
+  let shouldFail = true;
+  await withStorage(
+    async (values) => {
+      const failing = await saveGame(createInitialState(4));
+      assert.deepEqual(failing, { ok: false, reason: "quota" });
+
+      shouldFail = false;
+      const recovered = reduceGameState(createInitialState(4), {
+        type: "togglePlayer",
+        id: "robert-lewandowski",
+        limit: 23,
+      });
+      const success = await saveGame(recovered);
+      assert.deepEqual(success, { ok: true });
+      const saved = JSON.parse(values.get(KEY)!);
+      assert.deepEqual(saved.state.selected, ["robert-lewandowski"]);
+    },
+    addFailingLocalWrite(quotaError(), () => shouldFail),
+  );
+});
+
+test("a rejecting primary falls back to localStorage and loadGame reads the fallback", async () => {
+  await withStorage(
+    async (values) => {
+      const state = createInitialState(5);
+      const result = await saveGame(state);
+      assert.deepEqual(result, { ok: true });
+      assert.ok(values.has(KEY));
+      const loaded = await loadGame();
+      assert.equal(loaded.state?.seed, 5);
+    },
+    (stub) => {
+      stub.storage = makeFailingPrimary(new Error("primary unreachable"));
+    },
+  );
+});
+
+test("a later successful primary save clears the local fallback and loadGame reads primary", async () => {
+  await withStorage(
+    async (values) => {
+      let primaryValue: string | null = null;
+      let primaryFails = true;
+      const storage: PrimaryStub = {
+        get: async () => (primaryValue ? { value: primaryValue } : null),
+        set: async (_key, value) => {
+          if (primaryFails) throw new Error("primary unreachable");
+          primaryValue = value;
+        },
+      };
+      // Reinstall so the closure above is used by getPrimaryBackend on every call.
+      (globalThis as { window: WindowStub }).window.storage = storage;
+
+      const fallback = await saveGame(createInitialState(6));
+      assert.deepEqual(fallback, { ok: true });
+      assert.ok(values.has(KEY));
+
+      primaryFails = false;
+      const recovered = await saveGame(createInitialState(7));
+      assert.deepEqual(recovered, { ok: true });
+      assert.equal(values.has(KEY), false);
+
+      const loaded = await loadGame();
+      assert.equal(loaded.state?.seed, 7);
+    },
+    (stub) => {
+      stub.storage = makeFailingPrimary(new Error("placeholder"));
+    },
+  );
+});
+
+test("a rejecting primary with no localStorage reports failed", async () => {
+  await withStorage(
+    async () => {
+      const result = await saveGame(createInitialState(8));
+      assert.deepEqual(result, { ok: false, reason: "failed" });
+    },
+    (stub) => {
+      stub.storage = makeFailingPrimary(new Error("primary unreachable"));
+      stub.localStorage.setItem = () => {
+        throw new Error("no local storage either");
+      };
+    },
+  );
+});
+
+test("clearGame removes the key from both the primary and the local backend", async () => {
+  await withStorage(
+    async (values) => {
+      values.set(KEY, "local-copy");
+      let primaryDeleted = false;
+      (globalThis as { window: WindowStub }).window.storage = {
+        get: async () => ({ value: "primary-copy" }),
+        set: async () => undefined,
+        delete: async () => {
+          primaryDeleted = true;
+        },
+      };
+      await clearGame();
+      assert.equal(values.has(KEY), false);
+      assert.equal(primaryDeleted, true);
+    },
+    (stub) => {
+      stub.storage = { get: async () => null, set: async () => undefined };
+    },
+  );
+});
+
+test("two concurrent saves resolve in call order with their own results", async () => {
+  await withStorage(async (values) => {
+    const first = saveGame(createInitialState(9));
+    const second = saveGame(createInitialState(10));
+    const [firstResult, secondResult] = await Promise.all([first, second]);
+    assert.deepEqual(firstResult, { ok: true });
+    assert.deepEqual(secondResult, { ok: true });
+    const saved = JSON.parse(values.get(KEY)!);
+    assert.equal(saved.state.seed, 10);
+  });
+});
+
+test("a save whose backend detection throws is reported as failed without poisoning later saves", async () => {
+  await withStorage(async () => {
+    let shouldThrow = true;
+    // A `window.storage` accessor that throws synchronously, as a permission-revoked or
+    // sandboxed host integration might, before getPrimaryBackend can even read its methods.
+    Object.defineProperty(
+      (globalThis as { window: WindowStub }).window,
+      "storage",
+      {
+        configurable: true,
+        get(): PrimaryStub | undefined {
+          if (shouldThrow) throw new Error("storage accessor exploded");
+          return undefined;
+        },
+      },
+    );
+
+    const failing = await saveGame(createInitialState(11));
+    assert.deepEqual(failing, { ok: false, reason: "failed" });
+
+    shouldThrow = false;
+    const recovered = await saveGame(createInitialState(12));
+    assert.deepEqual(recovered, { ok: true });
+  });
+});
+
+test("loadGame falls back to primary when the local copy fails to read", async () => {
+  const state = createInitialState(13);
+  const raw = encodeSave(state);
+  await withStorage(
+    async () => {
+      // Simulates a browser that blocks localStorage reads while still allowing the
+      // availability probe's write/remove and the primary backend's own reads.
+      (globalThis as { window: WindowStub }).window.localStorage.getItem =
+        () => {
+          throw new Error("local read blocked");
+        };
+      const loaded = await loadGame();
+      assert.equal(loaded.state?.seed, 13);
+    },
+    (stub) => {
+      stub.storage = {
+        get: async () => ({ value: raw }),
+        set: async () => undefined,
+      };
+    },
+  );
+});
+
+// Installs a localStorage whose setItem throws for the game key (but not the availability
+// probe key) while `active` returns true, so tests can toggle failure on and off.
+function addFailingLocalWrite(
+  error: unknown,
+  active: () => boolean = () => true,
+) {
+  return (stub: WindowStub, values: Map<string, string>) => {
+    stub.localStorage.setItem = (key: string, value: string) => {
+      if (key === KEY && active()) throw error;
+      values.set(key, value);
+    };
+  };
+}
