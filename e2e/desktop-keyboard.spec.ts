@@ -5,6 +5,7 @@ import {
   dialog,
   dockToggle,
   expectCoherentReport,
+  expectFocusVisible,
   finalizeButton,
   squadCount,
   text,
@@ -69,6 +70,7 @@ test("desktop game is playable with the keyboard alone", async ({ page }) => {
   await expect(page.locator(".game-head .eyebrow")).toContainText(
     text.systems["433"].name,
   );
+  await expectFocusVisible(page, "start -> camp");
 
   // Profile dialog: focus moves in, Tab is trapped, Escape closes and restores focus.
   const profile = page.getByRole("button", { name: text.profile }).first();
@@ -76,6 +78,7 @@ test("desktop game is playable with the keyboard alone", async ({ page }) => {
   await expect(dialog(page)).toBeVisible();
   const dialogButtons = dialog(page).getByRole("button");
   await expect(dialogButtons.first()).toBeFocused();
+  await expectFocusVisible(page, "profile dialog open");
   const buttonCount = await dialogButtons.count();
   for (let step = 0; step < buttonCount; step++)
     await page.keyboard.press("Tab");
@@ -85,12 +88,14 @@ test("desktop game is playable with the keyboard alone", async ({ page }) => {
   await page.keyboard.press("Escape");
   await expect(dialog(page)).toBeHidden();
   await expect(profile).toBeFocused();
+  await expectFocusVisible(page, "profile dialog close");
 
   // Comparison of two candidates, then clearing it from the dialog.
   const compareButtons = page.locator(".compare-btn");
   await activate(page, compareButtons.nth(0));
   await activate(page, compareButtons.nth(1));
   await expect(dialog(page)).toHaveAccessibleName(text.comparisonTitle);
+  await expectFocusVisible(page, "comparison dialog open");
   const clear = dialog(page).getByRole("button", {
     name: text.clearComparison,
   });
@@ -100,6 +105,7 @@ test("desktop game is playable with the keyboard alone", async ({ page }) => {
   await expect(page.locator('.compare-btn[aria-pressed="true"]')).toHaveCount(
     0,
   );
+  await expectFocusVisible(page, "comparison dialog close");
 
   // Position filter and search.
   const leftBack = page.getByRole("button", { name: "LO (0)" });
@@ -118,6 +124,8 @@ test("desktop game is playable with the keyboard alone", async ({ page }) => {
 
   // Event dialogs are blocking: Escape does not dismiss them.
   await activate(page, page.getByRole("button", { name: text.autoFill }));
+  await expect(dialog(page)).toBeVisible();
+  await expectFocusVisible(page, "random fill dialog open");
   for (const event of Object.values(text.events)) {
     await expect(dialog(page)).toHaveAccessibleName(event.title);
     await page.keyboard.press("Escape");
@@ -127,10 +135,12 @@ test("desktop game is playable with the keyboard alone", async ({ page }) => {
         name: new RegExp(event.choices[0]!.title),
       }),
     ).toBeFocused();
+    await expectFocusVisible(page, `event dialog open (${event.title})`);
     await page.keyboard.press("Enter");
   }
   await expect(dialog(page)).toBeHidden();
   await expect(squadCount(page)).toHaveText("23/23");
+  await expectFocusVisible(page, "event dialogs closed");
 
   await activate(page, dockToggle(page));
   await expect(dockToggle(page)).toHaveAttribute("aria-expanded", "true");
@@ -142,10 +152,12 @@ test("desktop game is playable with the keyboard alone", async ({ page }) => {
   await expect(
     dialog(page).getByRole("button", { name: text.continueToFinal }),
   ).toBeFocused();
+  await expectFocusVisible(page, "camp report dialog open");
   await page.keyboard.press("Enter");
   await expect(
     page.getByRole("heading", { name: text.stages.final.heading }),
   ).toBeVisible();
+  await expectFocusVisible(page, "camp -> final");
 
   await activate(page, page.getByRole("button", { name: text.autoFill }));
   await expect(squadCount(page)).toHaveText("26/26");
@@ -153,12 +165,14 @@ test("desktop game is playable with the keyboard alone", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: text.tournamentProgress }),
   ).toBeVisible();
+  await expectFocusVisible(page, "final -> tournament report");
   await expectCoherentReport(page);
 
   await activate(page, page.getByRole("button", { name: text.restart }));
   await expect(
     page.getByRole("heading", { name: text.introTitle }),
   ).toBeVisible();
+  await expectFocusVisible(page, "restart");
 
   expect(errors).toEqual([]);
 });

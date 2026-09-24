@@ -197,6 +197,58 @@ export function dockToggle(page: Page): Locator {
   return page.locator(".dock .dock-copy");
 }
 
+// Asserts the focus invariant that must hold after every screen transition: focus is never
+// lost to the body (or nowhere at all), and the focused element's centre point is not covered
+// by the sticky top bar/save banner or the fixed bottom dock, and is inside the viewport.
+// Uses elementFromPoint on the element's own centre rather than bounding-box overlap, so an
+// element that is merely adjacent to an overlay (not actually covered by it) still passes.
+export async function expectFocusVisible(
+  page: Page,
+  state: string,
+): Promise<void> {
+  const result = await page.evaluate(() => {
+    function describe(element: Element | null): string {
+      if (!element) return "(none)";
+      const tag = element.tagName.toLowerCase();
+      const className =
+        element instanceof HTMLElement && element.className
+          ? `.${element.className.toString().trim().split(/\s+/).join(".")}`
+          : "";
+      const label = (element.textContent ?? "").trim().slice(0, 60);
+      return `<${tag}${className}> "${label}"`;
+    }
+    const active = document.activeElement;
+    if (!active || active === document.body)
+      return {
+        ok: false,
+        message: "focus was lost (document.activeElement is body or null)",
+      };
+    const rect = active.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const inViewport =
+      centerX >= 0 &&
+      centerY >= 0 &&
+      centerX <= window.innerWidth &&
+      centerY <= window.innerHeight;
+    if (!inViewport)
+      return {
+        ok: false,
+        message: `focused element ${describe(active)} is outside the viewport (not scrolled into view)`,
+      };
+    const atCenter = document.elementFromPoint(centerX, centerY);
+    const visible =
+      atCenter !== null && (atCenter === active || active.contains(atCenter));
+    if (!visible)
+      return {
+        ok: false,
+        message: `focused element ${describe(active)} is covered by ${describe(atCenter)}`,
+      };
+    return { ok: true, message: "" };
+  });
+  expect(result.ok, `${state}: ${result.message}`).toBe(true);
+}
+
 export async function expectNoHorizontalScroll(page: Page): Promise<void> {
   const overflow = await page.evaluate(
     () =>

@@ -5,6 +5,7 @@ import {
   dialog,
   dockToggle,
   expectCoherentReport,
+  expectFocusVisible,
   expectNoHorizontalScroll,
   finalizeButton,
   readReport,
@@ -34,22 +35,29 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
   ).toBeVisible();
   await expect(squadCount(page)).toHaveText("0/23");
   await expectNoHorizontalScroll(page);
+  await expectFocusVisible(page, "start -> camp");
 
   // A random fill crosses every event threshold; undo inside the blocking
   // event dialog reverts the whole fill as one step.
   await page.getByRole("button", { name: text.autoFill }).tap();
   await expect(dialog(page)).toHaveAccessibleName(text.events.doctor.title);
+  await expectFocusVisible(page, "random fill dialog open");
   await dialog(page).getByRole("button", { name: text.undo }).tap();
   await expect(dialog(page)).toBeHidden();
   await expect(squadCount(page)).toHaveText("0/23");
+  await expectFocusVisible(page, "random fill dialog undo (closed)");
 
   await page.getByRole("button", { name: text.autoFill }).tap();
-  for (const choice of CAMP_EVENT_CHOICES)
+  for (const choice of CAMP_EVENT_CHOICES) {
+    await expect(dialog(page)).toBeVisible();
+    await expectFocusVisible(page, `event dialog open (${choice})`);
     await dialog(page)
       .getByRole("button", { name: new RegExp(choice) })
       .tap();
+  }
   await expect(dialog(page)).toBeHidden();
   await expect(squadCount(page)).toHaveText("23/23");
+  await expectFocusVisible(page, "event dialogs closed");
 
   // The dock stays reachable at the bottom of a long list.
   await page.evaluate(() =>
@@ -67,8 +75,10 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
   if (await outsiders.isVisible()) {
     await outsiders.tap();
     await expect(dialog(page)).toBeVisible();
+    await expectFocusVisible(page, "outsiders dialog open");
     await dialog(page).getByRole("button", { name: text.returnToPitch }).tap();
     await expect(dialog(page)).toBeHidden();
+    await expectFocusVisible(page, "outsiders dialog close");
   }
   await dockToggle(page).tap();
   await expect(dockToggle(page)).toHaveAttribute("aria-expanded", "false");
@@ -85,6 +95,7 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
 
   await finalizeButton(page).tap();
   await expect(dialog(page)).toHaveAccessibleName(text.campReportTitle);
+  await expectFocusVisible(page, "camp report dialog open");
   await dialog(page).getByRole("button", { name: text.continueToFinal }).tap();
   await expect(
     page.getByRole("heading", { name: text.stages.final.heading }),
@@ -93,6 +104,7 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
   await expect(
     page.locator(".tag", { hasText: text.campResult }).first(),
   ).toBeVisible();
+  await expectFocusVisible(page, "camp -> final");
 
   await page.getByRole("button", { name: text.autoFill }).tap();
   await expect(squadCount(page)).toHaveText("26/26");
@@ -102,6 +114,7 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
   await expect(
     page.getByRole("heading", { name: text.tournamentProgress }),
   ).toBeVisible();
+  await expectFocusVisible(page, "final -> tournament report");
   await expectCoherentReport(page);
   await expectNoHorizontalScroll(page);
   const report = await readReport(page);
@@ -117,6 +130,7 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
     page.getByRole("heading", { name: text.stages.final.heading }),
   ).toBeVisible();
   await expect(squadCount(page)).toHaveText("26/26");
+  await expectFocusVisible(page, "undo (tournament report -> final)");
   await finalizeButton(page).tap();
   expect(await readReport(page)).toEqual(report);
 
@@ -125,6 +139,7 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
     page.getByRole("heading", { name: text.introTitle }),
   ).toBeVisible();
   await expect(page.getByRole("button", { name: text.undo })).toHaveCount(0);
+  await expectFocusVisible(page, "restart");
   await page.reload();
   await expect(
     page.getByRole("heading", { name: text.introTitle }),
