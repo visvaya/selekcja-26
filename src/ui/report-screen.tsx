@@ -7,7 +7,7 @@ import {
   playersByIds,
   positionShort,
 } from "../logic/selection.ts";
-import { groupPositions } from "./squad-dock.tsx";
+import { groupPositions } from "./group-order.ts";
 import { UI_TEXT as text } from "./text.ts";
 
 export function ReportScreen({

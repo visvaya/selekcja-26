@@ -8,10 +8,10 @@ const GLOBAL_KEYS = [
   "Node",
 ] as const;
 
-// Shared by game-app.test.ts and save-status-banner.test.ts: installs a fresh JSDOM window as
-// the global `window`/`document`/etc. for the duration of `body`, then restores whatever was
-// there before and closes the JSDOM window. Vite server creation/closing and
-// @testing-library/react's `cleanup()` stay with each caller, since those differ per test.
+// Installs a fresh JSDOM window as the global `window`/`document`/etc. for the duration of
+// `body`, then restores whatever was there before and closes the JSDOM window. Vite server
+// creation/closing and @testing-library/react's `cleanup()` stay with each caller, since those
+// differ per test.
 export async function withJsdomWindow<T>(
   body: (dom: JSDOM) => Promise<T>,
 ): Promise<T> {

@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { GAME_RULES } from "../data/constants.ts";
-import type { GameState, GroupPosition } from "../data/types.ts";
+import type { GameState } from "../data/types.ts";
 import {
   canFinalize,
   formationOutsiders,
@@ -9,10 +9,9 @@ import {
   squadLimit,
   squadProblems,
 } from "../logic/selection.ts";
+import { groupPositions } from "./group-order.ts";
 import { Pitch } from "./pitch.tsx";
 import { UI_TEXT as text } from "./text.ts";
-
-export const groupPositions: GroupPosition[] = ["BR", "OBR", "POM", "ATA"];
 
 export function SquadDock({
   state,
