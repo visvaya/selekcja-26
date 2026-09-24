@@ -1,5 +1,5 @@
-import { useEffect, useReducer, useRef, useState } from "react";
-import type { CSSProperties, ReactNode } from "react";
+import { useCallback, useEffect, useReducer, useRef, useState } from "react";
+import type { CSSProperties, ReactNode, RefObject } from "react";
 import {
   players,
   positionOrder,
@@ -100,21 +100,40 @@ function GameDialog({
   children,
   onClose,
   blocking = false,
+  restoreFocusFallback,
 }: {
   title: string;
   children: ReactNode;
   onClose: () => void;
   blocking?: boolean;
+  // Called on close when the element that opened the dialog is no longer in the
+  // document (e.g. it belonged to a screen that was replaced while the dialog was
+  // open), so focus does not fall back to the body.
+  restoreFocusFallback?: () => void;
 }) {
   const dialogRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
+    // On some browsers a tap that opens the dialog never focuses the tapped button (a
+    // touch-input default, not something this app controls), leaving document.body as the
+    // active element. Treat that the same as "nothing to restore" rather than trying to
+    // focus the body back, which would silently drop focus on close.
     const previouslyFocused =
-      document.activeElement instanceof HTMLElement
+      document.activeElement instanceof HTMLElement &&
+      document.activeElement !== document.body
         ? document.activeElement
         : null;
     dialogRef.current?.querySelector<HTMLButtonElement>("button")?.focus();
-    return () => previouslyFocused?.focus();
-  }, [title]);
+    return () => {
+      // The opener can still be in the document but no longer focusable (e.g. the finalize
+      // button is disabled once the next screen starts empty), so a failed focus() call must
+      // also fall through to the fallback rather than leaving focus on the body.
+      if (previouslyFocused && document.contains(previouslyFocused)) {
+        previouslyFocused.focus();
+        if (document.activeElement === previouslyFocused) return;
+      }
+      restoreFocusFallback?.();
+    };
+  }, [title, restoreFocusFallback]);
   function onKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
     if (event.key === "Escape" && !blocking) {
       event.preventDefault();
@@ -427,11 +446,13 @@ function ReportScreen({
   canUndo,
   onRestart,
   onUndo,
+  headingRef,
 }: {
   report: FinalReport;
   canUndo: boolean;
   onRestart: () => void;
   onUndo: () => void;
+  headingRef: RefObject<HTMLHeadingElement | null>;
 }) {
   const effect =
     report.luck > GAME_RULES.tournament.favorableLuckThresholdPoints
@@ -444,7 +465,9 @@ function ReportScreen({
       <div className="result-hero">
         <div className="eyebrow result-eyebrow">{text.reportEyebrow}</div>
         <div className="grade">{report.grade}</div>
-        <h1>{report.stage}</h1>
+        <h1 ref={headingRef} tabIndex={-1}>
+          {report.stage}
+        </h1>
         <p>
           {text.pointsInGroup(report.points)} {effect} {report.story.outcome}
         </p>
@@ -547,6 +570,11 @@ export function GameApp() {
   // is ever dispatched. Held in a ref so it is created once and stays stable across renders
   // (a ref, unlike plain render-scope state, is exempt from the exhaustive-deps lint rule).
   const saveRequestsRef = useRef(createLatestRequestTracker());
+  // The current screen's main heading (start, camp/final list, or the report). Only one of
+  // the three is ever mounted at a time, so a single tabIndex={-1} target is enough to give
+  // every full-screen transition somewhere safe to send focus.
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const focusHeading = useCallback(() => headingRef.current?.focus(), []);
 
   function runSave(nextState: GameState) {
     const isLatest = saveRequestsRef.current.begin();
@@ -579,6 +607,18 @@ export function GameApp() {
   useEffect(() => {
     if (ready) window.scrollTo(0, 0);
   }, [state.stage, state.started, state.report, ready]);
+  const pendingEvent = pendingCampEvent(state);
+  // Moves focus to the new screen's heading after a full-screen transition (start, undo,
+  // restart, finishing a stage) that is not itself opening a dialog. A dialog manages its own
+  // focus entry, so this checks the live DOM (rather than the `modal`/`pendingEvent` state)
+  // for one being open right now and steps aside if so; that also means closing a dialog on
+  // its own (Escape, a close button) does not re-run this and steal focus back from the
+  // opener that GameDialog's own cleanup just restored it to, since only the screen itself
+  // (not the dialog state) is a dependency here.
+  useEffect(() => {
+    if (!ready || document.querySelector('[role="dialog"]')) return;
+    headingRef.current?.focus();
+  }, [state.stage, state.started, state.report, ready]);
 
   if (!ready)
     return (
@@ -587,7 +627,6 @@ export function GameApp() {
       </div>
     );
 
-  const pendingEvent = pendingCampEvent(state);
   const selected = selectedPlayers(state);
   const detailed = detailedCounts(state);
   const risk = riskLevel(state);
@@ -659,7 +698,12 @@ export function GameApp() {
       const event = activeModal.event,
         copy = text.events[event.id];
       return (
-        <GameDialog title={copy.title} onClose={close} blocking>
+        <GameDialog
+          title={copy.title}
+          onClose={close}
+          blocking
+          restoreFocusFallback={focusHeading}
+        >
           <div className="eyebrow">{text.eventEyebrow}</div>
           <p>{copy.description}</p>
           {copy.choices.map((choice, index) => (
@@ -686,7 +730,11 @@ export function GameApp() {
     }
     if (activeModal.kind === "message")
       return (
-        <GameDialog title={activeModal.title} onClose={close}>
+        <GameDialog
+          title={activeModal.title}
+          onClose={close}
+          restoreFocusFallback={focusHeading}
+        >
           <div className="eyebrow">{text.notice}</div>
           <p>{activeModal.description}</p>
           <button className="primary start-button" onClick={close}>
@@ -711,7 +759,11 @@ export function GameApp() {
           .map((player) => player.name)
           .join(" i ");
       return (
-        <GameDialog title={text.campReportTitle} onClose={close}>
+        <GameDialog
+          title={text.campReportTitle}
+          onClose={close}
+          restoreFocusFallback={focusHeading}
+        >
           <div className="eyebrow">{text.campReportEyebrow}</div>
           <p>{text.campReportBody(best, doubts)}</p>
           <button className="primary start-button" onClick={close}>
@@ -726,6 +778,7 @@ export function GameApp() {
         <GameDialog
           title={text.outOfFormationTitle(outsiders.length)}
           onClose={close}
+          restoreFocusFallback={focusHeading}
         >
           <div className="eyebrow">{text.outOfFormationEyebrow}</div>
           <p>{text.outOfFormationExplanation}</p>
@@ -766,7 +819,11 @@ export function GameApp() {
         groupScore(player),
       ];
       return (
-        <GameDialog title={player.name} onClose={close}>
+        <GameDialog
+          title={player.name}
+          onClose={close}
+          restoreFocusFallback={focusHeading}
+        >
           <div className="eyebrow">{text.profile}</div>
           <div className="profile-head">
             <p>
@@ -845,7 +902,11 @@ export function GameApp() {
         [text.playerMetrics.tactics, left.tact, right.tact],
       ];
       return (
-        <GameDialog title={text.comparisonTitle} onClose={close}>
+        <GameDialog
+          title={text.comparisonTitle}
+          onClose={close}
+          restoreFocusFallback={focusHeading}
+        >
           <div className="eyebrow">{text.comparisonEyebrow}</div>
           <div className="compare-grid">
             {[left, right].map((player) => (
@@ -931,11 +992,14 @@ export function GameApp() {
               setModal(null);
               setExpanded(false);
             }}
+            headingRef={headingRef}
           />
         ) : !state.started ? (
           <section className="start">
             <div className="eyebrow">{text.introEyebrow}</div>
-            <h1 className="hero-title">{text.introTitle}</h1>
+            <h1 className="hero-title" ref={headingRef} tabIndex={-1}>
+              {text.introTitle}
+            </h1>
             <p className="lead">{text.introLead}</p>
             <div className="brief">
               <h2>{text.briefTitle}</h2>
@@ -1021,7 +1085,9 @@ export function GameApp() {
                   {stageText.eyebrow} • {currentSystem.name} •{" "}
                   {stageText.suffix}
                 </div>
-                <h1>{stageText.heading}</h1>
+                <h1 ref={headingRef} tabIndex={-1}>
+                  {stageText.heading}
+                </h1>
                 <p>{stageText.hint}</p>
               </div>
               <div className="kpis">
