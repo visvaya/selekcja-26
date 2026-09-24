@@ -1,20 +1,9 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { flushSync } from "react-dom";
-import type { CSSProperties, RefObject } from "react";
-import {
-  players,
-  positionOrder,
-  priorities,
-  systems,
-} from "../data/catalog.ts";
-import { APP_CONFIG, GAME_RULES, RULES_REVISION } from "../data/constants.ts";
+import { players, priorities, systems } from "../data/catalog.ts";
+import { APP_CONFIG, GAME_RULES } from "../data/constants.ts";
 import { GAME_VERSION } from "../data/changelog.ts";
-import type {
-  FinalReport,
-  GameState,
-  GroupPosition,
-  PlayerId,
-} from "../data/types.ts";
+import type { GameState, PlayerId } from "../data/types.ts";
 import { fillSquadRandomly } from "../logic/random-squad.ts";
 import { createInitialState, reduceGameState } from "../logic/state.ts";
 import { clearGame, loadGame, saveGame } from "../logic/storage.ts";
@@ -33,18 +22,14 @@ import { ComparisonDialog } from "./comparison-dialog.tsx";
 import { buildFinalReport } from "../logic/report.ts";
 import {
   canFinalize,
-  detailedPositions,
   formationOutsiders,
   pendingCampEvent,
-  groupCounts,
-  playersByIds,
-  positionShort,
   selectedPlayers,
-  slotCount,
   squadLimit,
-  squadProblems,
 } from "../logic/selection.ts";
 import { SelectionScreen } from "./selection-screen.tsx";
+import { SquadDock } from "./squad-dock.tsx";
+import { ReportScreen } from "./report-screen.tsx";
 import { UI_TEXT as text } from "./text.ts";
 
 type ModalState =
@@ -53,8 +38,6 @@ type ModalState =
   | { kind: "outsiders" }
   | { kind: "campReport" }
   | { kind: "message"; title: string; description: string };
-
-const groupPositions: GroupPosition[] = ["BR", "OBR", "POM", "ATA"];
 
 // A player stuck with a broken save can open the game with ?reset to start over.
 // The parameter is removed only after the save is cleared, so a StrictMode re-run
@@ -72,291 +55,6 @@ function randomSeed(): number {
   const value = new Uint32Array(1);
   globalThis.crypto?.getRandomValues(value);
   return value[0] || APP_CONFIG.fallbackSeed;
-}
-
-function Pitch({ state }: { state: GameState }) {
-  const system = systems.find((candidate) => candidate.id === state.system)!;
-  const accessibleSlots = system.shape
-    .flat()
-    .map((position) =>
-      text.occupied(slotCount(state, position), text.positions[position]),
-    )
-    .join(". ");
-  return (
-    <div
-      className="mini-pitch"
-      role="img"
-      aria-label={`${text.systems[state.system].name}. ${text.pitchDescription} ${accessibleSlots}`}
-    >
-      <div className="formation-label">
-        <i aria-hidden="true" />
-        {text.systems[state.system].name} • {text.availablePlayers}
-      </div>
-      {system.shape.map((row, index) => (
-        <div className="pitch-row" key={index}>
-          {row.map((position, slot) => (
-            <span
-              className="pitch-node"
-              key={`${position}-${slot}`}
-              title={text.occupied(
-                slotCount(state, position),
-                text.positions[position],
-              )}
-            >
-              <small>{position}</small>
-              <b>{slotCount(state, position)}</b>
-            </span>
-          ))}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function SquadDock({
-  state,
-  expanded,
-  onExpand,
-  onOutsiders,
-  onFinalize,
-}: {
-  state: GameState;
-  expanded: boolean;
-  onExpand: () => void;
-  onOutsiders: () => void;
-  onFinalize: () => void;
-}) {
-  const counts = groupCounts(state),
-    requirements = GAME_RULES[state.stage].minimumPlayersByGroup;
-  const issues = squadProblems(state),
-    outsiders = formationOutsiders(state);
-  const groups = Object.entries(
-    outsiders.reduce<Record<string, number>>((result, player) => {
-      const key = positionShort(player);
-      return { ...result, [key]: (result[key] ?? 0) + 1 };
-    }, {}),
-  )
-    .map(([position, count]) => `${position} ×${count}`)
-    .join(" · ");
-  const progress = Math.min(
-    GAME_RULES.ratingMaximumPoints,
-    (state.selected.size / squadLimit(state)) * GAME_RULES.ratingMaximumPoints,
-  );
-  const issueText = issues
-    .map((issue) =>
-      issue.kind === "missing"
-        ? text.missing(issue.count, issue.group)
-        : text.excess(issue.count, issue.group),
-    )
-    .join(" • ");
-  return (
-    <aside className="dock" aria-label={text.yourSquad}>
-      <div
-        className={`dock-breakdown ${expanded ? "" : "hidden"}`}
-        id="dockBreakdown"
-      >
-        <div className="dock-summary">
-          {groupPositions.map((group) => {
-            const missing = Math.max(0, requirements[group] - counts[group]);
-            const excess =
-              state.stage === "final" && group === "BR"
-                ? Math.max(0, counts[group] - requirements[group])
-                : 0;
-            return (
-              <div
-                className={missing ? "need" : excess ? "over" : "ok"}
-                key={group}
-              >
-                <small>{text.groups[group]}</small>
-                <b>
-                  {counts[group]} /{" "}
-                  {state.stage === "final" && group === "BR"
-                    ? text.exact
-                    : text.minimum}{" "}
-                  {requirements[group]}
-                </b>
-                <span>
-                  {missing
-                    ? text.missingShort(missing)
-                    : excess
-                      ? text.excessShort(excess)
-                      : text.fulfilled}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-        <div className="pitch-panel">
-          <Pitch state={state} />
-          {outsiders.length > 0 && (
-            <button
-              className="formation-outsiders"
-              onClick={onOutsiders}
-              aria-label={text.outOfFormationTitle(outsiders.length)}
-            >
-              <div>
-                <strong>{text.outOfFormationTitle(outsiders.length)}</strong>
-                <small>{groups}</small>
-              </div>
-              <span className="outside-arrow" aria-hidden="true">
-                ›
-              </span>
-            </button>
-          )}
-        </div>
-      </div>
-      <div className="dock-inner">
-        <div
-          className="count-ring"
-          style={{ "--progress": `${progress}%` } as CSSProperties}
-        >
-          <b>
-            {state.selected.size}/{squadLimit(state)}
-          </b>
-        </div>
-        <button
-          className="dock-copy"
-          onClick={onExpand}
-          aria-expanded={expanded}
-          aria-controls="dockBreakdown"
-        >
-          <b>
-            {state.selected.size < squadLimit(state)
-              ? text.remaining(squadLimit(state) - state.selected.size)
-              : canFinalize(state)
-                ? text.stages[state.stage].completed
-                : issueText}
-          </b>
-          <small>
-            {issueText ||
-              (outsiders.length
-                ? text.outOfFormationCount(outsiders.length)
-                : text.dockCoverage)}
-          </small>
-        </button>
-        <button
-          className="finalize"
-          disabled={!canFinalize(state)}
-          onClick={onFinalize}
-        >
-          {text.stages[state.stage].finalize}
-        </button>
-      </div>
-    </aside>
-  );
-}
-
-function ReportScreen({
-  report,
-  canUndo,
-  onRestart,
-  onUndo,
-  headingRef,
-}: {
-  report: FinalReport;
-  canUndo: boolean;
-  onRestart: () => void;
-  onUndo: () => void;
-  headingRef: RefObject<HTMLHeadingElement | null>;
-}) {
-  const effect =
-    report.luck > GAME_RULES.tournament.favorableLuckThresholdPoints
-      ? text.luck.positive
-      : report.luck < GAME_RULES.tournament.unfavorableLuckThresholdPoints
-        ? text.luck.negative
-        : text.luck.neutral;
-  return (
-    <section className="result">
-      <div className="result-hero">
-        <div className="eyebrow result-eyebrow">{text.reportEyebrow}</div>
-        <div className="grade">{report.grade}</div>
-        <h1 ref={headingRef} tabIndex={-1}>
-          {report.stage}
-        </h1>
-        <p>
-          {text.pointsInGroup(report.points)} {effect} {report.story.outcome}
-        </p>
-        <div className="outcomes">
-          <div className="outcome">
-            <small>{text.reportKpis.quality}</small>
-            <b>{Math.round(report.quality)}</b>
-          </div>
-          <div className="outcome">
-            <small>{text.reportKpis.chemistry}</small>
-            <b>{Math.round(report.chem)}</b>
-          </div>
-          <div className="outcome">
-            <small>{text.reportKpis.roles}</small>
-            <b>{Math.round(report.coverage)}%</b>
-          </div>
-        </div>
-      </div>
-      <div className="report">
-        <h2>{text.tournamentProgress}</h2>
-        <ul>
-          {report.story.matches.map((match, index) => (
-            <li key={index}>{match}</li>
-          ))}
-        </ul>
-        <p>
-          <b>{text.lastMatch}</b> {report.story.last}
-        </p>
-      </div>
-      <div className="report">
-        <h2>{text.strengths}</h2>
-        <ul>
-          {(report.strengths.length
-            ? report.strengths
-            : [text.noStrengths]
-          ).map((reason, index) => (
-            <li key={index}>{reason}</li>
-          ))}
-        </ul>
-      </div>
-      <div className="report">
-        <h2>{text.weaknesses}</h2>
-        <ul>
-          {(report.weak.length ? report.weak : [text.noWeaknesses]).map(
-            (reason, index) => (
-              <li key={index}>{reason}</li>
-            ),
-          )}
-        </ul>
-      </div>
-      <div className="report">
-        <h2>{text.yourSquad}</h2>
-        {groupPositions.map((group) => (
-          <div className="squad-group" key={group}>
-            <h3>{text.groups[group]}</h3>
-            <div className="squad-list">
-              {playersByIds(report.squadIds)
-                .filter((player) => player.pos === group)
-                .sort(
-                  (left, right) =>
-                    positionOrder[detailedPositions(left)[0]!] -
-                    positionOrder[detailedPositions(right)[0]!],
-                )
-                .map((player) => (
-                  <span className="squad-pill" key={player.id}>
-                    <b>{positionShort(player)}</b> {player.name}
-                  </span>
-                ))}
-            </div>
-          </div>
-        ))}
-      </div>
-      {report.rulesRevision !== RULES_REVISION && (
-        <p className="fineprint">{text.reportFromOlderRules}</p>
-      )}
-      <button className="action-button" disabled={!canUndo} onClick={onUndo}>
-        {text.undo}
-      </button>
-      <button className="primary restart" onClick={onRestart}>
-        {text.restart}
-      </button>
-      <p className="fineprint">{text.simulationDisclaimer}</p>
-    </section>
-  );
 }
 
 export function GameApp() {
