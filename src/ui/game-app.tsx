@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { flushSync } from "react-dom";
-import type { CSSProperties, ReactNode, RefObject } from "react";
+import type { CSSProperties, RefObject } from "react";
 import {
   players,
   positionOrder,
@@ -19,12 +19,7 @@ import type {
   SortId,
 } from "../data/types.ts";
 import { fillSquadRandomly } from "../logic/random-squad.ts";
-import {
-  experienceScore,
-  groupScore,
-  modelScore,
-  trialImpact,
-} from "../logic/scoring.ts";
+import { modelScore, trialImpact } from "../logic/scoring.ts";
 import { createInitialState, reduceGameState } from "../logic/state.ts";
 import { clearGame, loadGame, saveGame } from "../logic/storage.ts";
 import type { LoadedSave } from "../logic/save-format.ts";
@@ -33,6 +28,13 @@ import { initialSaveStatus, reduceSaveStatus } from "../logic/save-status.ts";
 import { SaveStatusBanner } from "./save-status-banner.tsx";
 import { LiveAnnouncer } from "./live-announcer.tsx";
 import { ChangelogSection } from "./changelog-section.tsx";
+import { EventDialog } from "./event-dialog.tsx";
+import { MessageDialog } from "./message-dialog.tsx";
+import { CampReportDialog } from "./camp-report-dialog.tsx";
+import { OutsidersDialog } from "./outsiders-dialog.tsx";
+import { ProfileDialog } from "./profile-dialog.tsx";
+import { ComparisonDialog } from "./comparison-dialog.tsx";
+import { FlagTag, RoleTags, TrialTag } from "./player-tags.tsx";
 import { buildFinalReport } from "../logic/report.ts";
 import {
   canFinalize,
@@ -43,7 +45,6 @@ import {
   groupCounts,
   playersByIds,
   positionShort,
-  preferredFoot,
   riskLevel,
   selectedPlayers,
   slotCount,
@@ -97,84 +98,6 @@ function randomSeed(): number {
   return value[0] || APP_CONFIG.fallbackSeed;
 }
 
-function GameDialog({
-  title,
-  children,
-  onClose,
-  blocking = false,
-  restoreFocusFallback,
-}: {
-  title: string;
-  children: ReactNode;
-  onClose: () => void;
-  blocking?: boolean;
-  // Called on close when the element that opened the dialog is no longer in the
-  // document (e.g. it belonged to a screen that was replaced while the dialog was
-  // open), so focus does not fall back to the body.
-  restoreFocusFallback?: () => void;
-}) {
-  const dialogRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    // On some browsers a tap that opens the dialog never focuses the tapped button (a
-    // touch-input default, not something this app controls), leaving document.body as the
-    // active element. Treat that the same as "nothing to restore" rather than trying to
-    // focus the body back, which would silently drop focus on close.
-    const previouslyFocused =
-      document.activeElement instanceof HTMLElement &&
-      document.activeElement !== document.body
-        ? document.activeElement
-        : null;
-    dialogRef.current?.querySelector<HTMLButtonElement>("button")?.focus();
-    return () => {
-      // The opener can still be in the document but no longer focusable (e.g. the finalize
-      // button is disabled once the next screen starts empty), so a failed focus() call must
-      // also fall through to the fallback rather than leaving focus on the body.
-      if (previouslyFocused && document.contains(previouslyFocused)) {
-        previouslyFocused.focus();
-        if (document.activeElement === previouslyFocused) return;
-      }
-      restoreFocusFallback?.();
-    };
-  }, [title, restoreFocusFallback]);
-  function onKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
-    if (event.key === "Escape" && !blocking) {
-      event.preventDefault();
-      onClose();
-      return;
-    }
-    if (event.key !== "Tab") return;
-    const buttons = [
-      ...(dialogRef.current?.querySelectorAll<HTMLButtonElement>(
-        "button:not([disabled])",
-      ) ?? []),
-    ];
-    const first = buttons[0],
-      last = buttons.at(-1);
-    if (event.shiftKey && document.activeElement === first) {
-      event.preventDefault();
-      last?.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
-      event.preventDefault();
-      first?.focus();
-    }
-  }
-  return (
-    <div className="modal-wrap" role="presentation">
-      <div
-        className="modal"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="modal-title"
-        ref={dialogRef}
-        onKeyDown={onKeyDown}
-      >
-        <h2 id="modal-title">{title}</h2>
-        {children}
-      </div>
-    </div>
-  );
-}
-
 function PlayerCard({
   player,
   state,
@@ -210,22 +133,10 @@ function PlayerCard({
             {player.club} • {player.age} {text.yearsOld}
           </div>
           <div className="tags">
-            {player.roles.slice(0, 3).map((role) => (
-              <span className="tag" key={role}>
-                {text.roles[role]}
-              </span>
-            ))}
-            {player.flag && (
-              <span className="tag alert">
-                {text.availabilityFlags[player.flag]}
-              </span>
-            )}
+            <RoleTags roles={player.roles} limit={3} />
+            <FlagTag flag={player.flag} />
             {state.stage === "final" && trial && (
-              <span className={`tag ${impact < 0 ? "alert" : ""}`}>
-                {text.campResult}: {text.trialNotes[trial.note]} (
-                {impact >= 0 ? "+" : ""}
-                {impact})
-              </span>
+              <TrialTag note={trial.note} impact={impact} format="card" />
             )}
           </div>
         </div>
@@ -719,110 +630,50 @@ export function GameApp() {
     if (!activeModal) return null;
     const close = () => setModal(null);
     if (activeModal.kind === "event") {
-      const event = activeModal.event,
-        copy = text.events[event.id];
+      const event = activeModal.event;
       return (
-        <GameDialog
-          title={copy.title}
+        <EventDialog
+          event={event}
           onClose={close}
-          blocking
+          onChoose={(index, choiceTitle) => {
+            dispatch({
+              type: "resolveEvent",
+              id: event.id,
+              effects: event.choices[index]!,
+            });
+            announce(text.announcements.eventResolved(choiceTitle));
+          }}
+          onUndo={undo}
           restoreFocusFallback={focusHeading}
-        >
-          <div className="eyebrow">{text.eventEyebrow}</div>
-          <p>{copy.description}</p>
-          {copy.choices.map((choice, index) => (
-            <button
-              className="decision"
-              key={choice.title}
-              onClick={() => {
-                dispatch({
-                  type: "resolveEvent",
-                  id: event.id,
-                  effects: event.choices[index]!,
-                });
-                announce(text.announcements.eventResolved(choice.title));
-              }}
-            >
-              <b>{choice.title}</b>
-              <small>{choice.description}</small>
-            </button>
-          ))}
-          <button className="action-button" onClick={undo}>
-            {text.undo}
-          </button>
-        </GameDialog>
+        />
       );
     }
     if (activeModal.kind === "message")
       return (
-        <GameDialog
+        <MessageDialog
           title={activeModal.title}
+          description={activeModal.description}
           onClose={close}
           restoreFocusFallback={focusHeading}
-        >
-          <div className="eyebrow">{text.notice}</div>
-          <p>{activeModal.description}</p>
-          <button className="primary start-button" onClick={close}>
-            {text.understood}
-          </button>
-        </GameDialog>
+        />
       );
-    if (activeModal.kind === "campReport") {
-      const ranked = players
-        .filter((player) => state.campSquad.has(player.id))
-        .sort(
-          (left, right) =>
-            (state.trial[right.id]?.delta ?? 0) -
-            (state.trial[left.id]?.delta ?? 0),
-        );
-      const best = ranked
-          .slice(0, 3)
-          .map((player) => player.name)
-          .join(", "),
-        doubts = ranked
-          .slice(-2)
-          .map((player) => player.name)
-          .join(" i ");
+    if (activeModal.kind === "campReport")
       return (
-        <GameDialog
-          title={text.campReportTitle}
+        <CampReportDialog
+          state={state}
           onClose={close}
           restoreFocusFallback={focusHeading}
-        >
-          <div className="eyebrow">{text.campReportEyebrow}</div>
-          <p>{text.campReportBody(best, doubts)}</p>
-          <button className="primary start-button" onClick={close}>
-            {text.continueToFinal}
-          </button>
-        </GameDialog>
+        />
       );
-    }
     if (activeModal.kind === "outsiders") {
       const outsiders = formationOutsiders(state);
       return (
-        <GameDialog
-          title={text.outOfFormationTitle(outsiders.length)}
+        <OutsidersDialog
+          outsiders={outsiders}
           onClose={close}
+          onOpenProfile={(id) => setModal({ kind: "profile", id })}
           restoreFocusFallback={focusHeading}
-        >
-          <div className="eyebrow">{text.outOfFormationEyebrow}</div>
-          <p>{text.outOfFormationExplanation}</p>
-          {outsiders.map((player) => (
-            <button
-              className="decision"
-              key={player.id}
-              onClick={() => setModal({ kind: "profile", id: player.id })}
-            >
-              <b>{player.name}</b>
-              <small>
-                {positionShort(player)} • {player.club}
-              </small>
-            </button>
-          ))}
-          <button className="close start-button" onClick={close}>
-            {text.returnToPitch}
-          </button>
-        </GameDialog>
+        />
       );
     }
     if (activeModal.kind === "profile") {
@@ -830,146 +681,30 @@ export function GameApp() {
         (candidate) => candidate.id === activeModal.id,
       );
       if (!player) return null;
-      const foot = preferredFoot(player),
-        trial = state.trial[player.id],
-        impact = trialImpact(player, state);
-      const metrics = [
-        modelScore(player, state),
-        player.ov,
-        player.form,
-        player.fit,
-        player.tact,
-        experienceScore(player),
-        player.chem,
-        groupScore(player),
-      ];
       return (
-        <GameDialog
-          title={player.name}
+        <ProfileDialog
+          player={player}
+          state={state}
           onClose={close}
+          onToggle={togglePlayer}
           restoreFocusFallback={focusHeading}
-        >
-          <div className="eyebrow">{text.profile}</div>
-          <div className="profile-head">
-            <p>
-              {player.club} • {player.age} {text.yearsOld}
-            </p>
-            <div className="profile-score">{modelScore(player, state)}</div>
-          </div>
-          <div className="profile-positions">
-            {detailedPositions(player).map((position) => (
-              <span className="tag" key={position}>
-                <b>{position}</b> {text.positions[position]}
-              </span>
-            ))}
-            <span className="tag">
-              <b>{foot === "both" ? text.foot.both : text.foot.lead}</b>{" "}
-              {foot !== "both" && text.foot[foot].toLocaleLowerCase("pl")}
-            </span>
-          </div>
-          <div className="tags">
-            {player.roles.map((role) => (
-              <span className="tag" key={role}>
-                {text.roles[role]}
-              </span>
-            ))}
-            {player.flag && (
-              <span className="tag alert">
-                {text.availabilityFlags[player.flag]}
-              </span>
-            )}
-            {trial && (
-              <span className={`tag ${impact < 0 ? "alert" : ""}`}>
-                {text.campResult}: {text.trialNotes[trial.note]} •{" "}
-                {impact >= 0 ? "+" : ""}
-                {impact}
-              </span>
-            )}
-          </div>
-          <div className="profile-metrics">
-            {text.profileMetrics.map((label, index) => (
-              <div className="profile-metric" key={label}>
-                <small>{label}</small>
-                <b>{metrics[index]}</b>
-              </div>
-            ))}
-          </div>
-          <button
-            className="primary start-button"
-            onClick={() => togglePlayer(player.id)}
-          >
-            {state.selected.has(player.id)
-              ? text.removeFromSquad
-              : text.addToSquad}
-          </button>
-          <button className="close start-button" onClick={close}>
-            {text.returnToList}
-          </button>
-        </GameDialog>
+        />
       );
     }
     if (activeModal.kind === "comparison" && state.compare.length === 2) {
       const left = players.find((player) => player.id === state.compare[0]),
         right = players.find((player) => player.id === state.compare[1]);
       if (!left || !right) return null;
-      const rows: [string, number, number][] = [
-        [
-          text.selectionScore,
-          modelScore(left, state),
-          modelScore(right, state),
-        ],
-        [text.playerMetrics.quality, left.ov, right.ov],
-        [text.playerMetrics.form, left.form, right.form],
-        [text.playerMetrics.fitness, left.fit, right.fit],
-        [text.profileMetrics[5], experienceScore(left), experienceScore(right)],
-        [text.profileMetrics[6], left.chem, right.chem],
-        [text.profileMetrics[7], groupScore(left), groupScore(right)],
-        [text.playerMetrics.tactics, left.tact, right.tact],
-      ];
       return (
-        <GameDialog
-          title={text.comparisonTitle}
+        <ComparisonDialog
+          left={left}
+          right={right}
+          state={state}
           onClose={close}
+          onToggle={togglePlayer}
+          onClearComparison={() => dispatch({ type: "clearCompare" })}
           restoreFocusFallback={focusHeading}
-        >
-          <div className="eyebrow">{text.comparisonEyebrow}</div>
-          <div className="compare-grid">
-            {[left, right].map((player) => (
-              <div className="compare-card" key={player.id}>
-                <span className="pos">{positionShort(player)}</span>
-                <h3>{player.name}</h3>
-                <small>{player.club}</small>
-                <button
-                  className="select-btn compare-select"
-                  onClick={() => togglePlayer(player.id)}
-                >
-                  {state.selected.has(player.id)
-                    ? text.removeShort
-                    : text.select}
-                </button>
-              </div>
-            ))}
-            {rows.map(([label, first, second]) => (
-              <div className="comparison-row" key={label}>
-                <b className={first > second ? "better" : ""}>{first}</b>
-                <span>{label}</span>
-                <b className={second > first ? "better" : ""}>{second}</b>
-              </div>
-            ))}
-          </div>
-          <button
-            className="primary start-button"
-            onClick={() => {
-              dispatch({ type: "clearCompare" });
-              close();
-            }}
-          >
-            {text.clearComparison}
-          </button>
-          <button className="close start-button" onClick={close}>
-            {text.returnWithoutClearing}
-          </button>
-        </GameDialog>
+        />
       );
     }
     return null;
