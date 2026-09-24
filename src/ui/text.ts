@@ -8,6 +8,7 @@ import type {
   SortId,
   Stage,
   SystemId,
+  TrialNoteId,
 } from "../data/types.ts";
 import type { EventId } from "../data/events.ts";
 import type { SaveFailureReason } from "../logic/storage.ts";
@@ -203,7 +204,7 @@ export const UI_TEXT = {
     solid: "bez zarzutu",
     uncertain: "niepewny",
     disappointed: "rozczarował",
-  } as Record<string, string>,
+  } satisfies Record<TrialNoteId, string>,
   foot: {
     both: "Obunożny",
     left: "Lewa",

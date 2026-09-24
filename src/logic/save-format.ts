@@ -15,6 +15,7 @@ import type {
   FinalReport,
 } from "../data/types.ts";
 import { LEGACY_RULES_REVISION, migrateLegacyState } from "./save-migration.ts";
+import { trialNote } from "./scoring.ts";
 
 type RawRecord = Record<string, unknown>;
 
@@ -49,6 +50,9 @@ const isStringArray = (value: unknown): value is string[] =>
 const isPlayerIdArray = (value: unknown): value is string[] =>
   isStringArray(value) && value.every((id) => PLAYER_IDS.has(id));
 
+// note is not trusted (it is recomputed from delta by restoreSnapshot below), so a string note
+// is accepted but not required: a save missing it, or carrying a stale or foreign value, still
+// loads instead of being rejected.
 function isTrial(value: unknown): boolean {
   return (
     isRecord(value) &&
@@ -57,7 +61,7 @@ function isTrial(value: unknown): boolean {
         PLAYER_IDS.has(id) &&
         isRecord(result) &&
         isNumber(result.delta) &&
-        typeof result.note === "string",
+        (result.note === undefined || typeof result.note === "string"),
     )
   );
 }
@@ -111,12 +115,24 @@ function isSnapshot(value: unknown): value is GameSnapshot {
   );
 }
 
+// note is derived purely from delta (see trialNote); it is never trusted from the save, so it
+// is recomputed here for every entry instead of carrying over whatever was stored.
+function restoreTrial(trial: GameSnapshot["trial"]): GameSnapshot["trial"] {
+  return Object.fromEntries(
+    Object.entries(trial).map(([id, result]) => [
+      id,
+      { delta: result.delta, note: trialNote(result.delta) },
+    ]),
+  );
+}
+
 function restoreSnapshot(value: GameSnapshot): GameSnapshot {
   return {
     ...value,
     selected: new Set(value.selected),
     campSquad: new Set(value.campSquad),
     events: new Set(value.events),
+    trial: restoreTrial(value.trial),
   };
 }
 

@@ -76,9 +76,10 @@ export interface System {
   fits: DetailedPosition[];
 }
 
+export type TrialNoteId = "impressed" | "solid" | "uncertain" | "disappointed";
 interface TrialReport {
   delta: number;
-  note: string;
+  note: TrialNoteId;
 }
 export interface Effects {
   chem: number;

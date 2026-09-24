@@ -222,7 +222,7 @@ function PlayerCard({
             )}
             {state.stage === "final" && trial && (
               <span className={`tag ${impact < 0 ? "alert" : ""}`}>
-                {text.campResult}: {text.trialNotes[trial.note] ?? trial.note} (
+                {text.campResult}: {text.trialNotes[trial.note]} (
                 {impact >= 0 ? "+" : ""}
                 {impact})
               </span>
@@ -880,7 +880,7 @@ export function GameApp() {
             )}
             {trial && (
               <span className={`tag ${impact < 0 ? "alert" : ""}`}>
-                {text.campResult}: {text.trialNotes[trial.note] ?? trial.note} •{" "}
+                {text.campResult}: {text.trialNotes[trial.note]} •{" "}
                 {impact >= 0 ? "+" : ""}
                 {impact}
               </span>

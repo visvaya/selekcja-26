@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { players } from "../data/catalog.ts";
 import { RULES_REVISION } from "../data/constants.ts";
 import { createInitialState, reduceGameState } from "./state.ts";
 import { clearGame, loadGame, saveGame } from "./storage.ts";
@@ -149,6 +150,78 @@ test("a version 2 save keeps its undo history with stable IDs", async () => {
       "jakub-kiwior",
       "kamil-grosicki",
     ]);
+  });
+});
+
+test("a tampered trial note is recomputed from delta, in state and history, on load", async () => {
+  await withStorage(async (values) => {
+    const started = reduceGameState(createInitialState(42), { type: "start" });
+    const squad = [players[0]!];
+    const afterCamp = reduceGameState(started, {
+      type: "completeCamp",
+      squad,
+    });
+    const playerId = squad[0]!.id;
+    const trueNote = afterCamp.trial[playerId]!.note;
+    const trueDelta = afterCamp.trial[playerId]!.delta;
+    assert.notEqual(trueNote, "bogus-note");
+
+    // Any remembered action after completeCamp pushes the current trial into history too.
+    const withHistory = reduceGameState(afterCamp, {
+      type: "setSystem",
+      value: afterCamp.system === "4231" ? "3421" : "4231",
+    });
+
+    await saveGame(withHistory);
+    const raw = JSON.parse(values.get(KEY)!);
+    raw.state.trial[playerId].note = "bogus-note";
+    raw.state.history.at(-1).trial[playerId].note = "another-bogus-note";
+    values.set(KEY, JSON.stringify(raw));
+
+    const loaded = (await loadGame()).state;
+    assert.ok(loaded);
+    assert.equal(loaded.trial[playerId]!.delta, trueDelta);
+    assert.equal(loaded.trial[playerId]!.note, trueNote);
+    assert.equal(loaded.history.at(-1)!.trial[playerId]!.delta, trueDelta);
+    assert.equal(loaded.history.at(-1)!.trial[playerId]!.note, trueNote);
+  });
+});
+
+test("a trial entry missing its note still loads, recomputed from delta", async () => {
+  await withStorage(async (values) => {
+    const started = reduceGameState(createInitialState(42), { type: "start" });
+    const squad = [players[0]!];
+    const afterCamp = reduceGameState(started, {
+      type: "completeCamp",
+      squad,
+    });
+    const playerId = squad[0]!.id;
+    const trueNote = afterCamp.trial[playerId]!.note;
+
+    await saveGame(afterCamp);
+    const raw = JSON.parse(values.get(KEY)!);
+    delete raw.state.trial[playerId].note;
+    values.set(KEY, JSON.stringify(raw));
+
+    const loaded = (await loadGame()).state;
+    assert.ok(loaded);
+    assert.equal(loaded.trial[playerId]!.note, trueNote);
+  });
+});
+
+test("a legacy save with a trial note that contradicts its delta is recomputed", async () => {
+  await withStorage(async (values) => {
+    const tampered = V1_REPORT_SAVE.replace(
+      '"trial":{"Łukasz Skorupski":{"delta":2,"note":"solid"}}',
+      '"trial":{"Łukasz Skorupski":{"delta":2,"note":"przekonał"}}',
+    );
+    assert.notEqual(tampered, V1_REPORT_SAVE);
+    values.set(KEY, tampered);
+    const state = (await loadGame()).state;
+    assert.ok(state);
+    assert.deepEqual(state.trial, {
+      "lukasz-skorupski": { delta: 2, note: "solid" },
+    });
   });
 });
 

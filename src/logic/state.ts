@@ -1,4 +1,5 @@
 import { nextRandom } from "./random.ts";
+import { trialNote } from "./scoring.ts";
 import { APP_CONFIG, GAME_RULES } from "../data/constants.ts";
 import type {
   Effects,
@@ -154,17 +155,7 @@ export function reduceGameState(
             ),
           ),
         );
-        trial[player.id] = {
-          delta,
-          note:
-            delta >= rules.impressedThresholdPoints
-              ? "impressed"
-              : delta >= rules.solidThresholdPoints
-                ? "solid"
-                : delta >= rules.uncertainThresholdPoints
-                  ? "uncertain"
-                  : "disappointed",
-        };
+        trial[player.id] = { delta, note: trialNote(delta) };
       }
       return remember(state, {
         ...state,

@@ -1,6 +1,17 @@
 import { systems } from "../data/catalog.ts";
 import { GAME_RULES } from "../data/constants.ts";
-import type { GameState, Player } from "../data/types.ts";
+import type { GameState, Player, TrialNoteId } from "../data/types.ts";
+
+// Pure classification of a trial delta into its note, by the thresholds in
+// GAME_RULES.campTrial. delta is the source of truth (a seeded random draw); note is always
+// derivable from it, so this is also used to recompute note on load instead of trusting a save.
+export function trialNote(deltaPoints: number): TrialNoteId {
+  const rules = GAME_RULES.campTrial;
+  if (deltaPoints >= rules.impressedThresholdPoints) return "impressed";
+  if (deltaPoints >= rules.solidThresholdPoints) return "solid";
+  if (deltaPoints >= rules.uncertainThresholdPoints) return "uncertain";
+  return "disappointed";
+}
 
 export function experienceScore(player: Player): number {
   const rule = GAME_RULES.selection;
