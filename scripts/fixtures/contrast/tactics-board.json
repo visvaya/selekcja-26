@@ -1,0 +1,891 @@
+[
+  {
+    "fg": "ink",
+    "bg": "board",
+    "required": 4.5,
+    "ratio": 14.24,
+    "note": "body copy on page background"
+  },
+  {
+    "fg": "ink-soft",
+    "bg": "board",
+    "required": 4.5,
+    "ratio": 7.31,
+    "note": "lead / secondary text on page background"
+  },
+  {
+    "fg": "ink",
+    "bg": "board-deep",
+    "required": 4.5,
+    "ratio": 11.86,
+    "note": "brief stat numbers, kpi values on recessed panel"
+  },
+  {
+    "fg": "ink-soft",
+    "bg": "board-deep",
+    "required": 4.5,
+    "ratio": 6.09,
+    "note": "brief stat labels, kpi labels"
+  },
+  {
+    "fg": "ink-soft",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 8.09,
+    "note": "mockup label text"
+  },
+  {
+    "fg": "frame-soft",
+    "bg": "board-deep",
+    "required": 3,
+    "ratio": 3.49,
+    "note": "mockup label border"
+  },
+  {
+    "fg": "on-action",
+    "bg": "ink",
+    "required": 4.5,
+    "ratio": 15.98,
+    "note": "top bar brand / phase text on ink bar"
+  },
+  {
+    "fg": "on-select",
+    "bg": "select",
+    "required": 4.5,
+    "ratio": 7.33,
+    "note": "brand mark 26 on magnet red"
+  },
+  {
+    "fg": "on-action",
+    "bg": "action",
+    "required": 4.5,
+    "ratio": 6.99,
+    "note": "phase pill text on marker blue"
+  },
+  {
+    "fg": "action",
+    "bg": "board",
+    "required": 4.5,
+    "ratio": 6.23,
+    "note": "eyebrow text on page background"
+  },
+  {
+    "fg": "action",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 6.9,
+    "note": "eyebrow text on strip surface"
+  },
+  {
+    "fg": "ink",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 15.76,
+    "note": "choice card title on surface"
+  },
+  {
+    "fg": "ink-soft",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 8.09,
+    "note": "choice card description on surface"
+  },
+  {
+    "fg": "frame",
+    "bg": "surface",
+    "required": 3,
+    "ratio": 4.84,
+    "note": "choice card border / radio ring, unselected"
+  },
+  {
+    "fg": "select",
+    "bg": "surface",
+    "required": 3,
+    "ratio": 7.23,
+    "note": "choice card border, selected"
+  },
+  {
+    "fg": "on-action",
+    "bg": "action",
+    "required": 4.5,
+    "ratio": 6.99,
+    "note": "primary start button text"
+  },
+  {
+    "fg": "on-ink-dim",
+    "bg": "ink",
+    "required": 4.5,
+    "ratio": 10.43,
+    "note": "top bar version label on ink bar"
+  },
+  {
+    "fg": "ink",
+    "bg": "board-deep",
+    "required": 4.5,
+    "ratio": 11.86,
+    "note": "changelog version label on recessed panel"
+  },
+  {
+    "fg": "ink-soft",
+    "bg": "board-deep",
+    "required": 4.5,
+    "ratio": 6.09,
+    "note": "changelog list items"
+  },
+  {
+    "fg": "ink",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 15.76,
+    "note": "action-button label (changelog toggle)"
+  },
+  {
+    "fg": "frame",
+    "bg": "surface",
+    "required": 3,
+    "ratio": 4.84,
+    "note": "action-button border"
+  },
+  {
+    "fg": "ink",
+    "bg": "board",
+    "required": 4.5,
+    "ratio": 14.24,
+    "note": "game-head h1 heading"
+  },
+  {
+    "fg": "ink-soft",
+    "bg": "board",
+    "required": 4.5,
+    "ratio": 7.31,
+    "note": "game-head hint paragraph"
+  },
+  {
+    "fg": "ink",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 15.76,
+    "note": "search input text"
+  },
+  {
+    "fg": "frame",
+    "bg": "surface",
+    "required": 3,
+    "ratio": 4.84,
+    "note": "search input border"
+  },
+  {
+    "fg": "ink",
+    "bg": "board-deep",
+    "required": 4.5,
+    "ratio": 11.86,
+    "note": "filter chip label, inactive"
+  },
+  {
+    "fg": "frame",
+    "bg": "board-deep",
+    "required": 3,
+    "ratio": 3.64,
+    "note": "filter chip border, inactive"
+  },
+  {
+    "fg": "on-action",
+    "bg": "action",
+    "required": 4.5,
+    "ratio": 6.99,
+    "note": "filter chip label, active"
+  },
+  {
+    "fg": "ink",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 15.76,
+    "note": "sort select text"
+  },
+  {
+    "fg": "frame",
+    "bg": "surface",
+    "required": 3,
+    "ratio": 4.84,
+    "note": "sort select border"
+  },
+  {
+    "fg": "frame",
+    "bg": "surface",
+    "required": 3,
+    "ratio": 4.84,
+    "note": "player strip border, unselected"
+  },
+  {
+    "fg": "ink",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 15.76,
+    "note": "player name on unselected strip"
+  },
+  {
+    "fg": "ink-soft",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 8.09,
+    "note": "player club/age meta on unselected strip"
+  },
+  {
+    "fg": "ink",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 15.76,
+    "note": "selection score number on unselected strip"
+  },
+  {
+    "fg": "ink",
+    "bg": "board-deep",
+    "required": 4.5,
+    "ratio": 11.86,
+    "note": "position magnet code on unselected strip"
+  },
+  {
+    "fg": "frame",
+    "bg": "board-deep",
+    "required": 3,
+    "ratio": 3.64,
+    "note": "position magnet border on unselected strip"
+  },
+  {
+    "fg": "ink-soft",
+    "bg": "board-deep",
+    "required": 4.5,
+    "ratio": 6.09,
+    "note": "role tag text on unselected strip"
+  },
+  {
+    "fg": "frame-soft",
+    "bg": "board-deep",
+    "required": 3,
+    "ratio": 3.49,
+    "note": "role tag border on unselected strip"
+  },
+  {
+    "fg": "warn-ink",
+    "bg": "warn-fill",
+    "required": 4.5,
+    "ratio": 6.99,
+    "note": "availability flag / alert tag text"
+  },
+  {
+    "fg": "warn-ink",
+    "bg": "warn-fill",
+    "required": 3,
+    "ratio": 6.99,
+    "note": "availability flag / alert tag border"
+  },
+  {
+    "fg": "ink-soft",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 8.09,
+    "note": "metric label on unselected strip"
+  },
+  {
+    "fg": "ink",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 15.76,
+    "note": "metric value on unselected strip"
+  },
+  {
+    "fg": "action",
+    "bg": "board-deep",
+    "required": 3,
+    "ratio": 5.19,
+    "note": "meter fill vs meter track"
+  },
+  {
+    "fg": "frame-soft",
+    "bg": "board-deep",
+    "required": 3,
+    "ratio": 3.49,
+    "note": "meter track border"
+  },
+  {
+    "fg": "on-action",
+    "bg": "action",
+    "required": 4.5,
+    "ratio": 6.99,
+    "note": "select-btn label, unpressed (Powolaj)"
+  },
+  {
+    "fg": "ink",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 15.76,
+    "note": "profile-btn label"
+  },
+  {
+    "fg": "frame",
+    "bg": "surface",
+    "required": 3,
+    "ratio": 4.84,
+    "note": "profile-btn / compare-btn border, unpressed"
+  },
+  {
+    "fg": "ink",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 15.76,
+    "note": "compare-btn label, unpressed"
+  },
+  {
+    "fg": "on-select",
+    "bg": "select",
+    "required": 4.5,
+    "ratio": 7.33,
+    "note": "select-btn label, pressed (Powolany)"
+  },
+  {
+    "fg": "action",
+    "bg": "board-deep",
+    "required": 4.5,
+    "ratio": 5.19,
+    "note": "compare-btn label, pressed (Wybrany)"
+  },
+  {
+    "fg": "action",
+    "bg": "board-deep",
+    "required": 3,
+    "ratio": 5.19,
+    "note": "compare-btn border, pressed"
+  },
+  {
+    "fg": "action",
+    "bg": "surface",
+    "required": 3,
+    "ratio": 6.9,
+    "note": "compare-on outline against surface"
+  },
+  {
+    "fg": "on-action",
+    "bg": "ink",
+    "required": 4.5,
+    "ratio": 15.98,
+    "note": "selected strip: player name on ink fill"
+  },
+  {
+    "fg": "on-action",
+    "bg": "ink",
+    "required": 4.5,
+    "ratio": 15.98,
+    "note": "selected strip: score number on ink fill"
+  },
+  {
+    "fg": "on-ink-meta",
+    "bg": "ink",
+    "required": 4.5,
+    "ratio": 9.45,
+    "note": "selected strip: club/age meta on ink fill"
+  },
+  {
+    "fg": "on-select",
+    "bg": "select",
+    "required": 4.5,
+    "ratio": 7.33,
+    "note": "selected strip: position magnet on magnet red"
+  },
+  {
+    "fg": "on-ink-tile",
+    "bg": "ink-tile",
+    "required": 4.5,
+    "ratio": 9.28,
+    "note": "selected strip: role tag text on dark tag fill"
+  },
+  {
+    "fg": "on-ink-tile-border",
+    "bg": "ink-tile",
+    "required": 3,
+    "ratio": 3.49,
+    "note": "selected strip: role tag border on dark tag fill"
+  },
+  {
+    "fg": "on-ink-soft",
+    "bg": "ink-tile",
+    "required": 4.5,
+    "ratio": 5.88,
+    "note": "selected strip: metric label on dark chip"
+  },
+  {
+    "fg": "on-action",
+    "bg": "ink-tile",
+    "required": 4.5,
+    "ratio": 11.41,
+    "note": "selected strip: metric value on dark chip"
+  },
+  {
+    "fg": "on-action",
+    "bg": "ink-tile",
+    "required": 4.5,
+    "ratio": 11.41,
+    "note": "selected strip: action button labels on dark fill"
+  },
+  {
+    "fg": "on-ink-border",
+    "bg": "ink-tile",
+    "required": 3,
+    "ratio": 3.78,
+    "note": "selected strip: action button border on dark fill"
+  },
+  {
+    "fg": "ink",
+    "bg": "board-deep",
+    "required": 4.5,
+    "ratio": 11.86,
+    "note": "dock-copy remaining-slots text"
+  },
+  {
+    "fg": "ink-soft",
+    "bg": "board-deep",
+    "required": 4.5,
+    "ratio": 6.09,
+    "note": "dock-copy hint text"
+  },
+  {
+    "fg": "frame",
+    "bg": "board-deep",
+    "required": 3,
+    "ratio": 3.64,
+    "note": "count-ring border"
+  },
+  {
+    "fg": "ink",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 15.76,
+    "note": "count-ring number on surface disc"
+  },
+  {
+    "fg": "ink-soft",
+    "bg": "disabled-fill",
+    "required": 3,
+    "ratio": 5.52,
+    "note": "finalize button label, disabled (WCAG exempts disabled text from 4.5:1; checked at ui/3:1 instead)"
+  },
+  {
+    "fg": "on-good",
+    "bg": "good",
+    "required": 4.5,
+    "ratio": 6.24,
+    "note": "finalize button label, enabled"
+  },
+  {
+    "fg": "frame",
+    "bg": "board-deep",
+    "required": 3,
+    "ratio": 3.64,
+    "note": "dock breakdown divider"
+  },
+  {
+    "fg": "ink-soft",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 8.09,
+    "note": "dock-summary group label"
+  },
+  {
+    "fg": "ink",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 15.76,
+    "note": "dock-summary count value"
+  },
+  {
+    "fg": "good",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 6.15,
+    "note": "dock-summary fulfilled status text"
+  },
+  {
+    "fg": "select-strong",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 10.34,
+    "note": "dock-summary missing status text"
+  },
+  {
+    "fg": "select",
+    "bg": "surface",
+    "required": 3,
+    "ratio": 7.23,
+    "note": "dock-summary missing card border"
+  },
+  {
+    "fg": "warn-ink",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 11.45,
+    "note": "dock-summary excess status text"
+  },
+  {
+    "fg": "warn-ink",
+    "bg": "surface",
+    "required": 3,
+    "ratio": 11.45,
+    "note": "dock-summary excess card border"
+  },
+  {
+    "fg": "board-line",
+    "bg": "board",
+    "required": 3,
+    "ratio": 3.13,
+    "note": "pitch marker lines against board surface"
+  },
+  {
+    "fg": "ink-soft",
+    "bg": "board",
+    "required": 4.5,
+    "ratio": 7.31,
+    "note": "formation label on pitch board"
+  },
+  {
+    "fg": "ink-soft",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 8.09,
+    "note": "pitch node position code"
+  },
+  {
+    "fg": "action",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 6.9,
+    "note": "pitch node count number"
+  },
+  {
+    "fg": "frame",
+    "bg": "surface",
+    "required": 3,
+    "ratio": 4.84,
+    "note": "pitch node magnet border"
+  },
+  {
+    "fg": "warn-ink",
+    "bg": "warn-fill",
+    "required": 4.5,
+    "ratio": 6.99,
+    "note": "formation-outsiders button text"
+  },
+  {
+    "fg": "warn-ink",
+    "bg": "warn-fill",
+    "required": 3,
+    "ratio": 6.99,
+    "note": "formation-outsiders dashed border"
+  },
+  {
+    "fg": "on-action",
+    "bg": "ink",
+    "required": 4.5,
+    "ratio": 15.98,
+    "note": "result-hero heading on ink hero"
+  },
+  {
+    "fg": "on-ink-lead",
+    "bg": "ink",
+    "required": 4.5,
+    "ratio": 11.48,
+    "note": "result-hero paragraph on ink hero"
+  },
+  {
+    "fg": "on-ink-eyebrow",
+    "bg": "ink",
+    "required": 4.5,
+    "ratio": 10.42,
+    "note": "result-eyebrow on ink hero"
+  },
+  {
+    "fg": "on-select",
+    "bg": "select",
+    "required": 4.5,
+    "ratio": 7.33,
+    "note": "grade magnet letter"
+  },
+  {
+    "fg": "on-action",
+    "bg": "ink-tile",
+    "required": 4.5,
+    "ratio": 11.41,
+    "note": "outcome value on hero chip"
+  },
+  {
+    "fg": "on-ink-meta",
+    "bg": "ink-tile",
+    "required": 4.5,
+    "ratio": 6.74,
+    "note": "outcome label on hero chip"
+  },
+  {
+    "fg": "ink",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 15.76,
+    "note": "report section heading"
+  },
+  {
+    "fg": "ink-soft",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 8.09,
+    "note": "report list item / last match text"
+  },
+  {
+    "fg": "frame-soft",
+    "bg": "surface",
+    "required": 3,
+    "ratio": 4.64,
+    "note": "report panel border"
+  },
+  {
+    "fg": "board-line",
+    "bg": "board",
+    "required": 3,
+    "ratio": 3.13,
+    "note": "bracket connector line and panel border"
+  },
+  {
+    "fg": "action",
+    "bg": "surface",
+    "required": 3,
+    "ratio": 6.9,
+    "note": "bracket dot fill/border, group stage (still carries the points number)"
+  },
+  {
+    "fg": "action",
+    "bg": "board",
+    "required": 3,
+    "ratio": 6.23,
+    "note": "bracket dot fill, passed/won stage, no invented letter code, against the bracket panel"
+  },
+  {
+    "fg": "select",
+    "bg": "board",
+    "required": 3,
+    "ratio": 6.54,
+    "note": "bracket dot fill, eliminated stage, no invented letter code, against the bracket panel"
+  },
+  {
+    "fg": "ink",
+    "bg": "board-deep",
+    "required": 4.5,
+    "ratio": 11.86,
+    "note": "bracket step round name"
+  },
+  {
+    "fg": "ink-soft",
+    "bg": "board-deep",
+    "required": 4.5,
+    "ratio": 6.09,
+    "note": "bracket step score"
+  },
+  {
+    "fg": "ink",
+    "bg": "board-deep",
+    "required": 4.5,
+    "ratio": 11.86,
+    "note": "squad-pill player name"
+  },
+  {
+    "fg": "frame-soft",
+    "bg": "board-deep",
+    "required": 3,
+    "ratio": 3.49,
+    "note": "squad-pill border"
+  },
+  {
+    "fg": "ink",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 15.76,
+    "note": "squad-pill position code on inner disc"
+  },
+  {
+    "fg": "frame",
+    "bg": "surface",
+    "required": 3,
+    "ratio": 4.84,
+    "note": "squad-pill position disc border"
+  },
+  {
+    "fg": "ink-soft",
+    "bg": "board",
+    "required": 4.5,
+    "ratio": 7.31,
+    "note": "fineprint / disclaimer text"
+  },
+  {
+    "fg": "focus-core",
+    "bg": "board",
+    "required": 3,
+    "ratio": 11.05,
+    "note": "focus ring inner colour on light background (the halo is not visible here, core carries it)"
+  },
+  {
+    "fg": "focus-halo",
+    "bg": "ink",
+    "required": 3,
+    "ratio": 16.44,
+    "note": "focus ring outer halo against dark strip (halo carries visibility here, core alone would not)"
+  },
+  {
+    "fg": "ink",
+    "bg": "surface-dialog",
+    "required": 4.5,
+    "ratio": 15.98,
+    "note": "dialog title"
+  },
+  {
+    "fg": "frame",
+    "bg": "surface-dialog",
+    "required": 3,
+    "ratio": 4.91,
+    "note": "dialog panel border"
+  },
+  {
+    "fg": "action",
+    "bg": "surface-dialog",
+    "required": 4.5,
+    "ratio": 7,
+    "note": "profile score big number"
+  },
+  {
+    "fg": "ink",
+    "bg": "board-deep",
+    "required": 4.5,
+    "ratio": 11.86,
+    "note": "profile metric value on board-deep tile"
+  },
+  {
+    "fg": "ink-soft",
+    "bg": "board-deep",
+    "required": 4.5,
+    "ratio": 6.09,
+    "note": "profile metric label on board-deep tile"
+  },
+  {
+    "fg": "ink",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 15.76,
+    "note": "close button label"
+  },
+  {
+    "fg": "ink",
+    "bg": "board-deep",
+    "required": 4.5,
+    "ratio": 11.86,
+    "note": "compare-card name and club"
+  },
+  {
+    "fg": "good",
+    "bg": "surface-dialog",
+    "required": 4.5,
+    "ratio": 6.24,
+    "note": "comparison-row winning value"
+  },
+  {
+    "fg": "ink",
+    "bg": "surface-dialog",
+    "required": 4.5,
+    "ratio": 15.98,
+    "note": "comparison-row value, non-winning"
+  },
+  {
+    "fg": "ink-soft",
+    "bg": "surface-dialog",
+    "required": 4.5,
+    "ratio": 8.21,
+    "note": "comparison-row metric label"
+  },
+  {
+    "fg": "frame-soft",
+    "bg": "surface-dialog",
+    "required": 3,
+    "ratio": 4.71,
+    "note": "comparison-row top divider"
+  },
+  {
+    "fg": "select-strong",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 10.34,
+    "note": "Resetuj (danger action) default text"
+  },
+  {
+    "fg": "select",
+    "bg": "surface",
+    "required": 3,
+    "ratio": 7.23,
+    "note": "Resetuj (danger action) default border"
+  },
+  {
+    "fg": "ink-soft",
+    "bg": "disabled-fill",
+    "required": 3,
+    "ratio": 5.52,
+    "note": "secondary action button label, disabled (Cofnij with no history), same tokens as the finalize disabled fix"
+  },
+  {
+    "fg": "action",
+    "bg": "board-deep",
+    "required": 4.5,
+    "ratio": 5.19,
+    "note": "secondary action / inactive chip label on hover"
+  },
+  {
+    "fg": "action",
+    "bg": "board-deep",
+    "required": 3,
+    "ratio": 5.19,
+    "note": "secondary action / inactive chip border on hover"
+  },
+  {
+    "fg": "select-strong",
+    "bg": "warn-fill",
+    "required": 4.5,
+    "ratio": 6.31,
+    "note": "Resetuj (danger action) label on hover"
+  },
+  {
+    "fg": "select",
+    "bg": "warn-fill",
+    "required": 3,
+    "ratio": 4.41,
+    "note": "Resetuj (danger action) border on hover"
+  },
+  {
+    "fg": "on-action",
+    "bg": "action-strong",
+    "required": 4.5,
+    "ratio": 10.63,
+    "note": "primary / select-btn (unpressed) / active chip label on hover or active"
+  },
+  {
+    "fg": "on-select",
+    "bg": "select-strong",
+    "required": 4.5,
+    "ratio": 10.48,
+    "note": "select-btn (pressed, Powolany) label on hover"
+  },
+  {
+    "fg": "action",
+    "bg": "surface",
+    "required": 3,
+    "ratio": 6.9,
+    "note": "choice button border on hover (unselected)"
+  },
+  {
+    "fg": "select-strong",
+    "bg": "surface",
+    "required": 3,
+    "ratio": 10.34,
+    "note": "choice button border on hover (selected)"
+  }
+]

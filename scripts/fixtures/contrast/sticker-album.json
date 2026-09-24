@@ -1,0 +1,310 @@
+[
+  {
+    "fg": "ink",
+    "bg": "page",
+    "required": 4.5,
+    "ratio": 14.9,
+    "note": "body text, h1, eyebrow on album page"
+  },
+  {
+    "fg": "ink",
+    "bg": "page-line",
+    "required": 4.5,
+    "ratio": 13.59,
+    "note": "body text on darker page stripe / selected sticker body / tag text inside a selected sticker / chip and outline-button hover tint text"
+  },
+  {
+    "fg": "ink-soft",
+    "bg": "page",
+    "required": 4.5,
+    "ratio": 8.41,
+    "note": "lead paragraph, chip caption on page"
+  },
+  {
+    "fg": "ink-soft",
+    "bg": "page-line",
+    "required": 4.5,
+    "ratio": 7.67,
+    "note": "secondary text on darker page stripe"
+  },
+  {
+    "fg": "ink-faint",
+    "bg": "page",
+    "required": 4.5,
+    "ratio": 4.62,
+    "note": "fineprint on page"
+  },
+  {
+    "fg": "ink-faint",
+    "bg": "sticker",
+    "required": 4.5,
+    "ratio": 5.42,
+    "note": "fineprint / small caption on sticker stock"
+  },
+  {
+    "fg": "ink",
+    "bg": "sticker",
+    "required": 4.5,
+    "ratio": 17.46,
+    "note": "name, tags, buttons, meters, pitch counts, default filter chip text on sticker stock"
+  },
+  {
+    "fg": "ink-soft",
+    "bg": "sticker",
+    "required": 4.5,
+    "ratio": 9.85,
+    "note": "meta line, dock-summary caption, mockup label on sticker stock"
+  },
+  {
+    "fg": "page-edge",
+    "bg": "surface-outer",
+    "required": 3,
+    "ratio": 3.9,
+    "note": "frame border against outer backdrop"
+  },
+  {
+    "fg": "on-dark",
+    "bg": "ink",
+    "required": 4.5,
+    "ratio": 16.72,
+    "note": "topbar brand/version, active filter chip, select-btn pressed text"
+  },
+  {
+    "fg": "action-ink",
+    "bg": "action",
+    "required": 4.5,
+    "ratio": 8.65,
+    "note": "phase pill, brand mark, primary button, call-up button text"
+  },
+  {
+    "fg": "line",
+    "bg": "sticker",
+    "required": 3,
+    "ratio": 4.57,
+    "note": "card / input / meter track border on sticker stock"
+  },
+  {
+    "fg": "line",
+    "bg": "page",
+    "required": 3,
+    "ratio": 3.9,
+    "note": "card border on page"
+  },
+  {
+    "fg": "sticker-line",
+    "bg": "sticker",
+    "required": 3,
+    "ratio": 3.3,
+    "note": "player sticker outer border"
+  },
+  {
+    "fg": "line-strong",
+    "bg": "sticker",
+    "required": 3,
+    "ratio": 9.85,
+    "note": "dashed slot / pitch-node border on sticker"
+  },
+  {
+    "fg": "line-strong",
+    "bg": "page",
+    "required": 3,
+    "ratio": 8.4,
+    "note": "dashed slot border on album page"
+  },
+  {
+    "fg": "ink",
+    "bg": "gk-band",
+    "required": 4.5,
+    "ratio": 10.83,
+    "note": "goalkeeper sticker band code + group label; also squad-pill text on the goalkeeper band in the report"
+  },
+  {
+    "fg": "ink",
+    "bg": "def-band",
+    "required": 4.5,
+    "ratio": 9.53,
+    "note": "defender sticker band code + group label; also squad-pill text on the defender band in the report"
+  },
+  {
+    "fg": "ink",
+    "bg": "mid-band",
+    "required": 4.5,
+    "ratio": 10.66,
+    "note": "midfielder sticker band code + group label; also squad-pill text on the midfielder band in the report; also dock-summary fulfilled group card"
+  },
+  {
+    "fg": "ink",
+    "bg": "fwd-band",
+    "required": 4.5,
+    "ratio": 9.12,
+    "note": "forward sticker band code + group label; also squad-pill text on the forward band in the report"
+  },
+  {
+    "fg": "gk-strong",
+    "bg": "sticker",
+    "required": 3,
+    "ratio": 9.9,
+    "note": "selected goalkeeper card frame ring"
+  },
+  {
+    "fg": "def-strong",
+    "bg": "sticker",
+    "required": 3,
+    "ratio": 10.03,
+    "note": "selected defender card frame ring"
+  },
+  {
+    "fg": "mid-strong",
+    "bg": "sticker",
+    "required": 3,
+    "ratio": 11.15,
+    "note": "selected midfielder card frame ring"
+  },
+  {
+    "fg": "fwd-strong",
+    "bg": "sticker",
+    "required": 3,
+    "ratio": 9,
+    "note": "selected forward card frame ring"
+  },
+  {
+    "fg": "gk-strong",
+    "bg": "gk-band",
+    "required": 3,
+    "ratio": 6.14,
+    "note": "report squad-pill goalkeeper border on its own band"
+  },
+  {
+    "fg": "def-strong",
+    "bg": "def-band",
+    "required": 3,
+    "ratio": 5.47,
+    "note": "report squad-pill defender border on its own band"
+  },
+  {
+    "fg": "mid-strong",
+    "bg": "mid-band",
+    "required": 3,
+    "ratio": 6.81,
+    "note": "report squad-pill midfielder border on its own band"
+  },
+  {
+    "fg": "fwd-strong",
+    "bg": "fwd-band",
+    "required": 3,
+    "ratio": 4.7,
+    "note": "report squad-pill forward border on its own band"
+  },
+  {
+    "fg": "alert-ink",
+    "bg": "alert-bg",
+    "required": 4.5,
+    "ratio": 9.38,
+    "note": "availability flag / negative trial tag text and border"
+  },
+  {
+    "fg": "alert-ink",
+    "bg": "sticker",
+    "required": 4.5,
+    "ratio": 11.49,
+    "note": "dock-summary missing group status text"
+  },
+  {
+    "fg": "action",
+    "bg": "sticker",
+    "required": 4.5,
+    "ratio": 9.07,
+    "note": "comparison-row 'better' value highlight"
+  },
+  {
+    "fg": "focus",
+    "bg": "page",
+    "required": 3,
+    "ratio": 6.05,
+    "note": "focus ring on album page"
+  },
+  {
+    "fg": "focus",
+    "bg": "sticker",
+    "required": 3,
+    "ratio": 7.09,
+    "note": "focus ring on sticker / card surfaces"
+  },
+  {
+    "fg": "focus-ondark",
+    "bg": "ink",
+    "required": 3,
+    "ratio": 13.03,
+    "note": "focus ring inside dialog / dark modal backdrop"
+  },
+  {
+    "fg": "focus-ondark",
+    "bg": "action",
+    "required": 3,
+    "ratio": 6.77,
+    "note": "focus ring on action-coloured buttons"
+  },
+  {
+    "fg": "ink",
+    "bg": "surface-active",
+    "required": 4.5,
+    "ratio": 11.24,
+    "note": "outline button / choice active (pressed-down) tint"
+  },
+  {
+    "fg": "action-ink",
+    "bg": "action-hover",
+    "required": 4.5,
+    "ratio": 11.06,
+    "note": "primary / finalize / call-up button hover"
+  },
+  {
+    "fg": "action-ink",
+    "bg": "action-active",
+    "required": 4.5,
+    "ratio": 13.48,
+    "note": "primary / finalize / call-up button active"
+  },
+  {
+    "fg": "on-dark",
+    "bg": "ink-hover",
+    "required": 4.5,
+    "ratio": 12.86,
+    "note": "pressed call-up button (Powołany) hover"
+  },
+  {
+    "fg": "on-dark",
+    "bg": "ink-active",
+    "required": 4.5,
+    "ratio": 18.57,
+    "note": "pressed call-up button (Powołany) active"
+  },
+  {
+    "fg": "ink",
+    "bg": "line",
+    "required": 3,
+    "ratio": 3.81,
+    "note": "meter fill (ink) vs its own track (line), 3:1"
+  },
+  {
+    "fg": "ink-soft",
+    "bg": "page-line",
+    "required": 3,
+    "ratio": 7.67,
+    "note": "disabled finalize button text on its disabled background"
+  },
+  {
+    "fg": "line",
+    "bg": "page-line",
+    "required": 3,
+    "ratio": 3.56,
+    "note": "disabled finalize button border on its disabled background"
+  },
+  {
+    "fg": "focus",
+    "bg": "page-line",
+    "required": 3,
+    "ratio": 5.52,
+    "note": "focus ring on a selected sticker body / pressed surface"
+  }
+]
