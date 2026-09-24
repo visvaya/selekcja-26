@@ -1,5 +1,4 @@
 import { expect, test } from "@playwright/test";
-import type { Page } from "@playwright/test";
 import { players } from "../src/data/catalog.ts";
 import { APP_CONFIG, RULES_REVISION } from "../src/data/constants.ts";
 import {
@@ -7,26 +6,17 @@ import {
   collectPageErrors,
   dialog,
   expectSavedSchemaVersion,
+  finishedOtherRulesReportSave,
   patchStorageFailures,
   saveAlert,
   saveBanner,
   saveStatusRegion,
+  seedStorage,
   setStorageFailureMode,
   squadCount,
   text,
+  unfinishedOtherRulesSave,
 } from "./helpers.ts";
-
-async function seedStorage(page: Page, value: string): Promise<void> {
-  await page.addInitScript(
-    ([key, raw]) => {
-      if (!sessionStorage.getItem("seeded")) {
-        localStorage.setItem(key!, raw!);
-        sessionStorage.setItem("seeded", "1");
-      }
-    },
-    [STORAGE_KEY, value],
-  );
-}
 
 test("a version 1 save is migrated without undo history", async ({ page }) => {
   const errors = collectPageErrors(page);
@@ -181,41 +171,11 @@ test("a version 2 save loads into the final stage and rewrites to version 3", as
   expect(errors).toEqual([]);
 });
 
-function v3Snapshot(
-  overrides: Record<string, unknown> = {},
-): Record<string, unknown> {
-  return {
-    system: "433",
-    priority: "balance",
-    stage: "camp",
-    started: true,
-    selected: ["robert-lewandowski"],
-    campSquad: [],
-    trial: {},
-    filter: "ALL",
-    query: "",
-    sort: "model",
-    events: [],
-    effects: { chem: 0, fit: 0, quality: 0 },
-    compare: [],
-    seed: 111,
-    report: null,
-    ...overrides,
-  };
-}
-
 test("an unfinished version 3 save from other rules is discarded with a notice", async ({
   page,
 }) => {
   const errors = collectPageErrors(page);
-  await seedStorage(
-    page,
-    JSON.stringify({
-      schemaVersion: 3,
-      rulesRevision: RULES_REVISION + 1,
-      state: { ...v3Snapshot(), history: [] },
-    }),
-  );
+  await seedStorage(page, unfinishedOtherRulesSave());
   await page.goto("/");
 
   await expect(dialog(page)).toBeVisible();
@@ -249,44 +209,7 @@ test("a finished version 3 report from other rules is shown frozen with the olde
   page,
 }) => {
   const errors = collectPageErrors(page);
-  const squadIds = [
-    "lukasz-skorupski",
-    "jakub-kiwior",
-    "piotr-zielinski",
-    "robert-lewandowski",
-  ];
-  await seedStorage(
-    page,
-    JSON.stringify({
-      schemaVersion: 3,
-      rulesRevision: RULES_REVISION + 1,
-      state: {
-        ...v3Snapshot({
-          stage: "final",
-          report: {
-            rulesRevision: RULES_REVISION + 1,
-            squadIds,
-            quality: 80,
-            chem: 78,
-            coverage: 92,
-            luck: 0,
-            points: 5,
-            stage: text.outcomes.roundOf16,
-            grade: "B",
-            strengths: [],
-            weak: [],
-            story: {
-              matches: [`${text.tournament.rounds[0]}: 5 pkt`],
-              outcome: "Polska odpadła w 1/8 finału.",
-              last: "Polska 0:1 Dania",
-              seed: 9,
-            },
-          },
-        }),
-        history: [],
-      },
-    }),
-  );
+  await seedStorage(page, finishedOtherRulesReportSave());
   await page.goto("/");
 
   await expect(

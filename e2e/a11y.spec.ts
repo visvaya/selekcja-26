@@ -7,12 +7,15 @@ import {
   dialog,
   dockToggle,
   finalizeButton,
+  finishedOtherRulesReportSave,
   patchStorageFailures,
   saveAlert,
+  seedStorage,
   setStorageFailureMode,
   squadCount,
   STORAGE_KEY,
   text,
+  unfinishedOtherRulesSave,
 } from "./helpers.ts";
 
 const WCAG_TAGS = [
@@ -38,11 +41,28 @@ const EXPECTED_STATES = [
   "camp report dialog",
   "final list",
   "tournament report",
+  "rules changed notice",
+  "older rules report",
 ] as const;
 type ScreenState = (typeof EXPECTED_STATES)[number];
 
-async function scan(page: Page, state: ScreenState, scanned: Set<string>) {
-  const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+// The candidate list renders every card with the same PlayerCard component, so once its markup
+// is scanned in full on "camp list" and "final list" (the two required full-list scans; the
+// final-stage card has an extra camp-result line the camp-stage card never renders, so it needs
+// its own full scan), repeated cards on every other state, which mostly stays open behind
+// dialogs or the formation dock, add scan time without adding coverage. Keeping the first few
+// still exercises the list container and its layout.
+const REPEATED_CARD_SELECTOR = ".players .player:nth-child(n+4)";
+
+async function scan(
+  page: Page,
+  state: ScreenState,
+  scanned: Set<string>,
+  { fullList = false }: { fullList?: boolean } = {},
+) {
+  let builder = new AxeBuilder({ page }).withTags(WCAG_TAGS);
+  if (!fullList) builder = builder.exclude(REPEATED_CARD_SELECTOR);
+  const results = await builder.analyze();
   const violations = results.violations.map(
     (violation) =>
       `${violation.id} (${violation.impact}): ${violation.nodes
@@ -54,93 +74,129 @@ async function scan(page: Page, state: ScreenState, scanned: Set<string>) {
   scanned.add(state);
 }
 
-test("every screen and dialog passes an axe WCAG 2.2 AA scan", async ({
-  page,
-}) => {
-  // Nine full-page axe scans of a 61-card list take longer than a plain journey.
-  test.setTimeout(300_000);
+// The two save-related states need a fresh page with seeded localStorage, so they run as their
+// own tests rather than steps in the game-screens test below. describe.serial guarantees all
+// three tests run in order in the same worker, so the closed-over `scanned` set accumulates
+// across them and the last test can still assert every EXPECTED_STATES entry was reached.
+test.describe.serial("axe WCAG 2.2 AA scan", () => {
   const scanned = new Set<string>();
-  await patchStorageFailures(page, STORAGE_KEY);
-  await page.goto("/");
-  await expect(
-    page.getByRole("heading", { name: text.introTitle }),
-  ).toBeVisible();
-  await scan(page, "intro", scanned);
 
-  // Located by aria-controls rather than accessible name: the button's own label changes
-  // ("Wcześniejsze zmiany (N)" to "Ukryj wcześniejsze zmiany") when it toggles.
-  const changelogToggle = page.locator('[aria-controls="changelog-older"]');
-  await expect(changelogToggle).toHaveAccessibleName(
-    text.changelogShowOlder(CHANGELOG.length - 1),
-  );
-  await changelogToggle.click();
-  await expect(changelogToggle).toHaveAttribute("aria-expanded", "true");
-  await expect(changelogToggle).toHaveAccessibleName(text.changelogHideOlder);
-  await scan(page, "intro changelog expanded", scanned);
-  await changelogToggle.click();
+  test("every screen and dialog passes an axe WCAG 2.2 AA scan", async ({
+    page,
+  }) => {
+    // Eleven axe scans across a full game, two of them full 61-card list scans, still take
+    // longer than a plain journey.
+    test.setTimeout(300_000);
+    await patchStorageFailures(page, STORAGE_KEY);
+    await page.goto("/");
+    await expect(
+      page.getByRole("heading", { name: text.introTitle }),
+    ).toBeVisible();
+    await scan(page, "intro", scanned);
 
-  await page.getByRole("button", { name: text.start }).click();
-  await expect(
-    page.getByRole("heading", { name: text.stages.camp.heading }),
-  ).toBeVisible();
-  await scan(page, "camp list", scanned);
+    // Located by aria-controls rather than accessible name: the button's own label changes
+    // ("Wcześniejsze zmiany (N)" to "Ukryj wcześniejsze zmiany") when it toggles.
+    const changelogToggle = page.locator('[aria-controls="changelog-older"]');
+    await expect(changelogToggle).toHaveAccessibleName(
+      text.changelogShowOlder(CHANGELOG.length - 1),
+    );
+    await changelogToggle.click();
+    await expect(changelogToggle).toHaveAttribute("aria-expanded", "true");
+    await expect(changelogToggle).toHaveAccessibleName(text.changelogHideOlder);
+    await scan(page, "intro changelog expanded", scanned);
+    await changelogToggle.click();
 
-  await setStorageFailureMode(page, "failed");
-  await page.locator(".select-btn").first().click();
-  await expect(saveAlert(page)).toHaveText(text.save.messages.failed);
-  await scan(page, "save error banner", scanned);
-  await setStorageFailureMode(page, "none");
-  // Toggle the same player back off, restoring the earlier selection while forcing a
-  // successful save that clears the banner so the remaining states stay unaffected.
-  await page.locator(".select-btn").first().click();
-  await expect(saveAlert(page)).toHaveText("");
+    await page.getByRole("button", { name: text.start }).click();
+    await expect(
+      page.getByRole("heading", { name: text.stages.camp.heading }),
+    ).toBeVisible();
+    await scan(page, "camp list", scanned, { fullList: true });
 
-  await page.getByRole("button", { name: text.profile }).first().click();
-  await expect(dialog(page)).toBeVisible();
-  await scan(page, "profile dialog", scanned);
-  await dialog(page).getByRole("button", { name: text.returnToList }).click();
+    await setStorageFailureMode(page, "failed");
+    await page.locator(".select-btn").first().click();
+    await expect(saveAlert(page)).toHaveText(text.save.messages.failed);
+    await scan(page, "save error banner", scanned);
+    await setStorageFailureMode(page, "none");
+    // Toggle the same player back off, restoring the earlier selection while forcing a
+    // successful save that clears the banner so the remaining states stay unaffected.
+    await page.locator(".select-btn").first().click();
+    await expect(saveAlert(page)).toHaveText("");
 
-  const compareButtons = page.locator(".compare-btn");
-  await compareButtons.nth(0).click();
-  await compareButtons.nth(1).click();
-  await expect(dialog(page)).toHaveAccessibleName(text.comparisonTitle);
-  await scan(page, "comparison dialog", scanned);
-  await dialog(page)
-    .getByRole("button", { name: text.clearComparison })
-    .click();
+    await page.getByRole("button", { name: text.profile }).first().click();
+    await expect(dialog(page)).toBeVisible();
+    await scan(page, "profile dialog", scanned);
+    await dialog(page).getByRole("button", { name: text.returnToList }).click();
 
-  await page.getByRole("button", { name: text.autoFill }).click();
-  await expect(dialog(page)).toHaveAccessibleName(text.events.doctor.title);
-  await scan(page, "event dialog", scanned);
-  for (const choice of CAMP_EVENT_CHOICES)
+    const compareButtons = page.locator(".compare-btn");
+    await compareButtons.nth(0).click();
+    await compareButtons.nth(1).click();
+    await expect(dialog(page)).toHaveAccessibleName(text.comparisonTitle);
+    await scan(page, "comparison dialog", scanned);
     await dialog(page)
-      .getByRole("button", { name: new RegExp(choice) })
+      .getByRole("button", { name: text.clearComparison })
       .click();
-  await expect(squadCount(page)).toHaveText("23/23");
 
-  await dockToggle(page).click();
-  await expect(dockToggle(page)).toHaveAttribute("aria-expanded", "true");
-  await scan(page, "formation map", scanned);
-  await dockToggle(page).click();
+    await page.getByRole("button", { name: text.autoFill }).click();
+    await expect(dialog(page)).toHaveAccessibleName(text.events.doctor.title);
+    await scan(page, "event dialog", scanned);
+    for (const choice of CAMP_EVENT_CHOICES)
+      await dialog(page)
+        .getByRole("button", { name: new RegExp(choice) })
+        .click();
+    await expect(squadCount(page)).toHaveText("23/23");
 
-  await finalizeButton(page).click();
-  await expect(dialog(page)).toHaveAccessibleName(text.campReportTitle);
-  await scan(page, "camp report dialog", scanned);
-  await dialog(page)
-    .getByRole("button", { name: text.continueToFinal })
-    .click();
+    await dockToggle(page).click();
+    await expect(dockToggle(page)).toHaveAttribute("aria-expanded", "true");
+    await scan(page, "formation map", scanned);
+    await dockToggle(page).click();
 
-  await expect(
-    page.getByRole("heading", { name: text.stages.final.heading }),
-  ).toBeVisible();
-  await scan(page, "final list", scanned);
+    await finalizeButton(page).click();
+    await expect(dialog(page)).toHaveAccessibleName(text.campReportTitle);
+    await scan(page, "camp report dialog", scanned);
+    await dialog(page)
+      .getByRole("button", { name: text.continueToFinal })
+      .click();
 
-  await page.getByRole("button", { name: text.autoFill }).click();
-  await finalizeButton(page).click();
-  await expect(
-    page.getByRole("heading", { name: text.tournamentProgress }),
-  ).toBeVisible();
-  await scan(page, "tournament report", scanned);
+    await expect(
+      page.getByRole("heading", { name: text.stages.final.heading }),
+    ).toBeVisible();
+    await scan(page, "final list", scanned, { fullList: true });
 
-  expect([...scanned]).toEqual([...EXPECTED_STATES]);
+    await page.getByRole("button", { name: text.autoFill }).click();
+    await finalizeButton(page).click();
+    await expect(
+      page.getByRole("heading", { name: text.tournamentProgress }),
+    ).toBeVisible();
+    await scan(page, "tournament report", scanned);
+  });
+
+  test("rules changed notice from an unfinished save with other rules", async ({
+    page,
+  }) => {
+    await seedStorage(page, unfinishedOtherRulesSave());
+    await page.goto("/");
+    await expect(dialog(page)).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: text.rulesChangedTitle }),
+    ).toBeVisible();
+    await scan(page, "rules changed notice", scanned);
+  });
+
+  test("older rules report from a finished save with other rules", async ({
+    page,
+  }) => {
+    await seedStorage(page, finishedOtherRulesReportSave());
+    await page.goto("/");
+    await expect(
+      page.getByRole("heading", { name: text.outcomes.roundOf16 }),
+    ).toBeVisible();
+    await expect(page.locator(".fineprint").first()).toContainText(
+      text.reportFromOlderRules,
+    );
+    await scan(page, "older rules report", scanned);
+
+    // Every EXPECTED_STATES entry must have been scanned by one of the three tests above; this
+    // test runs last (describe.serial), so it is the only reliable place for the full check.
+    expect([...scanned].sort()).toEqual([...EXPECTED_STATES].sort());
+  });
 });

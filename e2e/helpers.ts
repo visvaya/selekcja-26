@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test";
 import type { Locator, Page } from "@playwright/test";
-import { APP_CONFIG } from "../src/data/constants.ts";
+import { APP_CONFIG, RULES_REVISION } from "../src/data/constants.ts";
 import { UI_TEXT as text } from "../src/ui/text.ts";
 
 export { text };
@@ -12,6 +12,95 @@ export const CAMP_EVENT_CHOICES = [
   text.events.captain.choices[0]!.title,
   text.events.scout.choices[0]!.title,
 ] as const;
+
+// Seeds localStorage before the page's own scripts run, so the game boots directly from the
+// given save. "seeded" guards against re-seeding on a reload within the same test.
+export async function seedStorage(page: Page, value: string): Promise<void> {
+  await page.addInitScript(
+    ([key, raw]) => {
+      if (!sessionStorage.getItem("seeded")) {
+        localStorage.setItem(key!, raw!);
+        sessionStorage.setItem("seeded", "1");
+      }
+    },
+    [STORAGE_KEY, value],
+  );
+}
+
+// A minimal version 3 save state, used as the base for the "other rules" scenarios below.
+function v3Snapshot(
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+  return {
+    system: "433",
+    priority: "balance",
+    stage: "camp",
+    started: true,
+    selected: ["robert-lewandowski"],
+    campSquad: [],
+    trial: {},
+    filter: "ALL",
+    query: "",
+    sort: "model",
+    events: [],
+    effects: { chem: 0, fit: 0, quality: 0 },
+    compare: [],
+    seed: 111,
+    report: null,
+    ...overrides,
+  };
+}
+
+// An unfinished version 3 save whose rulesRevision does not match the running build, so it gets
+// discarded on load with the "rules changed" notice. Shared by the storage test and the axe scan.
+export function unfinishedOtherRulesSave(): string {
+  return JSON.stringify({
+    schemaVersion: 3,
+    rulesRevision: RULES_REVISION + 1,
+    state: { ...v3Snapshot(), history: [] },
+  });
+}
+
+const OLDER_RULES_SQUAD_IDS = [
+  "lukasz-skorupski",
+  "jakub-kiwior",
+  "piotr-zielinski",
+  "robert-lewandowski",
+];
+
+// A finished version 3 report from another rules revision, shown frozen with the older-rules
+// note. Shared by the storage test and the axe scan.
+export function finishedOtherRulesReportSave(): string {
+  return JSON.stringify({
+    schemaVersion: 3,
+    rulesRevision: RULES_REVISION + 1,
+    state: {
+      ...v3Snapshot({
+        stage: "final",
+        report: {
+          rulesRevision: RULES_REVISION + 1,
+          squadIds: OLDER_RULES_SQUAD_IDS,
+          quality: 80,
+          chem: 78,
+          coverage: 92,
+          luck: 0,
+          points: 5,
+          stage: text.outcomes.roundOf16,
+          grade: "B",
+          strengths: [],
+          weak: [],
+          story: {
+            matches: [`${text.tournament.rounds[0]}: 5 pkt`],
+            outcome: "Polska odpadła w 1/8 finału.",
+            last: "Polska 0:1 Dania",
+            seed: 9,
+          },
+        },
+      }),
+      history: [],
+    },
+  });
+}
 
 export async function expectSavedSchemaVersion(
   page: Page,
