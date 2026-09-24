@@ -9,7 +9,7 @@
 //   - a known failure's ratio drops below the recorded value (regression);
 //   - a known failure's ratio now meets its required ratio (the map entry
 //     is stale and must be removed).
-// No colour is changed by this task; known failures are left for the
+// Known failures are left for the
 // planned visual redesign (docs/future-scope.md).
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -302,8 +302,6 @@ const KNOWN_FAILURES = new Map([
   ["line on card", 1.29],
   ["radio-border on card", 2.22],
   ["pitch-marker on card", 2.23],
-  ["focus-ring on paper", 1.66],
-  ["focus-ring on card", 1.68],
   ["warning-border on warning-surface", 1.63],
   ["warning-border on card", 1.8],
 ]);

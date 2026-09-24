@@ -12,7 +12,7 @@
   --surface-soft: #f0f2f5;
   --surface-accent: #edf0f4;
   --text-secondary: #4f5661;
-  --focus-ring: rgba(201, 25, 45, 0.3);
+  --focus-ring: var(--red);
   --spacing-unit: 4px;
   --shadow: 0 14px 34px rgba(17, 21, 28, 0.09);
 }
