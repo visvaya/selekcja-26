@@ -224,6 +224,14 @@ export const UI_TEXT = {
   addToSquad: "Powołaj do kadry",
   removeShort: "Odwołaj",
   returnToList: "Wróć do listy",
+  announcements: {
+    undo: (count: number, limit: number) =>
+      `Cofnięto ostatnią decyzję. Powołani: ${count} z ${limit}.`,
+    autoFill: (added: number, count: number, limit: number) =>
+      `Losowo dobrano zawodników: ${added}. Powołani: ${count} z ${limit}.`,
+    eventResolved: (choiceTitle: string) =>
+      `Zdarzenie rozstrzygnięte: ${choiceTitle}.`,
+  },
   fullSquadTitle: "Lista jest pełna",
   fullSquadMessage:
     "Aby powołać kolejnego zawodnika, najpierw zwolnij jedno miejsce.",

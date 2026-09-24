@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import type { CSSProperties, ReactNode, RefObject } from "react";
 import {
   players,
@@ -30,6 +31,7 @@ import type { LoadedSave } from "../logic/save-format.ts";
 import { createLatestRequestTracker } from "../logic/latest-request.ts";
 import { initialSaveStatus, reduceSaveStatus } from "../logic/save-status.ts";
 import { SaveStatusBanner } from "./save-status-banner.tsx";
+import { LiveAnnouncer } from "./live-announcer.tsx";
 import { ChangelogSection } from "./changelog-section.tsx";
 import { buildFinalReport } from "../logic/report.ts";
 import {
@@ -575,6 +577,17 @@ export function GameApp() {
   // every full-screen transition somewhere safe to send focus.
   const headingRef = useRef<HTMLHeadingElement>(null);
   const focusHeading = useCallback(() => headingRef.current?.focus(), []);
+  // Screen-reader announcements for actions that change the squad without moving focus
+  // (undo, a successful random fill, resolving a camp event). Local UI state, never saved,
+  // no undo step. flushSync commits the empty string as its own render before the real
+  // message is set, so an identical announcement (e.g. undoing twice in a row) still mutates
+  // the live region's text content and gets read out again instead of being silently
+  // skipped by React's same-value bailout.
+  const [announcement, setAnnouncement] = useState("");
+  function announce(message: string) {
+    flushSync(() => setAnnouncement(""));
+    setAnnouncement(message);
+  }
 
   function runSave(nextState: GameState) {
     const isLatest = saveRequestsRef.current.begin();
@@ -655,11 +668,19 @@ export function GameApp() {
       });
       return;
     }
+    const added = result.selected.size - state.selected.size;
     dispatch({
       type: "autoFill",
       selected: result.selected,
       seed: result.seed,
     });
+    announce(
+      text.announcements.autoFill(
+        added,
+        result.selected.size,
+        squadLimit(state),
+      ),
+    );
   }
   function retrySave() {
     runSave(state);
@@ -668,6 +689,9 @@ export function GameApp() {
     dispatchSaveStatus({ type: "dismiss" });
   }
   function undo() {
+    const next = reduceGameState(state, { type: "undo" });
+    if (next !== state)
+      announce(text.announcements.undo(next.selected.size, squadLimit(next)));
     dispatch({ type: "undo" });
     setModal(null);
     setExpanded(false);
@@ -710,13 +734,14 @@ export function GameApp() {
             <button
               className="decision"
               key={choice.title}
-              onClick={() =>
+              onClick={() => {
                 dispatch({
                   type: "resolveEvent",
                   id: event.id,
                   effects: event.choices[index]!,
-                })
-              }
+                });
+                announce(text.announcements.eventResolved(choice.title));
+              }}
             >
               <b>{choice.title}</b>
               <small>{choice.description}</small>
@@ -954,6 +979,7 @@ export function GameApp() {
   const currentSystem = text.systems[state.system];
   return (
     <div className="app">
+      <LiveAnnouncer message={announcement} />
       <SaveStatusBanner
         status={saveStatus}
         onRetry={retrySave}

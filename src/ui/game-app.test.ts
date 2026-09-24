@@ -1,31 +1,23 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { players } from "../data/catalog.ts";
+import { GAME_RULES } from "../data/constants.ts";
 import type { GroupPosition, Player } from "../data/types.ts";
-import { createServer } from "vite";
 import { withJsdomWindow } from "./test-jsdom-window.ts";
+import { renderGameApp } from "./test-render-game-app.ts";
+import { UI_TEXT } from "./text.ts";
 
 test("start, profile, comparison, event and position filter work together", async () => {
   await withJsdomWindow(async (dom) => {
-    dom.window.scrollTo = () => {};
-    const React = await import("react");
-    const { act, fireEvent, render, screen, waitFor, cleanup } =
-      await import("@testing-library/react");
-    const vite = await createServer({
-      server: { middlewareMode: true },
-      appType: "custom",
-    });
+    const { act, fireEvent, screen, waitFor, cleanup, vite, view } =
+      await renderGameApp(dom);
     try {
-      const { GameApp } = (await vite.ssrLoadModule(
-        "/src/ui/game-app.tsx",
-      )) as typeof import("./game-app.tsx");
       // Node's assert failure message runs util.inspect on both values; doing that on a live
       // DOM node walks jsdom's circular window/document graph and can exhaust the heap. Every
       // focus check below compares to a boolean instead of asserting on the node directly.
       function isFocused(element: Element | null): boolean {
         return dom.window.document.activeElement === element;
       }
-      const view = render(React.createElement(GameApp));
       fireEvent.click(
         await screen.findByRole("button", { name: "Rozpocznij odprawę" }),
       );
@@ -180,6 +172,99 @@ test("start, profile, comparison, event and position filter work together", asyn
       // JSDOM globals are still installed. Without this, cleanup() can unmount the tree while a
       // scheduled passive-effect flush is still pending; that callback then runs after the
       // environment is torn down and throws reading `window.event`.
+      await act(async () => {
+        await new Promise((resolve) => setImmediate(resolve));
+      });
+    } finally {
+      cleanup();
+      await vite.close();
+    }
+  });
+});
+
+test("live region announces undo, random fill and event outcomes", async () => {
+  await withJsdomWindow(async (dom) => {
+    // `screen` is bound to `document.body` once, at the first `@testing-library/react`
+    // import in this process, so with a second JSDOM window in play it would still query
+    // the first test's (by then closed) document. `view`'s own query methods are bound to
+    // this render's `baseElement` instead, which stays correct across separate windows.
+    const { act, fireEvent, waitFor, cleanup, vite, view } =
+      await renderGameApp(dom);
+    try {
+      function liveRegionText(): string {
+        return (
+          view.container.querySelector('[aria-live="polite"]')?.textContent ??
+          ""
+        );
+      }
+      await view.findByRole("button", { name: "Rozpocznij odprawę" });
+      // Nothing has changed the squad yet: the region must start empty, both on this first
+      // render and while the save load (there is none to load here) settles.
+      assert.equal(liveRegionText(), "");
+
+      // Two system swaps before the game starts (neither changes the selected squad) give
+      // two undo steps to exercise: reverting either always lands on the same "0 z 23"
+      // wording, which is exactly the repeated-announcement case the mechanism must handle.
+      const systemGrid = view.container.querySelectorAll(".choice-grid")[0]!;
+      const systemButtons = [...systemGrid.querySelectorAll("button")];
+      fireEvent.click(systemButtons[1]!);
+      fireEvent.click(systemButtons[2]!);
+
+      const expectedUndo = UI_TEXT.announcements.undo(
+        0,
+        GAME_RULES.camp.squadSizePlayers,
+      );
+      fireEvent.click(view.getByRole("button", { name: "Cofnij" }));
+      await waitFor(() => assert.equal(liveRegionText(), expectedUndo));
+
+      // A MutationObserver, not just the final text, proves the region's content was
+      // actually mutated a second time: a screen reader announces on DOM mutation, so a
+      // same-value setState that reused the old string without going through an empty
+      // intermediate value would pass a text-only check while still announcing nothing.
+      const liveRegion = view.container.querySelector('[aria-live="polite"]')!;
+      let mutations = 0;
+      const observer = new dom.window.MutationObserver(() => {
+        mutations += 1;
+      });
+      observer.observe(liveRegion, {
+        childList: true,
+        characterData: true,
+        subtree: true,
+      });
+      fireEvent.click(view.getByRole("button", { name: "Cofnij" }));
+      await waitFor(() => assert.equal(liveRegionText(), expectedUndo));
+      assert.ok(
+        mutations > 0,
+        "repeating the same announcement must still mutate the live region",
+      );
+      observer.disconnect();
+
+      fireEvent.click(view.getByRole("button", { name: "Rozpocznij odprawę" }));
+      await view.findByRole("heading", {
+        name: "Wybierz 23 zawodników na test",
+      });
+
+      const expectedAutoFill = UI_TEXT.announcements.autoFill(
+        GAME_RULES.camp.squadSizePlayers,
+        GAME_RULES.camp.squadSizePlayers,
+        GAME_RULES.camp.squadSizePlayers,
+      );
+      fireEvent.click(view.getByRole("button", { name: "Dobierz losowo" }));
+      await waitFor(() => assert.equal(liveRegionText(), expectedAutoFill));
+
+      // A full squad crosses every camp event threshold at once; the first unresolved one
+      // opens a blocking dialog on top of the just-announced random-fill message.
+      await view.findByRole("heading", {
+        name: "Raport medyczny: przeciążenie",
+      });
+      const expectedEvent = UI_TEXT.announcements.eventResolved(
+        "Ogranicz jego minuty",
+      );
+      fireEvent.click(
+        view.getByRole("button", { name: /Ogranicz jego minuty/ }),
+      );
+      await waitFor(() => assert.equal(liveRegionText(), expectedEvent));
+
       await act(async () => {
         await new Promise((resolve) => setImmediate(resolve));
       });
