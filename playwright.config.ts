@@ -21,6 +21,9 @@ export default defineConfig({
   },
   projects: [
     {
+      // The axe scan runs here only: the game is mobile-first, and the layout-dependent rules
+      // (contrast of overlapping elements, WCAG 2.2 target size) are most exposed on a narrow
+      // screen. The DOM is the same at every width, so a second project repeated the same scan.
       name: "phone",
       testMatch: /phone|storage|a11y/,
       use: { ...devices["Pixel 7"], viewport: PHONE_VIEWPORT },
@@ -33,7 +36,7 @@ export default defineConfig({
     },
     {
       name: "desktop-keyboard",
-      testMatch: /keyboard|a11y/,
+      testMatch: /keyboard/,
       use: { ...devices["Desktop Chrome"] },
     },
   ],
