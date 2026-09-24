@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { flushSync } from "react-dom";
-import { players, priorities, systems } from "../data/catalog.ts";
-import { APP_CONFIG, GAME_RULES } from "../data/constants.ts";
-import { GAME_VERSION } from "../data/changelog.ts";
+import { players } from "../data/catalog.ts";
+import { APP_CONFIG } from "../data/constants.ts";
 import type { GameState, PlayerId } from "../data/types.ts";
 import { fillSquadRandomly } from "../logic/random-squad.ts";
 import { createInitialState, reduceGameState } from "../logic/state.ts";
@@ -12,7 +11,8 @@ import { createLatestRequestTracker } from "../logic/latest-request.ts";
 import { initialSaveStatus, reduceSaveStatus } from "../logic/save-status.ts";
 import { SaveStatusBanner } from "./save-status-banner.tsx";
 import { LiveAnnouncer } from "./live-announcer.tsx";
-import { ChangelogSection } from "./changelog-section.tsx";
+import { AppHeader } from "./app-header.tsx";
+import { StartScreen } from "./start-screen.tsx";
 import { EventDialog } from "./event-dialog.tsx";
 import { MessageDialog } from "./message-dialog.tsx";
 import { CampReportDialog } from "./camp-report-dialog.tsx";
@@ -307,28 +307,15 @@ export function GameApp() {
         onRetry={retrySave}
         onDismiss={dismissSaveIssue}
       />
-      <header className="topbar">
-        <div className="topbar-inner">
-          <div className="brand-group">
-            <div className="brand">
-              <span className="brand-mark">26</span> {text.brand}
-            </div>
-            <span className="topbar-version">
-              <span aria-hidden="true">{text.topBarVersion(GAME_VERSION)}</span>
-              <span className="visually-hidden">
-                {text.topBarVersionAccessible(GAME_VERSION)}
-              </span>
-            </span>
-          </div>
-          <div className="phase">
-            {state.report
-              ? text.resultPhase
-              : state.started
-                ? stageText.phase
-                : text.introPhase}
-          </div>
-        </div>
-      </header>
+      <AppHeader
+        phase={
+          state.report
+            ? text.resultPhase
+            : state.started
+              ? stageText.phase
+              : text.introPhase
+        }
+      />
       <main className="main">
         {state.report ? (
           <ReportScreen
@@ -343,88 +330,16 @@ export function GameApp() {
             headingRef={headingRef}
           />
         ) : !state.started ? (
-          <section className="start">
-            <div className="eyebrow">{text.introEyebrow}</div>
-            <h1 className="hero-title" ref={headingRef} tabIndex={-1}>
-              {text.introTitle}
-            </h1>
-            <p className="lead">{text.introLead}</p>
-            <div className="brief">
-              <h2>{text.briefTitle}</h2>
-              <div className="brief-grid">
-                <div className="brief-stat">
-                  <b>{players.length}</b>
-                  <span>{text.candidateCount}</span>
-                </div>
-                <div className="brief-stat">
-                  <b>{Object.keys(text.stages).length}</b>
-                  <span>{text.campCount}</span>
-                </div>
-                <div className="brief-stat">
-                  <b>
-                    {GAME_RULES.camp.squadSizePlayers} →{" "}
-                    {GAME_RULES.final.squadSizePlayers}
-                  </b>
-                  <span>{text.rosterTransition}</span>
-                </div>
-                <div className="brief-stat">
-                  <b>{GAME_RULES.groupMatchesCount}</b>
-                  <span>{text.groupMatches}</span>
-                </div>
-              </div>
-            </div>
-            <div className="choice-title">{text.systemChoice}</div>
-            <div className="choice-grid">
-              {systems.map((system) => (
-                <button
-                  className={`choice ${state.system === system.id ? "selected" : ""}`}
-                  aria-pressed={state.system === system.id}
-                  key={system.id}
-                  onClick={() =>
-                    dispatch({ type: "setSystem", value: system.id })
-                  }
-                >
-                  <span className="radio" aria-hidden="true" />
-                  <span>
-                    <b>{text.systems[system.id].name}</b>
-                    <small>{text.systems[system.id].description}</small>
-                  </span>
-                </button>
-              ))}
-            </div>
-            <div className="choice-title">{text.priorityChoice}</div>
-            <div className="choice-grid">
-              {priorities.map((priority) => (
-                <button
-                  className={`choice ${state.priority === priority ? "selected" : ""}`}
-                  aria-pressed={state.priority === priority}
-                  key={priority}
-                  onClick={() =>
-                    dispatch({ type: "setPriority", value: priority })
-                  }
-                >
-                  <span className="radio" aria-hidden="true" />
-                  <span>
-                    <b>{text.priorities[priority].name}</b>
-                    <small>{text.priorities[priority].description}</small>
-                  </span>
-                </button>
-              ))}
-            </div>
-            <button
-              className="primary start-button"
-              onClick={() => dispatch({ type: "start" })}
-            >
-              {text.start}
-            </button>
-            {state.history.length > 0 && (
-              <button className="action-button" onClick={undo}>
-                {text.undo}
-              </button>
-            )}
-            <p className="fineprint">{text.disclaimer}</p>
-            <ChangelogSection />
-          </section>
+          <StartScreen
+            system={state.system}
+            priority={state.priority}
+            canUndo={state.history.length > 0}
+            headingRef={headingRef}
+            onSystem={(value) => dispatch({ type: "setSystem", value })}
+            onPriority={(value) => dispatch({ type: "setPriority", value })}
+            onStart={() => dispatch({ type: "start" })}
+            onUndo={undo}
+          />
         ) : (
           <SelectionScreen
             state={state}
