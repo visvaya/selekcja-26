@@ -10,16 +10,12 @@ import {
 import { APP_CONFIG, GAME_RULES, RULES_REVISION } from "../data/constants.ts";
 import { GAME_VERSION } from "../data/changelog.ts";
 import type {
-  DetailedPosition,
   FinalReport,
   GameState,
   GroupPosition,
-  Player,
   PlayerId,
-  SortId,
 } from "../data/types.ts";
 import { fillSquadRandomly } from "../logic/random-squad.ts";
-import { modelScore, trialImpact } from "../logic/scoring.ts";
 import { createInitialState, reduceGameState } from "../logic/state.ts";
 import { clearGame, loadGame, saveGame } from "../logic/storage.ts";
 import type { LoadedSave } from "../logic/save-format.ts";
@@ -34,24 +30,21 @@ import { CampReportDialog } from "./camp-report-dialog.tsx";
 import { OutsidersDialog } from "./outsiders-dialog.tsx";
 import { ProfileDialog } from "./profile-dialog.tsx";
 import { ComparisonDialog } from "./comparison-dialog.tsx";
-import { FlagTag, RoleTags, TrialTag } from "./player-tags.tsx";
 import { buildFinalReport } from "../logic/report.ts";
 import {
   canFinalize,
-  detailedCounts,
   detailedPositions,
   formationOutsiders,
   pendingCampEvent,
   groupCounts,
   playersByIds,
   positionShort,
-  riskLevel,
   selectedPlayers,
   slotCount,
   squadLimit,
   squadProblems,
-  visiblePlayers,
 } from "../logic/selection.ts";
+import { SelectionScreen } from "./selection-screen.tsx";
 import { UI_TEXT as text } from "./text.ts";
 
 type ModalState =
@@ -61,23 +54,6 @@ type ModalState =
   | { kind: "campReport" }
   | { kind: "message"; title: string; description: string };
 
-const filterPositions: ("ALL" | DetailedPosition)[] = [
-  "ALL",
-  "BR",
-  "LO",
-  "LŚO",
-  "ŚO",
-  "PŚO",
-  "PO",
-  "LWO",
-  "DP",
-  "ŚP",
-  "OP",
-  "PWO",
-  "LS",
-  "N",
-  "PS",
-];
 const groupPositions: GroupPosition[] = ["BR", "OBR", "POM", "ATA"];
 
 // A player stuck with a broken save can open the game with ?reset to start over.
@@ -96,90 +72,6 @@ function randomSeed(): number {
   const value = new Uint32Array(1);
   globalThis.crypto?.getRandomValues(value);
   return value[0] || APP_CONFIG.fallbackSeed;
-}
-
-function PlayerCard({
-  player,
-  state,
-  onToggle,
-  onProfile,
-  onCompare,
-}: {
-  player: Player;
-  state: GameState;
-  onToggle: (id: PlayerId) => void;
-  onProfile: (id: PlayerId) => void;
-  onCompare: (id: PlayerId) => void;
-}) {
-  const chosen = state.selected.has(player.id);
-  const compared = state.compare.includes(player.id);
-  const trial = state.trial[player.id];
-  const impact = trialImpact(player, state);
-  const metrics = [
-    [text.playerMetrics.quality, player.ov],
-    [text.playerMetrics.form, player.form],
-    [text.playerMetrics.fitness, player.fit],
-    [text.playerMetrics.tactics, player.tact],
-  ] as const;
-  return (
-    <article
-      className={`player ${chosen ? "selected" : ""} ${compared ? "compare-on" : ""}`}
-    >
-      <div className="player-top">
-        <span className="pos">{positionShort(player)}</span>
-        <div>
-          <h3>{player.name}</h3>
-          <div className="meta">
-            {player.club} • {player.age} {text.yearsOld}
-          </div>
-          <div className="tags">
-            <RoleTags roles={player.roles} limit={3} />
-            <FlagTag flag={player.flag} />
-            {state.stage === "final" && trial && (
-              <TrialTag note={trial.note} impact={impact} format="card" />
-            )}
-          </div>
-        </div>
-      </div>
-      <div className="score" title={text.selectionScore}>
-        {modelScore(player, state)}
-      </div>
-      <div className="metrics">
-        {metrics.map(([label, value]) => (
-          <div className="metric" key={label}>
-            <span>
-              {label}
-              <b>{value}</b>
-            </span>
-            <progress
-              value={value}
-              max={GAME_RULES.ratingMaximumPoints}
-              aria-label={`${label}: ${value}`}
-            />
-          </div>
-        ))}
-      </div>
-      <div className="player-actions">
-        <button
-          className="select-btn"
-          aria-pressed={chosen}
-          onClick={() => onToggle(player.id)}
-        >
-          {chosen ? text.selected : text.select}
-        </button>
-        <button className="profile-btn" onClick={() => onProfile(player.id)}>
-          {text.profile}
-        </button>
-        <button
-          className="compare-btn"
-          aria-pressed={compared}
-          onClick={() => onCompare(player.id)}
-        >
-          {compared ? text.compared : text.compare}
-        </button>
-      </div>
-    </article>
-  );
 }
 
 function Pitch({ state }: { state: GameState }) {
@@ -552,8 +444,6 @@ export function GameApp() {
     );
 
   const selected = selectedPlayers(state);
-  const detailed = detailedCounts(state);
-  const risk = riskLevel(state);
   const activeModal = pendingEvent
     ? { kind: "event" as const, event: pendingEvent }
     : modal;
@@ -711,7 +601,6 @@ export function GameApp() {
   }
 
   const stageText = text.stages[state.stage];
-  const currentSystem = text.systems[state.system];
   return (
     <div className="app">
       <LiveAnnouncer message={announcement} />
@@ -839,133 +728,18 @@ export function GameApp() {
             <ChangelogSection />
           </section>
         ) : (
-          <section>
-            <div className="game-head">
-              <div>
-                <div className="eyebrow">
-                  {stageText.eyebrow} • {currentSystem.name} •{" "}
-                  {stageText.suffix}
-                </div>
-                <h1 ref={headingRef} tabIndex={-1}>
-                  {stageText.heading}
-                </h1>
-                <p>{stageText.hint}</p>
-              </div>
-              <div className="kpis">
-                <div className="kpi">
-                  <span>{text.kpis.quality}</span>
-                  <b>
-                    {selected.length
-                      ? Math.round(
-                          selected.reduce((sum, player) => sum + player.ov, 0) /
-                            selected.length +
-                            state.effects.quality,
-                        )
-                      : text.emptyValue}
-                  </b>
-                </div>
-                <div className="kpi">
-                  <span>{text.kpis.fit}</span>
-                  <b>
-                    {selected.length
-                      ? `${Math.round(selected.reduce((sum, player) => sum + player.tact, 0) / selected.length)}%`
-                      : text.emptyValue}
-                  </b>
-                </div>
-                <div className="kpi">
-                  <span>{text.kpis.risk}</span>
-                  <b>{text.risk[risk]}</b>
-                </div>
-              </div>
-            </div>
-            <div className="game-actions">
-              <button
-                className="action-button"
-                onClick={autoFill}
-                disabled={state.selected.size >= squadLimit(state)}
-              >
-                {text.autoFill}
-              </button>
-              <button
-                className="action-button"
-                onClick={undo}
-                disabled={!state.history.length}
-              >
-                {text.undo}
-              </button>
-            </div>
-            <div className="toolbar">
-              <input
-                className="search"
-                type="search"
-                value={state.query}
-                onChange={(event) =>
-                  dispatch({ type: "setQuery", value: event.target.value })
-                }
-                placeholder={text.searchPlaceholder}
-                aria-label={text.searchLabel}
-              />
-              <div className="filters" aria-label={text.filterLabel}>
-                {filterPositions.map((position) => (
-                  <button
-                    className={`chip ${state.filter === position ? "active" : ""}`}
-                    aria-pressed={state.filter === position}
-                    key={position}
-                    title={
-                      position === "ALL"
-                        ? text.filtersAll
-                        : text.positions[position]
-                    }
-                    onClick={() =>
-                      dispatch({ type: "setFilter", value: position })
-                    }
-                  >
-                    {position === "ALL" ? text.filtersAll : position} (
-                    {position === "ALL" ? selected.length : detailed[position]})
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="section-label">
-              <h2>
-                {state.filter === "ALL"
-                  ? text.allCandidates
-                  : text.positions[state.filter]}
-              </h2>
-              <select
-                className="sort"
-                aria-label={text.sortLabel}
-                value={state.sort}
-                onChange={(event) =>
-                  dispatch({
-                    type: "setSort",
-                    value: event.target.value as SortId,
-                  })
-                }
-              >
-                {(Object.keys(text.sort) as SortId[]).map((sort) => (
-                  <option key={sort} value={sort}>
-                    {text.sort[sort]}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="players">
-              {visiblePlayers(state).map((player) => (
-                <PlayerCard
-                  key={player.id}
-                  player={player}
-                  state={state}
-                  onToggle={togglePlayer}
-                  onProfile={(id) => setModal({ kind: "profile", id })}
-                  onCompare={comparePlayer}
-                />
-              ))}
-              {visiblePlayers(state).length === 0 && (
-                <div className="report">{text.noCandidates}</div>
-              )}
-            </div>
-          </section>
+          <SelectionScreen
+            state={state}
+            headingRef={headingRef}
+            onAutoFill={autoFill}
+            onUndo={undo}
+            onQuery={(value) => dispatch({ type: "setQuery", value })}
+            onFilter={(value) => dispatch({ type: "setFilter", value })}
+            onSort={(value) => dispatch({ type: "setSort", value })}
+            onToggle={togglePlayer}
+            onProfile={(id) => setModal({ kind: "profile", id })}
+            onCompare={comparePlayer}
+          />
         )}
       </main>
       {state.started && !state.report && (
