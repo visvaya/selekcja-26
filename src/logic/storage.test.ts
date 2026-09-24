@@ -209,6 +209,28 @@ test("a trial entry missing its note still loads, recomputed from delta", async 
   });
 });
 
+test("a trial entry with a non-string note still loads, recomputed from delta", async () => {
+  await withStorage(async (values) => {
+    const started = reduceGameState(createInitialState(42), { type: "start" });
+    const squad = [players[0]!];
+    const afterCamp = reduceGameState(started, {
+      type: "completeCamp",
+      squad,
+    });
+    const playerId = squad[0]!.id;
+    const trueNote = afterCamp.trial[playerId]!.note;
+
+    await saveGame(afterCamp);
+    const raw = JSON.parse(values.get(KEY)!);
+    raw.state.trial[playerId].note = 5;
+    values.set(KEY, JSON.stringify(raw));
+
+    const loaded = (await loadGame()).state;
+    assert.ok(loaded);
+    assert.equal(loaded.trial[playerId]!.note, trueNote);
+  });
+});
+
 test("a legacy save with a trial note that contradicts its delta is recomputed", async () => {
   await withStorage(async (values) => {
     const tampered = V1_REPORT_SAVE.replace(

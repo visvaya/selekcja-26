@@ -50,18 +50,15 @@ const isStringArray = (value: unknown): value is string[] =>
 const isPlayerIdArray = (value: unknown): value is string[] =>
   isStringArray(value) && value.every((id) => PLAYER_IDS.has(id));
 
-// note is not trusted (it is recomputed from delta by restoreSnapshot below), so a string note
-// is accepted but not required: a save missing it, or carrying a stale or foreign value, still
-// loads instead of being rejected.
+// note is recomputed from delta by restoreSnapshot below, so it is never validated here: a save
+// missing it, or carrying a stale, foreign or non-string value, still loads instead of being
+// rejected.
 function isTrial(value: unknown): boolean {
   return (
     isRecord(value) &&
     Object.entries(value).every(
       ([id, result]) =>
-        PLAYER_IDS.has(id) &&
-        isRecord(result) &&
-        isNumber(result.delta) &&
-        (result.note === undefined || typeof result.note === "string"),
+        PLAYER_IDS.has(id) && isRecord(result) && isNumber(result.delta),
     )
   );
 }
