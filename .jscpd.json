@@ -7,6 +7,7 @@
   "ignore": [
     "**/pnpm-lock.yaml",
     "**/*.md",
+    "scripts/fixtures/**",
     "dist/**",
     "node_modules/**",
     "src/logic/golden/traces/**"
