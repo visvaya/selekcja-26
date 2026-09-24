@@ -435,4 +435,11 @@ export const UI_TEXT = {
       "Pierwsza wersja: marcowe zgrupowanie na 23 zawodników, kadra turniejowa na 26, trzy systemy gry, zdarzenia ze zgrupowania, cofanie decyzji i raport z turnieju.",
     ],
   } satisfies Record<ChangelogVersion, readonly string[]>,
+  errorBoundary: {
+    title: "Coś poszło nie tak",
+    message:
+      "Gra napotkała nieoczekiwany błąd. Odśwież stronę – ostatni zapisany postęp powinien się wczytać. Jeśli błąd wraca, zacznij od nowa; zapisana gra zostanie wtedy usunięta.",
+    reload: "Odśwież stronę",
+    reset: "Zacznij od nowa",
+  },
 } as const;
