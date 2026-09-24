@@ -433,6 +433,12 @@ export const UI_TEXT = {
   changelogShowOlder: (count: number) => `Wcześniejsze zmiany (${count})`,
   changelogHideOlder: "Ukryj wcześniejsze zmiany",
   changelogNotes: {
+    "0.1.2": [
+      "Jeśli gra napotka nieoczekiwany błąd, zamiast pustej strony pojawia się komunikat z możliwością odświeżenia strony albo rozpoczęcia od nowa.",
+      "Przy grze klawiaturą fokus po zmianie ekranu trafia na jego nagłówek, a po zamknięciu okna wraca w widoczne miejsce.",
+      "Czytniki ekranu ogłaszają wynik cofnięcia decyzji, losowego doboru i rozstrzygnięcia zdarzenia.",
+      "Przy włączonym w systemie ograniczeniu ruchu strona nie przewija się płynnie, a karty zawodników nie są animowane.",
+    ],
     "0.1.1": [
       "Gdy przeglądarka nie zapisze postępu, na górze ekranu pojawia się pasek z wyjaśnieniem. Przy braku miejsca albo błędzie zapisu można spróbować ponownie, a pasek znika po udanym zapisie.",
       "Jeśli zmienią się zasady gry, ukończony raport zostaje jako historia z adnotacją, a niedokończonej selekcji nie da się wczytać. Gra mówi o tym wprost.",
