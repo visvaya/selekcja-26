@@ -34,6 +34,10 @@ export async function withJsdomWindow<T>(
   try {
     return await body(dom);
   } finally {
+    // React's scheduler runs deferred work (such as a passive-effect flush that reads
+    // `window.event`) in a later setImmediate task. Let queued tasks run while the JSDOM globals
+    // still exist, or they fail after the test ends with `window` already restored to undefined.
+    await new Promise((resolve) => setImmediate(resolve));
     for (const [index, key] of GLOBAL_KEYS.entries()) {
       Object.defineProperty(globalThis, key, previous[index]!);
     }
