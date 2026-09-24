@@ -433,6 +433,9 @@ export const UI_TEXT = {
   changelogShowOlder: (count: number) => `Wcześniejsze zmiany (${count})`,
   changelogHideOlder: "Ukryj wcześniejsze zmiany",
   changelogNotes: {
+    "0.1.3": [
+      "Obwódka wskazująca aktywny element przy grze klawiaturą jest wyraźniejsza i dobrze widoczna na każdym tle.",
+    ],
     "0.1.2": [
       "Jeśli gra napotka nieoczekiwany błąd, zamiast pustej strony pojawia się komunikat z możliwością odświeżenia strony albo rozpoczęcia od nowa.",
       "Przy grze klawiaturą fokus po zmianie ekranu trafia na jego nagłówek, a po zamknięciu okna wraca w widoczne miejsce.",
