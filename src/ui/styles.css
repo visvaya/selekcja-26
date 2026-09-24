@@ -1211,3 +1211,11 @@ body {
     min-height: 220px;
   }
 }
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .player {
+    transition: none;
+  }
+}
