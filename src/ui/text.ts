@@ -90,7 +90,7 @@ export const UI_TEXT = {
     tooManyGoalkeepers:
       "W finałowej kadrze mogą być dokładnie trzej bramkarze. Odwołaj nadliczbowego bramkarza i spróbuj ponownie.",
   },
-  autoFillErrorTitle: "Nie można dobrać kadry",
+  autoFillErrorTitle: "Nie udało się dobrać zawodników",
   disclaimer:
     "Nieoficjalna gra fanowska. Kluby, dostępność i oceny są elementem scenariusza EURO 2028 oraz autorskim modelem rozgrywki – nie rzeczywistym scoutingiem ani produktem PZPN/UEFA.",
   systems: {
@@ -445,6 +445,9 @@ export const UI_TEXT = {
   changelogShowOlder: (count: number) => `Wcześniejsze zmiany (${count})`,
   changelogHideOlder: "Ukryj wcześniejsze zmiany",
   changelogNotes: {
+    "0.1.6": [
+      "Komunikat po nieudanym losowym doborze ma jaśniejszy tytuł: „Nie udało się dobrać zawodników”.",
+    ],
     "0.1.5": [
       "Wynik turnieju jest ostateczny: na ekranie raportu nie ma już przycisku „Cofnij”.",
     ],
