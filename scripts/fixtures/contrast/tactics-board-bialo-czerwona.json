@@ -1,5 +1,19 @@
 [
   {
+    "fg": "select",
+    "bg": "board-deep",
+    "required": 3,
+    "ratio": 10.09,
+    "note": "excess dock slot square fill/border (final-stage sample with 4 goalkeepers, round 6 item 16)"
+  },
+  {
+    "fg": "select-strong",
+    "bg": "board",
+    "required": 4.5,
+    "ratio": 15.39,
+    "note": "dock excess note text under the excess dock sample (round 6 item 16)"
+  },
+  {
     "fg": "ink",
     "bg": "board",
     "required": 4.5,
