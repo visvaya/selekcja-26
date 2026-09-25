@@ -62,9 +62,6 @@ export function ReportScreen({
             <li key={index}>{match}</li>
           ))}
         </ul>
-        <p>
-          <b>{text.lastMatch}</b> {report.story.last}
-        </p>
       </div>
       <div className="report">
         <h2>{text.strengths}</h2>

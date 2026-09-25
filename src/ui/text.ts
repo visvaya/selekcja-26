@@ -21,6 +21,18 @@ function formatChangelogDate(isoDate: string): string {
   return `${day}.${month}.${year}`;
 }
 
+// Polish plural of "rok" for an age: 1 rok; 2-4, 22-24, 32-34 lata (but 12-14 lat); otherwise lat.
+function formatAge(years: number): string {
+  if (years === 1) return "1 rok";
+  const lastDigit = years % 10,
+    lastTwoDigits = years % 100;
+  const few =
+    lastDigit >= 2 &&
+    lastDigit <= 4 &&
+    (lastTwoDigits < 12 || lastTwoDigits > 14);
+  return `${years} ${few ? "lata" : "lat"}`;
+}
+
 export const UI_TEXT = {
   brand: "SELEKCJA",
   introPhase: "ODPRAWA",
@@ -197,7 +209,7 @@ export const UI_TEXT = {
     tactics: "Taktyka",
   },
   selectionScore: "Ocena selekcyjna",
-  yearsOld: "lat",
+  age: formatAge,
   campResult: "Zgrupowanie",
   trialNotes: {
     impressed: "przekonał",
@@ -394,7 +406,6 @@ export const UI_TEXT = {
   },
   reportKpis: { quality: "Jakość", chemistry: "Chemia", roles: "Role" },
   tournamentProgress: "Przebieg turnieju",
-  lastMatch: "Ostatni mecz:",
   strengths: "Co zadziałało",
   weaknesses: "Ryzyka selekcji",
   yourSquad: "Twoja kadra",
@@ -434,6 +445,10 @@ export const UI_TEXT = {
   changelogShowOlder: (count: number) => `Wcześniejsze zmiany (${count})`,
   changelogHideOlder: "Ukryj wcześniejsze zmiany",
   changelogNotes: {
+    "0.1.4": [
+      "Wiek zawodników ma poprawną formę, np. „34 lata” zamiast „34 lat”.",
+      "Raport turniejowy nie powtarza już ostatniego meczu pod listą spotkań. Ostatni wiersz listy to ostatni mecz.",
+    ],
     "0.1.3": [
       "Obwódka wskazująca aktywny element przy grze klawiaturą jest wyraźniejsza i dobrze widoczna na każdym tle.",
     ],

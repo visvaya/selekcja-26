@@ -45,7 +45,7 @@ export function ProfileDialog({
     >
       <div className="profile-head">
         <p>
-          {player.club} • {player.age} {text.yearsOld}
+          {player.club} • {text.age(player.age)}
         </p>
         <div className="profile-score">{modelScore(player, state)}</div>
       </div>

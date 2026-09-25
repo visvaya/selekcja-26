@@ -37,7 +37,7 @@ export function PlayerCard({
         <div>
           <h3>{player.name}</h3>
           <div className="meta">
-            {player.club} • {player.age} {text.yearsOld}
+            {player.club} • {text.age(player.age)}
           </div>
           <div className="tags">
             <RoleTags roles={player.roles} limit={3} />

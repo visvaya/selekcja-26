@@ -268,15 +268,24 @@ export async function readReport(page: Page) {
       .first()
       .locator("li")
       .allInnerTexts(),
-    lastMatch: await report.locator(".report").first().locator("p").innerText(),
   };
 }
 
 export async function expectCoherentReport(page: Page): Promise<void> {
   const report = await readReport(page);
-  const last = report.lastMatch.replace(text.lastMatch, "").trim();
+  // The last list item is the last match: "Ostatni mecz grupy: ..." after a group exit,
+  // otherwise the last knockout round played (the final for champion and runner-up).
+  const reachedFinal =
+    report.stage === text.outcomes.champion ||
+    report.stage === text.outcomes.runnerUp;
+  const lastRound = reachedFinal ? text.tournament.rounds.at(-1) : report.stage;
+  const lastMatchPrefix =
+    report.stage === text.outcomes.group
+      ? text.tournament.groupLast("").trim()
+      : `${lastRound}:`;
   expect(report.matches.length).toBeGreaterThanOrEqual(2);
-  expect(report.matches.at(-1)).toContain(last);
+  expect(report.matches.at(-1)).toMatch(/Polska \d/);
+  expect(report.matches.at(-1)!.startsWith(lastMatchPrefix)).toBe(true);
   expect(Object.values(text.outcomes)).toContain(report.stage);
   const knockoutRounds = report.matches.filter((match) =>
     text.tournament.rounds.some((round) => match.startsWith(`${round}:`)),
