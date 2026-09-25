@@ -892,63 +892,63 @@
     "fg": "hue-gk-ink",
     "bg": "hue-gk-bg",
     "required": 4.5,
-    "ratio": 8.61,
+    "ratio": 8.31,
     "note": "position-group hue: goalkeeper magnet text"
   },
   {
     "fg": "hue-gk-ink",
     "bg": "hue-gk-bg",
     "required": 3,
-    "ratio": 8.61,
+    "ratio": 8.31,
     "note": "position-group hue: goalkeeper magnet border"
   },
   {
     "fg": "hue-def-ink",
     "bg": "hue-def-bg",
     "required": 4.5,
-    "ratio": 8.89,
+    "ratio": 8.58,
     "note": "position-group hue: defender magnet text"
   },
   {
     "fg": "ink-soft",
     "bg": "hue-mid-bg",
     "required": 4.5,
-    "ratio": 6.25,
+    "ratio": 6.07,
     "note": "profile position tag: non-bold label text (e.g. \"pomocnik\") on the mid hue"
   },
   {
     "fg": "hue-mid-ink",
     "bg": "hue-mid-bg",
     "required": 4.5,
-    "ratio": 7.99,
+    "ratio": 7.74,
     "note": "position-group hue: midfielder magnet text"
   },
   {
     "fg": "hue-fwd-ink",
     "bg": "hue-fwd-bg",
     "required": 4.5,
-    "ratio": 7.64,
+    "ratio": 7.36,
     "note": "position-group hue: forward magnet text"
   },
   {
     "fg": "meter-low",
     "bg": "board-deep",
     "required": 3,
-    "ratio": 3.46,
+    "ratio": 4.9,
     "note": "meter tint: low band fill against its track"
   },
   {
     "fg": "meter-mid",
     "bg": "board-deep",
     "required": 3,
-    "ratio": 3.39,
+    "ratio": 4.52,
     "note": "meter tint: mid band fill against its track"
   },
   {
     "fg": "meter-high",
     "bg": "board-deep",
     "required": 3,
-    "ratio": 5.82,
+    "ratio": 4.18,
     "note": "meter tint: high band fill against its track"
   },
   {
@@ -1067,7 +1067,224 @@
     "fg": "ink",
     "bg": "hue-mid-bg",
     "required": 4.5,
-    "ratio": 11.72,
+    "ratio": 11.38,
     "note": "profile position tag bold code, fallback ink colour check against the mid hue background"
+  },
+  {
+    "fg": "hue-gk-ink",
+    "bg": "board-deep",
+    "required": 3,
+    "ratio": 9.39,
+    "note": "dock slot group: BR filled squares against the dock track"
+  },
+  {
+    "fg": "hue-def-ink",
+    "bg": "board-deep",
+    "required": 3,
+    "ratio": 9.92,
+    "note": "dock slot group: OBR filled squares against the dock track"
+  },
+  {
+    "fg": "hue-mid-ink",
+    "bg": "board-deep",
+    "required": 3,
+    "ratio": 8.75,
+    "note": "dock slot group: POM filled squares against the dock track"
+  },
+  {
+    "fg": "hue-fwd-ink",
+    "bg": "board-deep",
+    "required": 3,
+    "ratio": 9.33,
+    "note": "dock slot group: NAP filled squares against the dock track"
+  },
+  {
+    "fg": "ink-soft",
+    "bg": "board-deep",
+    "required": 3,
+    "ratio": 6.86,
+    "note": "dock slot group: Dowolne filled squares against the dock track"
+  },
+  {
+    "fg": "hue-def-ink",
+    "bg": "hue-def-bg",
+    "required": 3,
+    "ratio": 8.58,
+    "note": "position-group hue: defender magnet border"
+  },
+  {
+    "fg": "hue-mid-ink",
+    "bg": "hue-mid-bg",
+    "required": 3,
+    "ratio": 7.74,
+    "note": "position-group hue: midfielder magnet border"
+  },
+  {
+    "fg": "hue-fwd-ink",
+    "bg": "hue-fwd-bg",
+    "required": 3,
+    "ratio": 7.36,
+    "note": "position-group hue: forward magnet border"
+  },
+  {
+    "fg": "board-line",
+    "bg": "surface",
+    "required": 3,
+    "ratio": 3.84,
+    "note": "tournament path: marker-drawn dashed line under the score"
+  },
+  {
+    "fg": "select-strong",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 16.81,
+    "note": "tournament path: lost-round \"Odpadlismy\" label"
+  },
+  {
+    "fg": "select",
+    "bg": "surface",
+    "required": 3,
+    "ratio": 13.23,
+    "note": "tournament path: lost-round row border"
+  },
+  {
+    "fg": "ink",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 16.87,
+    "note": "pos-popover: full position name list"
+  },
+  {
+    "fg": "frame",
+    "bg": "surface",
+    "required": 3,
+    "ratio": 5.37,
+    "note": "pos-popover: card border"
+  },
+  {
+    "fg": "ink",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 16.87,
+    "note": "filters panel: fieldset legend and checkbox labels"
+  },
+  {
+    "fg": "frame",
+    "bg": "surface",
+    "required": 3,
+    "ratio": 5.37,
+    "note": "filters panel: number input border"
+  },
+  {
+    "fg": "action",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 7.63,
+    "note": "filters toggle: expanded state text"
+  },
+  {
+    "fg": "action",
+    "bg": "surface",
+    "required": 3,
+    "ratio": 7.63,
+    "note": "filters toggle: expanded state border"
+  },
+  {
+    "fg": "on-select",
+    "bg": "select",
+    "required": 4.5,
+    "ratio": 13.23,
+    "note": "filters count badge on the toggle"
+  },
+  {
+    "fg": "on-action",
+    "bg": "action",
+    "required": 4.5,
+    "ratio": 7.63,
+    "note": "report kpi gauge: value large next to the outcome bar"
+  },
+  {
+    "fg": "on-ink-meta",
+    "bg": "ink",
+    "required": 4.5,
+    "ratio": 9.88,
+    "note": "report grade stamp: \"Ocena\" label on the hero"
+  },
+  {
+    "fg": "ink-soft",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 8.99,
+    "note": "\"Wczesniejsze zmiany\" quiet text link"
+  },
+  {
+    "fg": "warn-ink",
+    "bg": "warn-fill",
+    "required": 4.5,
+    "ratio": 6.99,
+    "note": "dock copy: \"N poza ustawieniem\" chip"
+  },
+  {
+    "fg": "ink",
+    "bg": "board",
+    "required": 4.5,
+    "ratio": 15.44,
+    "note": "outsiders strip: player name on the board"
+  },
+  {
+    "fg": "ink-soft",
+    "bg": "board",
+    "required": 4.5,
+    "ratio": 8.23,
+    "note": "outsiders strip: \"Poza boiskiem\" label"
+  },
+  {
+    "fg": "board-line",
+    "bg": "board",
+    "required": 3,
+    "ratio": 3.52,
+    "note": "outsiders strip: dashed border on the board"
+  },
+  {
+    "fg": "action",
+    "bg": "board-deep",
+    "required": 3,
+    "ratio": 5.82,
+    "note": "range track: selected segment fill against the track"
+  },
+  {
+    "fg": "frame-soft",
+    "bg": "board-deep",
+    "required": 3,
+    "ratio": 3.6,
+    "note": "range track: outer border"
+  },
+  {
+    "fg": "ink-soft",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 8.99,
+    "note": "dock copy: hint line and readout text"
+  },
+  {
+    "fg": "ink",
+    "bg": "surface-dialog",
+    "required": 4.5,
+    "ratio": 17.11,
+    "note": "name popover: full player name"
+  },
+  {
+    "fg": "frame",
+    "bg": "surface-dialog",
+    "required": 3,
+    "ratio": 5.44,
+    "note": "name popover: card border"
+  },
+  {
+    "fg": "ink-soft",
+    "bg": "board-deep",
+    "required": 3,
+    "ratio": 6.86,
+    "note": "dock copy: chevron affordance"
   }
 ]
