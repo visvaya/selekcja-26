@@ -3,266 +3,266 @@
     "fg": "ink",
     "bg": "board",
     "required": 4.5,
-    "ratio": 14.24,
+    "ratio": 15.44,
     "note": "body copy on page background"
   },
   {
     "fg": "ink-soft",
     "bg": "board",
     "required": 4.5,
-    "ratio": 7.31,
+    "ratio": 8.23,
     "note": "lead / secondary text on page background"
   },
   {
     "fg": "ink",
     "bg": "board-deep",
     "required": 4.5,
-    "ratio": 11.86,
+    "ratio": 12.87,
     "note": "brief stat numbers, kpi values on recessed panel"
   },
   {
     "fg": "ink-soft",
     "bg": "board-deep",
     "required": 4.5,
-    "ratio": 6.09,
+    "ratio": 6.86,
     "note": "brief stat labels, kpi labels"
   },
   {
     "fg": "ink-soft",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 8.09,
+    "ratio": 8.99,
     "note": "mockup label text"
   },
   {
     "fg": "frame-soft",
     "bg": "board-deep",
     "required": 3,
-    "ratio": 3.49,
+    "ratio": 3.6,
     "note": "mockup label border"
   },
   {
     "fg": "on-action",
     "bg": "ink",
     "required": 4.5,
-    "ratio": 15.98,
+    "ratio": 16.87,
     "note": "top bar brand / phase text on ink bar"
   },
   {
     "fg": "on-select",
     "bg": "select",
     "required": 4.5,
-    "ratio": 7.33,
+    "ratio": 13.23,
     "note": "brand mark 26 on magnet red"
   },
   {
     "fg": "on-action",
     "bg": "action",
     "required": 4.5,
-    "ratio": 7.14,
+    "ratio": 7.63,
     "note": "phase pill text on marker blue"
   },
   {
     "fg": "action",
     "bg": "board",
     "required": 4.5,
-    "ratio": 6.37,
+    "ratio": 6.99,
     "note": "eyebrow text on page background"
   },
   {
     "fg": "action",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 7.05,
+    "ratio": 7.63,
     "note": "eyebrow text on strip surface"
   },
   {
     "fg": "ink",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 15.76,
+    "ratio": 16.87,
     "note": "choice card title on surface"
   },
   {
     "fg": "ink-soft",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 8.09,
+    "ratio": 8.99,
     "note": "choice card description on surface"
   },
   {
     "fg": "frame",
     "bg": "surface",
     "required": 3,
-    "ratio": 4.84,
+    "ratio": 5.37,
     "note": "choice card border / radio ring, unselected"
   },
   {
     "fg": "select",
     "bg": "surface",
     "required": 3,
-    "ratio": 7.23,
+    "ratio": 13.23,
     "note": "choice card border, selected"
   },
   {
     "fg": "on-action",
     "bg": "action",
     "required": 4.5,
-    "ratio": 7.14,
+    "ratio": 7.63,
     "note": "primary start button text"
   },
   {
     "fg": "on-ink-dim",
     "bg": "ink",
     "required": 4.5,
-    "ratio": 10.43,
+    "ratio": 10.92,
     "note": "top bar version label on ink bar"
   },
   {
     "fg": "ink",
     "bg": "board-deep",
     "required": 4.5,
-    "ratio": 11.86,
+    "ratio": 12.87,
     "note": "changelog version label on recessed panel"
   },
   {
     "fg": "ink-soft",
     "bg": "board-deep",
     "required": 4.5,
-    "ratio": 6.09,
+    "ratio": 6.86,
     "note": "changelog list items"
   },
   {
     "fg": "ink",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 15.76,
+    "ratio": 16.87,
     "note": "action-button label (changelog toggle)"
   },
   {
     "fg": "frame",
     "bg": "surface",
     "required": 3,
-    "ratio": 4.84,
+    "ratio": 5.37,
     "note": "action-button border"
   },
   {
     "fg": "ink",
     "bg": "board",
     "required": 4.5,
-    "ratio": 14.24,
+    "ratio": 15.44,
     "note": "game-head h1 heading"
   },
   {
     "fg": "ink-soft",
     "bg": "board",
     "required": 4.5,
-    "ratio": 7.31,
+    "ratio": 8.23,
     "note": "game-head hint paragraph"
   },
   {
     "fg": "ink",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 15.76,
+    "ratio": 16.87,
     "note": "search input text"
   },
   {
     "fg": "frame",
     "bg": "surface",
     "required": 3,
-    "ratio": 4.84,
+    "ratio": 5.37,
     "note": "search input border"
   },
   {
     "fg": "ink",
     "bg": "board-deep",
     "required": 4.5,
-    "ratio": 11.86,
+    "ratio": 12.87,
     "note": "filter chip label, inactive"
   },
   {
     "fg": "frame",
     "bg": "board-deep",
     "required": 3,
-    "ratio": 3.64,
+    "ratio": 4.09,
     "note": "filter chip border, inactive"
   },
   {
     "fg": "on-action",
     "bg": "action",
     "required": 4.5,
-    "ratio": 7.14,
+    "ratio": 7.63,
     "note": "filter chip label, active"
   },
   {
     "fg": "ink",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 15.76,
+    "ratio": 16.87,
     "note": "sort select text"
   },
   {
     "fg": "frame",
     "bg": "surface",
     "required": 3,
-    "ratio": 4.84,
+    "ratio": 5.37,
     "note": "sort select border"
   },
   {
     "fg": "frame",
     "bg": "surface",
     "required": 3,
-    "ratio": 4.84,
+    "ratio": 5.37,
     "note": "player strip border, unselected"
   },
   {
     "fg": "ink",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 15.76,
+    "ratio": 16.87,
     "note": "player name on unselected strip"
   },
   {
     "fg": "ink-soft",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 8.09,
+    "ratio": 8.99,
     "note": "player club/age meta on unselected strip"
   },
   {
     "fg": "ink",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 15.76,
+    "ratio": 16.87,
     "note": "selection score number on unselected strip"
   },
   {
     "fg": "ink",
     "bg": "board-deep",
     "required": 4.5,
-    "ratio": 11.86,
+    "ratio": 12.87,
     "note": "position magnet code on unselected strip"
   },
   {
     "fg": "frame",
     "bg": "board-deep",
     "required": 3,
-    "ratio": 3.64,
+    "ratio": 4.09,
     "note": "position magnet border on unselected strip"
   },
   {
     "fg": "ink-soft",
     "bg": "board-deep",
     "required": 4.5,
-    "ratio": 6.09,
+    "ratio": 6.86,
     "note": "role tag text on unselected strip"
   },
   {
     "fg": "frame-soft",
     "bg": "board-deep",
     "required": 3,
-    "ratio": 3.49,
+    "ratio": 3.6,
     "note": "role tag border on unselected strip"
   },
   {
@@ -283,287 +283,287 @@
     "fg": "ink-soft",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 8.09,
+    "ratio": 8.99,
     "note": "metric label on unselected strip"
   },
   {
     "fg": "ink",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 15.76,
+    "ratio": 16.87,
     "note": "metric value on unselected strip"
   },
   {
     "fg": "action",
     "bg": "board-deep",
     "required": 3,
-    "ratio": 5.3,
+    "ratio": 5.82,
     "note": "meter fill vs meter track"
   },
   {
     "fg": "frame-soft",
     "bg": "board-deep",
     "required": 3,
-    "ratio": 3.49,
+    "ratio": 3.6,
     "note": "meter track border"
   },
   {
     "fg": "on-action",
     "bg": "action",
     "required": 4.5,
-    "ratio": 7.14,
+    "ratio": 7.63,
     "note": "select-btn label, unpressed (Powolaj)"
   },
   {
     "fg": "ink",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 15.76,
+    "ratio": 16.87,
     "note": "profile-btn label"
   },
   {
     "fg": "frame",
     "bg": "surface",
     "required": 3,
-    "ratio": 4.84,
+    "ratio": 5.37,
     "note": "profile-btn / compare-btn border, unpressed"
   },
   {
     "fg": "ink",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 15.76,
+    "ratio": 16.87,
     "note": "compare-btn label, unpressed"
   },
   {
     "fg": "on-select",
     "bg": "select",
     "required": 4.5,
-    "ratio": 7.33,
+    "ratio": 13.23,
     "note": "select-btn label, pressed (Powolany)"
   },
   {
     "fg": "action",
     "bg": "board-deep",
     "required": 4.5,
-    "ratio": 5.3,
+    "ratio": 5.82,
     "note": "compare-btn label, pressed (Wybrany)"
   },
   {
     "fg": "action",
     "bg": "board-deep",
     "required": 3,
-    "ratio": 5.3,
+    "ratio": 5.82,
     "note": "compare-btn border, pressed"
   },
   {
     "fg": "action",
     "bg": "surface",
     "required": 3,
-    "ratio": 7.05,
+    "ratio": 7.63,
     "note": "compare-on outline against surface"
   },
   {
     "fg": "on-action",
     "bg": "ink",
     "required": 4.5,
-    "ratio": 15.98,
+    "ratio": 16.87,
     "note": "selected strip: player name on ink fill"
   },
   {
     "fg": "on-action",
     "bg": "ink",
     "required": 4.5,
-    "ratio": 15.98,
+    "ratio": 16.87,
     "note": "selected strip: score number on ink fill"
   },
   {
     "fg": "on-ink-meta",
     "bg": "ink",
     "required": 4.5,
-    "ratio": 9.45,
+    "ratio": 9.88,
     "note": "selected strip: club/age meta on ink fill"
   },
   {
     "fg": "on-select",
     "bg": "select",
     "required": 4.5,
-    "ratio": 7.33,
+    "ratio": 13.23,
     "note": "selected strip: position magnet on magnet red"
   },
   {
     "fg": "on-ink-tile",
     "bg": "ink-tile",
     "required": 4.5,
-    "ratio": 9.28,
+    "ratio": 10.05,
     "note": "selected strip: role tag text on dark tag fill"
   },
   {
     "fg": "on-ink-tile-border",
     "bg": "ink-tile",
     "required": 3,
-    "ratio": 3.49,
+    "ratio": 3.75,
     "note": "selected strip: role tag border on dark tag fill"
   },
   {
     "fg": "on-ink-soft",
     "bg": "ink-tile",
     "required": 4.5,
-    "ratio": 5.88,
+    "ratio": 6.34,
     "note": "selected strip: metric label on dark chip"
   },
   {
     "fg": "on-action",
     "bg": "ink-tile",
     "required": 4.5,
-    "ratio": 11.41,
+    "ratio": 12.41,
     "note": "selected strip: metric value on dark chip"
   },
   {
     "fg": "on-action",
     "bg": "ink-tile",
     "required": 4.5,
-    "ratio": 11.41,
+    "ratio": 12.41,
     "note": "selected strip: action button labels on dark fill"
   },
   {
     "fg": "on-ink-border",
     "bg": "ink-tile",
     "required": 3,
-    "ratio": 3.78,
+    "ratio": 4.06,
     "note": "selected strip: action button border on dark fill"
   },
   {
     "fg": "ink",
     "bg": "board-deep",
     "required": 4.5,
-    "ratio": 11.86,
+    "ratio": 12.87,
     "note": "dock-copy remaining-slots text"
   },
   {
     "fg": "ink-soft",
     "bg": "board-deep",
     "required": 4.5,
-    "ratio": 6.09,
+    "ratio": 6.86,
     "note": "dock-copy hint text"
   },
   {
     "fg": "frame",
     "bg": "board-deep",
     "required": 3,
-    "ratio": 3.64,
+    "ratio": 4.09,
     "note": "count-ring border"
   },
   {
     "fg": "ink",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 15.76,
+    "ratio": 16.87,
     "note": "count-ring number on surface disc"
   },
   {
     "fg": "ink-soft",
     "bg": "disabled-fill",
     "required": 3,
-    "ratio": 5.52,
+    "ratio": 6.04,
     "note": "finalize button label, disabled (WCAG exempts disabled text from 4.5:1; checked at ui/3:1 instead)"
   },
   {
     "fg": "on-good",
     "bg": "good",
     "required": 4.5,
-    "ratio": 5.54,
+    "ratio": 5.98,
     "note": "finalize button label, enabled"
   },
   {
     "fg": "frame",
     "bg": "board-deep",
     "required": 3,
-    "ratio": 3.64,
+    "ratio": 4.09,
     "note": "dock breakdown divider"
   },
   {
     "fg": "ink-soft",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 8.09,
+    "ratio": 8.99,
     "note": "dock-summary group label"
   },
   {
     "fg": "ink",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 15.76,
+    "ratio": 16.87,
     "note": "dock-summary count value"
   },
   {
     "fg": "good",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 5.47,
+    "ratio": 5.97,
     "note": "dock-summary fulfilled status text"
   },
   {
     "fg": "select-strong",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 10.34,
+    "ratio": 16.81,
     "note": "dock-summary missing status text"
   },
   {
     "fg": "select",
     "bg": "surface",
     "required": 3,
-    "ratio": 7.23,
+    "ratio": 13.23,
     "note": "dock-summary missing card border"
   },
   {
     "fg": "warn-ink",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 11.45,
+    "ratio": 11.6,
     "note": "dock-summary excess status text"
   },
   {
     "fg": "warn-ink",
     "bg": "surface",
     "required": 3,
-    "ratio": 11.45,
+    "ratio": 11.6,
     "note": "dock-summary excess card border"
   },
   {
     "fg": "board-line",
     "bg": "board",
     "required": 3,
-    "ratio": 3.13,
+    "ratio": 3.52,
     "note": "pitch marker lines against board surface"
   },
   {
     "fg": "ink-soft",
     "bg": "board",
     "required": 4.5,
-    "ratio": 7.31,
+    "ratio": 8.23,
     "note": "formation label on pitch board"
   },
   {
     "fg": "ink-soft",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 8.09,
+    "ratio": 8.99,
     "note": "pitch node position code"
   },
   {
     "fg": "action",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 7.05,
+    "ratio": 7.63,
     "note": "pitch node count number"
   },
   {
     "fg": "frame",
     "bg": "surface",
     "required": 3,
-    "ratio": 4.84,
+    "ratio": 5.37,
     "note": "pitch node magnet border"
   },
   {
@@ -584,322 +584,322 @@
     "fg": "on-action",
     "bg": "ink",
     "required": 4.5,
-    "ratio": 15.98,
+    "ratio": 16.87,
     "note": "result-hero heading on ink hero"
   },
   {
     "fg": "on-ink-lead",
     "bg": "ink",
     "required": 4.5,
-    "ratio": 11.48,
+    "ratio": 12.04,
     "note": "result-hero paragraph on ink hero"
   },
   {
     "fg": "on-ink-eyebrow",
     "bg": "ink",
     "required": 4.5,
-    "ratio": 10.71,
+    "ratio": 10.66,
     "note": "result-eyebrow on ink hero"
   },
   {
     "fg": "on-select",
     "bg": "select",
     "required": 4.5,
-    "ratio": 7.33,
+    "ratio": 13.23,
     "note": "grade magnet letter"
   },
   {
     "fg": "on-action",
     "bg": "ink-tile",
     "required": 4.5,
-    "ratio": 11.41,
+    "ratio": 12.41,
     "note": "outcome value on hero chip"
   },
   {
     "fg": "on-ink-meta",
     "bg": "ink-tile",
     "required": 4.5,
-    "ratio": 6.74,
+    "ratio": 7.27,
     "note": "outcome label on hero chip"
   },
   {
     "fg": "ink",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 15.76,
+    "ratio": 16.87,
     "note": "report section heading"
   },
   {
     "fg": "ink-soft",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 8.09,
+    "ratio": 8.99,
     "note": "report list item / last match text"
   },
   {
     "fg": "frame-soft",
     "bg": "surface",
     "required": 3,
-    "ratio": 4.64,
+    "ratio": 4.72,
     "note": "report panel border"
   },
   {
     "fg": "board-line",
     "bg": "board",
     "required": 3,
-    "ratio": 3.13,
+    "ratio": 3.52,
     "note": "bracket connector line and panel border"
   },
   {
     "fg": "action",
     "bg": "surface",
     "required": 3,
-    "ratio": 7.05,
+    "ratio": 7.63,
     "note": "bracket dot fill/border, group stage (still carries the points number)"
   },
   {
     "fg": "action",
     "bg": "board",
     "required": 3,
-    "ratio": 6.37,
+    "ratio": 6.99,
     "note": "bracket dot fill, passed/won stage, no invented letter code, against the bracket panel"
   },
   {
     "fg": "select",
     "bg": "board",
     "required": 3,
-    "ratio": 6.54,
+    "ratio": 12.11,
     "note": "bracket dot fill, eliminated stage, no invented letter code, against the bracket panel"
   },
   {
     "fg": "ink",
     "bg": "board-deep",
     "required": 4.5,
-    "ratio": 11.86,
+    "ratio": 12.87,
     "note": "bracket step round name"
   },
   {
     "fg": "ink-soft",
     "bg": "board-deep",
     "required": 4.5,
-    "ratio": 6.09,
+    "ratio": 6.86,
     "note": "bracket step score"
   },
   {
     "fg": "ink",
     "bg": "board-deep",
     "required": 4.5,
-    "ratio": 11.86,
+    "ratio": 12.87,
     "note": "squad-pill player name"
   },
   {
     "fg": "frame-soft",
     "bg": "board-deep",
     "required": 3,
-    "ratio": 3.49,
+    "ratio": 3.6,
     "note": "squad-pill border"
   },
   {
     "fg": "ink",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 15.76,
+    "ratio": 16.87,
     "note": "squad-pill position code on inner disc"
   },
   {
     "fg": "frame",
     "bg": "surface",
     "required": 3,
-    "ratio": 4.84,
+    "ratio": 5.37,
     "note": "squad-pill position disc border"
   },
   {
     "fg": "ink-soft",
     "bg": "board",
     "required": 4.5,
-    "ratio": 7.31,
+    "ratio": 8.23,
     "note": "fineprint / disclaimer text"
   },
   {
     "fg": "focus-core",
     "bg": "board",
     "required": 3,
-    "ratio": 11.45,
+    "ratio": 12.76,
     "note": "focus ring inner colour on light background (the halo is not visible here, core carries it)"
   },
   {
     "fg": "focus-halo",
     "bg": "ink",
     "required": 3,
-    "ratio": 16.44,
+    "ratio": 17.37,
     "note": "focus ring outer halo against dark strip (halo carries visibility here, core alone would not)"
   },
   {
     "fg": "ink",
     "bg": "surface-dialog",
     "required": 4.5,
-    "ratio": 15.98,
+    "ratio": 17.11,
     "note": "dialog title"
   },
   {
     "fg": "frame",
     "bg": "surface-dialog",
     "required": 3,
-    "ratio": 4.91,
+    "ratio": 5.44,
     "note": "dialog panel border"
   },
   {
     "fg": "action",
     "bg": "surface-dialog",
     "required": 4.5,
-    "ratio": 7.15,
+    "ratio": 7.74,
     "note": "profile score big number"
   },
   {
     "fg": "ink",
     "bg": "board-deep",
     "required": 4.5,
-    "ratio": 11.86,
+    "ratio": 12.87,
     "note": "profile metric value on board-deep tile"
   },
   {
     "fg": "ink-soft",
     "bg": "board-deep",
     "required": 4.5,
-    "ratio": 6.09,
+    "ratio": 6.86,
     "note": "profile metric label on board-deep tile"
   },
   {
     "fg": "ink",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 15.76,
+    "ratio": 16.87,
     "note": "close button label"
   },
   {
     "fg": "ink",
     "bg": "board-deep",
     "required": 4.5,
-    "ratio": 11.86,
+    "ratio": 12.87,
     "note": "compare-card name and club"
   },
   {
     "fg": "good",
     "bg": "surface-dialog",
     "required": 4.5,
-    "ratio": 5.55,
+    "ratio": 6.06,
     "note": "comparison-row winning value"
   },
   {
     "fg": "ink",
     "bg": "surface-dialog",
     "required": 4.5,
-    "ratio": 15.98,
+    "ratio": 17.11,
     "note": "comparison-row value, non-winning"
   },
   {
     "fg": "ink-soft",
     "bg": "surface-dialog",
     "required": 4.5,
-    "ratio": 8.21,
+    "ratio": 9.12,
     "note": "comparison-row metric label"
   },
   {
     "fg": "frame-soft",
     "bg": "surface-dialog",
     "required": 3,
-    "ratio": 4.71,
+    "ratio": 4.79,
     "note": "comparison-row top divider"
   },
   {
     "fg": "select-strong",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 10.34,
+    "ratio": 16.81,
     "note": "Resetuj (danger action) default text"
   },
   {
     "fg": "select",
     "bg": "surface",
     "required": 3,
-    "ratio": 7.23,
+    "ratio": 13.23,
     "note": "Resetuj (danger action) default border"
   },
   {
     "fg": "ink-soft",
     "bg": "disabled-fill",
     "required": 3,
-    "ratio": 5.52,
+    "ratio": 6.04,
     "note": "secondary action button label, disabled (Cofnij with no history), same tokens as the finalize disabled fix"
   },
   {
     "fg": "action",
     "bg": "board-deep",
     "required": 4.5,
-    "ratio": 5.3,
+    "ratio": 5.82,
     "note": "secondary action / inactive chip label on hover"
   },
   {
     "fg": "action",
     "bg": "board-deep",
     "required": 3,
-    "ratio": 5.3,
+    "ratio": 5.82,
     "note": "secondary action / inactive chip border on hover"
   },
   {
     "fg": "select-strong",
     "bg": "warn-fill",
     "required": 4.5,
-    "ratio": 6.31,
+    "ratio": 10.12,
     "note": "Resetuj (danger action) label on hover"
   },
   {
     "fg": "select",
     "bg": "warn-fill",
     "required": 3,
-    "ratio": 4.41,
+    "ratio": 7.96,
     "note": "Resetuj (danger action) border on hover"
   },
   {
     "fg": "on-action",
     "bg": "action-strong",
     "required": 4.5,
-    "ratio": 10.99,
+    "ratio": 11.33,
     "note": "primary / select-btn (unpressed) / active chip label on hover or active"
   },
   {
     "fg": "on-select",
     "bg": "select-strong",
     "required": 4.5,
-    "ratio": 10.48,
+    "ratio": 16.81,
     "note": "select-btn (pressed, Powolany) label on hover"
   },
   {
     "fg": "action",
     "bg": "surface",
     "required": 3,
-    "ratio": 7.05,
+    "ratio": 7.63,
     "note": "choice button border on hover (unselected)"
   },
   {
     "fg": "select-strong",
     "bg": "surface",
     "required": 3,
-    "ratio": 10.34,
+    "ratio": 16.81,
     "note": "choice button border on hover (selected)"
   },
   {
     "fg": "hue-gk-ink",
     "bg": "hue-gk-bg",
     "required": 4.5,
-    "ratio": 8.64,
+    "ratio": 8.61,
     "note": "position-group hue: goalkeeper magnet text"
   },
   {
     "fg": "hue-gk-ink",
     "bg": "hue-gk-bg",
     "required": 3,
-    "ratio": 8.64,
+    "ratio": 8.61,
     "note": "position-group hue: goalkeeper magnet border"
   },
   {
@@ -913,7 +913,7 @@
     "fg": "ink-soft",
     "bg": "hue-mid-bg",
     "required": 4.5,
-    "ratio": 5.69,
+    "ratio": 6.25,
     "note": "profile position tag: non-bold label text (e.g. \"pomocnik\") on the mid hue"
   },
   {
@@ -927,147 +927,147 @@
     "fg": "hue-fwd-ink",
     "bg": "hue-fwd-bg",
     "required": 4.5,
-    "ratio": 7.68,
+    "ratio": 7.64,
     "note": "position-group hue: forward magnet text"
   },
   {
     "fg": "meter-low",
     "bg": "board-deep",
     "required": 3,
-    "ratio": 3.37,
+    "ratio": 3.46,
     "note": "meter tint: low band fill against its track"
   },
   {
     "fg": "meter-mid",
     "bg": "board-deep",
     "required": 3,
-    "ratio": 3.3,
+    "ratio": 3.39,
     "note": "meter tint: mid band fill against its track"
   },
   {
     "fg": "meter-high",
     "bg": "board-deep",
     "required": 3,
-    "ratio": 4.07,
+    "ratio": 5.82,
     "note": "meter tint: high band fill against its track"
   },
   {
     "fg": "ink-soft",
     "bg": "surface-dialog",
     "required": 4.5,
-    "ratio": 8.21,
+    "ratio": 9.12,
     "note": "variant switcher: field label text"
   },
   {
     "fg": "frame",
     "bg": "surface-dialog",
     "required": 3,
-    "ratio": 4.91,
+    "ratio": 5.44,
     "note": "variant switcher: panel and select border"
   },
   {
     "fg": "ink",
     "bg": "surface-dialog",
     "required": 4.5,
-    "ratio": 15.98,
+    "ratio": 17.11,
     "note": "variant switcher: select value text"
   },
   {
     "fg": "ink-soft",
     "bg": "surface-dialog",
     "required": 4.5,
-    "ratio": 8.21,
+    "ratio": 9.12,
     "note": "h2h: losing value, greyed but still readable"
   },
   {
     "fg": "good",
     "bg": "surface-dialog",
     "required": 4.5,
-    "ratio": 5.55,
+    "ratio": 6.06,
     "note": "h2h: winning value"
   },
   {
     "fg": "good",
     "bg": "board-deep",
     "required": 3,
-    "ratio": 4.11,
+    "ratio": 4.56,
     "note": "h2h bar: winning side fill against the bar track"
   },
   {
     "fg": "frame-soft",
     "bg": "board-deep",
     "required": 3,
-    "ratio": 3.49,
+    "ratio": 3.6,
     "note": "h2h bar: losing side fill against the bar track"
   },
   {
     "fg": "on-action",
     "bg": "ink",
     "required": 4.5,
-    "ratio": 15.98,
+    "ratio": 16.87,
     "note": "report grade stamp: letter grade on the hero"
   },
   {
     "fg": "on-action",
     "bg": "ink",
     "required": 3,
-    "ratio": 15.98,
+    "ratio": 16.87,
     "note": "report grade stamp: border on the hero"
   },
   {
     "fg": "action",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 7.05,
+    "ratio": 7.63,
     "note": "changelog toggle: subtle text button label"
   },
   {
     "fg": "on-action",
     "bg": "action",
     "required": 4.5,
-    "ratio": 7.14,
+    "ratio": 7.63,
     "note": "path list: round-name tab label"
   },
   {
     "fg": "action-strong",
     "bg": "board-deep",
     "required": 4.5,
-    "ratio": 8.16,
+    "ratio": 8.63,
     "note": "path list: score emphasis (bold number) on the score row"
   },
   {
     "fg": "good",
     "bg": "surface",
     "required": 3,
-    "ratio": 5.47,
+    "ratio": 5.97,
     "note": "reasons list: positive marker dot"
   },
   {
     "fg": "select",
     "bg": "surface",
     "required": 3,
-    "ratio": 7.23,
+    "ratio": 13.23,
     "note": "reasons list: risk marker dot"
   },
   {
     "fg": "action",
     "bg": "board-deep",
     "required": 3,
-    "ratio": 5.3,
+    "ratio": 5.82,
     "note": "dock slot: filled square against the dock panel"
   },
   {
     "fg": "frame",
     "bg": "board-deep",
     "required": 3,
-    "ratio": 3.64,
+    "ratio": 4.09,
     "note": "dock slot: empty square border against the dock panel"
   },
   {
     "fg": "ink",
     "bg": "hue-mid-bg",
     "required": 4.5,
-    "ratio": 11.08,
+    "ratio": 11.72,
     "note": "profile position tag bold code, fallback ink colour check against the mid hue background"
   }
 ]

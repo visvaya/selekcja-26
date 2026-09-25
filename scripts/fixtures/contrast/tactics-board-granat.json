@@ -59,21 +59,21 @@
     "fg": "on-action",
     "bg": "action",
     "required": 4.5,
-    "ratio": 7.14,
+    "ratio": 6.99,
     "note": "phase pill text on marker blue"
   },
   {
     "fg": "action",
     "bg": "board",
     "required": 4.5,
-    "ratio": 6.37,
+    "ratio": 6.23,
     "note": "eyebrow text on page background"
   },
   {
     "fg": "action",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 7.05,
+    "ratio": 6.9,
     "note": "eyebrow text on strip surface"
   },
   {
@@ -108,7 +108,7 @@
     "fg": "on-action",
     "bg": "action",
     "required": 4.5,
-    "ratio": 7.14,
+    "ratio": 6.99,
     "note": "primary start button text"
   },
   {
@@ -192,7 +192,7 @@
     "fg": "on-action",
     "bg": "action",
     "required": 4.5,
-    "ratio": 7.14,
+    "ratio": 6.99,
     "note": "filter chip label, active"
   },
   {
@@ -297,7 +297,7 @@
     "fg": "action",
     "bg": "board-deep",
     "required": 3,
-    "ratio": 5.3,
+    "ratio": 5.19,
     "note": "meter fill vs meter track"
   },
   {
@@ -311,7 +311,7 @@
     "fg": "on-action",
     "bg": "action",
     "required": 4.5,
-    "ratio": 7.14,
+    "ratio": 6.99,
     "note": "select-btn label, unpressed (Powolaj)"
   },
   {
@@ -346,21 +346,21 @@
     "fg": "action",
     "bg": "board-deep",
     "required": 4.5,
-    "ratio": 5.3,
+    "ratio": 5.19,
     "note": "compare-btn label, pressed (Wybrany)"
   },
   {
     "fg": "action",
     "bg": "board-deep",
     "required": 3,
-    "ratio": 5.3,
+    "ratio": 5.19,
     "note": "compare-btn border, pressed"
   },
   {
     "fg": "action",
     "bg": "surface",
     "required": 3,
-    "ratio": 7.05,
+    "ratio": 6.9,
     "note": "compare-on outline against surface"
   },
   {
@@ -472,7 +472,7 @@
     "fg": "on-good",
     "bg": "good",
     "required": 4.5,
-    "ratio": 5.54,
+    "ratio": 6.24,
     "note": "finalize button label, enabled"
   },
   {
@@ -500,7 +500,7 @@
     "fg": "good",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 5.47,
+    "ratio": 6.15,
     "note": "dock-summary fulfilled status text"
   },
   {
@@ -556,7 +556,7 @@
     "fg": "action",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 7.05,
+    "ratio": 6.9,
     "note": "pitch node count number"
   },
   {
@@ -598,7 +598,7 @@
     "fg": "on-ink-eyebrow",
     "bg": "ink",
     "required": 4.5,
-    "ratio": 10.71,
+    "ratio": 10.42,
     "note": "result-eyebrow on ink hero"
   },
   {
@@ -654,14 +654,14 @@
     "fg": "action",
     "bg": "surface",
     "required": 3,
-    "ratio": 7.05,
+    "ratio": 6.9,
     "note": "bracket dot fill/border, group stage (still carries the points number)"
   },
   {
     "fg": "action",
     "bg": "board",
     "required": 3,
-    "ratio": 6.37,
+    "ratio": 6.23,
     "note": "bracket dot fill, passed/won stage, no invented letter code, against the bracket panel"
   },
   {
@@ -724,7 +724,7 @@
     "fg": "focus-core",
     "bg": "board",
     "required": 3,
-    "ratio": 11.45,
+    "ratio": 11.05,
     "note": "focus ring inner colour on light background (the halo is not visible here, core carries it)"
   },
   {
@@ -752,7 +752,7 @@
     "fg": "action",
     "bg": "surface-dialog",
     "required": 4.5,
-    "ratio": 7.15,
+    "ratio": 7,
     "note": "profile score big number"
   },
   {
@@ -787,7 +787,7 @@
     "fg": "good",
     "bg": "surface-dialog",
     "required": 4.5,
-    "ratio": 5.55,
+    "ratio": 6.24,
     "note": "comparison-row winning value"
   },
   {
@@ -836,14 +836,14 @@
     "fg": "action",
     "bg": "board-deep",
     "required": 4.5,
-    "ratio": 5.3,
+    "ratio": 5.19,
     "note": "secondary action / inactive chip label on hover"
   },
   {
     "fg": "action",
     "bg": "board-deep",
     "required": 3,
-    "ratio": 5.3,
+    "ratio": 5.19,
     "note": "secondary action / inactive chip border on hover"
   },
   {
@@ -864,7 +864,7 @@
     "fg": "on-action",
     "bg": "action-strong",
     "required": 4.5,
-    "ratio": 10.99,
+    "ratio": 10.63,
     "note": "primary / select-btn (unpressed) / active chip label on hover or active"
   },
   {
@@ -878,7 +878,7 @@
     "fg": "action",
     "bg": "surface",
     "required": 3,
-    "ratio": 7.05,
+    "ratio": 6.9,
     "note": "choice button border on hover (unselected)"
   },
   {
@@ -892,14 +892,14 @@
     "fg": "hue-gk-ink",
     "bg": "hue-gk-bg",
     "required": 4.5,
-    "ratio": 8.64,
+    "ratio": 8.75,
     "note": "position-group hue: goalkeeper magnet text"
   },
   {
     "fg": "hue-gk-ink",
     "bg": "hue-gk-bg",
     "required": 3,
-    "ratio": 8.64,
+    "ratio": 8.75,
     "note": "position-group hue: goalkeeper magnet border"
   },
   {
@@ -913,7 +913,7 @@
     "fg": "ink-soft",
     "bg": "hue-mid-bg",
     "required": 4.5,
-    "ratio": 5.69,
+    "ratio": 5.7,
     "note": "profile position tag: non-bold label text (e.g. \"pomocnik\") on the mid hue"
   },
   {
@@ -948,7 +948,7 @@
     "fg": "meter-high",
     "bg": "board-deep",
     "required": 3,
-    "ratio": 4.07,
+    "ratio": 5.19,
     "note": "meter tint: high band fill against its track"
   },
   {
@@ -983,14 +983,14 @@
     "fg": "good",
     "bg": "surface-dialog",
     "required": 4.5,
-    "ratio": 5.55,
+    "ratio": 6.24,
     "note": "h2h: winning value"
   },
   {
     "fg": "good",
     "bg": "board-deep",
     "required": 3,
-    "ratio": 4.11,
+    "ratio": 4.63,
     "note": "h2h bar: winning side fill against the bar track"
   },
   {
@@ -1018,28 +1018,28 @@
     "fg": "action",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 7.05,
+    "ratio": 6.9,
     "note": "changelog toggle: subtle text button label"
   },
   {
     "fg": "on-action",
     "bg": "action",
     "required": 4.5,
-    "ratio": 7.14,
+    "ratio": 6.99,
     "note": "path list: round-name tab label"
   },
   {
     "fg": "action-strong",
     "bg": "board-deep",
     "required": 4.5,
-    "ratio": 8.16,
+    "ratio": 7.89,
     "note": "path list: score emphasis (bold number) on the score row"
   },
   {
     "fg": "good",
     "bg": "surface",
     "required": 3,
-    "ratio": 5.47,
+    "ratio": 6.15,
     "note": "reasons list: positive marker dot"
   },
   {
@@ -1053,7 +1053,7 @@
     "fg": "action",
     "bg": "board-deep",
     "required": 3,
-    "ratio": 5.3,
+    "ratio": 5.19,
     "note": "dock slot: filled square against the dock panel"
   },
   {
@@ -1067,7 +1067,7 @@
     "fg": "ink",
     "bg": "hue-mid-bg",
     "required": 4.5,
-    "ratio": 11.08,
+    "ratio": 11.1,
     "note": "profile position tag bold code, fallback ink colour check against the mid hue background"
   }
 ]
