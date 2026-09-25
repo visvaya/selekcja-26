@@ -889,48 +889,6 @@
     "note": "choice button border on hover (selected)"
   },
   {
-    "fg": "hue-gk-ink",
-    "bg": "hue-gk-bg",
-    "required": 4.5,
-    "ratio": 8.43,
-    "note": "position-group hue: goalkeeper magnet text"
-  },
-  {
-    "fg": "hue-gk-ink",
-    "bg": "hue-gk-bg",
-    "required": 3,
-    "ratio": 8.43,
-    "note": "position-group hue: goalkeeper magnet border"
-  },
-  {
-    "fg": "hue-def-ink",
-    "bg": "hue-def-bg",
-    "required": 4.5,
-    "ratio": 8.58,
-    "note": "position-group hue: defender magnet text"
-  },
-  {
-    "fg": "ink-soft",
-    "bg": "hue-mid-bg",
-    "required": 4.5,
-    "ratio": 5.52,
-    "note": "profile position tag: non-bold label text (e.g. \"pomocnik\") on the mid hue"
-  },
-  {
-    "fg": "hue-mid-ink",
-    "bg": "hue-mid-bg",
-    "required": 4.5,
-    "ratio": 7.73,
-    "note": "position-group hue: midfielder magnet text"
-  },
-  {
-    "fg": "hue-fwd-ink",
-    "bg": "hue-fwd-bg",
-    "required": 4.5,
-    "ratio": 7.37,
-    "note": "position-group hue: forward magnet text"
-  },
-  {
     "fg": "meter-low",
     "bg": "board-deep",
     "required": 3,
@@ -1064,67 +1022,11 @@
     "note": "dock slot: empty square border against the dock panel"
   },
   {
-    "fg": "ink",
-    "bg": "hue-mid-bg",
-    "required": 4.5,
-    "ratio": 10.75,
-    "note": "profile position tag bold code, fallback ink colour check against the mid hue background"
-  },
-  {
-    "fg": "hue-gk-ink",
-    "bg": "board-deep",
-    "required": 3,
-    "ratio": 9.39,
-    "note": "dock slot group: BR filled squares against the dock track"
-  },
-  {
-    "fg": "hue-def-ink",
-    "bg": "board-deep",
-    "required": 3,
-    "ratio": 9.65,
-    "note": "dock slot group: OBR filled squares against the dock track"
-  },
-  {
-    "fg": "hue-mid-ink",
-    "bg": "board-deep",
-    "required": 3,
-    "ratio": 8.52,
-    "note": "dock slot group: POM filled squares against the dock track"
-  },
-  {
-    "fg": "hue-fwd-ink",
-    "bg": "board-deep",
-    "required": 3,
-    "ratio": 8.83,
-    "note": "dock slot group: NAP filled squares against the dock track"
-  },
-  {
     "fg": "ink-soft",
     "bg": "board-deep",
     "required": 3,
     "ratio": 6.09,
     "note": "dock slot group: Dowolne filled squares against the dock track"
-  },
-  {
-    "fg": "hue-def-ink",
-    "bg": "hue-def-bg",
-    "required": 3,
-    "ratio": 8.58,
-    "note": "position-group hue: defender magnet border"
-  },
-  {
-    "fg": "hue-mid-ink",
-    "bg": "hue-mid-bg",
-    "required": 3,
-    "ratio": 7.73,
-    "note": "position-group hue: midfielder magnet border"
-  },
-  {
-    "fg": "hue-fwd-ink",
-    "bg": "hue-fwd-bg",
-    "required": 3,
-    "ratio": 7.37,
-    "note": "position-group hue: forward magnet border"
   },
   {
     "fg": "board-line",
@@ -1286,5 +1188,61 @@
     "required": 3,
     "ratio": 6.09,
     "note": "dock copy: chevron affordance"
+  },
+  {
+    "fg": "hue-gk",
+    "bg": "surface",
+    "required": 3,
+    "ratio": 4.78,
+    "note": "position badge: goalkeeper left bar / border on the card surface"
+  },
+  {
+    "fg": "hue-def",
+    "bg": "surface",
+    "required": 3,
+    "ratio": 8.14,
+    "note": "position badge: defender left bar / border on the card surface"
+  },
+  {
+    "fg": "hue-mid",
+    "bg": "surface",
+    "required": 3,
+    "ratio": 5.46,
+    "note": "position badge: midfielder left bar / border on the card surface"
+  },
+  {
+    "fg": "hue-fwd",
+    "bg": "surface",
+    "required": 3,
+    "ratio": 6.29,
+    "note": "position badge: forward left bar / border on the card surface"
+  },
+  {
+    "fg": "hue-gk",
+    "bg": "board-deep",
+    "required": 3,
+    "ratio": 3.6,
+    "note": "dock slot group: BR filled/empty squares against the dock track"
+  },
+  {
+    "fg": "hue-def",
+    "bg": "board-deep",
+    "required": 3,
+    "ratio": 6.12,
+    "note": "dock slot group: OBR filled/empty squares against the dock track"
+  },
+  {
+    "fg": "hue-mid",
+    "bg": "board-deep",
+    "required": 3,
+    "ratio": 4.11,
+    "note": "dock slot group: POM filled/empty squares against the dock track"
+  },
+  {
+    "fg": "hue-fwd",
+    "bg": "board-deep",
+    "required": 3,
+    "ratio": 4.73,
+    "note": "dock slot group: NAP filled/empty squares against the dock track"
   }
 ]
