@@ -123,16 +123,8 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
   await page.reload();
   expect(await readReport(page)).toEqual(report);
 
-  // Undoing the finalization returns to the full squad; the same seed
-  // reproduces the same report.
-  await page.getByRole("button", { name: text.undo }).tap();
-  await expect(
-    page.getByRole("heading", { name: text.stages.final.heading }),
-  ).toBeVisible();
-  await expect(squadCount(page)).toHaveText("26/26");
-  await expectFocusVisible(page, "undo (tournament report -> final)");
-  await finalizeButton(page).tap();
-  expect(await readReport(page)).toEqual(report);
+  // The report is final: it offers no undo (owner decision, 2026-09-25).
+  await expect(page.getByRole("button", { name: text.undo })).toHaveCount(0);
 
   await page.getByRole("button", { name: text.restart }).tap();
   await expect(

@@ -218,7 +218,7 @@ test("a finished version 3 report from other rules is shown frozen with the olde
   await expect(page.locator(".fineprint").first()).toContainText(
     text.reportFromOlderRules,
   );
-  await expect(page.getByRole("button", { name: text.undo })).toBeDisabled();
+  await expect(page.getByRole("button", { name: text.undo })).toHaveCount(0);
   for (const name of [
     "Łukasz Skorupski",
     "Jakub Kiwior",

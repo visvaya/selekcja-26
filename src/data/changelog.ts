@@ -9,6 +9,7 @@ export interface ChangelogEntry {
 
 // Newest first.
 export const CHANGELOG = [
+  { version: "0.1.5", date: "2026-09-25" },
   { version: "0.1.4", date: "2026-09-25" },
   { version: "0.1.3", date: "2026-09-24" },
   { version: "0.1.2", date: "2026-09-24" },

@@ -12,15 +12,11 @@ import { UI_TEXT as text } from "./text.ts";
 
 export function ReportScreen({
   report,
-  canUndo,
   onRestart,
-  onUndo,
   headingRef,
 }: {
   report: FinalReport;
-  canUndo: boolean;
   onRestart: () => void;
-  onUndo: () => void;
   headingRef: RefObject<HTMLHeadingElement | null>;
 }) {
   const effect =
@@ -109,9 +105,6 @@ export function ReportScreen({
       {report.rulesRevision !== RULES_REVISION && (
         <p className="fineprint">{text.reportFromOlderRules}</p>
       )}
-      <button className="action-button" disabled={!canUndo} onClick={onUndo}>
-        {text.undo}
-      </button>
       <button className="primary restart" onClick={onRestart}>
         {text.restart}
       </button>

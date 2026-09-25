@@ -416,7 +416,7 @@ export const UI_TEXT = {
   rulesChangedDiscarded:
     "Od twojej ostatniej wizyty zmieniły się zasady gry i nie ma możliwości wczytania niedokończonej selekcji. Zaczynasz od nowa.",
   reportFromOlderRules:
-    "Ten raport powstał według wcześniejszej wersji zasad gry. Decyzji z tej selekcji nie można już cofnąć.",
+    "Ten raport powstał według wcześniejszej wersji zasad gry.",
   simulationDisclaimer:
     "Symulacja ocenia strukturę decyzji i zawiera kontrolowaną losowość. Nie jest prognozą rzeczywistego wyniku sportowego.",
   resultReasons: {
@@ -445,6 +445,9 @@ export const UI_TEXT = {
   changelogShowOlder: (count: number) => `Wcześniejsze zmiany (${count})`,
   changelogHideOlder: "Ukryj wcześniejsze zmiany",
   changelogNotes: {
+    "0.1.5": [
+      "Wynik turnieju jest ostateczny: na ekranie raportu nie ma już przycisku „Cofnij”.",
+    ],
     "0.1.4": [
       "Wiek zawodników ma poprawną formę, np. „34 lata” zamiast „34 lat”.",
       "Raport turniejowy nie powtarza już ostatniego meczu pod listą spotkań. Ostatni wiersz listy to ostatni mecz.",

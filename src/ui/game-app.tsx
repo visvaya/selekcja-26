@@ -320,8 +320,6 @@ export function GameApp() {
         {state.report ? (
           <ReportScreen
             report={state.report}
-            canUndo={state.history.length > 0}
-            onUndo={undo}
             onRestart={() => {
               dispatch({ type: "reset", seed: randomSeed() });
               setModal(null);
