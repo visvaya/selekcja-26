@@ -104,7 +104,7 @@ export const UI_TEXT = {
   },
   autoFillErrorTitle: "Nie udało się dobrać zawodników",
   disclaimer:
-    "Nieoficjalna gra fanowska. Kluby, dostępność i oceny są elementem scenariusza EURO 2028 oraz autorskim modelem rozgrywki – nie rzeczywistym scoutingiem ani produktem PZPN/UEFA.",
+    "Nieoficjalna gra fanowska. Nie jest rzeczywistym produktem PZPN/UEFA.",
   systems: {
     "4231": {
       name: "4–2–3–1",
@@ -139,7 +139,7 @@ export const UI_TEXT = {
       phase: "ZGRUPOWANIE 1/2",
       eyebrow: "MARZEC 2028",
       heading: "Wybierz 23 zawodników na test",
-      hint: "To moment na sprawdzenie wynalazków. Występ na zgrupowaniu ujawni dodatkową informację przed EURO.",
+      hint: "To moment na sprawdzenie nowych twarzy. Występ na zgrupowaniu ujawni dodatkowe informacje przed EURO.",
       finalize: "Jedź na zgrupowanie",
       completed: "Lista kontrolna gotowa",
       suffix: "LISTA KONTROLNA",
@@ -459,6 +459,7 @@ export const UI_TEXT = {
   changelogShowOlder: (count: number) => `Wcześniejsze zmiany (${count})`,
   changelogHideOlder: "Ukryj wcześniejsze zmiany",
   changelogNotes: {
+    "0.1.8": ["Poprawione teksty na ekranie zgrupowania i na starcie."],
     "0.1.7": [
       "Raport turniejowy mówi o reprezentacji w pierwszej osobie, np. „Zakończyliśmy udział w turnieju po fazie grupowej.”.",
     ],
