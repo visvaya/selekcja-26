@@ -159,6 +159,13 @@ test("start, profile, comparison, event and position filter work together", asyn
       // not the "Przebieg turnieju" section title above, which is only a level-2 heading.
       const reportHeading = screen.getByRole("heading", { level: 1 });
       assert.equal(isFocused(reportHeading), true);
+      // The closing sentence speaks of Poland as "we" and matches the reported stage.
+      const outcomeSentence = UI_TEXT.reportOutcome(
+        reportHeading.textContent ?? "",
+      );
+      const summary = reportHeading.nextElementSibling?.textContent ?? "";
+      assert.match(summary, /^Zdobyliśmy \d+ pkt w grupie\./);
+      assert.equal(summary.endsWith(outcomeSentence ?? "missing"), true);
       fireEvent.click(
         screen.getByRole("button", { name: "Zagraj od początku" }),
       );

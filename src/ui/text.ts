@@ -33,6 +33,18 @@ function formatAge(years: number): string {
   return `${years} ${few ? "lata" : "lat"}`;
 }
 
+// The report's closing sentence, speaking of Poland as "we", keyed by the stage label the report
+// stores (`FinalReport.stage`). Built at display time, so older saved reports read the same way;
+// the sentence stored in `story.outcome` stays frozen, because it is part of the golden traces.
+const REPORT_OUTCOMES: Readonly<Record<string, string>> = {
+  "Faza grupowa": "Zakończyliśmy udział w turnieju po fazie grupowej.",
+  "1/8 finału": "Odpadliśmy w 1/8 finału.",
+  Ćwierćfinał: "Odpadliśmy w ćwierćfinale.",
+  Półfinał: "Odpadliśmy w półfinale.",
+  "Wicemistrz Europy": "Zostaliśmy wicemistrzami Europy.",
+  "Mistrz Europy": "Zostaliśmy mistrzami Europy.",
+};
+
 export const UI_TEXT = {
   brand: "SELEKCJA",
   introPhase: "ODPRAWA",
@@ -351,7 +363,9 @@ export const UI_TEXT = {
     `Najlepiej wypadli ${best}. Najwięcej wątpliwości zostawili ${doubts}. Ocena selekcyjna uwzględnia teraz występ i znajomość automatyzmów.`,
   continueToFinal: "Przejdź do powołań na EURO",
   reportEyebrow: "Raport turniejowy",
-  pointsInGroup: (count: number) => `Polska zdobyła ${count} pkt w grupie.`,
+  pointsInGroup: (count: number) => `Zdobyliśmy ${count} pkt w grupie.`,
+  reportOutcome: (stage: string): string | undefined =>
+    Object.hasOwn(REPORT_OUTCOMES, stage) ? REPORT_OUTCOMES[stage] : undefined,
   outcomes: {
     champion: "Mistrz Europy",
     runnerUp: "Wicemistrz Europy",
@@ -445,6 +459,9 @@ export const UI_TEXT = {
   changelogShowOlder: (count: number) => `Wcześniejsze zmiany (${count})`,
   changelogHideOlder: "Ukryj wcześniejsze zmiany",
   changelogNotes: {
+    "0.1.7": [
+      "Raport turniejowy mówi o reprezentacji w pierwszej osobie, np. „Zakończyliśmy udział w turnieju po fazie grupowej.”.",
+    ],
     "0.1.6": [
       "Komunikat po nieudanym losowym doborze ma jaśniejszy tytuł: „Nie udało się dobrać zawodników”.",
     ],

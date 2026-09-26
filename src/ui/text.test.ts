@@ -25,3 +25,28 @@ test("age uses the Polish plural form for the number of years", () => {
   for (const [years, expected] of cases)
     assert.equal(text.age(years), expected, `age(${years})`);
 });
+
+test("the report outcome sentence speaks of Poland as we, for every outcome", () => {
+  const cases: [string, string][] = [
+    [text.outcomes.group, "Zakończyliśmy udział w turnieju po fazie grupowej."],
+    [text.outcomes.roundOf16, "Odpadliśmy w 1/8 finału."],
+    [text.outcomes.quarterfinal, "Odpadliśmy w ćwierćfinale."],
+    [text.outcomes.semifinal, "Odpadliśmy w półfinale."],
+    [text.outcomes.runnerUp, "Zostaliśmy wicemistrzami Europy."],
+    [text.outcomes.champion, "Zostaliśmy mistrzami Europy."],
+  ];
+  for (const [stage, expected] of cases)
+    assert.equal(
+      text.reportOutcome(stage),
+      expected,
+      `reportOutcome(${stage})`,
+    );
+});
+
+test("an unknown report stage has no outcome sentence", () => {
+  assert.equal(text.reportOutcome("Etap spoza listy"), undefined);
+});
+
+test("group points in the report speak of Poland as we", () => {
+  assert.equal(text.pointsInGroup(5), "Zdobyliśmy 5 pkt w grupie.");
+});

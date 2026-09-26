@@ -34,7 +34,8 @@ export function ReportScreen({
           {report.stage}
         </h1>
         <p>
-          {text.pointsInGroup(report.points)} {effect} {report.story.outcome}
+          {text.pointsInGroup(report.points)} {effect}{" "}
+          {text.reportOutcome(report.stage) ?? report.story.outcome}
         </p>
         <div className="outcomes">
           <div className="outcome">
