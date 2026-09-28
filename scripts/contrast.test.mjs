@@ -601,3 +601,43 @@ test("every palette pair meets its required ratio and matches the fixture", () =
     );
   }
 });
+
+// Combinations the re-pointed legacy.css rules produce that PALETTE_PAIRS does not contain.
+// They cover legacy.css until the screen stages delete its rules; stage 11 removes this list.
+// Only pairs of palette tokens are listed: text on legacy brand colours is re-pointed later.
+// The dock summary's warning row mixes two palette tokens, so it gets a local token here.
+const interimTokens = new Map([
+  ...paletteTokens,
+  [
+    "--interim-warn-overlay",
+    "color-mix(in oklab, var(--warn-fill) 25%, var(--surface))",
+  ],
+]);
+const INTERIM_PAIRS = [
+  {
+    fg: "frame",
+    bg: "board",
+    required: LARGE_OR_UI_RATIO,
+    note: "control borders on the board background: .search, .chip, .sort in .toolbar; .choice and .action-button on the start screen",
+  },
+  {
+    fg: "warn-ink",
+    bg: "interim-warn-overlay",
+    required: TEXT_RATIO,
+    note: ".dock-summary div.need, div.over and their span: text and border on the warning row",
+  },
+];
+
+for (const pair of INTERIM_PAIRS) {
+  test(`interim pair ${pair.fg} on ${pair.bg} meets ${pair.required}:1`, () => {
+    const ratio = tokenContrastRatio(
+      `--${pair.fg}`,
+      `--${pair.bg}`,
+      interimTokens,
+    );
+    assert.ok(
+      ratio >= pair.required,
+      `${pair.fg} on ${pair.bg}: ${ratio.toFixed(2)} < ${pair.required} (${pair.note})`,
+    );
+  });
+}

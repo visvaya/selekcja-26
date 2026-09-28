@@ -25,7 +25,7 @@ html {
 }
 body {
   margin: 0;
-  background: var(--paper);
+  background: var(--board);
   color: var(--ink);
   font-family: var(--font-body);
   font-size: var(--font-body-size);
@@ -53,7 +53,7 @@ input:focus-visible {
   top: var(--save-banner-offset, 0px);
   z-index: 20;
   background: var(--topbar-background);
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--board-line);
   backdrop-filter: blur(12px);
 }
 .save-status {
@@ -68,9 +68,9 @@ input:focus-visible {
   justify-content: space-between;
   gap: var(--legacy-space-7);
   padding: var(--legacy-space-6) var(--legacy-space-8);
-  background: var(--warning-surface);
-  color: var(--warning-text);
-  border-bottom: 1px solid var(--warning-border);
+  background: var(--warn-fill);
+  color: var(--warn-ink);
+  border-bottom: 1px solid var(--warn-ink);
 }
 .save-status-alert p {
   flex: 1;
@@ -94,10 +94,10 @@ input:focus-visible {
 }
 .save-status-action {
   flex: none;
-  border: 1px solid var(--warning-border);
+  border: 1px solid var(--warn-ink);
   border-radius: var(--radius-control);
-  background: var(--card);
-  color: var(--warning-text);
+  background: var(--surface);
+  color: var(--warn-ink);
   padding: var(--legacy-space-4) var(--legacy-space-7);
   font-weight: 800;
   font-size: var(--font-small);
@@ -140,7 +140,7 @@ input:focus-visible {
 .topbar-version {
   flex: none;
   font-size: var(--font-caption);
-  color: var(--muted);
+  color: var(--ink-soft);
   font-weight: 700;
   white-space: nowrap;
 }
@@ -150,7 +150,7 @@ input:focus-visible {
   height: 28px;
   border-radius: 8px;
   background: var(--red);
-  color: var(--card);
+  color: var(--surface);
   display: grid;
   place-items: center;
   font-size: var(--font-caption);
@@ -159,7 +159,7 @@ input:focus-visible {
   font-family: var(--font-display);
   flex: none;
   font-size: var(--font-small);
-  color: var(--muted);
+  color: var(--ink-soft);
   font-weight: 700;
 }
 .main {
@@ -188,12 +188,12 @@ input:focus-visible {
 }
 .lead {
   font-size: var(--font-large);
-  color: var(--lead-text);
+  color: var(--ink-soft);
   max-width: 650px;
 }
 .brief {
   background: var(--navy);
-  color: var(--card);
+  color: var(--surface);
   padding: var(--legacy-space-11);
   border-radius: 18px;
   margin: 26px 0;
@@ -236,8 +236,8 @@ input:focus-visible {
   gap: 9px;
 }
 .choice {
-  background: var(--card);
-  border: 1px solid var(--line);
+  background: var(--surface);
+  border: 1px solid var(--frame);
   border-radius: 14px;
   padding: var(--legacy-space-7);
   text-align: left;
@@ -253,14 +253,14 @@ input:focus-visible {
   display: block;
 }
 .choice small {
-  color: var(--muted);
+  color: var(--ink-soft);
   display: block;
   margin-top: 3px;
 }
 .radio {
   width: 18px;
   height: 18px;
-  border: 2px solid var(--radio-border);
+  border: 2px solid var(--frame);
   border-radius: 50%;
   margin-top: var(--legacy-space-1);
   flex: 0 0 auto;
@@ -273,7 +273,7 @@ input:focus-visible {
   border: 0;
   border-radius: 12px;
   background: var(--red);
-  color: var(--card);
+  color: var(--surface);
   padding: var(--legacy-space-7) var(--legacy-space-9);
   font-weight: 850;
   box-shadow: 0 8px 18px var(--red-shadow);
@@ -288,9 +288,9 @@ input:focus-visible {
 }
 .action-button {
   flex: 1;
-  border: 1px solid var(--line);
+  border: 1px solid var(--frame);
   border-radius: var(--radius-control);
-  background: var(--card);
+  background: var(--surface);
   color: var(--ink);
   padding: var(--legacy-space-6);
   font-weight: 800;
@@ -307,7 +307,7 @@ input:focus-visible {
 }
 .fineprint {
   font-size: var(--font-caption);
-  color: var(--muted);
+  color: var(--ink-soft);
   margin-top: var(--legacy-space-7);
 }
 .game-head {
@@ -323,7 +323,7 @@ input:focus-visible {
 }
 .game-head p {
   margin: var(--legacy-space-1) 0 0;
-  color: var(--muted);
+  color: var(--ink-soft);
 }
 .kpis {
   display: grid;
@@ -331,14 +331,14 @@ input:focus-visible {
   gap: var(--legacy-space-4);
 }
 .kpi {
-  background: var(--card);
-  border: 1px solid var(--line);
+  background: var(--surface);
+  border: 1px solid var(--board-line);
   border-radius: 12px;
   padding: var(--legacy-space-5);
 }
 .kpi span {
   font-size: var(--font-caption);
-  color: var(--muted);
+  color: var(--ink-soft);
   text-transform: uppercase;
   font-weight: 800;
   letter-spacing: 0.06em;
@@ -353,7 +353,7 @@ input:focus-visible {
   position: sticky;
   top: calc(var(--topbar-height) + var(--save-banner-offset, 0px));
   z-index: 15;
-  background: var(--paper);
+  background: var(--board);
   padding: 9px 0;
   display: grid;
   gap: var(--legacy-space-4);
@@ -361,10 +361,10 @@ input:focus-visible {
 .search {
   width: 100%;
   height: 44px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--frame);
   border-radius: 12px;
   padding: 0 var(--legacy-space-7);
-  background: var(--card);
+  background: var(--surface);
 }
 .filters {
   display: flex;
@@ -376,26 +376,26 @@ input:focus-visible {
 .chip {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
-  background: var(--card);
-  border: 1px solid var(--line);
+  background: var(--surface);
+  border: 1px solid var(--frame);
   padding: var(--legacy-space-4) var(--legacy-space-6);
   border-radius: 999px;
   font-size: var(--font-small);
   font-weight: 750;
-  color: var(--text-secondary);
+  color: var(--ink-soft);
 }
 .chip.active {
   background: var(--navy);
-  color: var(--card);
+  color: var(--surface);
   border-color: var(--navy);
 }
 .sort {
   height: 38px;
-  border: 1px solid var(--line);
-  background: var(--card);
+  border: 1px solid var(--frame);
+  background: var(--surface);
   border-radius: 10px;
   padding: 0 var(--legacy-space-5);
-  color: var(--text-secondary);
+  color: var(--ink-soft);
 }
 .section-label {
   display: flex;
@@ -410,15 +410,15 @@ input:focus-visible {
   margin: 0;
 }
 .section-label small {
-  color: var(--muted);
+  color: var(--ink-soft);
 }
 .players {
   display: grid;
   gap: var(--legacy-space-4);
 }
 .player {
-  background: var(--card);
-  border: 1px solid var(--line);
+  background: var(--surface);
+  border: 1px solid var(--board-line);
   border-radius: 15px;
   padding: 13px;
   display: grid;
@@ -439,8 +439,8 @@ input:focus-visible {
   gap: var(--legacy-space-5);
 }
 .pos {
-  background: var(--surface-accent);
-  color: var(--position-text);
+  background: var(--board-deep);
+  color: var(--ink-soft);
   border-radius: 8px;
   padding: 5px 7px;
   font-size: var(--font-caption);
@@ -456,7 +456,7 @@ input:focus-visible {
 }
 .meta {
   font-size: var(--font-caption);
-  color: var(--muted);
+  color: var(--ink-soft);
   margin-top: var(--legacy-space-1);
 }
 .tags {
@@ -469,12 +469,12 @@ input:focus-visible {
   font-size: var(--font-caption);
   padding: 3px 7px;
   border-radius: 999px;
-  background: var(--surface-soft);
-  color: var(--text-secondary);
+  background: var(--board-deep);
+  color: var(--ink-soft);
 }
 .tag.alert {
-  background: var(--warning-surface);
-  color: var(--warning-text);
+  background: var(--warn-fill);
+  color: var(--warn-ink);
 }
 .score {
   font-family: var(--font-display);
@@ -484,7 +484,7 @@ input:focus-visible {
   display: grid;
   place-items: center;
   background: var(--navy);
-  color: var(--card);
+  color: var(--surface);
   font-weight: 900;
   font-size: 17px;
 }
@@ -496,13 +496,13 @@ input:focus-visible {
 }
 .metric span {
   font-size: var(--font-caption);
-  color: var(--muted);
+  color: var(--ink-soft);
   display: flex;
   justify-content: space-between;
 }
 .bar {
   height: 4px;
-  background: var(--surface-track);
+  background: var(--board-deep);
   border-radius: 9px;
   overflow: hidden;
   margin-top: var(--legacy-space-2);
@@ -520,8 +520,8 @@ input:focus-visible {
 }
 .select-btn,
 .compare-btn {
-  border: 1px solid var(--line);
-  background: var(--card);
+  border: 1px solid var(--frame);
+  background: var(--surface);
   border-radius: 10px;
   padding: 9px var(--legacy-space-5);
   font-size: var(--font-small);
@@ -529,11 +529,11 @@ input:focus-visible {
 }
 .selected .select-btn {
   background: var(--red);
-  color: var(--card);
+  color: var(--surface);
   border-color: var(--red);
 }
 .compare-btn {
-  color: var(--muted);
+  color: var(--ink-soft);
 }
 .dock {
   position: fixed;
@@ -541,8 +541,8 @@ input:focus-visible {
   bottom: 0;
   left: 0;
   right: 0;
-  background: var(--card);
-  border-top: 1px solid var(--line);
+  background: var(--surface);
+  border-top: 1px solid var(--board-line);
   padding: var(--legacy-space-5) var(--legacy-space-7)
     calc(var(--legacy-space-5) + env(safe-area-inset-bottom));
   box-shadow: 0 -10px 30px var(--shadow-color);
@@ -560,7 +560,7 @@ input:focus-visible {
   border-radius: 50%;
   background: conic-gradient(
     var(--red) var(--progress, 0%),
-    var(--surface-track) 0
+    var(--board-deep) 0
   );
   display: grid;
   place-items: center;
@@ -571,7 +571,7 @@ input:focus-visible {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: var(--card);
+  background: var(--surface);
   position: absolute;
 }
 .count-ring b {
@@ -588,7 +588,7 @@ input:focus-visible {
   display: block;
 }
 .dock-copy small {
-  color: var(--muted);
+  color: var(--ink-soft);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -597,7 +597,7 @@ input:focus-visible {
 .finalize {
   border: 0;
   background: var(--navy);
-  color: var(--card);
+  color: var(--surface);
   border-radius: 11px;
   padding: var(--legacy-space-6) 15px;
   font-weight: 850;
@@ -616,7 +616,7 @@ input:focus-visible {
   padding: 0;
 }
 .modal {
-  background: var(--card);
+  background: var(--surface-dialog);
   width: 100%;
   max-width: 620px;
   border-radius: 22px 22px 0 0;
@@ -631,14 +631,14 @@ input:focus-visible {
   margin: var(--legacy-space-3) 0 var(--legacy-space-4);
 }
 .modal p {
-  color: var(--dialog-text);
+  color: var(--ink-soft);
 }
 .decision {
   display: block;
   width: 100%;
   text-align: left;
-  border: 1px solid var(--line);
-  background: var(--card);
+  border: 1px solid var(--frame);
+  background: var(--surface-dialog);
   padding: var(--legacy-space-7);
   border-radius: 12px;
   margin-top: 9px;
@@ -648,7 +648,7 @@ input:focus-visible {
 }
 .decision small {
   display: block;
-  color: var(--muted);
+  color: var(--ink-soft);
   margin-top: 3px;
 }
 .compare-grid {
@@ -657,7 +657,7 @@ input:focus-visible {
   gap: 9px;
 }
 .compare-card {
-  border: 1px solid var(--line);
+  border: 1px solid var(--board-line);
   border-radius: 13px;
   padding: var(--legacy-space-6);
 }
@@ -674,7 +674,7 @@ input:focus-visible {
   font-size: var(--font-small);
 }
 .comparison-row span:nth-child(2) {
-  color: var(--muted);
+  color: var(--ink-soft);
   font-size: var(--font-caption);
 }
 .better {
@@ -682,8 +682,8 @@ input:focus-visible {
   font-weight: 900;
 }
 .close {
-  border: 1px solid var(--line);
-  background: var(--card);
+  border: 1px solid var(--frame);
+  background: var(--surface-dialog);
   border-radius: 10px;
   padding: 9px var(--legacy-space-6);
   font-weight: 750;
@@ -694,7 +694,7 @@ input:focus-visible {
 }
 .result-hero {
   background: var(--navy);
-  color: var(--card);
+  color: var(--surface);
   border-radius: 20px;
   padding: var(--legacy-space-12);
 }
@@ -721,13 +721,13 @@ input:focus-visible {
   margin: var(--legacy-space-6) 0;
 }
 .outcome {
-  background: var(--card);
+  background: var(--surface);
   color: var(--ink);
   border-radius: 12px;
   padding: 11px;
 }
 .outcome small {
-  color: var(--muted);
+  color: var(--ink-soft);
   display: block;
 }
 .outcome b {
@@ -735,8 +735,8 @@ input:focus-visible {
   font-size: 17px;
 }
 .report {
-  background: var(--card);
-  border: 1px solid var(--line);
+  background: var(--surface);
+  border: 1px solid var(--board-line);
   border-radius: 16px;
   padding: 17px;
   margin-top: var(--legacy-space-6);
@@ -754,7 +754,7 @@ input:focus-visible {
 }
 .changelog-version {
   font-size: var(--font-caption);
-  color: var(--muted);
+  color: var(--ink-soft);
   margin: 0 0 var(--legacy-space-5);
 }
 .changelog-toggle {
@@ -763,12 +763,12 @@ input:focus-visible {
 .changelog-older {
   margin-top: var(--legacy-space-7);
   padding-top: var(--legacy-space-6);
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--board-line);
 }
 .changelog-entry + .changelog-entry {
   margin-top: var(--legacy-space-7);
   padding-top: var(--legacy-space-6);
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--board-line);
 }
 .squad-list {
   display: flex;
@@ -777,7 +777,7 @@ input:focus-visible {
 }
 .squad-pill {
   font-size: var(--font-caption);
-  background: var(--squad-surface);
+  background: var(--board-deep);
   padding: var(--legacy-space-3) 9px;
   border-radius: 999px;
 }
@@ -844,8 +844,8 @@ input:focus-visible {
   grid-template-columns: 1fr 1fr 1fr;
 }
 .profile-btn {
-  border: 1px solid var(--line);
-  background: var(--control-background);
+  border: 1px solid var(--frame);
+  background: var(--board-deep);
   border-radius: 10px;
   padding: 9px var(--legacy-space-5);
   font-size: var(--font-small);
@@ -870,7 +870,7 @@ input:focus-visible {
   right: 12px;
   bottom: 76px;
   background: var(--navy);
-  color: var(--card);
+  color: var(--surface);
   border-radius: 15px;
   padding: 13px;
   box-shadow: var(--legacy-shadow);
@@ -894,8 +894,9 @@ input:focus-visible {
 }
 .dock-summary div.need,
 .dock-summary div.over {
-  border-color: var(--warning-border);
-  background: var(--warning-overlay);
+  border-color: var(--warn-ink);
+  background: color-mix(in oklab, var(--warn-fill) 25%, var(--surface));
+  color: var(--warn-ink);
 }
 .dock-summary span {
   display: block;
@@ -905,7 +906,12 @@ input:focus-visible {
 }
 .dock-summary .need span,
 .dock-summary .over span {
-  color: var(--warning-soft);
+  color: var(--warn-ink);
+}
+/* The warning row is light since the neutral re-pointing; its label follows. */
+.dock-summary .need small,
+.dock-summary .over small {
+  color: var(--warn-ink);
 }
 .dock-breakdown small {
   display: block;
@@ -925,9 +931,9 @@ input:focus-visible {
 .mini-pitch {
   position: relative;
   min-height: 240px;
-  border: 2px solid var(--pitch-outline);
+  border: 2px solid var(--board-line);
   border-radius: 9px;
-  background: var(--pitch-background);
+  background: var(--board);
   display: flex;
   flex-direction: column;
   justify-content: space-around;
@@ -940,7 +946,7 @@ input:focus-visible {
   left: 0;
   right: 0;
   top: 50%;
-  border-top: 1px solid var(--pitch-divider);
+  border-top: 1px solid var(--board-line);
 }
 .formation-label {
   position: absolute;
@@ -950,13 +956,13 @@ input:focus-visible {
   font-size: var(--font-caption);
   font-weight: 900;
   letter-spacing: 0.08em;
-  color: var(--card);
+  color: var(--ink);
 }
 .formation-label i {
   display: inline-block;
   width: 12px;
   height: 12px;
-  border: 2px solid var(--pitch-marker);
+  border: 2px solid var(--select);
   border-radius: 50%;
   vertical-align: -2px;
   margin-right: var(--legacy-space-2);
@@ -971,19 +977,19 @@ input:focus-visible {
 .pitch-node {
   width: 38px;
   height: 38px;
-  border: 3px solid var(--pitch-marker);
+  border: 3px solid var(--select);
   border-radius: 50%;
-  background: var(--card);
+  background: var(--surface);
   color: var(--navy);
   display: grid;
   place-items: center;
   font-weight: 950;
   box-shadow:
-    0 0 0 2px var(--node-outline),
-    0 4px 10px var(--node-shadow);
+    0 0 0 2px var(--frame),
+    2px 2px 0 var(--shadow);
 }
 .pitch-node small {
-  color: var(--muted);
+  color: var(--ink-soft);
   font-size: 9px;
   line-height: 1;
 }
@@ -994,10 +1000,10 @@ input:focus-visible {
 }
 .formation-outsiders {
   width: 100%;
-  border: 1px solid var(--warning-border);
+  border: 1px solid var(--warn-ink);
   border-radius: 8px;
-  background: var(--pitch-warning-surface);
-  color: var(--pitch-warning-text);
+  background: var(--warn-fill);
+  color: var(--warn-ink);
   padding: 7px var(--legacy-space-4);
   display: flex;
   align-items: center;
@@ -1014,14 +1020,14 @@ input:focus-visible {
   font-size: var(--font-caption);
 }
 .formation-outsiders small {
-  color: var(--pitch-warning-muted);
+  color: var(--warn-ink);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .formation-outsiders .outside-arrow {
   font-size: 20px;
-  color: var(--pitch-warning-arrow);
+  color: var(--warn-ink);
   flex: 0 0 auto;
 }
 .profile-head {
@@ -1038,7 +1044,7 @@ input:focus-visible {
   display: grid;
   place-items: center;
   background: var(--navy);
-  color: var(--card);
+  color: var(--surface);
   font-size: 24px;
   font-weight: 950;
 }
@@ -1055,13 +1061,13 @@ input:focus-visible {
   margin: var(--legacy-space-8) 0;
 }
 .profile-metric {
-  border: 1px solid var(--line);
+  border: 1px solid var(--board-line);
   border-radius: 11px;
   padding: var(--legacy-space-5);
 }
 .profile-metric small {
   display: block;
-  color: var(--muted);
+  color: var(--ink-soft);
 }
 .profile-metric b {
   font-family: var(--font-display);
@@ -1075,7 +1081,7 @@ input:focus-visible {
   text-transform: uppercase;
   letter-spacing: 0.07em;
   margin: 0 0 7px;
-  color: var(--muted);
+  color: var(--ink-soft);
 }
 .mini-pitch {
   min-height: 250px;
@@ -1095,8 +1101,8 @@ input:focus-visible {
 }
 .dock-warning {
   grid-column: 1/-1;
-  background: var(--warning-panel) !important;
-  color: var(--warning-panel-text);
+  background: var(--warn-fill) !important;
+  color: var(--warn-ink);
   border-radius: 9px;
   padding: var(--legacy-space-4) var(--legacy-space-5);
   font-size: var(--font-caption);
@@ -1187,10 +1193,10 @@ body {
   border: 0;
   border-radius: var(--spacing-unit);
   overflow: hidden;
-  background: var(--surface-track);
+  background: var(--board-deep);
 }
 .metric progress::-webkit-progress-bar {
-  background: var(--surface-track);
+  background: var(--board-deep);
 }
 .metric progress::-webkit-progress-value {
   background: var(--green);
@@ -1206,7 +1212,7 @@ body {
   margin-top: var(--space-medium);
 }
 .profile-btn {
-  background: var(--control-background);
+  background: var(--board-deep);
 }
 .modal .eyebrow {
   margin-bottom: var(--space-small);
