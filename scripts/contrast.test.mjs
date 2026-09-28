@@ -19,9 +19,11 @@ import {
   compositeOver,
   contrastRatio,
   extractRootTokens,
+  oklabToRgb,
   parseColorLiteral,
   relativeLuminance,
   resolveColor,
+  rgbToOklab,
   tokenContrastRatio,
 } from "./contrast.mjs";
 
@@ -360,6 +362,115 @@ test("resolveColor follows var() chains", () => {
     b: 0x33,
     a: 1,
   });
+});
+
+function assertRgbClose(actual, expected, tolerance = 1) {
+  for (const channel of ["r", "g", "b"])
+    assert.ok(
+      Math.abs(actual[channel] - expected[channel]) <= tolerance,
+      `${channel}: expected ${expected[channel]}, got ${actual[channel]}`,
+    );
+}
+
+test("parseColorLiteral supports oklch", () => {
+  assertRgbClose(parseColorLiteral("oklch(1 0 0)"), { r: 255, g: 255, b: 255 });
+  assertRgbClose(parseColorLiteral("oklch(0 0 0)"), { r: 0, g: 0, b: 0 });
+  // CSS Color 4 reference: sRGB red is oklch(0.62796 0.25768 29.234).
+  assertRgbClose(parseColorLiteral("oklch(0.62796 0.25768 29.234)"), {
+    r: 255,
+    g: 0,
+    b: 0,
+  });
+  assertRgbClose(parseColorLiteral("oklch(62.796% 0.25768 29.234)"), {
+    r: 255,
+    g: 0,
+    b: 0,
+  });
+  assert.equal(parseColorLiteral("oklch(0.22 0.02 40 / 0.35)").a, 0.35);
+  // Out of gamut clamps instead of throwing.
+  const clamped = parseColorLiteral("oklch(0.9 0.4 150)");
+  for (const channel of ["r", "g", "b"])
+    assert.ok(clamped[channel] >= 0 && clamped[channel] <= 255);
+});
+
+test("oklab conversion round-trips sRGB", () => {
+  const colour = { r: 18, g: 52, b: 86, a: 1 };
+  assertRgbClose(oklabToRgb(rgbToOklab(colour)), colour);
+});
+
+test("resolveColor mixes in oklab like the browser", () => {
+  const mixTokens = new Map([
+    ["--black", "#000"],
+    ["--white", "#fff"],
+    ["--mix", "color-mix(in oklab, var(--white) 50%, var(--black))"],
+    ["--only-second", "color-mix(in oklab, var(--white), var(--black) 100%)"],
+    ["--select", "oklch(0.3 0.03 255)"],
+    ["--surface", "oklch(0.99 0.003 60)"],
+    ["--wash", "color-mix(in oklab, var(--select) 9%, var(--surface))"],
+  ]);
+  // Oklab L = 0.5 grey is about sRGB 99.
+  assertRgbClose(resolveColor("var(--mix)", mixTokens), {
+    r: 99,
+    g: 99,
+    b: 99,
+  });
+  assertRgbClose(resolveColor("var(--only-second)", mixTokens), {
+    r: 0,
+    g: 0,
+    b: 0,
+  });
+  const wash = resolveColor("var(--wash)", mixTokens);
+  const surface = resolveColor("var(--surface)", mixTokens);
+  // The wash mixes 9% of a blue-leaning navy into the near-white surface,
+  // so every channel drops, but red and green should drop more than blue.
+  assert.ok(
+    surface.r - wash.r > surface.b - wash.b,
+    "the navy wash should reduce the blue channel less than red, leaning blue",
+  );
+  assert.ok(
+    surface.g - wash.g > surface.b - wash.b,
+    "the navy wash should reduce the blue channel less than green, leaning blue",
+  );
+  assert.ok(wash.r < surface.r, "the wash is darker than the surface");
+});
+
+test("resolveColor mixes nested color-mix() arguments", () => {
+  const nestedTokens = new Map([
+    ["--black", "#000"],
+    ["--white", "#fff"],
+    ["--half", "color-mix(in oklab, var(--white) 50%, var(--black))"],
+    ["--nested", "color-mix(in oklab, var(--half) 50%, var(--white))"],
+  ]);
+  const nested = resolveColor("var(--nested)", nestedTokens);
+  const half = resolveColor("var(--half)", nestedTokens);
+  assert.ok(
+    nested.r > half.r,
+    "mixing the half-grey with white should lighten it further",
+  );
+});
+
+test("resolveColor rejects unsupported color-mix() spaces", () => {
+  const spaceTokens = new Map([
+    ["--black", "#000"],
+    ["--white", "#fff"],
+    ["--bad", "color-mix(in srgb, var(--white) 50%, var(--black))"],
+  ]);
+  assert.throws(
+    () => resolveColor("var(--bad)", spaceTokens),
+    /Unsupported color-mix\(\) space/,
+  );
+});
+
+test("resolveColor rejects mixing translucent colours", () => {
+  const alphaTokens = new Map([
+    ["--translucent", "rgba(0, 0, 0, 0.5)"],
+    ["--white", "#fff"],
+    ["--bad-mix", "color-mix(in oklab, var(--translucent) 50%, var(--white))"],
+  ]);
+  assert.throws(
+    () => resolveColor("var(--bad-mix)", alphaTokens),
+    /translucent/,
+  );
 });
 
 test("compositeOver blends a translucent colour over an opaque one", () => {
