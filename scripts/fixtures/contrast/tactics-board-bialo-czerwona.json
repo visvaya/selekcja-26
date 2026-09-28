@@ -378,69 +378,6 @@
     "note": "compare-on outline against surface"
   },
   {
-    "fg": "on-action",
-    "bg": "ink",
-    "required": 4.5,
-    "ratio": 16.87,
-    "note": "selected strip: player name on ink fill"
-  },
-  {
-    "fg": "on-action",
-    "bg": "ink",
-    "required": 4.5,
-    "ratio": 16.87,
-    "note": "selected strip: score number on ink fill"
-  },
-  {
-    "fg": "on-ink-meta",
-    "bg": "ink",
-    "required": 4.5,
-    "ratio": 9.88,
-    "note": "selected strip: club/age meta on ink fill"
-  },
-  {
-    "fg": "on-ink-tile",
-    "bg": "ink-tile",
-    "required": 4.5,
-    "ratio": 10.05,
-    "note": "selected strip: role tag text on dark tag fill"
-  },
-  {
-    "fg": "on-ink-tile-border",
-    "bg": "ink-tile",
-    "required": 3,
-    "ratio": 3.75,
-    "note": "selected strip: role tag border on dark tag fill"
-  },
-  {
-    "fg": "on-ink-soft",
-    "bg": "ink-tile",
-    "required": 4.5,
-    "ratio": 6.34,
-    "note": "selected strip: metric label on dark chip"
-  },
-  {
-    "fg": "on-action",
-    "bg": "ink-tile",
-    "required": 4.5,
-    "ratio": 12.41,
-    "note": "selected strip: metric value on dark chip"
-  },
-  {
-    "fg": "on-action",
-    "bg": "ink-tile",
-    "required": 4.5,
-    "ratio": 12.41,
-    "note": "selected strip: action button labels on dark fill"
-  },
-  {
-    "fg": "on-ink-border",
-    "bg": "ink-tile",
-    "required": 3,
-    "ratio": 4.06,
-    "note": "selected strip: action button border on dark fill"
-  },
-  {
     "fg": "ink",
     "bg": "board-deep",
     "required": 4.5,
@@ -1253,48 +1190,6 @@
     "note": "dock slot group: NAP filled/empty squares against the dock track"
   },
   {
-    "fg": "meter-low-on-ink",
-    "bg": "ink-tile",
-    "required": 3,
-    "ratio": 4.1,
-    "note": "selected strip: low band meter fill against its track"
-  },
-  {
-    "fg": "meter-low-on-ink",
-    "bg": "ink",
-    "required": 3,
-    "ratio": 5.58,
-    "note": "selected strip: low band meter fill against the ink strip"
-  },
-  {
-    "fg": "meter-mid-on-ink",
-    "bg": "ink-tile",
-    "required": 3,
-    "ratio": 6.3,
-    "note": "selected strip: mid band meter fill against its track"
-  },
-  {
-    "fg": "meter-mid-on-ink",
-    "bg": "ink",
-    "required": 3,
-    "ratio": 8.57,
-    "note": "selected strip: mid band meter fill against the ink strip"
-  },
-  {
-    "fg": "meter-high-on-ink",
-    "bg": "ink-tile",
-    "required": 3,
-    "ratio": 5.47,
-    "note": "selected strip: high band meter fill against its track"
-  },
-  {
-    "fg": "meter-high-on-ink",
-    "bg": "ink",
-    "required": 3,
-    "ratio": 7.44,
-    "note": "selected strip: high band meter fill against the ink strip"
-  },
-  {
     "fg": "on-danger",
     "bg": "danger",
     "required": 4.5,
@@ -1344,27 +1239,6 @@
     "note": "strip selection score below 75 (large text, band colour)"
   },
   {
-    "fg": "meter-high-on-ink",
-    "bg": "ink",
-    "required": 3,
-    "ratio": 7.44,
-    "note": "called-up (ink) strip: selection score 85+ (large text, 3:1)"
-  },
-  {
-    "fg": "meter-mid-on-ink",
-    "bg": "ink",
-    "required": 3,
-    "ratio": 8.57,
-    "note": "called-up (ink) strip: selection score 75-84 (large text, 3:1)"
-  },
-  {
-    "fg": "meter-low-on-ink",
-    "bg": "ink",
-    "required": 3,
-    "ratio": 5.58,
-    "note": "called-up (ink) strip: selection score below 75 (large text, 3:1)"
-  },
-  {
     "fg": "good",
     "bg": "surface-dialog",
     "required": 4.5,
@@ -1400,87 +1274,129 @@
     "note": "camp event: effect arrow when the change hurts (Ryzyko zdrowotne up, Jakość down)"
   },
   {
-    "fg": "on-ink-tile",
-    "bg": "ink-tile",
-    "required": 4.5,
-    "ratio": 10.05,
-    "note": "selected strip: position badge primary code on its dark tile"
-  },
-  {
-    "fg": "on-ink-meta",
-    "bg": "ink-tile",
-    "required": 4.5,
-    "ratio": 7.27,
-    "note": "selected strip: position badge secondary codes on its dark tile"
-  },
-  {
-    "fg": "on-ink-tile-border",
-    "bg": "ink",
-    "required": 3,
-    "ratio": 5.1,
-    "note": "selected strip: position badge tile border against the ink strip"
-  },
-  {
-    "fg": "hue-gk-on-ink",
-    "bg": "ink-tile",
-    "required": 3,
-    "ratio": 5.05,
-    "note": "selected strip: goalkeeper badge bar against the dark tile"
-  },
-  {
-    "fg": "hue-def-on-ink",
-    "bg": "ink-tile",
-    "required": 3,
-    "ratio": 4.43,
-    "note": "selected strip: defender badge bar against the dark tile"
-  },
-  {
-    "fg": "hue-mid-on-ink",
-    "bg": "ink-tile",
-    "required": 3,
-    "ratio": 5.04,
-    "note": "selected strip: midfielder badge bar against the dark tile"
-  },
-  {
-    "fg": "hue-fwd-on-ink",
-    "bg": "ink-tile",
-    "required": 3,
-    "ratio": 4.11,
-    "note": "selected strip: forward badge bar against the dark tile"
-  },
-  {
-    "fg": "hue-gk-on-ink",
-    "bg": "ink",
-    "required": 3,
-    "ratio": 6.87,
-    "note": "selected strip: goalkeeper badge bar against the ink strip"
-  },
-  {
-    "fg": "hue-def-on-ink",
-    "bg": "ink",
-    "required": 3,
-    "ratio": 6.03,
-    "note": "selected strip: defender badge bar against the ink strip"
-  },
-  {
-    "fg": "hue-mid-on-ink",
-    "bg": "ink",
-    "required": 3,
-    "ratio": 6.85,
-    "note": "selected strip: midfielder badge bar against the ink strip"
-  },
-  {
-    "fg": "hue-fwd-on-ink",
-    "bg": "ink",
-    "required": 3,
-    "ratio": 5.59,
-    "note": "selected strip: forward badge bar against the ink strip"
-  },
-  {
     "fg": "scrollbar-thumb",
     "bg": "board",
     "required": 3,
     "ratio": 4.32,
     "note": "chip row: thin scrollbar thumb (fine pointer) on the page"
+  },
+  {
+    "fg": "select",
+    "bg": "surface-selected",
+    "required": 3,
+    "ratio": 10.96,
+    "note": "called-up strip: select bar on the left against the wash"
+  },
+  {
+    "fg": "select",
+    "bg": "board",
+    "required": 3,
+    "ratio": 12.07,
+    "note": "called-up strip: select bar on the left against the page"
+  },
+  {
+    "fg": "ink",
+    "bg": "surface-selected",
+    "required": 4.5,
+    "ratio": 14.08,
+    "note": "called-up strip: player name on the wash"
+  },
+  {
+    "fg": "ink-soft",
+    "bg": "surface-selected",
+    "required": 4.5,
+    "ratio": 7.51,
+    "note": "called-up strip: club/age meta and score label on the wash"
+  },
+  {
+    "fg": "good",
+    "bg": "surface-selected",
+    "required": 4.5,
+    "ratio": 4.97,
+    "note": "called-up strip: selection score 85+ (large text, band colour)"
+  },
+  {
+    "fg": "warn-ink",
+    "bg": "surface-selected",
+    "required": 4.5,
+    "ratio": 9.67,
+    "note": "called-up strip: selection score 75-84 (large text, band colour)"
+  },
+  {
+    "fg": "danger",
+    "bg": "surface-selected",
+    "required": 4.5,
+    "ratio": 6.36,
+    "note": "called-up strip: selection score below 75 (large text, band colour)"
+  },
+  {
+    "fg": "ink-soft",
+    "bg": "surface-selected",
+    "required": 4.5,
+    "ratio": 7.51,
+    "note": "called-up strip: metric label on the wash"
+  },
+  {
+    "fg": "ink",
+    "bg": "surface-selected",
+    "required": 4.5,
+    "ratio": 14.08,
+    "note": "called-up strip: metric value on the wash"
+  },
+  {
+    "fg": "frame",
+    "bg": "surface-selected",
+    "required": 3,
+    "ratio": 4.48,
+    "note": "called-up strip: profile-btn / compare-btn border against the wash"
+  },
+  {
+    "fg": "select",
+    "bg": "surface-selected",
+    "required": 3,
+    "ratio": 10.96,
+    "note": "called-up strip: pressed select-btn (Powolany) fill against the wash"
+  },
+  {
+    "fg": "frame-soft",
+    "bg": "surface-selected",
+    "required": 3,
+    "ratio": 3.94,
+    "note": "called-up strip: role tag and meter track border against the wash"
+  },
+  {
+    "fg": "action",
+    "bg": "surface-selected",
+    "required": 3,
+    "ratio": 6.36,
+    "note": "called-up strip: compare-on outline against the wash"
+  },
+  {
+    "fg": "hue-gk",
+    "bg": "surface-selected",
+    "required": 3,
+    "ratio": 4.02,
+    "note": "called-up strip: goalkeeper badge bar / border against the wash"
+  },
+  {
+    "fg": "hue-def",
+    "bg": "surface-selected",
+    "required": 3,
+    "ratio": 6.84,
+    "note": "called-up strip: defender badge bar / border against the wash"
+  },
+  {
+    "fg": "hue-mid",
+    "bg": "surface-selected",
+    "required": 3,
+    "ratio": 4.62,
+    "note": "called-up strip: midfielder badge bar / border against the wash"
+  },
+  {
+    "fg": "hue-fwd",
+    "bg": "surface-selected",
+    "required": 3,
+    "ratio": 5.3,
+    "note": "called-up strip: forward badge bar / border against the wash"
   }
 ]
