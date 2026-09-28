@@ -50,9 +50,7 @@ test("a version 1 save is migrated without undo history", async ({ page }) => {
     page.getByRole("heading", { name: text.stages.camp.heading }),
   ).toBeVisible();
   await expect(squadCount(page)).toHaveText("10/23");
-  await expect(page.locator(".game-head .eyebrow")).toContainText(
-    text.systems["433"].name,
-  );
+  await expect(page.getByRole("main")).toContainText(text.systems["433"].name);
   await expect(page.getByRole("dialog")).toBeHidden();
   await expect(page.getByRole("button", { name: text.undo })).toBeDisabled();
 
@@ -215,9 +213,7 @@ test("a finished version 3 report from other rules is shown frozen with the olde
   await expect(
     page.getByRole("heading", { name: text.outcomes.roundOf16 }),
   ).toBeVisible();
-  await expect(page.locator(".fineprint").first()).toContainText(
-    text.reportFromOlderRules,
-  );
+  await expect(page.getByText(text.reportFromOlderRules)).toBeVisible();
   await expect(page.getByRole("button", { name: text.undo })).toHaveCount(0);
   for (const name of [
     "Łukasz Skorupski",
@@ -225,16 +221,14 @@ test("a finished version 3 report from other rules is shown frozen with the olde
     "Piotr Zieliński",
     "Robert Lewandowski",
   ]) {
-    await expect(page.locator(".squad-pill", { hasText: name })).toHaveCount(1);
+    await expect(page.getByText(name).filter({ visible: true })).toHaveCount(1);
   }
 
   await page.reload();
   await expect(
     page.getByRole("heading", { name: text.outcomes.roundOf16 }),
   ).toBeVisible();
-  await expect(page.locator(".fineprint").first()).toContainText(
-    text.reportFromOlderRules,
-  );
+  await expect(page.getByText(text.reportFromOlderRules)).toBeVisible();
 
   await page.getByRole("button", { name: text.restart }).click();
   await expect(

@@ -67,9 +67,7 @@ test("desktop game is playable with the keyboard alone", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: text.stages.camp.heading }),
   ).toBeVisible();
-  await expect(page.locator(".game-head .eyebrow")).toContainText(
-    text.systems["433"].name,
-  );
+  await expect(page.getByRole("main")).toContainText(text.systems["433"].name);
   await expectFocusVisible(page, "start -> camp");
 
   // Profile dialog: focus moves in, Tab is trapped, Escape closes and restores focus.
