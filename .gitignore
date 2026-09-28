@@ -5,6 +5,9 @@ dist/
 test-results/
 playwright-report/
 blob-report/
+# local screenshot baselines from VISUAL=1; only the Linux (CI) ones are committed
+e2e/screenshots/*-win32.png
+e2e/screenshots/*-darwin.png
 CLAUDE.local.md
 .claude/settings.local.json
 

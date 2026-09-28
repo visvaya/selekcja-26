@@ -190,9 +190,7 @@ test.describe.serial("axe WCAG 2.2 AA scan", () => {
     await expect(
       page.getByRole("heading", { name: text.outcomes.roundOf16 }),
     ).toBeVisible();
-    await expect(page.locator(".fineprint").first()).toContainText(
-      text.reportFromOlderRules,
-    );
+    await expect(page.getByText(text.reportFromOlderRules)).toBeVisible();
     await scan(page, "older rules report", scanned);
 
     // Every EXPECTED_STATES entry must have been scanned by one of the three tests above; this

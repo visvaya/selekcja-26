@@ -15,6 +15,7 @@
   --focus-ring: var(--red);
   --spacing-unit: 4px;
   --shadow: 0 14px 34px rgba(17, 21, 28, 0.09);
+  --topbar-height: 58px;
 }
 * {
   box-sizing: border-box;
@@ -122,7 +123,7 @@ input:focus-visible {
 .topbar-inner {
   max-width: 1180px;
   margin: auto;
-  height: 58px;
+  height: var(--topbar-height);
   padding: 0 var(--space-8);
   display: flex;
   align-items: center;
@@ -346,7 +347,7 @@ input:focus-visible {
 }
 .toolbar {
   position: sticky;
-  top: calc(58px + var(--save-banner-offset, 0px));
+  top: calc(var(--topbar-height) + var(--save-banner-offset, 0px));
   z-index: 15;
   background: var(--paper);
   padding: 9px 0;

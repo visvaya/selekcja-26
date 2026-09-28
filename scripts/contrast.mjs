@@ -2,9 +2,188 @@
 // No DOM or CSS engine involved: colours are plain {r, g, b, a} objects with
 // channels in 0-255 and alpha in 0-1.
 
+const clamp255 = (value) => Math.min(255, Math.max(0, value));
+
+function linearToSrgb(channel) {
+  const c = Math.min(1, Math.max(0, channel));
+  return c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055;
+}
+
+function srgbToLinear(channel255) {
+  const c = channel255 / 255;
+  return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+}
+
 /**
- * Parse a single CSS colour literal (hex or rgb/rgba). Does not resolve
- * var() references; callers resolve those first via resolveColor().
+ * Convert an Oklab colour to sRGB 0-255, clamped to the gamut (Ottosson's
+ * matrices).
+ * @param {{L: number, a: number, b: number, alpha?: number}} lab
+ * @returns {{r: number, g: number, b: number, a: number}}
+ */
+export function oklabToRgb({ L, a, b, alpha = 1 }) {
+  const l = (L + 0.3963377774 * a + 0.2158037573 * b) ** 3;
+  const m = (L - 0.1055613458 * a - 0.0638541728 * b) ** 3;
+  const s = (L - 0.0894841775 * a - 1.291485548 * b) ** 3;
+  const r = 4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s;
+  const g = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s;
+  const bl = -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s;
+  return {
+    r: clamp255(linearToSrgb(r) * 255),
+    g: clamp255(linearToSrgb(g) * 255),
+    b: clamp255(linearToSrgb(bl) * 255),
+    a: alpha,
+  };
+}
+
+/**
+ * Convert an sRGB 0-255 colour to Oklab.
+ * @param {{r: number, g: number, b: number, a: number}} color
+ * @returns {{L: number, a: number, b: number, alpha: number}}
+ */
+export function rgbToOklab({ r, g, b, a }) {
+  const lr = srgbToLinear(r);
+  const lg = srgbToLinear(g);
+  const lb = srgbToLinear(b);
+  const l = Math.cbrt(
+    0.4122214708 * lr + 0.5363325363 * lg + 0.0514459929 * lb,
+  );
+  const m = Math.cbrt(
+    0.2119034982 * lr + 0.6806995451 * lg + 0.1073969566 * lb,
+  );
+  const s = Math.cbrt(
+    0.0883024619 * lr + 0.2817188376 * lg + 0.6299787005 * lb,
+  );
+  return {
+    L: 0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s,
+    a: 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s,
+    b: 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s,
+    alpha: a,
+  };
+}
+
+/**
+ * Parse an oklch() hue channel, which is a plain number of degrees, a
+ * number with an explicit `deg` unit, or (unsupported here) another CSS
+ * angle unit such as `turn` or `rad`.
+ * @param {string} hue
+ * @returns {number} the hue in degrees
+ */
+function parseOklchHue(hue) {
+  const hueMatch = /^(-?\d+(?:\.\d+)?)(deg)?$/.exec(hue);
+  if (!hueMatch) {
+    throw new Error(`Unsupported oklch() hue unit: ${hue}`);
+  }
+  return parseFloat(hueMatch[1]);
+}
+
+/**
+ * Parse a single oklch() channel that must be a number, rejecting the CSS
+ * `none` keyword: this script has no notion of a missing channel.
+ * @param {string} channel
+ * @param {string} raw the full oklch() body, for the error message
+ * @returns {string} the channel, unchanged, once validated
+ */
+function rejectNoneChannel(channel, raw) {
+  if (channel.trim() === "none") {
+    throw new Error(`oklch() channel "none" is not supported: ${raw}`);
+  }
+  return channel;
+}
+
+function parseOklch(body) {
+  const [channels, alphaPart] = body.split("/");
+  const [lightness, chroma, hue] = channels.trim().split(/\s+/);
+  rejectNoneChannel(lightness, body);
+  rejectNoneChannel(chroma, body);
+  rejectNoneChannel(hue, body);
+  const L = lightness.endsWith("%")
+    ? parseFloat(lightness) / 100
+    : parseFloat(lightness);
+  const C = parseFloat(chroma);
+  const h = (parseOklchHue(hue) * Math.PI) / 180;
+  const alpha =
+    alphaPart === undefined
+      ? 1
+      : alphaPart.trim().endsWith("%")
+        ? parseFloat(alphaPart) / 100
+        : parseFloat(alphaPart);
+  return oklabToRgb({ L, a: C * Math.cos(h), b: C * Math.sin(h), alpha });
+}
+
+/**
+ * Split a comma-separated argument list at top-level commas, ignoring
+ * commas nested inside parentheses (e.g. a nested color-mix() or var()
+ * fallback).
+ * @param {string} body
+ * @returns {string[]}
+ */
+function splitTopLevel(body) {
+  const parts = [];
+  let depth = 0;
+  let start = 0;
+  for (let index = 0; index < body.length; index++) {
+    const char = body[index];
+    if (char === "(") depth++;
+    else if (char === ")") depth--;
+    else if (char === "," && depth === 0) {
+      parts.push(body.slice(start, index).trim());
+      start = index + 1;
+    }
+  }
+  parts.push(body.slice(start).trim());
+  return parts;
+}
+
+/**
+ * Split a single color-mix() argument into its colour and optional
+ * percentage (e.g. "var(--white) 50%" or "var(--black)").
+ * @param {string} argument
+ * @returns {{color: string, percent: number|undefined}}
+ */
+function parseMixArgument(argument) {
+  const match = /^(.*?)(?:\s+(\d+(?:\.\d+)?)%)?$/.exec(argument.trim());
+  return {
+    color: match[1].trim(),
+    percent: match[2] === undefined ? undefined : parseFloat(match[2]) / 100,
+  };
+}
+
+/**
+ * Resolve a `color-mix(in oklab, <color> [p%], <color> [q%])` body into a
+ * concrete colour, matching the browser's Oklab mixing. Arguments may be
+ * var() chains, literals or nested color-mix() calls.
+ * @param {string} body
+ * @param {Map<string, string>} tokens
+ * @returns {{r: number, g: number, b: number, a: number}}
+ */
+function mixInOklab(body, tokens) {
+  const [space, first, second] = splitTopLevel(body);
+  if (space !== "in oklab") {
+    throw new Error(`Unsupported color-mix() space: ${space}`);
+  }
+  const a = parseMixArgument(first);
+  const b = parseMixArgument(second);
+  if (a.percent !== undefined && b.percent !== undefined) {
+    throw new Error("color-mix() with two percentages is not supported");
+  }
+  const pa = a.percent ?? (b.percent === undefined ? 0.5 : 1 - b.percent);
+  const labA = rgbToOklab(resolveColor(a.color, tokens));
+  const labB = rgbToOklab(resolveColor(b.color, tokens));
+  if (labA.alpha < 1 || labB.alpha < 1) {
+    throw new Error("color-mix() of translucent colours is not supported");
+  }
+  return oklabToRgb({
+    L: labA.L * pa + labB.L * (1 - pa),
+    a: labA.a * pa + labB.a * (1 - pa),
+    b: labA.b * pa + labB.b * (1 - pa),
+    alpha: labA.alpha * pa + labB.alpha * (1 - pa),
+  });
+}
+
+/**
+ * Parse a single CSS colour literal (hex, rgb/rgba or oklch), with
+ * color-mix(in oklab) resolved by resolveColor(). Does not resolve var()
+ * references; callers resolve those first via resolveColor().
  * @param {string} value
  * @returns {{r: number, g: number, b: number, a: number}}
  */
@@ -49,6 +228,9 @@ export function parseColorLiteral(value) {
     return { r, g, b, a };
   }
 
+  const oklchMatch = /^oklch\(\s*([^)]+)\)$/.exec(trimmed);
+  if (oklchMatch) return parseOklch(oklchMatch[1]);
+
   throw new Error(`Unsupported colour format: ${value}`);
 }
 
@@ -64,6 +246,10 @@ export function resolveColor(value, tokens) {
   const seen = new Set();
   while (true) {
     const varMatch = /^var\(\s*(--[\w-]+)\s*(?:,\s*(.+))?\)$/.exec(current);
+    const mixMatch = /^color-mix\(([\s\S]*)\)$/.exec(current);
+    if (!varMatch && mixMatch) {
+      return mixInOklab(mixMatch[1], tokens);
+    }
     if (!varMatch) {
       return parseColorLiteral(current);
     }
