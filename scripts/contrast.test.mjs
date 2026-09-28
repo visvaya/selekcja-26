@@ -1,5 +1,5 @@
 // Ratchet test: WCAG 2.x contrast ratios computed from the `--` custom
-// properties declared in `:root` in src/ui/styles.css.
+// properties declared in `:root` in src/ui/styles/legacy.css.
 //
 // This is a ratchet, not a gate that blocks every low-contrast pair: pairs
 // already known to fail today are listed in KNOWN_FAILURES with the ratio
@@ -28,7 +28,7 @@ import {
 } from "./contrast.mjs";
 
 const stylesPath = fileURLToPath(
-  new URL("../src/ui/styles.css", import.meta.url),
+  new URL("../src/ui/styles/legacy.css", import.meta.url),
 );
 const css = readFileSync(stylesPath, "utf8");
 const tokens = extractRootTokens(css);
@@ -37,7 +37,7 @@ const TEXT_RATIO = 4.5;
 const LARGE_OR_UI_RATIO = 3;
 
 // Pairs are read off actual `color` + `background` declarations in
-// styles.css (same rule or the closest ancestor that sets the
+// legacy.css (same rule or the closest ancestor that sets the
 // background), not chosen in the abstract. `bgOnto` names the opaque
 // token a translucent background token is composited onto before the
 // foreground is applied, matching how the two layers actually stack in
@@ -514,7 +514,7 @@ test("compositeOver blends a translucent colour over an opaque one", () => {
   assert.deepEqual(result, { r: 127.5, g: 0, b: 0, a: 1 });
 });
 
-test(":root tokens parse from styles.css", () => {
+test(":root tokens parse from legacy.css", () => {
   assert.equal(tokens.get("--ink"), "#11151c");
   assert.ok(tokens.size > 20, "expected a sizeable set of root tokens");
 });
