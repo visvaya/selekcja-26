@@ -1300,5 +1300,96 @@
     "required": 3,
     "ratio": 7.44,
     "note": "selected strip: high band meter fill against the ink strip"
+  },
+  {
+    "fg": "on-danger",
+    "bg": "danger",
+    "required": 4.5,
+    "ratio": 7.63,
+    "note": "confirming button of a destructive action (Zacznij nową grę, Zagraj od początku): text on the danger fill (decision 2026-09-28)"
+  },
+  {
+    "fg": "on-danger",
+    "bg": "danger-strong",
+    "required": 4.5,
+    "ratio": 11.33,
+    "note": "confirming danger button, hover and press: text on danger-strong"
+  },
+  {
+    "fg": "good",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 5.97,
+    "note": "strip selection score 85+ (large text, band colour, decision 2026-09-28)"
+  },
+  {
+    "fg": "warn-ink",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 11.6,
+    "note": "strip selection score 75-84 (large text, band colour)"
+  },
+  {
+    "fg": "danger",
+    "bg": "surface",
+    "required": 4.5,
+    "ratio": 7.63,
+    "note": "strip selection score below 75 (large text, band colour)"
+  },
+  {
+    "fg": "meter-high-on-ink",
+    "bg": "ink",
+    "required": 3,
+    "ratio": 7.44,
+    "note": "called-up (ink) strip: selection score 85+ (large text, 3:1)"
+  },
+  {
+    "fg": "meter-mid-on-ink",
+    "bg": "ink",
+    "required": 3,
+    "ratio": 8.57,
+    "note": "called-up (ink) strip: selection score 75-84 (large text, 3:1)"
+  },
+  {
+    "fg": "meter-low-on-ink",
+    "bg": "ink",
+    "required": 3,
+    "ratio": 5.58,
+    "note": "called-up (ink) strip: selection score below 75 (large text, 3:1)"
+  },
+  {
+    "fg": "good",
+    "bg": "surface-dialog",
+    "required": 4.5,
+    "ratio": 6.06,
+    "note": "comparison and profile: selection score 85+ in the dialog"
+  },
+  {
+    "fg": "warn-ink",
+    "bg": "surface-dialog",
+    "required": 4.5,
+    "ratio": 11.77,
+    "note": "comparison and profile: selection score 75-84 in the dialog"
+  },
+  {
+    "fg": "danger",
+    "bg": "surface-dialog",
+    "required": 4.5,
+    "ratio": 7.74,
+    "note": "comparison and profile: selection score below 75 in the dialog (profile no longer uses action)"
+  },
+  {
+    "fg": "meter-high",
+    "bg": "surface",
+    "required": 3,
+    "ratio": 5.47,
+    "note": "camp event: effect arrow when the change helps (Ryzyko zdrowotne down, Jakość up)"
+  },
+  {
+    "fg": "meter-low",
+    "bg": "surface",
+    "required": 3,
+    "ratio": 6.43,
+    "note": "camp event: effect arrow when the change hurts (Ryzyko zdrowotne up, Jakość down)"
   }
 ]
