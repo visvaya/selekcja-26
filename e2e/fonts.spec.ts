@@ -105,16 +105,12 @@ test("body text uses the new family", async ({ page }) => {
 test.describe("the wider display face fits a 320 px screen", () => {
   test.use({ viewport: { width: 320, height: 700 } });
 
-  test("start, camp list and report", async ({ page }) => {
+  test("start", async ({ page }) => {
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     await page.evaluate(() => document.fonts.ready);
     await expectNoHorizontalScroll(page);
   });
-});
-
-test.describe("the wider display face fits a 320 px screen: saved states", () => {
-  test.use({ viewport: { width: 320, height: 700 } });
 
   test("camp list", async ({ page }) => {
     await seedStorage(
