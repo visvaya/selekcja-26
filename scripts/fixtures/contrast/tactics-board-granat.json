@@ -399,13 +399,6 @@
     "note": "selected strip: club/age meta on ink fill"
   },
   {
-    "fg": "ink",
-    "bg": "surface",
-    "required": 4.5,
-    "ratio": 15.76,
-    "note": "selected strip: position magnet code on its own surface (keeps the group bar and border)"
-  },
-  {
     "fg": "on-ink-tile",
     "bg": "ink-tile",
     "required": 4.5,
@@ -1405,5 +1398,89 @@
     "required": 3,
     "ratio": 6.34,
     "note": "camp event: effect arrow when the change hurts (Ryzyko zdrowotne up, Jakość down)"
+  },
+  {
+    "fg": "on-ink-tile",
+    "bg": "ink-tile",
+    "required": 4.5,
+    "ratio": 9.28,
+    "note": "selected strip: position badge primary code on its dark tile"
+  },
+  {
+    "fg": "on-ink-meta",
+    "bg": "ink-tile",
+    "required": 4.5,
+    "ratio": 6.74,
+    "note": "selected strip: position badge secondary codes on its dark tile"
+  },
+  {
+    "fg": "on-ink-tile-border",
+    "bg": "ink",
+    "required": 3,
+    "ratio": 4.89,
+    "note": "selected strip: position badge tile border against the ink strip"
+  },
+  {
+    "fg": "hue-gk-on-ink",
+    "bg": "ink-tile",
+    "required": 3,
+    "ratio": 4.64,
+    "note": "selected strip: goalkeeper badge bar against the dark tile"
+  },
+  {
+    "fg": "hue-def-on-ink",
+    "bg": "ink-tile",
+    "required": 3,
+    "ratio": 4.08,
+    "note": "selected strip: defender badge bar against the dark tile"
+  },
+  {
+    "fg": "hue-mid-on-ink",
+    "bg": "ink-tile",
+    "required": 3,
+    "ratio": 4.63,
+    "note": "selected strip: midfielder badge bar against the dark tile"
+  },
+  {
+    "fg": "hue-fwd-on-ink",
+    "bg": "ink-tile",
+    "required": 3,
+    "ratio": 3.78,
+    "note": "selected strip: forward badge bar against the dark tile"
+  },
+  {
+    "fg": "hue-gk-on-ink",
+    "bg": "ink",
+    "required": 3,
+    "ratio": 6.5,
+    "note": "selected strip: goalkeeper badge bar against the ink strip"
+  },
+  {
+    "fg": "hue-def-on-ink",
+    "bg": "ink",
+    "required": 3,
+    "ratio": 5.71,
+    "note": "selected strip: defender badge bar against the ink strip"
+  },
+  {
+    "fg": "hue-mid-on-ink",
+    "bg": "ink",
+    "required": 3,
+    "ratio": 6.49,
+    "note": "selected strip: midfielder badge bar against the ink strip"
+  },
+  {
+    "fg": "hue-fwd-on-ink",
+    "bg": "ink",
+    "required": 3,
+    "ratio": 5.29,
+    "note": "selected strip: forward badge bar against the ink strip"
+  },
+  {
+    "fg": "scrollbar-thumb",
+    "bg": "board",
+    "required": 3,
+    "ratio": 4.19,
+    "note": "chip row: thin scrollbar thumb (fine pointer) on the page"
   }
 ]
