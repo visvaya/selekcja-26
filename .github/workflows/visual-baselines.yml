@@ -1,0 +1,36 @@
+name: Visual baselines
+
+# Regenerates the Linux screenshot baselines and uploads them as an artifact to commit.
+# Runs when a pull request gets the "update-screenshots" label, or by hand.
+on:
+  pull_request:
+    types: [labeled]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  baselines:
+    if: github.event_name == 'workflow_dispatch' || github.event.label.name == 'update-screenshots'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: Regenerate baselines
+        env:
+          CI: "1"
+          UPDATE_SCREENSHOTS: "1"
+        run: pnpm exec playwright test --project=visual --update-snapshots=all
+      - uses: actions/upload-artifact@v7
+        with:
+          name: visual-baselines
+          path: e2e/screenshots/
+          retention-days: 7

@@ -68,17 +68,18 @@ const OLDER_RULES_SQUAD_IDS = [
   "robert-lewandowski",
 ];
 
-// A finished version 3 report from another rules revision, shown frozen with the older-rules
-// note. Shared by the storage test and the axe scan.
-export function finishedOtherRulesReportSave(): string {
+// A finished version 3 report for the given rules revision, shown frozen with the older-rules
+// note when that revision differs from the running one. Shared by the storage test, the axe
+// scan and the visual baselines.
+export function finishedReportSave(rulesRevision: number): string {
   return JSON.stringify({
     schemaVersion: 3,
-    rulesRevision: RULES_REVISION + 1,
+    rulesRevision,
     state: {
       ...v3Snapshot({
         stage: "final",
         report: {
-          rulesRevision: RULES_REVISION + 1,
+          rulesRevision,
           squadIds: OLDER_RULES_SQUAD_IDS,
           quality: 80,
           chem: 78,
@@ -97,6 +98,32 @@ export function finishedOtherRulesReportSave(): string {
           },
         },
       }),
+      history: [],
+    },
+  });
+}
+
+// A finished version 3 report from another rules revision, shown frozen with the older-rules
+// note. Shared by the storage test and the axe scan.
+export function finishedOtherRulesReportSave(): string {
+  return finishedReportSave(RULES_REVISION + 1);
+}
+
+// An unfinished camp-stage save for the running rules, used by the screenshot baselines.
+export function campSave({
+  selectedIds,
+  events,
+  system = "433",
+}: {
+  selectedIds: string[];
+  events: string[];
+  system?: string;
+}): string {
+  return JSON.stringify({
+    schemaVersion: 3,
+    rulesRevision: RULES_REVISION,
+    state: {
+      ...v3Snapshot({ system, selected: selectedIds, events, seed: 12345 }),
       history: [],
     },
   });

@@ -3,6 +3,15 @@ import { defineConfig, devices } from "@playwright/test";
 const PORT = 5179;
 const PHONE_VIEWPORT = { width: 360, height: 740 };
 
+// Screenshot baselines exist only for Linux (CI); locally the project is skipped unless
+// VISUAL=1 is set, which then compares against the Linux files and is expected to differ.
+const visualProject = {
+  name: "visual",
+  testMatch: /visual/,
+  use: { ...devices["Desktop Chrome"] },
+};
+const runVisual = Boolean(process.env.CI || process.env.VISUAL);
+
 export default defineConfig({
   testDir: "e2e",
   // Each spec walks a complete two-stage game, so allow more than the 30 s default.
@@ -11,6 +20,9 @@ export default defineConfig({
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [["list"], ["html", { open: "never" }]] : "list",
+  snapshotPathTemplate: "{testDir}/screenshots/{arg}-{platform}{ext}",
+  updateSnapshots:
+    process.env.CI && !process.env.UPDATE_SCREENSHOTS ? "none" : "missing",
   use: {
     baseURL: `http://127.0.0.1:${PORT}`,
     locale: "pl-PL",
@@ -39,6 +51,7 @@ export default defineConfig({
       testMatch: /keyboard/,
       use: { ...devices["Desktop Chrome"] },
     },
+    ...(runVisual ? [visualProject] : []),
   ],
   // Tests run against the production build, not the dev server, so they cover what ships
   // and are free of dev-only behavior such as hot-module reloads.
