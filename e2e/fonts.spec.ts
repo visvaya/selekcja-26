@@ -142,3 +142,46 @@ test.describe("the wider display face fits a 320 px screen: saved states", () =>
     await expectNoHorizontalScroll(page);
   });
 });
+
+// Width of the same sample in the web font and in its fallback face, at the weight each
+// fallback was measured for. Chromium only: the local faces resolve to Arial on Windows and
+// to the metric-compatible Liberation Sans on the Linux CI runner.
+test("fallback faces take about the width of the web fonts", async ({
+  page,
+  browserName,
+}) => {
+  test.skip(
+    browserName !== "chromium",
+    "local() fallback measured in Chromium",
+  );
+  await page.goto("/");
+  await page.evaluate(() => document.fonts.ready);
+  const sample =
+    "Wybierz 26 zawodników: Łukasz Skorupski, Piotr Zieliński, Sebastian Szymański";
+  const ratios = await page.evaluate((line) => {
+    const width = (family: string, weight: string) => {
+      const span = document.createElement("span");
+      span.textContent = line;
+      span.style.setProperty("font-family", family);
+      span.style.setProperty("font-weight", weight);
+      span.style.setProperty("font-size", "20px");
+      span.style.setProperty("white-space", "nowrap");
+      document.body.append(span);
+      const result = span.getBoundingClientRect().width;
+      span.remove();
+      return result;
+    };
+    return {
+      display:
+        width('"Pathway Extreme Fallback"', "700") /
+        width('"Pathway Extreme Variable"', "700"),
+      body:
+        width('"Commissioner Fallback"', "400") /
+        width('"Commissioner Variable"', "400"),
+    };
+  }, sample);
+  expect(ratios.display).toBeGreaterThan(0.97);
+  expect(ratios.display).toBeLessThan(1.03);
+  expect(ratios.body).toBeGreaterThan(0.97);
+  expect(ratios.body).toBeLessThan(1.03);
+});

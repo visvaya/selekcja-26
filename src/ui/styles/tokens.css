@@ -3,8 +3,12 @@
    spacing, radius, shadows and motion. The current stylesheet keeps its own sizes until the
    screen stages replace its rules. */
 :root {
-  --font-display: "Pathway Extreme Variable", system-ui, sans-serif;
-  --font-body: "Commissioner Variable", system-ui, sans-serif;
+  /* Web font, then its metric-matched local fallback (fonts.css), then the system face. */
+  --font-display:
+    "Pathway Extreme Variable", "Pathway Extreme Fallback", system-ui,
+    sans-serif;
+  --font-body:
+    "Commissioner Variable", "Commissioner Fallback", system-ui, sans-serif;
 
   /* Pathway Extreme and Commissioner run wide and large for their nominal size, so the
      mockup gives this pair smaller steps than its other pairs. */

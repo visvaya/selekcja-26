@@ -8,6 +8,7 @@ import { GameApp } from "./ui/game-app.tsx";
 // latin-ext for Polish.
 import "@fontsource-variable/pathway-extreme/wght.css";
 import "@fontsource-variable/commissioner/wght.css";
+import "./ui/styles/fonts.css";
 import "./ui/styles/tokens.css";
 import "./ui/styles.css";
 
