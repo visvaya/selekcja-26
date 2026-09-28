@@ -22,6 +22,8 @@ const firstIds = (count: number) =>
   players.slice(0, count).map((player) => player.id);
 
 async function shot(page: Page, name: string, fullPage = false) {
+  // Park the pointer so no :hover state of the last-clicked button is captured.
+  await page.mouse.move(0, 0);
   await page.evaluate(() => document.fonts.ready);
   await expect(page).toHaveScreenshot(`${name}.png`, {
     fullPage,
