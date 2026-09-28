@@ -3,8 +3,10 @@ import { defineConfig, devices } from "@playwright/test";
 const PORT = 5179;
 const PHONE_VIEWPORT = { width: 360, height: 740 };
 
-// Screenshot baselines exist only for Linux (CI); locally the project is skipped unless
-// VISUAL=1 is set, which then compares against the Linux files and is expected to differ.
+// Screenshot baselines are committed only for Linux (CI). Locally the project is skipped unless
+// VISUAL=1 is set: the {platform} part of snapshotPathTemplate then points at separate local
+// files (e.g. *-win32.png), which the first run writes and later runs compare against. They are
+// useful only to look at the captured states, and .gitignore keeps them out of the repository.
 const visualProject = {
   name: "visual",
   testMatch: /visual/,

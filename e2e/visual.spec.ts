@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import { players } from "../src/data/catalog.ts";
 import { RULES_REVISION } from "../src/data/constants.ts";
 import {
@@ -21,15 +21,21 @@ const SIZES = [
 const firstIds = (count: number) =>
   players.slice(0, count).map((player) => player.id);
 
-async function shot(page: Page, name: string, fullPage = false) {
+interface ShotOptions {
+  readonly fullPage?: boolean;
+  // Extra regions to paint over, on top of the version badge masked in every shot.
+  readonly mask?: readonly Locator[];
+}
+
+async function shot(page: Page, name: string, options: ShotOptions = {}) {
   // Park the pointer so no :hover state of the last-clicked button is captured.
   await page.mouse.move(0, 0);
   await page.evaluate(() => document.fonts.ready);
   await expect(page).toHaveScreenshot(`${name}.png`, {
-    fullPage,
+    fullPage: options.fullPage ?? false,
     animations: "disabled",
     caret: "hide",
-    mask: [page.locator(".topbar-version")],
+    mask: [page.locator(".topbar-version"), ...(options.mask ?? [])],
   });
 }
 
@@ -40,7 +46,20 @@ for (const size of SIZES) {
     test("start screen", async ({ page }) => {
       await page.goto("/");
       await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-      await shot(page, `${size.name}-start`, true);
+      // The changelog gains an entry with every player-visible change, so it is masked, and its
+      // content is collapsed to the heading: the latest entry's note count and length would
+      // otherwise still change the section's height and so the full-page shot.
+      const changelog = page.getByRole("region", {
+        name: text.changelogTitle,
+      });
+      await expect(changelog).toBeVisible();
+      await page.addStyleTag({
+        content: ".changelog > :not(h2) { display: none !important; }",
+      });
+      await shot(page, `${size.name}-start`, {
+        fullPage: true,
+        mask: [changelog],
+      });
     });
 
     test("camp list", async ({ page }) => {
@@ -106,7 +125,7 @@ for (const size of SIZES) {
       await expect(
         page.getByRole("heading", { name: text.outcomes.roundOf16 }),
       ).toBeVisible();
-      await shot(page, `${size.name}-report`, true);
+      await shot(page, `${size.name}-report`, { fullPage: true });
     });
   });
 }
