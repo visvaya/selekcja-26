@@ -6,3 +6,4 @@ playwright-report/
 blob-report/
 src/logic/golden/traces/
 docs/moj-notatnik.md
+.superpowers/

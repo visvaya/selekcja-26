@@ -8,6 +8,12 @@ importers:
 
   .:
     dependencies:
+      '@fontsource-variable/commissioner':
+        specifier: 5.3.0
+        version: 5.3.0
+      '@fontsource-variable/pathway-extreme':
+        specifier: 5.3.0
+        version: 5.3.0
       react:
         specifier: ^19.3.0
         version: 19.3.0
@@ -148,6 +154,12 @@ packages:
     peerDependenciesMeta:
       '@noble/hashes':
         optional: true
+
+  '@fontsource-variable/commissioner@5.3.0':
+    resolution: {integrity: sha512-0IEvi8SO1slc5Pc9tA4OtA01I8UiCcEq/uh12oNjfHuABU9Lnz61l2V8o2cMPUUo3BAo5MbISVK2I/DSpBRw7Q==}
+
+  '@fontsource-variable/pathway-extreme@5.3.0':
+    resolution: {integrity: sha512-treCsbvUQskbCILn9Aodf9tviO69ijbh6HYdvZYVHltHsXwvHOLi3z7CBW58HsjDULDuxBvXVONsHWOwXaKwHA==}
 
   '@napi-rs/wasm-runtime@1.2.4':
     resolution: {integrity: sha512-AJxoUD2/15ESHbvpcyjU274nsAPLuOtPHCk0vKJM5pj//Fg/B1FXNWjPnXTT9PymCYYiHo4zPj0ZomXBKhoy7g==}
@@ -1342,6 +1354,10 @@ snapshots:
   '@epic-web/invariant@1.0.0': {}
 
   '@exodus/bytes@1.15.2': {}
+
+  '@fontsource-variable/commissioner@5.3.0': {}
+
+  '@fontsource-variable/pathway-extreme@5.3.0': {}
 
   '@napi-rs/wasm-runtime@1.2.4(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)':
     dependencies:

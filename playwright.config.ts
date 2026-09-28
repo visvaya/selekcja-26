@@ -39,13 +39,13 @@ export default defineConfig({
       // (contrast of overlapping elements, WCAG 2.2 target size) are most exposed on a narrow
       // screen. The DOM is the same at every width, so a second project repeated the same scan.
       name: "phone",
-      testMatch: /phone|storage|a11y/,
+      testMatch: /phone|storage|a11y|fonts/,
       use: { ...devices["Pixel 7"], viewport: PHONE_VIEWPORT },
     },
     {
       // Mobile Safari handles focus, scrolling and sticky elements differently from Chromium.
       name: "phone-webkit",
-      testMatch: /phone|storage/,
+      testMatch: /phone|storage|fonts/,
       use: { ...devices["iPhone 13"], viewport: PHONE_VIEWPORT },
     },
     {
