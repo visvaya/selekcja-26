@@ -1,9 +1,9 @@
 [
   {
-    "fg": "select",
+    "fg": "danger",
     "bg": "board-deep",
     "required": 3,
-    "ratio": 10.09,
+    "ratio": 5.82,
     "note": "excess dock slot square fill/border (final-stage sample with 4 goalkeepers, round 6 item 16)"
   },
   {
@@ -399,11 +399,11 @@
     "note": "selected strip: club/age meta on ink fill"
   },
   {
-    "fg": "on-select",
-    "bg": "select",
+    "fg": "ink",
+    "bg": "surface",
     "required": 4.5,
-    "ratio": 13.23,
-    "note": "selected strip: position magnet on magnet red"
+    "ratio": 16.87,
+    "note": "selected strip: position magnet code on its own surface (keeps the group bar and border)"
   },
   {
     "fg": "on-ink-tile",
@@ -826,17 +826,17 @@
     "note": "comparison-row top divider"
   },
   {
-    "fg": "select-strong",
+    "fg": "danger-strong",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 16.81,
+    "ratio": 11.32,
     "note": "Resetuj (danger action) default text"
   },
   {
-    "fg": "select",
+    "fg": "danger",
     "bg": "surface",
     "required": 3,
-    "ratio": 13.23,
+    "ratio": 7.63,
     "note": "Resetuj (danger action) default border"
   },
   {
@@ -861,17 +861,17 @@
     "note": "secondary action / inactive chip border on hover"
   },
   {
-    "fg": "select-strong",
+    "fg": "danger-strong",
     "bg": "warn-fill",
     "required": 4.5,
-    "ratio": 10.12,
+    "ratio": 6.82,
     "note": "Resetuj (danger action) label on hover"
   },
   {
-    "fg": "select",
+    "fg": "danger",
     "bg": "warn-fill",
     "required": 3,
-    "ratio": 7.96,
+    "ratio": 4.59,
     "note": "Resetuj (danger action) border on hover"
   },
   {
@@ -1050,17 +1050,17 @@
     "note": "tournament path: marker-drawn dashed line under the score"
   },
   {
-    "fg": "select-strong",
+    "fg": "danger-strong",
     "bg": "surface",
     "required": 4.5,
-    "ratio": 16.81,
+    "ratio": 11.32,
     "note": "tournament path: lost-round \"Odpadlismy\" label"
   },
   {
-    "fg": "select",
+    "fg": "danger",
     "bg": "surface",
     "required": 3,
-    "ratio": 13.23,
+    "ratio": 7.63,
     "note": "tournament path: lost-round row border"
   },
   {
@@ -1258,5 +1258,47 @@
     "required": 3,
     "ratio": 4.86,
     "note": "dock slot group: NAP filled/empty squares against the dock track"
+  },
+  {
+    "fg": "meter-low-on-ink",
+    "bg": "ink-tile",
+    "required": 3,
+    "ratio": 4.1,
+    "note": "selected strip: low band meter fill against its track"
+  },
+  {
+    "fg": "meter-low-on-ink",
+    "bg": "ink",
+    "required": 3,
+    "ratio": 5.58,
+    "note": "selected strip: low band meter fill against the ink strip"
+  },
+  {
+    "fg": "meter-mid-on-ink",
+    "bg": "ink-tile",
+    "required": 3,
+    "ratio": 6.3,
+    "note": "selected strip: mid band meter fill against its track"
+  },
+  {
+    "fg": "meter-mid-on-ink",
+    "bg": "ink",
+    "required": 3,
+    "ratio": 8.57,
+    "note": "selected strip: mid band meter fill against the ink strip"
+  },
+  {
+    "fg": "meter-high-on-ink",
+    "bg": "ink-tile",
+    "required": 3,
+    "ratio": 5.47,
+    "note": "selected strip: high band meter fill against its track"
+  },
+  {
+    "fg": "meter-high-on-ink",
+    "bg": "ink",
+    "required": 3,
+    "ratio": 7.44,
+    "note": "selected strip: high band meter fill against the ink strip"
   }
 ]

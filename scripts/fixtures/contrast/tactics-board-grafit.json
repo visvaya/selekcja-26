@@ -1,6 +1,6 @@
 [
   {
-    "fg": "select",
+    "fg": "danger",
     "bg": "board-deep",
     "required": 3,
     "ratio": 5.63,
@@ -399,11 +399,11 @@
     "note": "selected strip: club/age meta on ink fill"
   },
   {
-    "fg": "on-select",
-    "bg": "select",
+    "fg": "ink",
+    "bg": "surface",
     "required": 4.5,
-    "ratio": 7.85,
-    "note": "selected strip: position magnet on magnet red"
+    "ratio": 16.58,
+    "note": "selected strip: position magnet code on its own surface (keeps the group bar and border)"
   },
   {
     "fg": "on-ink-tile",
@@ -826,14 +826,14 @@
     "note": "comparison-row top divider"
   },
   {
-    "fg": "select-strong",
+    "fg": "danger-strong",
     "bg": "surface",
     "required": 4.5,
     "ratio": 11.13,
     "note": "Resetuj (danger action) default text"
   },
   {
-    "fg": "select",
+    "fg": "danger",
     "bg": "surface",
     "required": 3,
     "ratio": 7.74,
@@ -861,14 +861,14 @@
     "note": "secondary action / inactive chip border on hover"
   },
   {
-    "fg": "select-strong",
+    "fg": "danger-strong",
     "bg": "warn-fill",
     "required": 4.5,
     "ratio": 6.8,
     "note": "Resetuj (danger action) label on hover"
   },
   {
-    "fg": "select",
+    "fg": "danger",
     "bg": "warn-fill",
     "required": 3,
     "ratio": 4.73,
@@ -1050,14 +1050,14 @@
     "note": "tournament path: marker-drawn dashed line under the score"
   },
   {
-    "fg": "select-strong",
+    "fg": "danger-strong",
     "bg": "surface",
     "required": 4.5,
     "ratio": 11.13,
     "note": "tournament path: lost-round \"Odpadlismy\" label"
   },
   {
-    "fg": "select",
+    "fg": "danger",
     "bg": "surface",
     "required": 3,
     "ratio": 7.74,
@@ -1258,5 +1258,47 @@
     "required": 3,
     "ratio": 4.57,
     "note": "dock slot group: NAP filled/empty squares against the dock track"
+  },
+  {
+    "fg": "meter-low-on-ink",
+    "bg": "ink-tile",
+    "required": 3,
+    "ratio": 4.38,
+    "note": "selected strip: low band meter fill against its track"
+  },
+  {
+    "fg": "meter-low-on-ink",
+    "bg": "ink",
+    "required": 3,
+    "ratio": 5.56,
+    "note": "selected strip: low band meter fill against the ink strip"
+  },
+  {
+    "fg": "meter-mid-on-ink",
+    "bg": "ink-tile",
+    "required": 3,
+    "ratio": 6.72,
+    "note": "selected strip: mid band meter fill against its track"
+  },
+  {
+    "fg": "meter-mid-on-ink",
+    "bg": "ink",
+    "required": 3,
+    "ratio": 8.54,
+    "note": "selected strip: mid band meter fill against the ink strip"
+  },
+  {
+    "fg": "meter-high-on-ink",
+    "bg": "ink-tile",
+    "required": 3,
+    "ratio": 5.84,
+    "note": "selected strip: high band meter fill against its track"
+  },
+  {
+    "fg": "meter-high-on-ink",
+    "bg": "ink",
+    "required": 3,
+    "ratio": 7.41,
+    "note": "selected strip: high band meter fill against the ink strip"
   }
 ]
