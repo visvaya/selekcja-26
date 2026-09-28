@@ -155,33 +155,56 @@ test("fallback faces take about the width of the web fonts", async ({
     "local() fallback measured in Chromium",
   );
   await page.goto("/");
-  await page.evaluate(() => document.fonts.ready);
   const sample =
     "Wybierz 26 zawodników: Łukasz Skorupski, Piotr Zieliński, Sebastian Szymański";
-  const ratios = await page.evaluate((line) => {
-    const width = (family: string, weight: string) => {
-      const span = document.createElement("span");
-      span.textContent = line;
-      span.style.setProperty("font-family", family);
-      span.style.setProperty("font-weight", weight);
-      span.style.setProperty("font-size", "20px");
-      span.style.setProperty("white-space", "nowrap");
-      document.body.append(span);
-      const result = span.getBoundingClientRect().width;
-      span.remove();
-      return result;
-    };
-    return {
-      display:
-        width('"Pathway Extreme Fallback"', "700") /
-        width('"Pathway Extreme Variable"', "700"),
-      body:
-        width('"Commissioner Fallback"', "400") /
-        width('"Commissioner Variable"', "400"),
-    };
-  }, sample);
-  expect(ratios.display).toBeGreaterThan(0.97);
-  expect(ratios.display).toBeLessThan(1.03);
-  expect(ratios.body).toBeGreaterThan(0.97);
-  expect(ratios.body).toBeLessThan(1.03);
+  const pairs = [
+    ["Pathway Extreme Fallback", "Pathway Extreme Variable", "700"],
+    ["Commissioner Fallback", "Commissioner Variable", "400"],
+    ["Commissioner Fallback", "Commissioner Variable", "700"],
+  ] as const;
+  const measured = await page.evaluate(
+    async ({ line, faces: checked }) => {
+      // Load both sides explicitly, so neither width is taken in the browser default font.
+      for (const [fallback, web, weight] of checked) {
+        await document.fonts.load(`${weight} 20px "${web}"`, line);
+        await document.fonts.load(`${weight} 20px "${fallback}"`, line);
+      }
+      // Status of every fallback face; a machine without Arial or Liberation Sans reports
+      // "error" here instead of passing on the default font.
+      const faces = [...document.fonts]
+        .filter((face) => face.family.replaceAll('"', "").endsWith("Fallback"))
+        .map(
+          (face) =>
+            `${face.family.replaceAll('"', "")} ${face.weight} ${face.status}`,
+        );
+      const width = (family: string, weight: string) => {
+        const span = document.createElement("span");
+        span.textContent = line;
+        span.style.setProperty("font-family", `"${family}"`);
+        span.style.setProperty("font-weight", weight);
+        span.style.setProperty("font-size", "20px");
+        span.style.setProperty("white-space", "nowrap");
+        document.body.append(span);
+        const result = span.getBoundingClientRect().width;
+        span.remove();
+        return result;
+      };
+      const ratios = checked.map(
+        ([fallback, web, weight]) =>
+          width(fallback, weight) / width(web, weight),
+      );
+      return { faces, ratios };
+    },
+    { line: sample, faces: pairs },
+  );
+  expect(measured.faces.sort()).toEqual([
+    "Commissioner Fallback 400 loaded",
+    "Commissioner Fallback 600 900 loaded",
+    "Pathway Extreme Fallback 700 loaded",
+  ]);
+  for (const [index, ratio] of measured.ratios.entries()) {
+    const [fallback, , weight] = pairs[index]!;
+    expect(ratio, `${fallback} ${weight}`).toBeGreaterThan(0.97);
+    expect(ratio, `${fallback} ${weight}`).toBeLessThan(1.03);
+  }
 });

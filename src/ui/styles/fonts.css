@@ -2,7 +2,8 @@
    overrides make Arial, or the metric-compatible Arimo and Liberation Sans, take the web
    font's average width and line box, so the swap barely moves the text. Measured with
    fontTools against a Polish UI and name sample: Pathway Extreme at wght 700 against
-   Arial Bold, Commissioner at wght 400 against Arial (see the stage 1 plan). */
+   Arial Bold, Commissioner at wght 400 against Arial and at wght 700 against Arial Bold (see
+   the stage 1 plan). */
 @font-face {
   font-family: "Pathway Extreme Fallback";
   src:
@@ -23,5 +24,17 @@
   size-adjust: 100.3%;
   ascent-override: 101.39%;
   descent-override: 20.54%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Commissioner Fallback";
+  src:
+    local("Arial Bold"), local("Arial-BoldMT"), local("Arimo Bold"),
+    local("Liberation Sans Bold");
+  font-weight: 600 900;
+  size-adjust: 96.02%;
+  ascent-override: 105.92%;
+  descent-override: 21.45%;
   line-gap-override: 0%;
 }
