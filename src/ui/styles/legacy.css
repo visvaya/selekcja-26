@@ -31,13 +31,6 @@ body {
   font-size: var(--font-body-size);
   line-height: 1.42;
 }
-h1,
-h2,
-h3 {
-  font-family: var(--font-display);
-  /* A long word in the wider display face wraps instead of widening the page. */
-  overflow-wrap: break-word;
-}
 button,
 select,
 input {
@@ -209,6 +202,8 @@ input:focus-visible {
 .brief h2 {
   font-size: 17px;
   margin: 0 0 var(--legacy-space-6);
+  /* Keeps the light card colour now that base.css gives headings --ink. */
+  color: inherit;
 }
 .brief-grid {
   display: grid;
@@ -713,6 +708,8 @@ input:focus-visible {
 .result-hero h1 {
   font-size: 31px;
   margin: var(--legacy-space-5) 0 5px;
+  /* Keeps the light hero colour now that base.css gives headings --ink. */
+  color: inherit;
 }
 .result-hero p {
   color: var(--text-soft);

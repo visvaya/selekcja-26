@@ -1,0 +1,194 @@
+/* Base element rules and button primitives, ported from docs/mockups/tactics-board.html.
+   Page gutters (main) and component selectors belong to later stages. */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--board);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  /* A word wider than the column (enlarged text on a phone) breaks instead of widening the page. */
+  overflow-wrap: break-word;
+  margin: 0 0 var(--space-2);
+  color: var(--ink);
+}
+
+p {
+  margin: 0 0 var(--space-3);
+  color: var(--ink-soft);
+}
+
+b {
+  font-weight: 700;
+}
+
+button,
+input,
+select {
+  font-family: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  text-align: center;
+}
+
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus-core);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px var(--focus-halo);
+  border-radius: var(--radius-sm);
+}
+
+/* iOS must not inflate text on its own. */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Buttons */
+
+.action-button,
+.primary {
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
+}
+
+.action-button {
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--frame);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: var(--text-base);
+}
+
+.action-button:hover {
+  background: var(--board-deep);
+  border-color: var(--action);
+  color: var(--action);
+}
+
+.action-button:active {
+  transform: translateY(1px);
+}
+
+.action-button:disabled {
+  background: var(--disabled-fill);
+  border-color: var(--disabled-fill);
+  color: var(--ink-soft);
+  cursor: not-allowed;
+}
+
+/* Flagged as destructive without being louder than the primary action. */
+.action-button.danger {
+  color: var(--danger-strong);
+  border-color: var(--danger);
+}
+
+.action-button.danger:hover {
+  background: var(--warn-fill);
+  border-color: var(--danger);
+  color: var(--danger-strong);
+}
+
+.primary {
+  min-height: 44px;
+  padding: 0 var(--space-5);
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--action);
+  color: var(--on-action);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--button-primary-size);
+  box-shadow: 3px 3px 0 var(--shadow);
+}
+
+.primary:hover {
+  background: var(--action-strong);
+}
+
+.primary:active {
+  background: var(--action-strong);
+  transform: translateY(2px);
+  box-shadow: 1px 1px 0 var(--shadow);
+}
+
+/* The confirming button of a destructive action: the primary button filled with the danger colour. */
+.primary.danger {
+  background: var(--danger-fill);
+  color: var(--on-danger);
+}
+
+.primary.danger:hover,
+.primary.danger:active {
+  background: var(--danger-fill-strong);
+}
+
+/* A primary action that cannot run now: aria-disabled keeps it focusable and it takes the
+   disabled look of the other buttons. */
+.primary[aria-disabled="true"],
+.primary[aria-disabled="true"]:hover,
+.primary[aria-disabled="true"]:active {
+  background: var(--disabled-fill);
+  color: var(--ink-soft);
+  box-shadow: none;
+  transform: none;
+  cursor: not-allowed;
+}
+
+@media (forced-colors: active) {
+  /* The system colours replace the disabled fill: the text and a frame in GrayText. */
+  .primary[aria-disabled="true"] {
+    color: GrayText;
+    border: 2px solid GrayText;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .action-button:active,
+  .primary:active {
+    transform: none;
+    opacity: 0.85;
+  }
+}
