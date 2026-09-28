@@ -7,3 +7,6 @@ playwright-report/
 blob-report/
 CLAUDE.local.md
 .claude/settings.local.json
+
+# owner's private notes, never committed
+docs/moj-notatnik.md
