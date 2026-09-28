@@ -25,6 +25,9 @@ updates:
       development-minor-patch:
         dependency-type: development
         update-types: [minor, patch]
+  # Workflows pin actions to commit SHAs with the exact release as a comment
+  # (`@<sha> # v7.0.1`); Dependabot bumps the SHA and rewrites the comment
+  # when it names the most specific tag of the pinned commit.
   - package-ecosystem: github-actions
     directory: /
     schedule:
