@@ -1316,6 +1316,20 @@
     "note": "confirming danger button, hover and press: text on danger-strong"
   },
   {
+    "fg": "on-danger",
+    "bg": "danger-fill",
+    "required": 4.5,
+    "ratio": 13.9,
+    "note": "confirming button of a destructive action (Zacznij nową grę, Zagraj od początku): text on its own fill, bordeaux in bialo-czerwona so it differs from the red primary (decision 2026-09-28, D1)"
+  },
+  {
+    "fg": "on-danger",
+    "bg": "danger-fill-strong",
+    "required": 4.5,
+    "ratio": 16.82,
+    "note": "confirming danger button, hover and press: text on danger-fill-strong"
+  },
+  {
     "fg": "good",
     "bg": "surface",
     "required": 4.5,
