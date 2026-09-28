@@ -1,5 +1,14 @@
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
+import { players } from "../src/data/catalog.ts";
+import { RULES_REVISION } from "../src/data/constants.ts";
+import {
+  campSave,
+  expectNoHorizontalScroll,
+  finishedReportSave,
+  seedStorage,
+  text,
+} from "./helpers.ts";
 
 const DISPLAY = "Pathway Extreme Variable";
 const BODY = "Commissioner Variable";
@@ -46,8 +55,10 @@ test("both families load their latin and latin-ext faces from the build", async 
 }) => {
   const foreign: string[] = [];
   page.on("request", (request) => {
-    if (!request.url().startsWith("http://127.0.0.1:"))
-      foreign.push(request.url());
+    const url = request.url();
+    // data: and blob: URLs never leave the browser; only http(s) requests can.
+    if (/^https?:/.test(url) && !url.startsWith("http://127.0.0.1:"))
+      foreign.push(url);
   });
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
@@ -88,4 +99,46 @@ test("body text uses the new family", async ({ page }) => {
     "font-family",
     /Commissioner Variable/,
   );
+  await expect(heading).toHaveCSS("font-family", /Pathway Extreme Variable/);
+});
+
+test.describe("the wider display face fits a 320 px screen", () => {
+  test.use({ viewport: { width: 320, height: 700 } });
+
+  test("start, camp list and report", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await page.evaluate(() => document.fonts.ready);
+    await expectNoHorizontalScroll(page);
+  });
+});
+
+test.describe("the wider display face fits a 320 px screen: saved states", () => {
+  test.use({ viewport: { width: 320, height: 700 } });
+
+  test("camp list", async ({ page }) => {
+    await seedStorage(
+      page,
+      campSave({
+        selectedIds: players.slice(0, 10).map((player) => player.id),
+        events: ["doctor"],
+      }),
+    );
+    await page.goto("/");
+    await expect(
+      page.getByRole("heading", { name: text.stages.camp.heading }),
+    ).toBeVisible();
+    await page.evaluate(() => document.fonts.ready);
+    await expectNoHorizontalScroll(page);
+  });
+
+  test("report", async ({ page }) => {
+    await seedStorage(page, finishedReportSave(RULES_REVISION));
+    await page.goto("/");
+    await expect(
+      page.getByRole("heading", { name: text.outcomes.roundOf16 }),
+    ).toBeVisible();
+    await page.evaluate(() => document.fonts.ready);
+    await expectNoHorizontalScroll(page);
+  });
 });
