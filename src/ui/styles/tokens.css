@@ -1,0 +1,25 @@
+/* Design tokens of the tactics board redesign. Stage 1 adds the font pair and the type scale
+   (docs/superpowers/specs/redesign/01-global-tokens.md, section 1.2); stage 2 adds colours,
+   spacing, radius, shadows and motion. The current stylesheet keeps its own sizes until the
+   screen stages replace its rules. */
+:root {
+  --font-display: "Pathway Extreme Variable", system-ui, sans-serif;
+  --font-body: "Commissioner Variable", system-ui, sans-serif;
+
+  /* Pathway Extreme and Commissioner run wide and large for their nominal size, so the
+     mockup gives this pair smaller steps than its other pairs. */
+  --text-4xs: 0.5625rem;
+  --text-3xs: 0.625rem;
+  --text-2xs: 0.6875rem;
+  --text-xs: 0.75rem;
+  --text-sm: 0.75rem;
+  --text-base: 0.875rem;
+  --text-md: 0.9375rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.75rem;
+  --text-3xl: 2.25rem;
+  --text-4xl: 3.125rem;
+  /* Form fields on touch screens: 16 px in every case, so iOS Safari does not zoom on focus. */
+  --text-control: 1rem;
+}

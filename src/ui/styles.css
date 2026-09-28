@@ -27,14 +27,7 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font-family:
-    Inter,
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
+  font-family: var(--font-body);
   font-size: var(--font-body-size);
   line-height: 1.42;
 }
@@ -1089,9 +1082,6 @@ input:focus-visible {
 
 :root {
   --radius-control: 12px;
-  --font-body:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", sans-serif;
   --font-body-size: 1rem;
   --font-large: 1.125rem;
   --font-small: 0.875rem;
