@@ -26,4 +26,103 @@
   --text-4xl: 3.125rem;
   /* Form fields on touch screens: 16 px in every case, so iOS Safari does not zoom on focus. */
   --text-control: 1rem;
+
+  /* Colours: the bialo-czerwona palette of docs/mockups/tactics-board.html (base :root with
+     the :root[data-palette="bialo-czerwona"] block applied on top). */
+  /* Surfaces and ink */
+  --ink: oklch(0.22 0.015 40);
+  --ink-soft: oklch(0.4 0.015 40);
+  --board: oklch(0.96 0.006 60);
+  --board-deep: oklch(0.9 0.008 60);
+  --board-line: oklch(0.6 0.01 40);
+  --surface: oklch(0.99 0.003 60);
+  /* Called-up strip: a pale wash of the select colour and its bottom edge. */
+  --surface-selected: color-mix(in oklab, var(--select) 9%, var(--surface));
+  --selected-edge: color-mix(in oklab, var(--select) 35%, var(--surface));
+  --surface-dialog: oklch(0.995 0.002 60);
+  --frame: oklch(0.52 0.01 40);
+  --frame-soft: oklch(0.55 0.008 40);
+  --disabled-fill: oklch(0.86 0.006 40);
+
+  /* Brand, select and danger */
+  --action: oklch(0.46 0.185 25);
+  --action-strong: oklch(0.36 0.145 25);
+  --on-action: oklch(0.99 0 0);
+  --select: oklch(0.3 0.03 255);
+  --select-strong: oklch(0.22 0.03 255);
+  --on-select: oklch(0.99 0 0);
+  /* "Called up" is navy here, so warnings keep their own red. */
+  --danger: oklch(0.46 0.185 25);
+  --danger-strong: oklch(0.36 0.145 25);
+  --on-danger: oklch(0.99 0 0);
+  --danger-fill: var(--danger);
+  --danger-fill-strong: var(--danger-strong);
+  --good: oklch(0.48 0.13 150);
+  --on-good: oklch(0.99 0 0);
+  --warn-fill: oklch(0.83 0.15 82);
+  --warn-ink: oklch(0.34 0.075 68);
+  --focus-core: oklch(0.3 0.121 25);
+  --focus-halo: oklch(1 0 0);
+
+  /* Text on ink panels */
+  --ink-tile: oklch(0.32 0.02 40);
+  --on-ink-dim: oklch(0.85 0.02 40);
+  --on-ink-meta: oklch(0.82 0.02 40);
+  --on-ink-lead: oklch(0.88 0.015 40);
+  --on-ink-eyebrow: oklch(0.85 0.08 25);
+  --on-ink-border: oklch(0.66 0.03 40);
+
+  /* Position groups: one fixed set, 3:1 against --surface and --board-deep. */
+  --hue-gk: oklch(0.55 0.12 68);
+  --hue-def: oklch(0.42 0.1 255);
+  --hue-mid: oklch(0.5 0.11 150);
+  --hue-fwd: oklch(0.5 0.16 355);
+
+  /* Meter bands: below 75, 75 to 84, 85 and up. */
+  --meter-low: oklch(0.5 0.19 27);
+  --meter-mid: oklch(0.5 0.1 75);
+  --meter-high: oklch(0.5 0.13 152);
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 48px;
+
+  /* Radius */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-round: 999px;
+
+  /* Shadow and scrim */
+  --shadow: oklch(0.22 0.02 40 / 0.35);
+  --scrim: oklch(0.22 0.02 40 / 0.55);
+
+  /* Motion: a magnet is picked up and set back down, nothing loops or decorates. */
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 320ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasized: cubic-bezier(0.3, 0, 0.1, 1);
+
+  /* Layout and safe areas */
+  --button-primary-size: var(--text-base);
+  --cta-min-width: 240px;
+  --scrollbar-thumb: var(--frame-soft);
+  --scrollbar-track: transparent;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+
+  /* Bottom sheet head: inset, a 24 px row with the 44 x 4 px handle, then the gap. */
+  --sheet-head-inset: var(--space-1);
+  --sheet-handle-row: 24px;
+  --sheet-handle-width: 44px;
+  --sheet-handle-height: 4px;
+  --sheet-head-gap: var(--space-3);
 }

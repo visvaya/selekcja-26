@@ -554,3 +554,50 @@ test("KNOWN_FAILURES only lists pairs that are declared", () => {
     assert.ok(declared.has(key), `KNOWN_FAILURES has a stale entry: ${key}`);
   }
 });
+
+// The palette of the redesign: the 200 foreground/background pairs the mockup was checked
+// against (scripts/fixtures/contrast/tactics-board-bialo-czerwona.json), computed here from
+// src/ui/styles/tokens.css. Each pair must meet its required ratio, and the ratio computed
+// by this script must agree with the fixture, so a conversion error cannot pass unnoticed.
+const paletteTokens = extractRootTokens(
+  readFileSync(
+    fileURLToPath(new URL("../src/ui/styles/tokens.css", import.meta.url)),
+    "utf8",
+  ),
+);
+const PALETTE_PAIRS = JSON.parse(
+  readFileSync(
+    fileURLToPath(
+      new URL(
+        "../scripts/fixtures/contrast/tactics-board-bialo-czerwona.json",
+        import.meta.url,
+      ),
+    ),
+    "utf8",
+  ),
+);
+
+test("the palette fixture has 200 pairs", () => {
+  assert.equal(PALETTE_PAIRS.length, 200);
+});
+
+test("every palette pair meets its required ratio and matches the fixture", () => {
+  for (const pair of PALETTE_PAIRS) {
+    const ratio = tokenContrastRatio(
+      `--${pair.fg}`,
+      `--${pair.bg}`,
+      paletteTokens,
+    );
+    assert.ok(
+      ratio >= pair.required,
+      `${pair.fg} on ${pair.bg}: ${ratio.toFixed(2)} < ${pair.required} (${pair.note})`,
+    );
+    // The fixture was computed by the mockup's own tooling; this script agrees within 0.5 %
+    // (2026-09-29), all but ten pairs slightly above it. A 1 % tolerance still catches a
+    // wrong conversion, which moves ratios by several percent.
+    assert.ok(
+      Math.abs(ratio - pair.ratio) <= pair.ratio * 0.01,
+      `${pair.fg} on ${pair.bg}: computed ${ratio.toFixed(2)}, fixture ${pair.ratio}`,
+    );
+  }
+});
