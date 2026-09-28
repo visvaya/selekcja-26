@@ -61,15 +61,52 @@ export function rgbToOklab({ r, g, b, a }) {
   };
 }
 
+/**
+ * Parse an oklch() hue channel, which is a plain number of degrees, a
+ * number with an explicit `deg` unit, or (unsupported here) another CSS
+ * angle unit such as `turn` or `rad`.
+ * @param {string} hue
+ * @returns {number} the hue in degrees
+ */
+function parseOklchHue(hue) {
+  const hueMatch = /^(-?\d+(?:\.\d+)?)(deg)?$/.exec(hue);
+  if (!hueMatch) {
+    throw new Error(`Unsupported oklch() hue unit: ${hue}`);
+  }
+  return parseFloat(hueMatch[1]);
+}
+
+/**
+ * Parse a single oklch() channel that must be a number, rejecting the CSS
+ * `none` keyword: this script has no notion of a missing channel.
+ * @param {string} channel
+ * @param {string} raw the full oklch() body, for the error message
+ * @returns {string} the channel, unchanged, once validated
+ */
+function rejectNoneChannel(channel, raw) {
+  if (channel.trim() === "none") {
+    throw new Error(`oklch() channel "none" is not supported: ${raw}`);
+  }
+  return channel;
+}
+
 function parseOklch(body) {
   const [channels, alphaPart] = body.split("/");
   const [lightness, chroma, hue] = channels.trim().split(/\s+/);
+  rejectNoneChannel(lightness, body);
+  rejectNoneChannel(chroma, body);
+  rejectNoneChannel(hue, body);
   const L = lightness.endsWith("%")
     ? parseFloat(lightness) / 100
     : parseFloat(lightness);
   const C = parseFloat(chroma);
-  const h = (parseFloat(hue) * Math.PI) / 180;
-  const alpha = alphaPart === undefined ? 1 : parseFloat(alphaPart);
+  const h = (parseOklchHue(hue) * Math.PI) / 180;
+  const alpha =
+    alphaPart === undefined
+      ? 1
+      : alphaPart.trim().endsWith("%")
+        ? parseFloat(alphaPart) / 100
+        : parseFloat(alphaPart);
   return oklabToRgb({ L, a: C * Math.cos(h), b: C * Math.sin(h), alpha });
 }
 
@@ -126,6 +163,9 @@ function mixInOklab(body, tokens) {
   }
   const a = parseMixArgument(first);
   const b = parseMixArgument(second);
+  if (a.percent !== undefined && b.percent !== undefined) {
+    throw new Error("color-mix() with two percentages is not supported");
+  }
   const pa = a.percent ?? (b.percent === undefined ? 0.5 : 1 - b.percent);
   const labA = rgbToOklab(resolveColor(a.color, tokens));
   const labB = rgbToOklab(resolveColor(b.color, tokens));

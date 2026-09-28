@@ -393,6 +393,27 @@ test("parseColorLiteral supports oklch", () => {
     assert.ok(clamped[channel] >= 0 && clamped[channel] <= 255);
 });
 
+test("parseColorLiteral accepts a percentage alpha in oklch", () => {
+  assert.equal(parseColorLiteral("oklch(0.3 0.03 255 / 50%)").a, 0.5);
+  assert.equal(parseColorLiteral("oklch(0.3 0.03 255 / 100%)").a, 1);
+});
+
+test("parseColorLiteral rejects an oklch hue with an unsupported unit", () => {
+  assert.throws(() => parseColorLiteral("oklch(0.3 0.03 0.25turn)"));
+  assert.throws(() => parseColorLiteral("oklch(0.3 0.03 1rad)"));
+  // Bare numbers and deg stay accepted.
+  assertRgbClose(
+    parseColorLiteral("oklch(0.3 0.03 255deg)"),
+    parseColorLiteral("oklch(0.3 0.03 255)"),
+  );
+});
+
+test("parseColorLiteral rejects none in any oklch channel", () => {
+  assert.throws(() => parseColorLiteral("oklch(none 0.03 255)"));
+  assert.throws(() => parseColorLiteral("oklch(0.3 none 255)"));
+  assert.throws(() => parseColorLiteral("oklch(0.3 0.03 none)"));
+});
+
 test("oklab conversion round-trips sRGB", () => {
   const colour = { r: 18, g: 52, b: 86, a: 1 };
   assertRgbClose(oklabToRgb(rgbToOklab(colour)), colour);
@@ -458,6 +479,18 @@ test("resolveColor rejects unsupported color-mix() spaces", () => {
   assert.throws(
     () => resolveColor("var(--bad)", spaceTokens),
     /Unsupported color-mix\(\) space/,
+  );
+});
+
+test("resolveColor rejects color-mix() with two percentages", () => {
+  const twoPercentTokens = new Map([
+    ["--black", "#000"],
+    ["--white", "#fff"],
+    ["--bad", "color-mix(in oklab, var(--white) 30%, var(--black) 30%)"],
+  ]);
+  assert.throws(
+    () => resolveColor("var(--bad)", twoPercentTokens),
+    /color-mix\(\) with two percentages is not supported/,
   );
 });
 
