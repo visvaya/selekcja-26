@@ -86,7 +86,7 @@ function inlineStyleProblems(file, content) {
     return keys.every((key) => key.startsWith("--"))
       ? []
       : [
-          `${file}:${line}: inline styles may only set CSS custom properties; move the rest to styles.css`,
+          `${file}:${line}: inline styles may only set CSS custom properties; move the rest to a stylesheet in src/ui/styles/`,
         ];
   });
 }

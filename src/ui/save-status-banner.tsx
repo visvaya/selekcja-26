@@ -7,8 +7,9 @@ import { UI_TEXT as text } from "./text.ts";
 // banner's height. Rather than stack two sticky elements directly (independent sticky siblings
 // both pinned to the viewport top would overlap once scrolled, since neither knows about the
 // other's height), this measures the sticky wrapper's own rendered height and exposes it as a
-// custom property that styles.css adds to the topbar's and toolbar's `top`. When no issue is
-// shown the wrapper has no visible box, so the offset is 0 and both sit at their usual position.
+// custom property that src/ui/styles/legacy.css adds to the topbar's and toolbar's `top`. When
+// no issue is shown the wrapper has no visible box, so the offset is 0 and both sit at their
+// usual position.
 function useBannerOffset(visible: boolean) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {

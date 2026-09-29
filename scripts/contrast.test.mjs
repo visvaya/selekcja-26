@@ -1,16 +1,11 @@
-// Ratchet test: WCAG 2.x contrast ratios computed from the `--` custom
-// properties declared in `:root` in src/ui/styles.css.
+// WCAG 2.x contrast checks for the palette in src/ui/styles/tokens.css.
 //
-// This is a ratchet, not a gate that blocks every low-contrast pair: pairs
-// already known to fail today are listed in KNOWN_FAILURES with the ratio
-// measured when this test was written (rounded down to 2 decimals). The
-// test fails if:
-//   - a pair not listed in KNOWN_FAILURES does not meet its required ratio;
-//   - a known failure's ratio drops below the recorded value (regression);
-//   - a known failure's ratio now meets its required ratio (the map entry
-//     is stale and must be removed).
-// Known failures are left for the
-// planned visual redesign (docs/future-scope.md).
+// Two sets of pairs are checked, and every pair must meet its required ratio:
+//   - the palette fixture: the pairs the mockup was checked against, whose
+//     ratios this script must also reproduce;
+//   - INTERIM_PAIRS: combinations the re-pointed legacy.css rules produce
+//     that the fixture does not contain.
+// There are no known failures. legacy.css itself may declare no colour.
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -27,290 +22,8 @@ import {
   tokenContrastRatio,
 } from "./contrast.mjs";
 
-const stylesPath = fileURLToPath(
-  new URL("../src/ui/styles.css", import.meta.url),
-);
-const css = readFileSync(stylesPath, "utf8");
-const tokens = extractRootTokens(css);
-
 const TEXT_RATIO = 4.5;
 const LARGE_OR_UI_RATIO = 3;
-
-// Pairs are read off actual `color` + `background` declarations in
-// styles.css (same rule or the closest ancestor that sets the
-// background), not chosen in the abstract. `bgOnto` names the opaque
-// token a translucent background token is composited onto before the
-// foreground is applied, matching how the two layers actually stack in
-// the UI.
-const PAIRS = [
-  // Body and card text.
-  {
-    fg: "ink",
-    bg: "paper",
-    required: TEXT_RATIO,
-    note: "body text on the page background",
-  },
-  {
-    fg: "ink",
-    bg: "card",
-    required: TEXT_RATIO,
-    note: "default text on card surfaces (choice, player, compare, modal, decision)",
-  },
-  {
-    fg: "muted",
-    bg: "paper",
-    required: TEXT_RATIO,
-    note: "muted text (.phase, .fineprint, .lead small print) on the page background",
-  },
-  {
-    fg: "muted",
-    bg: "card",
-    required: TEXT_RATIO,
-    note: "muted text (.meta, .kpi span, .dock-copy small, .squad-group h3) on card surfaces",
-  },
-  {
-    fg: "text-secondary",
-    bg: "card",
-    required: TEXT_RATIO,
-    note: ".chip and .sort text on card background",
-  },
-  {
-    fg: "text-secondary",
-    bg: "surface-soft",
-    required: TEXT_RATIO,
-    note: ".tag text on its soft surface background",
-  },
-  {
-    fg: "lead-text",
-    bg: "paper",
-    required: TEXT_RATIO,
-    note: ".lead paragraph on the start screen",
-  },
-  {
-    fg: "dialog-text",
-    bg: "card",
-    required: TEXT_RATIO,
-    note: ".modal p on the modal card background",
-  },
-  {
-    fg: "position-text",
-    bg: "surface-accent",
-    required: TEXT_RATIO,
-    note: ".pos position badge text",
-  },
-  {
-    fg: "ink",
-    bg: "squad-surface",
-    required: TEXT_RATIO,
-    note: ".squad-pill text on its pill background",
-  },
-
-  // Text on dark navy panels (brief card, result hero, dock breakdown, buttons).
-  {
-    fg: "card",
-    bg: "navy",
-    required: TEXT_RATIO,
-    note: "light text on navy panels (.brief, .result-hero, .dock-breakdown, .finalize, .chip.active)",
-  },
-  {
-    fg: "red-soft",
-    bg: "navy",
-    required: TEXT_RATIO,
-    note: ".result-eyebrow text on the navy hero",
-  },
-  {
-    fg: "brief-muted",
-    bg: "navy",
-    required: TEXT_RATIO,
-    note: ".brief-stat span caption on the navy brief card",
-  },
-  {
-    fg: "text-on-navy",
-    bg: "navy",
-    required: TEXT_RATIO,
-    note: ".dock-breakdown small text on navy",
-  },
-  {
-    fg: "success-soft",
-    bg: "on-dark-surface",
-    bgOnto: "navy",
-    required: TEXT_RATIO,
-    note: ".dock-summary span (default state) on its translucent panel over navy",
-  },
-  {
-    fg: "warning-soft",
-    bg: "warning-overlay",
-    bgOnto: "navy",
-    required: TEXT_RATIO,
-    note: ".dock-summary .need/.over span on its translucent panel over navy",
-  },
-  {
-    fg: "card",
-    bg: "pitch-background",
-    required: TEXT_RATIO,
-    note: ".formation-label text on the pitch turf",
-  },
-
-  // Buttons and accent text.
-  {
-    fg: "card",
-    bg: "red",
-    required: TEXT_RATIO,
-    note: ".primary button text on the red accent",
-  },
-  {
-    fg: "card",
-    bg: "red-dark",
-    required: TEXT_RATIO,
-    note: ".primary:hover button text on the darker red",
-  },
-  {
-    fg: "red",
-    bg: "paper",
-    required: TEXT_RATIO,
-    note: ".eyebrow text on the page background",
-  },
-  {
-    fg: "green",
-    bg: "card",
-    required: TEXT_RATIO,
-    note: ".better comparison highlight text",
-  },
-
-  // Warning and status surfaces.
-  {
-    fg: "warning-text",
-    bg: "warning-surface",
-    required: TEXT_RATIO,
-    note: ".tag.alert and .save-status-alert text on the warning surface",
-  },
-  {
-    fg: "warning-text",
-    bg: "card",
-    required: TEXT_RATIO,
-    note: ".save-status-action retry button text on card",
-  },
-  {
-    fg: "pitch-warning-text",
-    bg: "pitch-warning-surface",
-    required: TEXT_RATIO,
-    note: ".formation-outsiders strong text",
-  },
-  {
-    fg: "pitch-warning-muted",
-    bg: "pitch-warning-surface",
-    required: TEXT_RATIO,
-    note: ".formation-outsiders small text",
-  },
-  {
-    fg: "warning-panel-text",
-    bg: "warning-panel",
-    required: TEXT_RATIO,
-    note: ".dock-warning text",
-  },
-
-  // Non-text UI: icons, borders and other elements that carry meaning on
-  // their own (WCAG 1.4.11, 3:1).
-  {
-    fg: "pitch-warning-arrow",
-    bg: "pitch-warning-surface",
-    required: LARGE_OR_UI_RATIO,
-    note: ".formation-outsiders .outside-arrow icon",
-  },
-  {
-    fg: "red",
-    bg: "card",
-    required: LARGE_OR_UI_RATIO,
-    note: "selected border colour (.choice.selected, .player.selected, .selected .radio) on card",
-  },
-  {
-    fg: "navy",
-    bg: "card",
-    required: LARGE_OR_UI_RATIO,
-    note: ".player.compare-on outline on card",
-  },
-  {
-    fg: "green",
-    bg: "surface-track",
-    required: LARGE_OR_UI_RATIO,
-    note: ".bar i / progress fill vs its track",
-  },
-  {
-    fg: "red",
-    bg: "surface-track",
-    required: LARGE_OR_UI_RATIO,
-    note: ".count-ring conic progress vs its track",
-  },
-  {
-    fg: "pitch-marker",
-    bg: "pitch-background",
-    required: LARGE_OR_UI_RATIO,
-    note: ".pitch-node border vs the pitch turf",
-  },
-  {
-    fg: "line",
-    bg: "paper",
-    required: LARGE_OR_UI_RATIO,
-    note: "form control border (.search) vs the page background",
-  },
-  {
-    fg: "line",
-    bg: "card",
-    required: LARGE_OR_UI_RATIO,
-    note: "form control and card border (.choice, .player, .kpi, .close) vs card background",
-  },
-  {
-    fg: "radio-border",
-    bg: "card",
-    required: LARGE_OR_UI_RATIO,
-    note: ".radio unselected border vs card",
-  },
-  {
-    fg: "pitch-marker",
-    bg: "card",
-    required: LARGE_OR_UI_RATIO,
-    note: ".pitch-node border vs its own card-coloured fill",
-  },
-  {
-    fg: "focus-ring",
-    bg: "paper",
-    required: LARGE_OR_UI_RATIO,
-    note: "focus-visible outline vs the page background",
-  },
-  {
-    fg: "focus-ring",
-    bg: "card",
-    required: LARGE_OR_UI_RATIO,
-    note: "focus-visible outline vs card-background controls",
-  },
-  {
-    fg: "warning-border",
-    bg: "warning-surface",
-    required: LARGE_OR_UI_RATIO,
-    note: "warning banner/tag border vs its own surface",
-  },
-  {
-    fg: "warning-border",
-    bg: "card",
-    required: LARGE_OR_UI_RATIO,
-    note: ".save-status-action border vs card",
-  },
-];
-
-// Ratio measured when this test was written, rounded down to 2 decimals.
-// May only move up (or the entry removed once the pair passes).
-const KNOWN_FAILURES = new Map([
-  ["line on paper", 1.19],
-  ["line on card", 1.29],
-  ["radio-border on card", 2.22],
-  ["pitch-marker on card", 2.23],
-  ["warning-border on warning-surface", 1.63],
-  ["warning-border on card", 1.8],
-]);
-
-function pairKey(pair) {
-  return `${pair.fg} on ${pair.bg}`;
-}
 
 test("contrast formula matches known WCAG reference values", () => {
   const black = { r: 0, g: 0, b: 0 };
@@ -514,43 +227,181 @@ test("compositeOver blends a translucent colour over an opaque one", () => {
   assert.deepEqual(result, { r: 127.5, g: 0, b: 0, a: 1 });
 });
 
-test(":root tokens parse from styles.css", () => {
-  assert.equal(tokens.get("--ink"), "#11151c");
-  assert.ok(tokens.size > 20, "expected a sizeable set of root tokens");
+// The palette of the redesign: the 200 foreground/background pairs the mockup was checked
+// against (scripts/fixtures/contrast/tactics-board-bialo-czerwona.json), computed here from
+// src/ui/styles/tokens.css. Each pair must meet its required ratio, and the ratio computed
+// by this script must agree with the fixture, so a conversion error cannot pass unnoticed.
+const paletteTokens = extractRootTokens(
+  readFileSync(
+    fileURLToPath(new URL("../src/ui/styles/tokens.css", import.meta.url)),
+    "utf8",
+  ),
+);
+const PALETTE_PAIRS = JSON.parse(
+  readFileSync(
+    fileURLToPath(
+      new URL(
+        "../scripts/fixtures/contrast/tactics-board-bialo-czerwona.json",
+        import.meta.url,
+      ),
+    ),
+    "utf8",
+  ),
+);
+
+test("the palette fixture has 200 pairs", () => {
+  assert.equal(PALETTE_PAIRS.length, 200);
 });
 
-for (const pair of PAIRS) {
-  test(`contrast: ${pairKey(pair)} (${pair.note})`, () => {
+// The fixture was computed by the mockup's own tooling; this script agrees within 0.5 %
+// (2026-09-29). A 1 % tolerance still catches a wrong conversion, which moves ratios by
+// several percent.
+for (const pair of PALETTE_PAIRS) {
+  test(`palette pair ${pair.fg} on ${pair.bg} meets ${pair.required}:1`, () => {
     const ratio = tokenContrastRatio(
       `--${pair.fg}`,
       `--${pair.bg}`,
-      tokens,
-      pair.bgOnto ? `--${pair.bgOnto}` : undefined,
-    );
-    const known = KNOWN_FAILURES.get(pairKey(pair));
-
-    if (known === undefined) {
-      assert.ok(
-        ratio >= pair.required,
-        `${pairKey(pair)} is ${ratio.toFixed(2)}:1, needs ${pair.required}:1 (${pair.note})`,
-      );
-      return;
-    }
-
-    assert.ok(
-      ratio < pair.required,
-      `${pairKey(pair)} now passes at ${ratio.toFixed(2)}:1; remove it from KNOWN_FAILURES`,
+      paletteTokens,
     );
     assert.ok(
-      ratio >= known,
-      `${pairKey(pair)} regressed to ${ratio.toFixed(2)}:1, was at least ${known}:1`,
+      ratio >= pair.required,
+      `${pair.fg} on ${pair.bg}: ${ratio.toFixed(2)} < ${pair.required} (${pair.note})`,
+    );
+    assert.ok(
+      Math.abs(ratio - pair.ratio) <= pair.ratio * 0.01,
+      `${pair.fg} on ${pair.bg}: computed ${ratio.toFixed(2)}, fixture ${pair.ratio}`,
     );
   });
 }
 
-test("KNOWN_FAILURES only lists pairs that are declared", () => {
-  const declared = new Set(PAIRS.map(pairKey));
-  for (const key of KNOWN_FAILURES.keys()) {
-    assert.ok(declared.has(key), `KNOWN_FAILURES has a stale entry: ${key}`);
+// Combinations the re-pointed legacy.css rules produce that PALETTE_PAIRS does not contain.
+// They cover legacy.css until the screen stages delete its rules; stage 11 removes this list.
+// The dock summary's warning row mixes two palette tokens, so it gets a local token here.
+const interimTokens = new Map([
+  ...paletteTokens,
+  [
+    "--interim-warn-overlay",
+    "color-mix(in oklab, var(--warn-fill) 25%, var(--surface))",
+  ],
+]);
+const INTERIM_PAIRS = [
+  {
+    fg: "frame",
+    bg: "board",
+    required: LARGE_OR_UI_RATIO,
+    note: "control borders on the board background: .search, .chip, .sort in .toolbar; .choice and .action-button on the start screen",
+  },
+  {
+    fg: "warn-ink",
+    bg: "interim-warn-overlay",
+    required: TEXT_RATIO,
+    note: ".dock-summary div.need, div.over and their span: text and border on the warning row",
+  },
+  {
+    fg: "board-line",
+    bg: "surface-dialog",
+    required: LARGE_OR_UI_RATIO,
+    note: ".compare-card and .profile-metric borders inside dialogs",
+  },
+  // Dark --ink panels: .brief, .result-hero, .dock-breakdown, .score, .profile-score.
+  {
+    fg: "on-select",
+    bg: "ink",
+    required: TEXT_RATIO,
+    note: "light text on --ink panels (.brief, .brief h2, .result-hero, .result-hero h1, .dock-breakdown b, .score, .profile-score)",
+  },
+  {
+    fg: "on-ink-border",
+    bg: "ink",
+    required: LARGE_OR_UI_RATIO,
+    note: ".brief-stat divider on the brief panel",
+  },
+  {
+    fg: "board-line",
+    bg: "ink",
+    required: LARGE_OR_UI_RATIO,
+    note: ".mini-pitch border inside .dock-breakdown",
+  },
+  {
+    fg: "interim-warn-overlay",
+    bg: "ink",
+    required: LARGE_OR_UI_RATIO,
+    note: "the dock summary warning row against .dock-breakdown: its light fill marks the row edge (its --warn-ink border is 1.45:1 on --ink and only decorates)",
+  },
+  {
+    fg: "on-select",
+    bg: "ink-tile",
+    required: TEXT_RATIO,
+    note: ".dock-summary div b on its tile",
+  },
+  {
+    fg: "on-ink-lead",
+    bg: "ink-tile",
+    required: TEXT_RATIO,
+    note: ".dock-summary span on its tile",
+  },
+  {
+    fg: "on-ink-dim",
+    bg: "ink-tile",
+    required: TEXT_RATIO,
+    note: ".dock-breakdown small on a .dock-summary tile",
+  },
+  {
+    fg: "warn-fill",
+    bg: "ink",
+    required: LARGE_OR_UI_RATIO,
+    note: ".formation-outsiders fill inside .dock-breakdown",
+  },
+  {
+    fg: "focus-halo",
+    bg: "ink",
+    required: LARGE_OR_UI_RATIO,
+    note: "the focus indicator on dark panels is carried by the white halo band; focus-core on ink is 1.21:1 and does not carry it there",
+  },
+  {
+    fg: "select",
+    bg: "board-deep",
+    required: LARGE_OR_UI_RATIO,
+    note: ".count-ring progress arc against its track",
+  },
+];
+
+for (const pair of INTERIM_PAIRS) {
+  test(`interim pair ${pair.fg} on ${pair.bg} meets ${pair.required}:1`, () => {
+    const ratio = tokenContrastRatio(
+      `--${pair.fg}`,
+      `--${pair.bg}`,
+      interimTokens,
+    );
+    assert.ok(
+      ratio >= pair.required,
+      `${pair.fg} on ${pair.bg}: ${ratio.toFixed(2)} < ${pair.required} (${pair.note})`,
+    );
+  });
+}
+
+test("legacy.css declares no colour and no mockup-named spacing token", () => {
+  const legacyTokens = extractRootTokens(
+    readFileSync(
+      fileURLToPath(new URL("../src/ui/styles/legacy.css", import.meta.url)),
+      "utf8",
+    ),
+  );
+  for (const [name, value] of legacyTokens) {
+    assert.doesNotMatch(
+      name,
+      /^--space-\d+$/,
+      `${name} collides with tokens.css`,
+    );
+    assert.doesNotMatch(
+      value,
+      /color-mix\(/,
+      `${name}: ${value} mixes colours; colours live in tokens.css`,
+    );
+    assert.throws(
+      () => parseColorLiteral(value),
+      undefined,
+      `${name}: ${value} is a colour; colours live in tokens.css`,
+    );
   }
 });
