@@ -179,8 +179,8 @@ button {
 .brief h2 {
   font-size: 17px;
   margin: 0 0 var(--legacy-space-6);
-  /* Keeps the light panel colour now that base.css gives headings --ink. */
-  color: inherit;
+  /* Light text on the --ink panel; base.css gives headings --ink. */
+  color: var(--on-select);
 }
 .brief-grid {
   display: grid;
@@ -687,8 +687,8 @@ button {
 .result-hero h1 {
   font-size: 31px;
   margin: var(--legacy-space-5) 0 5px;
-  /* Keeps the light hero colour now that base.css gives headings --ink. */
-  color: inherit;
+  /* Light text on the --ink panel; base.css gives headings --ink. */
+  color: var(--on-select);
 }
 .result-hero p {
   color: var(--on-ink-lead);

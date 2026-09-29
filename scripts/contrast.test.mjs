@@ -347,6 +347,18 @@ const INTERIM_PAIRS = [
     note: ".dock-breakdown small on a .dock-summary tile",
   },
   {
+    fg: "warn-fill",
+    bg: "ink",
+    required: LARGE_OR_UI_RATIO,
+    note: ".formation-outsiders fill inside .dock-breakdown",
+  },
+  {
+    fg: "focus-halo",
+    bg: "ink",
+    required: LARGE_OR_UI_RATIO,
+    note: "the focus indicator on dark panels is carried by the white halo band; focus-core on ink is 1.21:1 and does not carry it there",
+  },
+  {
     fg: "select",
     bg: "board-deep",
     required: LARGE_OR_UI_RATIO,
