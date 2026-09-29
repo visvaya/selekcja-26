@@ -1,21 +1,5 @@
 :root {
-  --ink: #11151c;
-  --muted: #69707d;
-  --line: #dfe2e7;
-  --paper: #f4f5f7;
-  --card: #fff;
-  --red: #c9192d;
-  --red-dark: #941221;
-  --navy: #14263f;
-  --green: #177454;
-  --amber: #a7650b;
-  --surface-soft: #f0f2f5;
-  --surface-accent: #edf0f4;
-  --text-secondary: #4f5661;
-  --focus-ring: var(--red);
   --spacing-unit: 4px;
-  --legacy-shadow: 0 14px 34px rgba(17, 21, 28, 0.09);
-  --topbar-height: 58px;
 }
 * {
   box-sizing: border-box;
@@ -39,12 +23,6 @@ input {
 button {
   cursor: pointer;
 }
-button:focus-visible,
-select:focus-visible,
-input:focus-visible {
-  outline: 3px solid var(--focus-ring);
-  outline-offset: 2px;
-}
 .app {
   min-height: 100vh;
 }
@@ -52,9 +30,8 @@ input:focus-visible {
   position: sticky;
   top: var(--save-banner-offset, 0px);
   z-index: 20;
-  background: var(--topbar-background);
+  background: var(--surface);
   border-bottom: 1px solid var(--board-line);
-  backdrop-filter: blur(12px);
 }
 .save-status {
   position: sticky;
@@ -149,8 +126,8 @@ input:focus-visible {
   width: 28px;
   height: 28px;
   border-radius: 8px;
-  background: var(--red);
-  color: var(--surface);
+  background: var(--action);
+  color: var(--on-action);
   display: grid;
   place-items: center;
   font-size: var(--font-caption);
@@ -176,7 +153,7 @@ input:focus-visible {
   font-size: var(--font-caption);
   letter-spacing: 0.13em;
   text-transform: uppercase;
-  color: var(--red);
+  color: var(--action);
   font-weight: 900;
 }
 .hero-title {
@@ -192,17 +169,17 @@ input:focus-visible {
   max-width: 650px;
 }
 .brief {
-  background: var(--navy);
-  color: var(--surface);
+  background: var(--ink);
+  color: var(--on-select);
   padding: var(--legacy-space-11);
   border-radius: 18px;
   margin: 26px 0;
-  box-shadow: var(--legacy-shadow);
+  box-shadow: 3px 3px 0 var(--shadow);
 }
 .brief h2 {
   font-size: 17px;
   margin: 0 0 var(--legacy-space-6);
-  /* Keeps the light card colour now that base.css gives headings --ink. */
+  /* Keeps the light panel colour now that base.css gives headings --ink. */
   color: inherit;
 }
 .brief-grid {
@@ -211,7 +188,7 @@ input:focus-visible {
   gap: var(--legacy-space-5);
 }
 .brief-stat {
-  border-left: 1px solid var(--on-dark-border);
+  border-left: 1px solid var(--on-ink-border);
   padding-left: var(--legacy-space-6);
 }
 .brief-stat:first-child {
@@ -224,7 +201,7 @@ input:focus-visible {
 }
 .brief-stat span {
   font-size: var(--font-caption);
-  color: var(--brief-muted);
+  color: var(--on-ink-meta);
 }
 .choice-title {
   font-family: var(--font-display);
@@ -246,8 +223,9 @@ input:focus-visible {
   align-items: flex-start;
 }
 .choice.selected {
-  border-color: var(--red);
-  box-shadow: 0 0 0 2px var(--selection-halo);
+  border-color: var(--select);
+  box-shadow: inset 0 0 0 1px var(--select);
+  background: var(--surface-selected);
 }
 .choice b {
   display: block;
@@ -266,20 +244,20 @@ input:focus-visible {
   flex: 0 0 auto;
 }
 .selected .radio {
-  border: 5px solid var(--red);
+  border: 5px solid var(--select);
 }
 .primary {
   font-family: var(--font-display);
   border: 0;
   border-radius: 12px;
-  background: var(--red);
-  color: var(--surface);
+  background: var(--action);
+  color: var(--on-action);
   padding: var(--legacy-space-7) var(--legacy-space-9);
   font-weight: 850;
-  box-shadow: 0 8px 18px var(--red-shadow);
+  box-shadow: 3px 3px 0 var(--shadow);
 }
 .primary:hover {
-  background: var(--red-dark);
+  background: var(--action-strong);
 }
 .game-actions {
   display: flex;
@@ -385,9 +363,9 @@ input:focus-visible {
   color: var(--ink-soft);
 }
 .chip.active {
-  background: var(--navy);
-  color: var(--surface);
-  border-color: var(--navy);
+  background: var(--action);
+  color: var(--on-action);
+  border-color: var(--action);
 }
 .sort {
   height: 38px;
@@ -427,11 +405,12 @@ input:focus-visible {
   transition: 0.18s;
 }
 .player.selected {
-  border-color: var(--red);
-  box-shadow: inset 4px 0 var(--red);
+  border-color: var(--select);
+  box-shadow: inset 4px 0 var(--select);
+  background: var(--surface-selected);
 }
 .player.compare-on {
-  outline: 2px solid var(--navy);
+  outline: 2px solid var(--ink);
 }
 .player-top {
   display: flex;
@@ -483,8 +462,8 @@ input:focus-visible {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: var(--navy);
-  color: var(--surface);
+  background: var(--ink);
+  color: var(--on-select);
   font-weight: 900;
   font-size: 17px;
 }
@@ -510,7 +489,7 @@ input:focus-visible {
 .bar i {
   display: block;
   height: 100%;
-  background: var(--green);
+  background: var(--good);
 }
 .player-actions {
   grid-column: 1/-1;
@@ -528,9 +507,9 @@ input:focus-visible {
   font-weight: 800;
 }
 .selected .select-btn {
-  background: var(--red);
-  color: var(--surface);
-  border-color: var(--red);
+  background: var(--select);
+  color: var(--on-select);
+  border-color: var(--select);
 }
 .compare-btn {
   color: var(--ink-soft);
@@ -545,7 +524,7 @@ input:focus-visible {
   border-top: 1px solid var(--board-line);
   padding: var(--legacy-space-5) var(--legacy-space-7)
     calc(var(--legacy-space-5) + env(safe-area-inset-bottom));
-  box-shadow: 0 -10px 30px var(--shadow-color);
+  box-shadow: 0 -4px 0 var(--shadow);
 }
 .dock-inner {
   max-width: 1180px;
@@ -559,7 +538,7 @@ input:focus-visible {
   height: 48px;
   border-radius: 50%;
   background: conic-gradient(
-    var(--red) var(--progress, 0%),
+    var(--select) var(--progress, 0%),
     var(--board-deep) 0
   );
   display: grid;
@@ -596,8 +575,8 @@ input:focus-visible {
 }
 .finalize {
   border: 0;
-  background: var(--navy);
-  color: var(--surface);
+  background: var(--good);
+  color: var(--on-good);
   border-radius: 11px;
   padding: var(--legacy-space-6) 15px;
   font-weight: 850;
@@ -610,7 +589,7 @@ input:focus-visible {
   position: fixed;
   inset: 0;
   z-index: 50;
-  background: var(--dialog-backdrop);
+  background: var(--scrim);
   display: grid;
   place-items: end center;
   padding: 0;
@@ -678,7 +657,7 @@ input:focus-visible {
   font-size: var(--font-caption);
 }
 .better {
-  color: var(--green);
+  color: var(--good);
   font-weight: 900;
 }
 .close {
@@ -693,8 +672,8 @@ input:focus-visible {
   margin: auto;
 }
 .result-hero {
-  background: var(--navy);
-  color: var(--surface);
+  background: var(--ink);
+  color: var(--on-select);
   border-radius: 20px;
   padding: var(--legacy-space-12);
 }
@@ -712,7 +691,7 @@ input:focus-visible {
   color: inherit;
 }
 .result-hero p {
-  color: var(--text-soft);
+  color: var(--on-ink-lead);
 }
 .outcomes {
   display: grid;
@@ -850,7 +829,7 @@ input:focus-visible {
   padding: 9px var(--legacy-space-5);
   font-size: var(--font-small);
   font-weight: 800;
-  color: var(--navy);
+  color: var(--ink);
 }
 .dock-copy {
   border: 0;
@@ -869,11 +848,11 @@ input:focus-visible {
   left: 12px;
   right: 12px;
   bottom: 76px;
-  background: var(--navy);
-  color: var(--surface);
+  background: var(--ink);
+  color: var(--on-select);
   border-radius: 15px;
   padding: 13px;
-  box-shadow: var(--legacy-shadow);
+  box-shadow: 3px 3px 0 var(--shadow);
   display: grid;
   grid-template-columns: 1fr 1.25fr;
   gap: var(--legacy-space-5);
@@ -887,7 +866,7 @@ input:focus-visible {
   gap: var(--legacy-space-3);
 }
 .dock-summary div {
-  background: var(--on-dark-surface);
+  background: var(--ink-tile);
   border: 1px solid transparent;
   border-radius: 9px;
   padding: 7px 9px;
@@ -902,7 +881,7 @@ input:focus-visible {
   display: block;
   font-size: var(--font-caption);
   font-weight: 800;
-  color: var(--success-soft);
+  color: var(--on-ink-lead);
 }
 .dock-summary .need span,
 .dock-summary .over span {
@@ -915,7 +894,7 @@ input:focus-visible {
 }
 .dock-breakdown small {
   display: block;
-  color: var(--text-on-navy);
+  color: var(--on-ink-dim);
 }
 .dock-breakdown b {
   font-size: var(--font-small);
@@ -980,7 +959,7 @@ input:focus-visible {
   border: 3px solid var(--select);
   border-radius: 50%;
   background: var(--surface);
-  color: var(--navy);
+  color: var(--ink);
   display: grid;
   place-items: center;
   font-weight: 950;
@@ -1043,8 +1022,8 @@ input:focus-visible {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: var(--navy);
-  color: var(--surface);
+  background: var(--ink);
+  color: var(--on-select);
   font-size: 24px;
   font-weight: 950;
 }
@@ -1130,42 +1109,6 @@ input:focus-visible {
   --legacy-space-13: 30px;
   --space-small: 0.5rem;
   --space-medium: 0.875rem;
-  --surface-track: #e9ebef;
-  --text-soft: #ced6e1;
-  --red-soft: #ff9caa;
-  --control-background: #f4f6f8;
-  --lead-text: #505764;
-  --position-text: #333b48;
-  --dialog-text: #545b67;
-  --warning-text: #87520b;
-  --warning-surface: #fff2df;
-  --squad-surface: #eff1f4;
-  --warning-border: #f3b65e;
-  --success-soft: #9fe3c9;
-  --warning-soft: #ffd698;
-  --text-on-navy: #bdc8d7;
-  --pitch-background: #176743;
-  --pitch-marker: #ff8b98;
-  --pitch-warning-surface: #fff0d7;
-  --pitch-warning-muted: #805019;
-  --pitch-warning-arrow: #8b4e00;
-  --pitch-warning-text: #4f3006;
-  --warning-panel: #fff0d8;
-  --warning-panel-text: #4b2c00;
-  --radio-border: #a9aeb8;
-  --brief-muted: #c8d0dc;
-  --topbar-background: rgba(255, 255, 255, 0.94);
-  --selection-halo: rgba(201, 25, 45, 0.1);
-  --red-shadow: rgba(201, 25, 45, 0.2);
-  --on-dark-border: rgba(255, 255, 255, 0.22);
-  --dialog-backdrop: rgba(8, 13, 20, 0.66);
-  --shadow-color: rgba(17, 21, 28, 0.09);
-  --node-outline: rgba(17, 21, 28, 0.28);
-  --node-shadow: rgba(0, 0, 0, 0.2);
-  --on-dark-surface: rgba(255, 255, 255, 0.09);
-  --warning-overlay: rgba(243, 182, 94, 0.13);
-  --pitch-outline: rgba(255, 255, 255, 0.65);
-  --pitch-divider: rgba(255, 255, 255, 0.55);
 }
 body {
   font-family: var(--font-body);
@@ -1199,13 +1142,13 @@ body {
   background: var(--board-deep);
 }
 .metric progress::-webkit-progress-value {
-  background: var(--green);
+  background: var(--good);
 }
 .metric progress::-moz-progress-bar {
-  background: var(--green);
+  background: var(--good);
 }
 .result-eyebrow {
-  color: var(--red-soft);
+  color: var(--on-ink-eyebrow);
 }
 .compare-select {
   width: 100%;

@@ -26,6 +26,8 @@
   --text-4xl: 3.125rem;
   /* Form fields on touch screens: 16 px in every case, so iOS Safari does not zoom on focus. */
   --text-control: 1rem;
+  /* Squad count in the count ring: the mockup's --text-sm, set to --text-xs for this pair. */
+  --ring-count-size: var(--text-xs);
 
   /* Colours: the bialo-czerwona palette of docs/mockups/tactics-board.html (base :root with
      the :root[data-palette="bialo-czerwona"] block applied on top). */
@@ -110,6 +112,7 @@
   --ease-emphasized: cubic-bezier(0.3, 0, 0.1, 1);
 
   /* Layout and safe areas */
+  --topbar-height: 56px;
   --button-primary-size: var(--text-base);
   --cta-min-width: 240px;
   --scrollbar-thumb: var(--frame-soft);
