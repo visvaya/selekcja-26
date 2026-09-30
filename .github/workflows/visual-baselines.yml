@@ -11,11 +11,15 @@ permissions:
   contents: read
 
 jobs:
-  baselines:
+  playwright-image:
     if: github.event_name == 'workflow_dispatch' || github.event.label.name == 'update-screenshots'
+    uses: ./.github/workflows/playwright-image.yml
+
+  baselines:
+    needs: playwright-image
     # Same image as ci.yml, so baselines render with the fonts the journeys see.
     container:
-      image: mcr.microsoft.com/playwright:v1.63.0-noble@sha256:eff16c30e6f3f4af0a03fa4b706120d5e9b0891c344a27d64559aff5900a4a27
+      image: ${{ needs.playwright-image.outputs.image }}
       options: --user 1001
     runs-on: ubuntu-24.04
     timeout-minutes: 20
