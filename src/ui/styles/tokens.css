@@ -1,7 +1,6 @@
-/* Design tokens of the tactics board redesign. Stage 1 adds the font pair and the type scale
-   (docs/superpowers/specs/redesign/01-global-tokens.md, section 1.2); stage 2 adds colours,
-   spacing, radius, shadows and motion. The current stylesheet keeps its own sizes until the
-   screen stages replace its rules. */
+/* Design tokens of the tactics board redesign. Stage 1 adds the font pair and the type scale;
+   stage 2 adds colours, spacing, radius, shadows and motion. The current stylesheet keeps its
+   own sizes until the screen stages replace its rules. */
 :root {
   /* Web font, then its metric-matched local fallback (fonts.css), then the system face. */
   --font-display:
@@ -29,8 +28,8 @@
   /* Squad count in the count ring: the mockup's --text-sm, set to --text-xs for this pair. */
   --ring-count-size: var(--text-xs);
 
-  /* Colours: the bialo-czerwona palette of docs/mockups/tactics-board.html (base :root with
-     the :root[data-palette="bialo-czerwona"] block applied on top). */
+  /* Colours: the bialo-czerwona palette of the tactics board design (the base palette with
+     the bialo-czerwona overrides applied on top). */
   /* Surfaces and ink */
   --ink: oklch(0.22 0.015 40);
   --ink-soft: oklch(0.4 0.015 40);

@@ -1,4 +1,4 @@
-// Enforces the repository conventions from AGENTS.md that a linter cannot express:
+// Enforces the repository conventions that a linter cannot express:
 // - file names in kebab-case (tool-mandated names excepted),
 // - no classes in src/ except Error subclasses and a React error boundary,
 // - CSS colors only as tokens inside :root blocks,
