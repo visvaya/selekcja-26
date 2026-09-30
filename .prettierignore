@@ -5,5 +5,4 @@ test-results/
 playwright-report/
 blob-report/
 src/logic/golden/traces/
-docs/selekcja_moj-notatnik.md
 .superpowers/
