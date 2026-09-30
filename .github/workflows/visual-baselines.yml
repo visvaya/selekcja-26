@@ -27,11 +27,6 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Font diagnostics (temporary)
-        run: |
-          export FONTCONFIG_FILE="$PWD/e2e/fonts.conf"
-          for f in sans-serif "sans-serif:bold" sans system-ui Inter Arial; do echo "$f -> $(fc-match "$f")"; done
-          fc-list : family file
       - name: Regenerate baselines
         env:
           CI: "1"
