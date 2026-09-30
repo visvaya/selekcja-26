@@ -45,11 +45,10 @@ A saved game can be discarded by opening the game with `?reset` added to its add
 | `src/logic/` | state reducer, selection, scoring, tournament, randomness, saving |
 | `src/ui/`    | React components, all Polish copy, styles                         |
 | `e2e/`       | Playwright journeys                                               |
-| `docs/`      | internal notes, known debt and decisions                          |
 
 ## Contributing
 
-[AGENTS.md](AGENTS.md) (in Polish) describes the architecture, the game rules that change only with the owner's approval, and the change checklist. [docs/future-scope.md](docs/future-scope.md) lists known technical debt, the recommended order of work and open product decisions. Commits follow Conventional Commits; the hooks in `.githooks/` check this automatically.
+Commits follow Conventional Commits; the hooks in `.githooks/` check this automatically, and `pnpm verify:full` is the gate every change passes before it reaches `main`. Security issues: see [SECURITY.md](SECURITY.md).
 
 ## Fiction and facts
 

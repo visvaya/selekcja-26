@@ -10,7 +10,7 @@
 //   - a known failure's ratio now meets its required ratio (the map entry
 //     is stale and must be removed).
 // Known failures are left for the
-// planned visual redesign (docs/future-scope.md).
+// planned visual redesign.
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
