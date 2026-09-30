@@ -17,6 +17,7 @@ const TOOL_MANDATED_NAMES = new Set([
   "LICENSE",
   "SECURITY.md",
   "_headers",
+  "Dockerfile",
 ]);
 const KEBAB_CASE = /^\.?[a-z0-9]+(?:[.-][a-z0-9]+)*$/;
 const CLASS_DECLARATION = /\bclass\s+[A-Za-z_$][\w$]*/;
