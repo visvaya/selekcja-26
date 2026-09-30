@@ -2,7 +2,7 @@
 
 A browser game about picking Poland's national squad for EURO 2028. The player, as head coach, narrows 61 real Polish footballers to a 23-player test camp and then to a 26-player tournament squad; a seeded simulation plays out the tournament. The game interface is in Polish.
 
-The game runs in any modern browser on a phone or a desktop and builds to a static site. A public hosted version is not available yet; run it locally as described below.
+**[Play in the browser](https://selekcja-26.visvaya.workers.dev)** on a phone or a desktop, no installation needed. Progress is saved on the device. The game builds to a static site served by Cloudflare Workers; every change to `main` is deployed only after the full test gate passes.
 
 ## Gameplay
 
