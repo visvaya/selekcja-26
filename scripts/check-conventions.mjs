@@ -15,6 +15,8 @@ const TOOL_MANDATED_NAMES = new Set([
   "CLAUDE.md",
   "SKILL.md",
   "LICENSE",
+  "SECURITY.md",
+  "_headers",
 ]);
 const KEBAB_CASE = /^\.?[a-z0-9]+(?:[.-][a-z0-9]+)*$/;
 const CLASS_DECLARATION = /\bclass\s+[A-Za-z_$][\w$]*/;
