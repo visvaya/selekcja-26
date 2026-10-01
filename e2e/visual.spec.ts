@@ -53,9 +53,19 @@ for (const size of SIZES) {
         name: text.changelogTitle,
       });
       await expect(changelog).toBeVisible();
-      await page.addStyleTag({
-        content: ".changelog > :not(h2) { display: none !important; }",
-      });
+      // Hidden through element.style rather than an injected <style> tag, which the production
+      // Content-Security-Policy (style-src 'self', sent by vite preview) blocks.
+      await page
+        .locator(".changelog > :not(h2)")
+        .evaluateAll((elements) =>
+          elements.forEach((element) =>
+            (element as HTMLElement).style.setProperty(
+              "display",
+              "none",
+              "important",
+            ),
+          ),
+        );
       await shot(page, `${size.name}-start`, {
         fullPage: true,
         mask: [changelog],

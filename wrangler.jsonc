@@ -1,0 +1,10 @@
+// Cloudflare Workers static assets: the Vite build is served as is, with no Worker script.
+// Response headers live in public/_headers, which Vite copies into dist/.
+// Deployed only by CI after the full gate passes (.github/workflows/ci.yml).
+{
+  "name": "selekcja-26",
+  "compatibility_date": "2026-09-30",
+  "assets": {
+    "directory": "./dist",
+  },
+}

@@ -4,6 +4,17 @@ version: 2
 # Security updates are not grouped here: they arrive on their own as soon as
 # an advisory lands, independent of this schedule. `cooldown` waits a week
 # after a version is published before proposing it.
+#
+# @playwright/test and the Playwright image the browser jobs run in
+# (.github/playwright/Dockerfile) must move together, so they share one
+# multi-ecosystem group and the regular npm entry ignores the package.
+multi-ecosystem-groups:
+  playwright:
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: Europe/Warsaw
+
 updates:
   - package-ecosystem: npm
     directory: /
@@ -18,6 +29,8 @@ updates:
       prefix: build
       prefix-development: build
       include: scope
+    ignore:
+      - dependency-name: "@playwright/test"
     groups:
       production-minor-patch:
         dependency-type: production
@@ -42,3 +55,15 @@ updates:
     groups:
       actions:
         patterns: ["*"]
+  - package-ecosystem: npm
+    directory: /
+    patterns: ["@playwright/test"]
+    multi-ecosystem-group: playwright
+    cooldown:
+      default-days: 7
+  - package-ecosystem: docker
+    directory: /.github/playwright
+    patterns: ["*"]
+    multi-ecosystem-group: playwright
+    cooldown:
+      default-days: 7

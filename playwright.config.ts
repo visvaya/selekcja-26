@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import { defineConfig, devices } from "@playwright/test";
 
 const PORT = 5179;
@@ -13,6 +14,20 @@ const visualProject = {
   use: { ...devices["Desktop Chrome"] },
 };
 const runVisual = Boolean(process.env.CI || process.env.VISUAL);
+
+// On Linux (the CI image) the browsers get e2e/fonts.conf, so generic sans-serif text renders in
+// a face with bold and Polish letters. Other systems keep their own font setup.
+const linuxFontLaunchOptions =
+  process.platform === "linux"
+    ? {
+        env: {
+          ...process.env,
+          FONTCONFIG_FILE: fileURLToPath(
+            new URL("./e2e/fonts.conf", import.meta.url),
+          ),
+        },
+      }
+    : {};
 
 export default defineConfig({
   testDir: "e2e",
@@ -32,6 +47,7 @@ export default defineConfig({
     screenshot: "only-on-failure",
     // Animations add timing noise; the reduced-motion path is the one under test.
     contextOptions: { reducedMotion: "reduce" },
+    launchOptions: linuxFontLaunchOptions,
   },
   projects: [
     {
