@@ -117,9 +117,7 @@ export interface GameState {
   selected: Set<PlayerId>;
   campSquad: Set<PlayerId>;
   trial: Record<PlayerId, TrialReport>;
-  filter: "ALL" | DetailedPosition;
-  query: string;
-  sort: SortId;
+  list: ListFilters;
   events: Set<string>;
   effects: Effects;
   compare: PlayerId[];
@@ -128,7 +126,36 @@ export interface GameState {
   history: GameSnapshot[];
 }
 
-export type GameSnapshot = Omit<GameState, "history">;
+export type GameSnapshot = Omit<GameState, "history" | "list">;
+
+export type RangeId =
+  | "age"
+  | "score"
+  | "quality"
+  | "form"
+  | "fitness"
+  | "tactics"
+  | "experience"
+  | "chemistry"
+  | "groupImpact"
+  | "campImpact";
+
+export interface RangeBounds {
+  min: number | null;
+  max: number | null;
+}
+
+// Player list view settings. They are saved with the game but never recorded as undo steps.
+export interface ListFilters {
+  positions: DetailedPosition[]; // empty = every position; several = any of them
+  query: string;
+  sort: SortId;
+  foot: { left: boolean; right: boolean };
+  traits: RoleId[]; // a player must have every listed trait
+  ranges: Partial<Record<RangeId, RangeBounds>>;
+  onlySelected: boolean;
+  onlyCamp: boolean;
+}
 
 export type SortId =
   | "model"

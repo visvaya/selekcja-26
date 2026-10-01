@@ -1,4 +1,4 @@
-// Save format: encodes GameState as schema version 3 and decodes every supported version.
+// Save format: encodes GameState as schema version 4 and decodes every supported version.
 // Anything that does not validate decodes to null, and the game starts fresh.
 import {
   players,
@@ -11,10 +11,16 @@ import { EVENTS } from "../data/events.ts";
 import type {
   GameSnapshot,
   GameState,
+  ListFilters,
+  RangeId,
   SortId,
   FinalReport,
 } from "../data/types.ts";
-import { LEGACY_RULES_REVISION, migrateLegacyState } from "./save-migration.ts";
+import {
+  LEGACY_RULES_REVISION,
+  migrateLegacyState,
+  migrateV3State,
+} from "./save-migration.ts";
 import { trialNote } from "./scoring.ts";
 
 type RawRecord = Record<string, unknown>;
@@ -23,7 +29,22 @@ const PLAYER_IDS = new Set(players.map((player) => player.id));
 const SYSTEM_IDS = new Set<unknown>(systems.map((system) => system.id));
 const PRIORITY_IDS = new Set<unknown>(priorities);
 const EVENT_IDS = new Set<unknown>(EVENTS.map((event) => event.id));
-const FILTERS = new Set<unknown>(["ALL", ...Object.keys(positionOrder)]);
+const POSITIONS = new Set<unknown>(Object.keys(positionOrder));
+const ROLE_IDS = new Set<unknown>(players.flatMap((player) => player.roles));
+const RANGE_IDS = new Set<string>(
+  Object.keys({
+    age: 0,
+    score: 0,
+    quality: 0,
+    form: 0,
+    fitness: 0,
+    tactics: 0,
+    experience: 0,
+    chemistry: 0,
+    groupImpact: 0,
+    campImpact: 0,
+  } satisfies Record<RangeId, 0>),
+);
 const SORT_IDS = new Set<unknown>(
   Object.keys({
     model: 0,
@@ -97,9 +118,6 @@ function isSnapshot(value: unknown): value is GameSnapshot {
     isPlayerIdArray(value.selected) &&
     isPlayerIdArray(value.campSquad) &&
     isTrial(value.trial) &&
-    FILTERS.has(value.filter) &&
-    typeof value.query === "string" &&
-    SORT_IDS.has(value.sort) &&
     isStringArray(value.events) &&
     value.events.every((id) => EVENT_IDS.has(id)) &&
     isRecord(effects) &&
@@ -110,6 +128,58 @@ function isSnapshot(value: unknown): value is GameSnapshot {
     isNumber(value.seed) &&
     (value.report === null || isReport(value.report))
   );
+}
+
+const isBound = (value: unknown): boolean => value === null || isNumber(value);
+
+function isRanges(value: unknown): boolean {
+  return (
+    isRecord(value) &&
+    Object.entries(value).every(
+      ([id, bounds]) =>
+        RANGE_IDS.has(id) &&
+        isRecord(bounds) &&
+        isBound(bounds.min) &&
+        isBound(bounds.max),
+    )
+  );
+}
+
+function isListFilters(value: unknown): value is ListFilters {
+  if (!isRecord(value)) return false;
+  const foot = value.foot;
+  return (
+    Array.isArray(value.positions) &&
+    value.positions.every((position) => POSITIONS.has(position)) &&
+    typeof value.query === "string" &&
+    SORT_IDS.has(value.sort) &&
+    isRecord(foot) &&
+    typeof foot.left === "boolean" &&
+    typeof foot.right === "boolean" &&
+    Array.isArray(value.traits) &&
+    value.traits.every((trait) => ROLE_IDS.has(trait)) &&
+    isRanges(value.ranges) &&
+    typeof value.onlySelected === "boolean" &&
+    typeof value.onlyCamp === "boolean"
+  );
+}
+
+function restoreList(value: ListFilters): ListFilters {
+  return {
+    positions: [...value.positions],
+    query: value.query,
+    sort: value.sort,
+    foot: { left: value.foot.left, right: value.foot.right },
+    traits: [...value.traits],
+    ranges: Object.fromEntries(
+      Object.entries(value.ranges).map(([id, bounds]) => [
+        id,
+        { min: bounds.min, max: bounds.max },
+      ]),
+    ),
+    onlySelected: value.onlySelected,
+    onlyCamp: value.onlyCamp,
+  };
 }
 
 // note is derived purely from delta (see trialNote); it is never trusted from the save, so it
@@ -134,7 +204,7 @@ function restoreSnapshot(value: GameSnapshot): GameSnapshot {
 }
 
 function serializeSnapshot(value: GameSnapshot) {
-  const { history: _history, ...snapshot } = value as GameState;
+  const { history: _history, list: _list, ...snapshot } = value as GameState;
   return {
     ...snapshot,
     selected: [...snapshot.selected],
@@ -149,6 +219,7 @@ export function encodeSave(state: GameState): string {
     rulesRevision: RULES_REVISION,
     state: {
       ...serializeSnapshot(state),
+      list: state.list,
       history: state.history.map(serializeSnapshot),
     },
   });
@@ -162,12 +233,19 @@ export interface LoadedSave {
 
 const EMPTY: LoadedSave = { state: null, discardedForRulesChange: false };
 
-// Returns the state in the version 3 shape with the rules revision it was saved under.
+// Returns the state in the version 4 shape with the rules revision it was saved under.
 function upgrade(saved: RawRecord): { state: unknown; rulesRevision: unknown } {
   if (saved.schemaVersion === 1 || saved.schemaVersion === 2)
     return {
-      state: migrateLegacyState(saved.state, saved.schemaVersion),
+      state: migrateV3State(
+        migrateLegacyState(saved.state, saved.schemaVersion),
+      ),
       rulesRevision: LEGACY_RULES_REVISION,
+    };
+  if (saved.schemaVersion === 3)
+    return {
+      state: migrateV3State(saved.state),
+      rulesRevision: saved.rulesRevision,
     };
   return saved.schemaVersion === APP_CONFIG.saveSchemaVersion
     ? { state: saved.state, rulesRevision: saved.rulesRevision }
@@ -176,7 +254,8 @@ function upgrade(saved: RawRecord): { state: unknown; rulesRevision: unknown } {
 
 function restoreState(state: unknown): GameState | null {
   if (!isSnapshot(state)) return null;
-  const history = (state as unknown as RawRecord).history;
+  const { history, list } = state as unknown as RawRecord;
+  if (!isListFilters(list)) return null;
   if (
     !Array.isArray(history) ||
     history.length > GAME_RULES.undoHistoryLimitActions ||
@@ -185,6 +264,7 @@ function restoreState(state: unknown): GameState | null {
     return null;
   return {
     ...restoreSnapshot(state),
+    list: restoreList(list),
     history: history.map(restoreSnapshot),
   };
 }

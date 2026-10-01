@@ -51,6 +51,34 @@ function v3Snapshot(
   };
 }
 
+// A minimal unfinished version 4 save state for the running rules, with list settings that
+// default to an unfiltered list unless overridden.
+export function v4State(
+  list: Record<string, unknown> = {},
+): Record<string, unknown> {
+  const {
+    filter: _filter,
+    query: _query,
+    sort: _sort,
+    ...snapshot
+  } = v3Snapshot();
+  return {
+    ...snapshot,
+    list: {
+      positions: [],
+      query: "",
+      sort: "model",
+      foot: { left: false, right: false },
+      traits: [],
+      ranges: {},
+      onlySelected: false,
+      onlyCamp: false,
+      ...list,
+    },
+    history: [],
+  };
+}
+
 // An unfinished version 3 save whose rulesRevision does not match the running build, so it gets
 // discarded on load with the "rules changed" notice. Shared by the storage test and the axe scan.
 export function unfinishedOtherRulesSave(): string {

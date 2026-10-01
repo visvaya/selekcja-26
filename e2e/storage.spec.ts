@@ -16,6 +16,7 @@ import {
   squadCount,
   text,
   unfinishedOtherRulesSave,
+  v4State,
 } from "./helpers.ts";
 
 test("a version 1 save is migrated without undo history", async ({ page }) => {
@@ -75,7 +76,7 @@ test("a version 1 save is migrated without undo history", async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-test("a version 2 save loads into the final stage and rewrites to version 3", async ({
+test("a version 2 save loads into the final stage and rewrites to the current version", async ({
   page,
 }) => {
   const errors = collectPageErrors(page);
@@ -159,7 +160,7 @@ test("a version 2 save loads into the final stage and rewrites to version 3", as
         STORAGE_KEY,
       ),
     )
-    .toBe(3);
+    .toBe(APP_CONFIG.saveSchemaVersion);
   const saved = await page.evaluate(
     (key) => JSON.parse(localStorage.getItem(key) ?? "{}"),
     STORAGE_KEY,
@@ -293,7 +294,7 @@ test("a quota-exceeded save shows a retry banner and recovers", async ({
   await expect(saveAlert(page)).toHaveText("");
   await expect(saveStatusRegion(page)).toHaveText(text.save.recovered);
 
-  await expectSavedSchemaVersion(page, 3);
+  await expectSavedSchemaVersion(page, APP_CONFIG.saveSchemaVersion);
 
   await page.reload();
   await expect(
@@ -351,5 +352,29 @@ test("unavailable storage shows a dismissible banner and keeps the game playable
   await page.getByRole("button", { name: text.autoFill }).click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await expect(saveAlert(page)).toHaveText("");
+  expect(errors).toEqual([]);
+});
+
+test("a version 4 save restores the list position filter and search", async ({
+  page,
+}) => {
+  const errors = collectPageErrors(page);
+  await seedStorage(
+    page,
+    JSON.stringify({
+      schemaVersion: 4,
+      rulesRevision: RULES_REVISION,
+      state: v4State({ positions: ["LŚO"], query: "ki" }),
+    }),
+  );
+  await page.goto("/");
+  await expect(
+    page.getByRole("heading", { name: text.positions["LŚO"] }),
+  ).toBeVisible();
+  await expect(page.getByLabel(text.searchLabel)).toHaveValue("ki");
+  await expect(page.getByRole("button", { name: /^LŚO \(/ })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
   expect(errors).toEqual([]);
 });

@@ -151,7 +151,7 @@ export const APP_CONFIG = Object.freeze({
   // Saved games live under this key. Never rename it without a migration of existing saves.
   storageKey: "selekcja-26-game",
   // Shape of the saved game. Bump it only together with an explicit migration in src/logic.
-  saveSchemaVersion: 3,
+  saveSchemaVersion: 4,
   // Used when the browser offers no crypto source for a fresh game seed.
   fallbackSeed: 2028,
 });

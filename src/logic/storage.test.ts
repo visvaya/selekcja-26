@@ -3,6 +3,8 @@ import assert from "node:assert/strict";
 import { players } from "../data/catalog.ts";
 import { RULES_REVISION } from "../data/constants.ts";
 import { createInitialState, reduceGameState } from "./state.ts";
+import { decodeSave, encodeSave } from "./save-format.ts";
+import { migrateV3State } from "./save-migration.ts";
 import { clearGame, loadGame, saveGame } from "./storage.ts";
 
 const KEY = "selekcja-26-game";
@@ -65,7 +67,7 @@ test("state round-trips through the asynchronous storage adapter", async () => {
     });
     await saveGame(state);
     const saved = JSON.parse(values.get(KEY)!);
-    assert.equal(saved.schemaVersion, 3);
+    assert.equal(saved.schemaVersion, 4);
     assert.equal(saved.rulesRevision, RULES_REVISION);
     assert.deepEqual(saved.state.selected, ["robert-lewandowski"]);
     const restored = (await loadGame()).state;
@@ -119,8 +121,9 @@ test("a version 2 save keeps its undo history with stable IDs", async () => {
     const state = (await loadGame()).state;
     assert.ok(state);
     assert.equal(state.stage, "final");
-    assert.equal(state.filter, "LŚO");
-    assert.equal(state.query, "ki");
+    assert.deepEqual(state.list.positions, ["LŚO"]);
+    assert.equal(state.list.query, "ki");
+    assert.equal(state.list.sort, "form");
     assert.deepEqual([...state.selected], ["jakub-kiwior", "pawel-wszolek"]);
     assert.deepEqual(state.compare, ["kamil-grosicki", "jakub-kiwior"]);
     assert.deepEqual(Object.keys(state.trial), [
@@ -141,7 +144,7 @@ test("a version 2 save keeps its undo history with stable IDs", async () => {
 
     await saveGame(state);
     const rewritten = JSON.parse(values.get(KEY)!);
-    assert.equal(rewritten.schemaVersion, 3);
+    assert.equal(rewritten.schemaVersion, 4);
     assert.deepEqual(rewritten.state.campSquad, [
       "jakub-kiwior",
       "kamil-grosicki",
@@ -497,3 +500,98 @@ function addFailingLocalWrite(
     };
   };
 }
+
+const V3_STATE = `{"system":"3421","priority":"balance","stage":"final","started":true,"selected":["jakub-kiwior"],"campSquad":["jakub-kiwior","kamil-grosicki"],"trial":{"jakub-kiwior":{"delta":4,"note":"impressed"}},"filter":"LŚO","query":"ki","sort":"form","events":["doctor","captain","scout"],"effects":{"chem":0,"fit":4,"quality":1},"compare":[],"seed":4242,"report":null,"history":[{"system":"3421","priority":"balance","stage":"camp","started":true,"selected":[],"campSquad":[],"trial":{},"filter":"ALL","query":"","sort":"model","events":[],"effects":{"chem":0,"fit":0,"quality":0},"compare":[],"seed":4000,"report":null},{"system":"3421","priority":"balance","stage":"camp","started":true,"selected":["jakub-kiwior"],"campSquad":[],"trial":{},"filter":"OP","query":"x","sort":"name","events":[],"effects":{"chem":0,"fit":0,"quality":0},"compare":[],"seed":4001,"report":null}]}`;
+
+test("a version 4 save round-trips every list field", () => {
+  const state = reduceGameState(
+    reduceGameState(createInitialState(8), { type: "start" }),
+    {
+      type: "setList",
+      patch: {
+        positions: ["LS", "ŚO"],
+        query: "kam",
+        sort: "form",
+        foot: { left: true, right: false },
+        traits: ["pace", "winger"],
+        ranges: {
+          age: { min: 20, max: null },
+          campImpact: { min: null, max: 3 },
+        },
+        onlySelected: true,
+        onlyCamp: true,
+      },
+    },
+  );
+  const decoded = decodeSave(encodeSave(state));
+  assert.equal(decoded.discardedForRulesChange, false);
+  assert.deepEqual(decoded.state?.list, state.list);
+  const raw = JSON.parse(encodeSave(state));
+  assert.equal(raw.schemaVersion, 4);
+  assert.equal(raw.state.history.length, 1);
+  assert.equal("list" in raw.state.history[0], false);
+});
+
+test("migrateV3State moves filter, query and sort into list", () => {
+  const migrated = migrateV3State(JSON.parse(V3_STATE)) as Record<
+    string,
+    unknown
+  >;
+  assert.deepEqual(migrated.list, {
+    positions: ["LŚO"],
+    query: "ki",
+    sort: "form",
+    foot: { left: false, right: false },
+    traits: [],
+    ranges: {},
+    onlySelected: false,
+    onlyCamp: false,
+  });
+  for (const key of ["filter", "query", "sort"])
+    assert.equal(key in migrated, false, key);
+  const history = migrated.history as Record<string, unknown>[];
+  assert.equal(history.length, 2);
+  for (const snapshot of history)
+    for (const key of ["filter", "query", "sort", "list"])
+      assert.equal(key in snapshot, false, key);
+  assert.deepEqual(
+    (
+      migrateV3State({ ...JSON.parse(V3_STATE), filter: "ALL" }) as {
+        list: { positions: string[] };
+      }
+    ).list.positions,
+    [],
+  );
+});
+
+test("migrateV3State passes malformed input through for validation", () => {
+  assert.equal(migrateV3State("x"), null);
+  const noHistory = migrateV3State({ filter: "ALL", history: "nope" }) as {
+    history: unknown;
+  };
+  assert.equal(noHistory.history, "nope");
+});
+
+test("a version 4 save with an invalid list is rejected", () => {
+  const valid = JSON.parse(
+    encodeSave(reduceGameState(createInitialState(9), { type: "start" })),
+  );
+  const broken = [
+    { positions: ["XX"] },
+    { ranges: { age: { min: "30", max: null } } },
+    { ranges: { height: { min: 1, max: null } } },
+    { traits: ["flying"] },
+    { onlySelected: "yes" },
+  ];
+  for (const patch of broken) {
+    const raw = JSON.stringify({
+      ...valid,
+      state: { ...valid.state, list: { ...valid.state.list, ...patch } },
+    });
+    assert.deepEqual(
+      decodeSave(raw),
+      { state: null, discardedForRulesChange: false },
+      JSON.stringify(patch),
+    );
+  }
+});

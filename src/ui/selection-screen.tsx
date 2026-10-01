@@ -5,12 +5,12 @@ import type {
   PlayerId,
   SortId,
 } from "../data/types.ts";
+import { visiblePlayers } from "../logic/list-filters.ts";
 import {
   detailedCounts,
   riskLevel,
   selectedPlayers,
   squadLimit,
-  visiblePlayers,
 } from "../logic/selection.ts";
 import { PlayerCard } from "./player-card.tsx";
 import { UI_TEXT as text } from "./text.ts";
@@ -61,6 +61,14 @@ export function SelectionScreen({
   const selected = selectedPlayers(state);
   const detailed = detailedCounts(state);
   const risk = riskLevel(state);
+  // The chip row shows a single position at most; several positions press no chip.
+  const positions = state.list.positions;
+  const activeFilter: "ALL" | DetailedPosition | null =
+    positions.length === 0
+      ? "ALL"
+      : positions.length === 1
+        ? positions[0]!
+        : null;
   return (
     <section>
       <div className="game-head">
@@ -120,7 +128,7 @@ export function SelectionScreen({
         <input
           className="search"
           type="search"
-          value={state.query}
+          value={state.list.query}
           onChange={(event) => onQuery(event.target.value)}
           placeholder={text.searchPlaceholder}
           aria-label={text.searchLabel}
@@ -128,8 +136,8 @@ export function SelectionScreen({
         <div className="filters" aria-label={text.filterLabel}>
           {filterPositions.map((position) => (
             <button
-              className={`chip ${state.filter === position ? "active" : ""}`}
-              aria-pressed={state.filter === position}
+              className={`chip ${activeFilter === position ? "active" : ""}`}
+              aria-pressed={activeFilter === position}
               key={position}
               title={
                 position === "ALL" ? text.filtersAll : text.positions[position]
@@ -144,14 +152,14 @@ export function SelectionScreen({
       </div>
       <div className="section-label">
         <h2>
-          {state.filter === "ALL"
+          {activeFilter === "ALL" || activeFilter === null
             ? text.allCandidates
-            : text.positions[state.filter]}
+            : text.positions[activeFilter]}
         </h2>
         <select
           className="sort"
           aria-label={text.sortLabel}
-          value={state.sort}
+          value={state.list.sort}
           onChange={(event) => onSort(event.target.value as SortId)}
         >
           {(Object.keys(text.sort) as SortId[]).map((sort) => (

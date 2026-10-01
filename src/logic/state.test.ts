@@ -41,10 +41,30 @@ test("undo reverses one decision at a time without tracking search", () => {
     id: "A",
     limit: 23,
   });
-  const searched = reduceGameState(picked, { type: "setQuery", value: "A" });
+  const searched = reduceGameState(picked, {
+    type: "setList",
+    patch: { query: "A" },
+  });
   const reverted = reduceGameState(searched, { type: "undo" });
   assert.equal(reverted.selected.size, 0);
-  assert.equal(reverted.query, "A");
+  assert.equal(reverted.list.query, "A");
   assert.equal(reverted.started, true);
   assert.equal(reduceGameState(reverted, { type: "undo" }).started, false);
+});
+
+test("list filters stay outside undo history", () => {
+  const started = reduceGameState(createInitialState(1), { type: "start" });
+  const filtered = reduceGameState(started, {
+    type: "setList",
+    patch: { positions: ["LS"], traits: ["pace"], onlySelected: true },
+  });
+  assert.equal(filtered.history.length, started.history.length);
+  const picked = reduceGameState(filtered, {
+    type: "togglePlayer",
+    id: "robert-lewandowski",
+    limit: 23,
+  });
+  const undone = reduceGameState(picked, { type: "undo" });
+  assert.deepEqual(undone.list, filtered.list);
+  assert.equal(undone.selected.has("robert-lewandowski"), false);
 });
