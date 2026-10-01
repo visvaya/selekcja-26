@@ -22,6 +22,7 @@ async function renderProbe(defaultMatches: boolean) {
 test("useMediaQuery returns the default when matchMedia is missing", async () => {
   await withJsdomWindow(async () => {
     Reflect.set(globalThis, "IS_REACT_ACT_ENVIRONMENT", true);
+    assert.equal(typeof window.matchMedia, "undefined");
     const { seen, root, act } = await renderProbe(true);
     assert.equal(seen.at(-1), true);
     await act(async () => root.unmount());

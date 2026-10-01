@@ -61,3 +61,20 @@ test("placePopover: custom gap and edge", () => {
     { top: 128, left: 16, side: "below" },
   );
 });
+
+test("placePopover: an anchor off the left edge is clamped to the edge", () => {
+  const anchor = { top: 100, left: -40, width: 50, height: 24 };
+  assert.deepEqual(placePopover({ anchor, popover, viewport }), {
+    top: 132,
+    left: 8,
+    side: "below",
+  });
+});
+
+test("placePopover: a viewport narrower than the popover keeps it at the left edge", () => {
+  const anchor = { top: 100, left: 20, width: 50, height: 24 };
+  assert.deepEqual(
+    placePopover({ anchor, popover, viewport: { width: 180, height: 740 } }),
+    { top: 132, left: 8, side: "below" },
+  );
+});
