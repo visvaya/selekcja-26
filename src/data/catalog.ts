@@ -959,8 +959,8 @@ const positionOrder: Record<DetailedPosition, number> = {
   ŚP: 21,
   OP: 22,
   LS: 30,
-  N: 31,
-  PS: 32,
+  PS: 31,
+  N: 32,
 };
 
 export { systems, priorities, players, detailedPositionMap, positionOrder };

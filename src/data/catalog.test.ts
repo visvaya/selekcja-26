@@ -1,6 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { detailedPositionMap, players, systems } from "./catalog.ts";
+import {
+  detailedPositionMap,
+  players,
+  positionOrder,
+  systems,
+} from "./catalog.ts";
 import { UI_TEXT } from "../ui/text.ts";
 import type { DetailedPosition, GroupPosition } from "./types.ts";
 
@@ -79,4 +84,26 @@ test("role and availability IDs are English and all have Polish labels", () => {
   for (const player of players)
     if (player.flag)
       assert.ok(UI_TEXT.availabilityFlags[player.flag], player.flag);
+});
+
+test("positions are ordered by line, deeper first, wingers before the striker", () => {
+  const order = (Object.keys(positionOrder) as DetailedPosition[]).sort(
+    (a, b) => positionOrder[a] - positionOrder[b],
+  );
+  assert.deepEqual(order, [
+    "BR",
+    "LO",
+    "LŚO",
+    "ŚO",
+    "PŚO",
+    "PO",
+    "LWO",
+    "PWO",
+    "DP",
+    "ŚP",
+    "OP",
+    "LS",
+    "PS",
+    "N",
+  ]);
 });
