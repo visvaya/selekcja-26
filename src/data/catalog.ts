@@ -4,7 +4,6 @@ import type {
   GroupPosition,
   Player,
   PlayerId,
-  PriorityId,
   RoleId,
   System,
 } from "./types.ts";
@@ -59,7 +58,6 @@ const systems: System[] = [
     fits: ["BR", "LO", "LŚO", "ŚO", "PŚO", "PO", "DP", "ŚP", "LS", "PS", "N"],
   },
 ];
-const priorities: PriorityId[] = ["balance", "form", "quality"];
 // The first argument is the stable player ID stored in saves. It must never change; the display
 // name (second argument) may be corrected freely.
 const playerRecord = (
@@ -963,4 +961,4 @@ const positionOrder: Record<DetailedPosition, number> = {
   N: 32,
 };
 
-export { systems, priorities, players, detailedPositionMap, positionOrder };
+export { systems, players, detailedPositionMap, positionOrder };

@@ -24,7 +24,7 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
   ).toBeVisible();
   await expect(
     page.getByRole("button", {
-      name: new RegExp(text.priorities.balance.name),
+      name: new RegExp(text.systems["4231"].name),
     }),
   ).toHaveAttribute("aria-pressed", "true");
   await expectNoHorizontalScroll(page);

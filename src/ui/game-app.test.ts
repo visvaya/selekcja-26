@@ -205,6 +205,8 @@ test("live region announces undo, random fill and event outcomes", async () => {
         );
       }
       await view.findByRole("button", { name: "Rozpocznij odprawę" });
+      // Only the balanced priority remains, so the start screen offers no priority choice.
+      assert.equal(view.queryByText("Ustal priorytet selekcji"), null);
       // Nothing has changed the squad yet: the region must start empty, both on this first
       // render and while the save load (there is none to load here) settles.
       assert.equal(liveRegionText(), "");

@@ -15,7 +15,6 @@ export type DetailedPosition =
   | "N"
   | "PS";
 export type SystemId = "4231" | "3421" | "433";
-export type PriorityId = "balance" | "form" | "quality";
 export type Stage = "camp" | "final";
 export type OutcomeId =
   | "champion"
@@ -111,7 +110,6 @@ export interface FinalReport {
 
 export interface GameState {
   system: SystemId;
-  priority: PriorityId;
   stage: Stage;
   started: boolean;
   selected: Set<PlayerId>;

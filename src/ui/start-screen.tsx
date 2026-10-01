@@ -1,7 +1,7 @@
 import type { RefObject } from "react";
-import { players, priorities, systems } from "../data/catalog.ts";
+import { players, systems } from "../data/catalog.ts";
 import { GAME_RULES } from "../data/constants.ts";
-import type { PriorityId, SystemId } from "../data/types.ts";
+import type { SystemId } from "../data/types.ts";
 import { ChangelogSection } from "./changelog-section.tsx";
 import { UI_TEXT as text } from "./text.ts";
 
@@ -33,20 +33,16 @@ function ChoiceButton({
 
 export function StartScreen({
   system,
-  priority,
   canUndo,
   headingRef,
   onSystem,
-  onPriority,
   onStart,
   onUndo,
 }: {
   system: SystemId;
-  priority: PriorityId;
   canUndo: boolean;
   headingRef: RefObject<HTMLHeadingElement | null>;
   onSystem: (value: SystemId) => void;
-  onPriority: (value: PriorityId) => void;
   onStart: () => void;
   onUndo: () => void;
 }) {
@@ -90,18 +86,6 @@ export function StartScreen({
             name={text.systems[candidate.id].name}
             description={text.systems[candidate.id].description}
             onClick={() => onSystem(candidate.id)}
-          />
-        ))}
-      </div>
-      <div className="choice-title">{text.priorityChoice}</div>
-      <div className="choice-grid">
-        {priorities.map((candidate) => (
-          <ChoiceButton
-            key={candidate}
-            selected={priority === candidate}
-            name={text.priorities[candidate].name}
-            description={text.priorities[candidate].description}
-            onClick={() => onPriority(candidate)}
           />
         ))}
       </div>

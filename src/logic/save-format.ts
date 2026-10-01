@@ -1,11 +1,6 @@
 // Save format: encodes GameState as schema version 4 and decodes every supported version.
 // Anything that does not validate decodes to null, and the game starts fresh.
-import {
-  players,
-  positionOrder,
-  priorities,
-  systems,
-} from "../data/catalog.ts";
+import { players, positionOrder, systems } from "../data/catalog.ts";
 import { APP_CONFIG, GAME_RULES, RULES_REVISION } from "../data/constants.ts";
 import { EVENTS } from "../data/events.ts";
 import type {
@@ -27,7 +22,6 @@ type RawRecord = Record<string, unknown>;
 
 const PLAYER_IDS = new Set(players.map((player) => player.id));
 const SYSTEM_IDS = new Set<unknown>(systems.map((system) => system.id));
-const PRIORITY_IDS = new Set<unknown>(priorities);
 const EVENT_IDS = new Set<unknown>(EVENTS.map((event) => event.id));
 const POSITIONS = new Set<unknown>(Object.keys(positionOrder));
 const ROLE_IDS = new Set<unknown>(players.flatMap((player) => player.roles));
@@ -112,7 +106,6 @@ function isSnapshot(value: unknown): value is GameSnapshot {
   const effects = value.effects;
   return (
     SYSTEM_IDS.has(value.system) &&
-    PRIORITY_IDS.has(value.priority) &&
     (value.stage === "camp" || value.stage === "final") &&
     typeof value.started === "boolean" &&
     isPlayerIdArray(value.selected) &&

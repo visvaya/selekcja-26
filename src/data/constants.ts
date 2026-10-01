@@ -60,18 +60,6 @@ export const GAME_RULES = Object.freeze({
       groupWeight: 0.08,
       tacticalWeight: 0.24,
     },
-    other: {
-      qualityWeight: 0.38,
-      formWeight: 0.2,
-      fitnessWeight: 0.12,
-      tacticsWeight: 0.18,
-      chemistryWeight: 0.12,
-      roleBonusPoints: 1.8,
-      formPriorityFormWeight: 0.08,
-      formPriorityQualityPenaltyWeight: 0.04,
-      qualityPriorityQualityWeight: 0.07,
-      qualityPriorityFormPenaltyWeight: 0.03,
-    },
   },
   tournament: {
     qualityWeight: 0.29,

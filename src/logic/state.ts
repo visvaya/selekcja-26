@@ -8,7 +8,6 @@ import type {
   GameSnapshot,
   Player,
   PlayerId,
-  PriorityId,
   ListFilters,
   SystemId,
 } from "../data/types.ts";
@@ -16,7 +15,6 @@ import { DEFAULT_LIST_FILTERS } from "./list-filters.ts";
 
 export type GameAction =
   | { type: "setSystem"; value: SystemId }
-  | { type: "setPriority"; value: PriorityId }
   | { type: "setList"; patch: Partial<ListFilters> }
   | { type: "start" }
   | { type: "togglePlayer"; id: PlayerId; limit: number }
@@ -35,7 +33,6 @@ export function createInitialState(
 ): GameState {
   return {
     system: "4231",
-    priority: "balance",
     stage: "camp",
     started: false,
     selected: new Set<string>(),
@@ -70,10 +67,6 @@ export function reduceGameState(
       return action.value === state.system
         ? state
         : remember(state, { ...state, system: action.value });
-    case "setPriority":
-      return action.value === state.priority
-        ? state
-        : remember(state, { ...state, priority: action.value });
     case "setList":
       return { ...state, list: { ...state.list, ...action.patch } };
     case "hydrate":

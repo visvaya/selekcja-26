@@ -595,3 +595,11 @@ test("a version 4 save with an invalid list is rejected", () => {
     );
   }
 });
+
+test("migrateV3State drops the priority from the state and every snapshot", () => {
+  const raw = JSON.parse(V3_STATE.replaceAll('"balance"', '"quality"'));
+  const migrated = migrateV3State(raw) as Record<string, unknown>;
+  assert.equal("priority" in migrated, false);
+  for (const snapshot of migrated.history as Record<string, unknown>[])
+    assert.equal("priority" in snapshot, false);
+});

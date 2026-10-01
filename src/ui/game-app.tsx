@@ -330,11 +330,9 @@ export function GameApp() {
         ) : !state.started ? (
           <StartScreen
             system={state.system}
-            priority={state.priority}
             canUndo={state.history.length > 0}
             headingRef={headingRef}
             onSystem={(value) => dispatch({ type: "setSystem", value })}
-            onPriority={(value) => dispatch({ type: "setPriority", value })}
             onStart={() => dispatch({ type: "start" })}
             onUndo={undo}
           />

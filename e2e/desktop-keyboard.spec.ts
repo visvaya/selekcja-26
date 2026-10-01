@@ -50,7 +50,7 @@ test("desktop game is playable with the keyboard alone", async ({ page }) => {
     page.getByRole("heading", { name: text.introTitle }),
   ).toBeVisible();
 
-  // Tab order reaches every system and priority choice before the start button.
+  // Tab order reaches the system choices and then the start button.
   const system433 = page.getByRole("button", {
     name: new RegExp(text.systems["433"].name),
   });
@@ -59,9 +59,7 @@ test("desktop game is playable with the keyboard alone", async ({ page }) => {
   await page.keyboard.press("Space");
   await expect(system433).toHaveAttribute("aria-pressed", "true");
   const start = page.getByRole("button", { name: text.start });
-  const visited = await tabUntil(page, start);
-  for (const priority of Object.values(text.priorities))
-    expect(visited.some((label) => label.includes(priority.name))).toBe(true);
+  await tabUntil(page, start);
   await expectVisibleFocus(start);
   await page.keyboard.press("Enter");
   await expect(

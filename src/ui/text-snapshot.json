@@ -360,21 +360,6 @@
     "ŚO": "Środkowy obrońca",
     "ŚP": "Środkowy pomocnik"
   },
-  "priorities": {
-    "balance": {
-      "description": "Najbliższy realizmowi: forma, rytm, doświadczenie, kadra, grupa i taktyka.",
-      "name": "Zrównoważony"
-    },
-    "form": {
-      "description": "Premia za obecną formę i rytm meczowy.",
-      "name": "Liczy się dziś"
-    },
-    "quality": {
-      "description": "Zaufanie do klasy, doświadczenia i sufitu.",
-      "name": "Najlepsi piłkarze"
-    }
-  },
-  "priorityChoice": "Ustal priorytet selekcji",
   "profile": "Profil",
   "profileMetrics": [
     "Ocena selekcyjna",

@@ -14,18 +14,15 @@ const start: ScenarioStep = { do: "start" };
 // A random fill in both stages with fixed event choices; the seeds were picked so that together
 // these scenarios reach every tournament outcome.
 function randomRun(
-  name: string,
   seed: number,
   system: "4231" | "3421" | "433",
-  priority: "balance" | "form" | "quality",
   choices: [0 | 1, 0 | 1, 0 | 1],
 ): Scenario {
   return {
-    name,
+    name: `random-${system}-s${seed}`,
     seed,
     steps: [
       { do: "setSystem", value: system },
-      { do: "setPriority", value: priority },
       start,
       autoFill,
       ...choices.map(choose),
@@ -38,7 +35,7 @@ function randomRun(
 
 export const SCENARIOS: Scenario[] = [
   {
-    name: "manual-4231-balance",
+    name: "manual-4231",
     seed: 2028,
     steps: [
       start,
@@ -113,11 +110,10 @@ export const SCENARIOS: Scenario[] = [
     ],
   },
   {
-    name: "mixed-433-quality",
+    name: "mixed-433",
     seed: 99,
     steps: [
       { do: "setSystem", value: "433" },
-      { do: "setPriority", value: "quality" },
       start,
       { do: "setSystem", value: "3421" },
       undo,
@@ -144,10 +140,10 @@ export const SCENARIOS: Scenario[] = [
       completeStage,
     ],
   },
-  randomRun("random-3421-balance", 1, "3421", "balance", [1, 0, 0]),
-  randomRun("random-433-balance", 2, "433", "balance", [0, 1, 0]),
-  randomRun("random-3421-form", 4, "3421", "form", [0, 0, 1]),
-  randomRun("random-3421-quality", 7, "3421", "quality", [1, 1, 1]),
-  randomRun("random-4231-balance", 27, "4231", "balance", [1, 1, 0]),
-  randomRun("random-3421-form-top", 67, "3421", "form", [1, 1, 0]),
+  randomRun(1, "3421", [1, 0, 0]),
+  randomRun(2, "433", [0, 1, 0]),
+  randomRun(4, "3421", [0, 0, 1]),
+  randomRun(7, "3421", [1, 1, 1]),
+  randomRun(27, "4231", [1, 1, 0]),
+  randomRun(67, "3421", [1, 1, 0]),
 ];
