@@ -104,3 +104,15 @@ test("the UI text matches the committed snapshot", async () => {
   const expected: unknown = JSON.parse(await readFile(SNAPSHOT_URL, "utf8"));
   assert.deepStrictEqual(actual, expected);
 });
+
+test("occupied uses the singular only for exactly one player", () => {
+  const cases: [number, string][] = [
+    [0, "LS: 0 powołanych"],
+    [1, "LS: 1 powołany"],
+    [2, "LS: 2 powołanych"],
+    [5, "LS: 5 powołanych"],
+    [22, "LS: 22 powołanych"],
+  ];
+  for (const [count, expected] of cases)
+    assert.equal(text.occupied(count, "LS"), expected, `occupied(${count})`);
+});

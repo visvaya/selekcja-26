@@ -5,17 +5,10 @@ import type {
   SortId,
   TrialNoteId,
 } from "../../data/types.ts";
+import { plural } from "./plural.ts";
 
-// Polish plural of "rok" for an age: 1 rok; 2-4, 22-24, 32-34 lata (but 12-14 lat); otherwise lat.
 function formatAge(years: number): string {
-  if (years === 1) return "1 rok";
-  const lastDigit = years % 10,
-    lastTwoDigits = years % 100;
-  const few =
-    lastDigit >= 2 &&
-    lastDigit <= 4 &&
-    (lastTwoDigits < 12 || lastTwoDigits > 14);
-  return `${years} ${few ? "lata" : "lat"}`;
+  return `${years} ${plural(years, "rok", "lata", "lat")}`;
 }
 
 export const LIST_TEXT = {

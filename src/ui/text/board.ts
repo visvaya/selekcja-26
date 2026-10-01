@@ -1,4 +1,5 @@
 import type { GroupPosition } from "../../data/types.ts";
+import { plural } from "./plural.ts";
 
 export const BOARD_TEXT = {
   groups: {
@@ -20,7 +21,7 @@ export const BOARD_TEXT = {
   outOfFormationCount: (count: number) => `${count} poza ustawieniem`,
   outOfFormationTitle: (count: number) => `Poza ustawieniem: ${count}`,
   occupied: (count: number, position: string) =>
-    `${position}: ${count} powołanych`,
+    `${position}: ${count} ${plural(count, "powołany", "powołanych", "powołanych")}`,
   exact: "dokładnie",
   minimum: "min.",
   missingShort: (count: number) => `Brakuje ${count}`,
