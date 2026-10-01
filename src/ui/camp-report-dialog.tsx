@@ -2,7 +2,7 @@ import { players } from "../data/catalog.ts";
 import type { GameState } from "../data/types.ts";
 import { GameDialog } from "./game-dialog.tsx";
 import { UI_TEXT as text } from "./text.ts";
-import { joinNames } from "./text/plural.ts";
+import { joinNames } from "./text/polish-format.ts";
 
 export function CampReportDialog({
   state,

@@ -5,7 +5,7 @@ import type {
   SortId,
   TrialNoteId,
 } from "../../data/types.ts";
-import { plural } from "./plural.ts";
+import { plural } from "./polish-format.ts";
 
 function formatAge(years: number): string {
   return `${years} ${plural(years, "rok", "lata", "lat")}`;

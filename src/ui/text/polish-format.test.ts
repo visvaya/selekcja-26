@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { formatSignedImpact, joinNames, plural } from "./plural.ts";
+import { formatSignedImpact, joinNames, plural } from "./polish-format.ts";
 
 test("plural picks the Polish form for the count", () => {
   const forms = ["rok", "lata", "lat"] as const;

@@ -1,5 +1,5 @@
 import type { GroupPosition } from "../../data/types.ts";
-import { plural } from "./plural.ts";
+import { plural } from "./polish-format.ts";
 
 export const BOARD_TEXT = {
   groups: {
