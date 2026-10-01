@@ -13,6 +13,8 @@ export interface Evaluation {
   chem: number;
   coverage: number;
   luck: number;
+  // Final score (base plus luck) compared with each band's minimumScorePoints.
+  score: number;
   points: number;
   outcome: OutcomeId;
   grade: string;
@@ -56,9 +58,9 @@ export function evaluateSquad(state: GameState): Evaluation {
     state.effects.quality;
   const draw = nextRandom(state.seed);
   const luck = Math.round((draw.value - 0.5) * rules.luckRangePoints);
-  const final = base + luck;
+  const score = base + luck;
   const band = rules.outcomeBands.find(
-    (candidate) => final >= candidate.minimumScorePoints,
+    (candidate) => score >= candidate.minimumScorePoints,
   )!;
   const result: { points: number; outcome: OutcomeId; grade: string } = {
     points: band.groupPoints,
@@ -74,6 +76,7 @@ export function evaluateSquad(state: GameState): Evaluation {
     chem,
     coverage,
     luck,
+    score,
     seed: draw.seed,
     ...result,
   };
