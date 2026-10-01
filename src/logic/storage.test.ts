@@ -6,6 +6,9 @@ import { createInitialState, reduceGameState } from "./state.ts";
 import { decodeSave, encodeSave } from "./save-format.ts";
 import { migrateV3State } from "./save-migration.ts";
 import { clearGame, loadGame, saveGame } from "./storage.ts";
+import { tournamentStory } from "./tournament.ts";
+import type { TournamentStory } from "../data/types.ts";
+import { UI_TEXT } from "../ui/text.ts";
 
 const KEY = "selekcja-26-game";
 
@@ -602,4 +605,111 @@ test("migrateV3State drops the priority from the state and every snapshot", () =
   assert.equal("priority" in migrated, false);
   for (const snapshot of migrated.history as Record<string, unknown>[])
     assert.equal("priority" in snapshot, false);
+});
+
+function finishedState(story: unknown) {
+  const started = reduceGameState(createInitialState(5), { type: "start" });
+  return {
+    ...started,
+    stage: "final" as const,
+    report: {
+      rulesRevision: RULES_REVISION,
+      squadIds: ["robert-lewandowski"],
+      quality: 80,
+      chem: 80,
+      coverage: 100,
+      luck: 0,
+      points: 7,
+      stage: "Półfinał",
+      grade: "A",
+      strengths: [],
+      weak: [],
+      story: story as TournamentStory,
+    },
+  };
+}
+
+test("a version 4 save with a structured story round-trips", () => {
+  const story = tournamentStory("semifinal", 7, 31, UI_TEXT.tournament);
+  const state = finishedState(story);
+  const decoded = decodeSave(encodeSave(state));
+  assert.equal(decoded.discardedForRulesChange, false);
+  assert.deepEqual(decoded.state?.report, state.report);
+});
+
+test("a version 3 report with a legacy story migrates to version 4 and keeps it", () => {
+  const legacy = {
+    matches: ["Faza grupowa: 5 pkt", "1/8 finału: Polska 0:1 Dania"],
+    outcome: "Polska odpadła w 1/8 finału.",
+    last: "Polska 0:1 Dania",
+    seed: 9,
+  };
+  const v3 = JSON.parse(V3_STATE);
+  const raw = JSON.stringify({
+    schemaVersion: 3,
+    rulesRevision: 1,
+    state: {
+      ...v3,
+      history: [],
+      report: {
+        rulesRevision: 1,
+        squadIds: ["jakub-kiwior"],
+        quality: 80,
+        chem: 78,
+        coverage: 92,
+        luck: 0,
+        points: 5,
+        stage: "1/8 finału",
+        grade: "B",
+        strengths: [],
+        weak: [],
+        story: legacy,
+      },
+    },
+  });
+  const first = decodeSave(raw).state;
+  assert.ok(first?.report);
+  const again = decodeSave(encodeSave(first)).state;
+  assert.equal(JSON.parse(encodeSave(first)).schemaVersion, 4);
+  assert.deepEqual(again?.report?.story, legacy);
+  assert.equal(again?.report?.grade, "B");
+});
+
+test("a version 4 report with a malformed structured story is rejected", () => {
+  const story = tournamentStory("champion", 9, 4, UI_TEXT.tournament);
+  const valid = JSON.parse(encodeSave(finishedState(story)));
+  const [first, ...rest] = story.groupMatches;
+  const broken = [
+    { ...story, groupMatches: story.groupMatches.slice(0, 2) },
+    { ...story, groupMatches: [{ ...first!, goalsFor: -1 }, ...rest] },
+    {
+      ...story,
+      knockout: [{ ...story.knockout[0]!, round: "eighth" }],
+    },
+    {
+      ...story,
+      groupMatches: [
+        { goalsFor: 1, goalsAgainst: 0, penalties: null },
+        ...rest,
+      ],
+    },
+    {
+      ...story,
+      groupMatches: [{ ...first!, penalties: { goalsFor: 3 } }, ...rest],
+    },
+  ];
+  for (const patch of broken) {
+    const raw = JSON.stringify({
+      ...valid,
+      state: {
+        ...valid.state,
+        report: { ...valid.state.report, story: patch },
+      },
+    });
+    assert.deepEqual(
+      decodeSave(raw),
+      { state: null, discardedForRulesChange: false },
+      JSON.stringify(patch),
+    );
+  }
 });

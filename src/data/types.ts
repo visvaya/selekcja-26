@@ -85,7 +85,30 @@ export interface Effects {
   fit: number;
   quality: number;
 }
+export type KnockoutRoundId =
+  "roundOf16" | "quarterfinal" | "semifinal" | "final";
+export type MatchResultId = "win" | "draw" | "loss";
+export interface MatchScore {
+  goalsFor: number;
+  goalsAgainst: number;
+  penalties: { goalsFor: number; goalsAgainst: number } | null;
+}
+export interface GroupMatch extends MatchScore {
+  opponent: string;
+}
+export interface KnockoutMatch extends MatchScore {
+  round: KnockoutRoundId;
+  opponent: string;
+}
 export interface TournamentStory {
+  groupPoints: number;
+  groupMatches: GroupMatch[]; // always 3
+  knockout: KnockoutMatch[]; // 0 after a group exit, up to 4
+  outcome: string; // closing sentence
+  seed: number;
+}
+// Shape written under rules revision 1; kept for frozen reports.
+export interface LegacyTournamentStory {
   matches: string[];
   outcome: string;
   last: string;
@@ -105,7 +128,7 @@ export interface FinalReport {
   grade: string;
   strengths: string[];
   weak: string[];
-  story: TournamentStory;
+  story: TournamentStory | LegacyTournamentStory;
 }
 
 export interface GameState {

@@ -561,35 +561,7 @@
     "Wersja 2026-10-01"
   ],
   "tournament": {
-    "championOutcome": "Polska została mistrzem Europy.",
-    "championStage": "Mistrz Europy",
-    "eliminated": [
-      "Polska odpadła w 1/8 finału.",
-      "Polska odpadła w 1/8 finału.",
-      "Polska odpadła w 1/8 finału.",
-      "Polska odpadła w 1/8 finału.",
-      "Polska odpadła w 1/8 finału.",
-      "Polska odpadła w 1/8 finału.",
-      "Polska odpadła w 1/8 finału.",
-      "Polska odpadła w półfinale.",
-      "Polska odpadła w 1/8 finału."
-    ],
-    "groupExit": [
-      "1:1",
-      "0:1",
-      "1:2"
-    ],
-    "groupLast": [
-      "Ostatni mecz grupy: 0",
-      "Ostatni mecz grupy: 1",
-      "Ostatni mecz grupy: 2",
-      "Ostatni mecz grupy: 5",
-      "Ostatni mecz grupy: 12",
-      "Ostatni mecz grupy: 22",
-      "Ostatni mecz grupy: X",
-      "Ostatni mecz grupy: Półfinał",
-      "Ostatni mecz grupy: 2026-10-01"
-    ],
+    "eliminatedMarker": "Odpadliśmy",
     "groupOpponents": [
       "Dania",
       "Szwajcaria",
@@ -598,7 +570,6 @@
       "Szkocja",
       "Turcja"
     ],
-    "groupOutcome": "Polska zakończyła udział w turnieju po fazie grupowej.",
     "groupPoints": [
       "Faza grupowa: 0 pkt",
       "Faza grupowa: 1 pkt",
@@ -610,7 +581,6 @@
       "Faza grupowa: Półfinał pkt",
       "Faza grupowa: 2026-10-01 pkt"
     ],
-    "groupStage": "Faza grupowa",
     "knockoutOpponents": [
       "Francja",
       "Hiszpania",
@@ -619,11 +589,6 @@
       "Portugalia",
       "Włochy",
       "Holandia"
-    ],
-    "losses": [
-      "0:1",
-      "1:2",
-      "0:2"
     ],
     "match": [
       "Polska 0 0",
@@ -636,12 +601,28 @@
       "Polska Półfinał Półfinał",
       "Polska 2026-10-01 2026-10-01"
     ],
-    "quarterfinalLosses": [
-      "1:1, karne 3:4",
-      "0:1",
-      "1:2"
+    "outcomeSentence": [
+      "undefined",
+      "undefined",
+      "undefined",
+      "undefined",
+      "undefined",
+      "undefined",
+      "undefined",
+      "undefined",
+      "undefined"
     ],
-    "quarterfinalStage": "Ćwierćfinał",
+    "placeMarker": [
+      "0. miejsce",
+      "1. miejsce",
+      "2. miejsce",
+      "5. miejsce",
+      "12. miejsce",
+      "22. miejsce",
+      "X. miejsce",
+      "Półfinał. miejsce",
+      "2026-10-01. miejsce"
+    ],
     "round": [
       "0: 0",
       "1: 1",
@@ -653,20 +634,24 @@
       "Półfinał: Półfinał",
       "2026-10-01: 2026-10-01"
     ],
-    "rounds": [
-      "1/8 finału",
-      "Ćwierćfinał",
-      "Półfinał",
-      "Finał"
+    "roundNames": {
+      "final": "Finał",
+      "quarterfinal": "Ćwierćfinał",
+      "roundOf16": "1/8 finału",
+      "semifinal": "Półfinał"
+    },
+    "score": [
+      "undefined:undefined",
+      "undefined:undefined",
+      "undefined:undefined",
+      "undefined:undefined",
+      "undefined:undefined",
+      "undefined:undefined",
+      "undefined:undefined",
+      "undefined:undefined",
+      "undefined:undefined"
     ],
-    "runnerUpOutcome": "Polska została wicemistrzem Europy.",
-    "runnerUpStage": "Wicemistrz Europy",
-    "semifinalStage": "Półfinał",
-    "wins": [
-      "2:0",
-      "2:1",
-      "1:0"
-    ]
+    "semifinalLossMarker": "Przegraliśmy"
   },
   "tournamentProgress": "Przebieg turnieju",
   "trialNotes": {

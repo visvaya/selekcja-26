@@ -1,7 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { players } from "../data/catalog.ts";
-import { GAME_RULES } from "../data/constants.ts";
+import { APP_CONFIG, GAME_RULES, RULES_REVISION } from "../data/constants.ts";
+import { tournamentStory } from "../logic/tournament.ts";
 import type { GroupPosition, Player } from "../data/types.ts";
 import { withJsdomWindow } from "./test-jsdom-window.ts";
 import { renderGameApp } from "./test-render-game-app.ts";
@@ -166,6 +167,13 @@ test("start, profile, comparison, event and position filter work together", asyn
       const summary = reportHeading.nextElementSibling?.textContent ?? "";
       assert.match(summary, /^Zdobyliśmy \d+ pkt w grupie\./);
       assert.equal(summary.endsWith(outcomeSentence ?? "missing"), true);
+      // The group line nests its three matches; knockout rounds follow at the top level.
+      const groupLine = view.container.querySelector(".report > ul > li");
+      assert.match(
+        groupLine?.firstChild?.textContent ?? "",
+        /^Faza grupowa: \d+ pkt$/,
+      );
+      assert.equal(groupLine?.querySelectorAll("ul > li").length, 3);
       fireEvent.click(
         screen.getByRole("button", { name: "Zagraj od początku" }),
       );
@@ -282,4 +290,105 @@ test("live region announces undo, random fill and event outcomes", async () => {
       await vite.close();
     }
   });
+});
+
+const REPORT_BASE = {
+  squadIds: ["robert-lewandowski"],
+  quality: 74,
+  chem: 70,
+  coverage: 90,
+  luck: 0,
+  strengths: [],
+  weak: [],
+};
+
+// Boots the app from a saved finished report and returns the tournament path lines: the
+// group line's own nested match lines, then every top-level line.
+async function renderSavedReport(report: Record<string, unknown>) {
+  return withJsdomWindow(async (dom) => {
+    dom.window.localStorage.setItem(
+      APP_CONFIG.storageKey,
+      JSON.stringify({
+        schemaVersion: APP_CONFIG.saveSchemaVersion,
+        rulesRevision: RULES_REVISION,
+        state: {
+          system: "433",
+          stage: "final",
+          started: true,
+          selected: [],
+          campSquad: [],
+          trial: {},
+          list: {
+            positions: [],
+            query: "",
+            sort: "model",
+            foot: { left: false, right: false },
+            traits: [],
+            ranges: {},
+            onlySelected: false,
+            onlyCamp: false,
+          },
+          events: [],
+          effects: { chem: 0, fit: 0, quality: 0 },
+          compare: [],
+          seed: 3,
+          report: { rulesRevision: RULES_REVISION, ...REPORT_BASE, ...report },
+          history: [],
+        },
+      }),
+    );
+    const { act, cleanup, vite, view } = await renderGameApp(dom);
+    try {
+      await view.findByRole("heading", { name: "Przebieg turnieju" });
+      const path = view.container.querySelector(".report > ul")!;
+      const nested = [...path.querySelectorAll(":scope > li > ul > li")].map(
+        (item) => item.textContent ?? "",
+      );
+      const top = [...path.querySelectorAll(":scope > li")].map(
+        (item) => item.firstChild?.textContent ?? "",
+      );
+      await act(async () => {
+        await new Promise((resolve) => setImmediate(resolve));
+      });
+      return { nested, top };
+    } finally {
+      cleanup();
+      await vite.close();
+    }
+  });
+}
+
+test("a group-exit report nests three matches and marks the last one", async () => {
+  const story = tournamentStory("group", 1, 77, UI_TEXT.tournament);
+  const { nested, top } = await renderSavedReport({
+    points: 1,
+    stage: UI_TEXT.outcomes.group,
+    grade: "C",
+    story,
+  });
+  assert.equal(top.length, 1);
+  assert.equal(top[0], UI_TEXT.tournament.groupPoints(1));
+  assert.equal(nested.length, 3);
+  for (const line of nested) assert.match(line, /^Polska \d+:\d+ /);
+  assert.equal(nested[2]!.endsWith(" Odpadliśmy"), true);
+  assert.equal(nested.slice(0, 2).join().includes("Odpadliśmy"), false);
+});
+
+test("a legacy report keeps its flat tournament lines", async () => {
+  const { nested, top } = await renderSavedReport({
+    points: 5,
+    stage: UI_TEXT.outcomes.roundOf16,
+    grade: "B",
+    story: {
+      matches: ["Faza grupowa: 5 pkt", "1/8 finału: Polska 0:1 Dania"],
+      outcome: "Polska odpadła w 1/8 finału.",
+      last: "Polska 0:1 Dania",
+      seed: 9,
+    },
+  });
+  assert.deepEqual(nested, []);
+  assert.deepEqual(top, [
+    "Faza grupowa: 5 pkt",
+    "1/8 finału: Polska 0:1 Dania",
+  ]);
 });

@@ -1,4 +1,24 @@
-import type { OutcomeId } from "./types.ts";
+import type { MatchResultId, MatchScore, OutcomeId } from "./types.ts";
+
+// A frozen match score; the optional pair is a penalty shoot-out after a draw.
+function score(
+  goalsFor: number,
+  goalsAgainst: number,
+  penaltiesFor?: number,
+  penaltiesAgainst?: number,
+): MatchScore {
+  return Object.freeze({
+    goalsFor,
+    goalsAgainst,
+    penalties:
+      penaltiesFor === undefined || penaltiesAgainst === undefined
+        ? null
+        : Object.freeze({
+            goalsFor: penaltiesFor,
+            goalsAgainst: penaltiesAgainst,
+          }),
+  });
+}
 
 export const GAME_RULES = Object.freeze({
   undoHistoryLimitActions: 50,
@@ -75,6 +95,26 @@ export const GAME_RULES = Object.freeze({
     fitnessStrengthThresholdPoints: 86,
     favorableLuckThresholdPoints: 3,
     unfavorableLuckThresholdPoints: -3,
+    // Group results for each points total; the order is shuffled when the story is drawn.
+    groupResultsByPoints: {
+      9: [["win", "win", "win"]],
+      7: [["win", "win", "draw"]],
+      5: [["win", "draw", "draw"]],
+      3: [
+        ["win", "loss", "loss"],
+        ["draw", "draw", "draw"],
+      ],
+      1: [["draw", "loss", "loss"]],
+      0: [["loss", "loss", "loss"]],
+    } satisfies Record<number, MatchResultId[][]> as Readonly<
+      Record<number, readonly (readonly MatchResultId[])[]>
+    >,
+    scores: {
+      wins: [score(2, 0), score(2, 1), score(1, 0)],
+      draws: [score(0, 0), score(1, 1), score(2, 2)],
+      losses: [score(0, 1), score(1, 2), score(0, 2)],
+      quarterfinalLosses: [score(1, 1, 3, 4), score(0, 1), score(1, 2)],
+    },
     outcomeBands: [
       {
         minimumScorePoints: 91,

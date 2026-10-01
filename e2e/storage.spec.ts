@@ -204,7 +204,7 @@ test("an unfinished version 3 save from other rules is discarded with a notice",
   expect(errors).toEqual([]);
 });
 
-test("a finished version 3 report from other rules is shown frozen with the older-rules note", async ({
+test("a finished report from other rules is shown frozen with the older-rules note", async ({
   page,
 }) => {
   const errors = collectPageErrors(page);

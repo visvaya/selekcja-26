@@ -10,6 +10,7 @@ import type {
   RangeId,
   SortId,
   FinalReport,
+  KnockoutRoundId,
 } from "../data/types.ts";
 import {
   LEGACY_RULES_REVISION,
@@ -78,6 +79,59 @@ function isTrial(value: unknown): boolean {
   );
 }
 
+const KNOCKOUT_ROUND_IDS: readonly unknown[] = Object.keys({
+  roundOf16: 0,
+  quarterfinal: 0,
+  semifinal: 0,
+  final: 0,
+} satisfies Record<KnockoutRoundId, 0>);
+
+const isGoals = (value: unknown): boolean =>
+  Number.isInteger(value) && (value as number) >= 0;
+
+function isMatchScore(value: unknown): value is RawRecord {
+  if (!isRecord(value)) return false;
+  const penalties = value.penalties;
+  return (
+    isGoals(value.goalsFor) &&
+    isGoals(value.goalsAgainst) &&
+    typeof value.opponent === "string" &&
+    (penalties === null ||
+      (isRecord(penalties) &&
+        isGoals(penalties.goalsFor) &&
+        isGoals(penalties.goalsAgainst)))
+  );
+}
+
+// Knockout rounds are stored in playing order, starting from the round of 16.
+function isStory(story: RawRecord): boolean {
+  const { groupMatches, knockout } = story;
+  return (
+    isNumber(story.groupPoints) &&
+    Array.isArray(groupMatches) &&
+    groupMatches.length === GAME_RULES.groupMatchesCount &&
+    groupMatches.every(isMatchScore) &&
+    Array.isArray(knockout) &&
+    knockout.length <= KNOCKOUT_ROUND_IDS.length &&
+    knockout.every(
+      (match, index) =>
+        isMatchScore(match) && match.round === KNOCKOUT_ROUND_IDS[index],
+    ) &&
+    typeof story.outcome === "string" &&
+    isNumber(story.seed)
+  );
+}
+
+// The flat story written under rules revision 1, kept for frozen reports.
+function isLegacyStory(story: RawRecord): boolean {
+  return (
+    isStringArray(story.matches) &&
+    typeof story.outcome === "string" &&
+    typeof story.last === "string" &&
+    isNumber(story.seed)
+  );
+}
+
 // Report squads may name players that a later catalogue no longer has; they are skipped when
 // the report is shown, so only the shape is checked here.
 function isReport(value: unknown): value is FinalReport {
@@ -94,10 +148,7 @@ function isReport(value: unknown): value is FinalReport {
     isStringArray(value.strengths) &&
     isStringArray(value.weak) &&
     isRecord(story) &&
-    isStringArray(story.matches) &&
-    typeof story.outcome === "string" &&
-    typeof story.last === "string" &&
-    isNumber(story.seed)
+    (isStory(story) || isLegacyStory(story))
   );
 }
 

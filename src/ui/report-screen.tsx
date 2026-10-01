@@ -1,7 +1,12 @@
 import type { RefObject } from "react";
 import { positionOrder } from "../data/catalog.ts";
 import { GAME_RULES, RULES_REVISION } from "../data/constants.ts";
-import type { FinalReport } from "../data/types.ts";
+import type {
+  FinalReport,
+  LegacyTournamentStory,
+  MatchScore,
+  TournamentStory,
+} from "../data/types.ts";
 import {
   detailedPositions,
   playersByIds,
@@ -54,11 +59,7 @@ export function ReportScreen({
       </div>
       <div className="report">
         <h2>{text.tournamentProgress}</h2>
-        <ul>
-          {report.story.matches.map((match, index) => (
-            <li key={index}>{match}</li>
-          ))}
-        </ul>
+        <TournamentPath story={report.story} />
       </div>
       <div className="report">
         <h2>{text.strengths}</h2>
@@ -112,4 +113,73 @@ export function ReportScreen({
       <p className="fineprint">{text.simulationDisclaimer}</p>
     </section>
   );
+}
+
+// The tournament path: the group with its three matches nested under it, then each knockout
+// round, with a marker on the match that ended the run or decided the final place. A report
+// written under rules revision 1 keeps its flat list of lines.
+function TournamentPath({
+  story,
+}: {
+  story: TournamentStory | LegacyTournamentStory;
+}) {
+  const t = text.tournament;
+  if ("matches" in story)
+    return (
+      <ul>
+        {story.matches.map((match, index) => (
+          <li key={index}>{match}</li>
+        ))}
+      </ul>
+    );
+  const lastIndex = story.knockout.length - 1;
+  const finalRow = story.knockout.at(-1)?.round === "final";
+  const finalWon = finalRow && matchWon(story.knockout.at(-1)!);
+  const lostRound = (index: number) => index === lastIndex && !finalRow;
+  const finalPlace = (index: number): 1 | 2 | null =>
+    index === lastIndex && finalRow ? (finalWon ? 1 : 2) : null;
+  const semifinalLoss = story.knockout.at(-1)?.round === "semifinal";
+  return (
+    <ul>
+      <li>
+        {t.groupPoints(story.groupPoints)}
+        <ul>
+          {story.groupMatches.map((match, index) => (
+            <li key={index}>
+              {t.match(t.score(match), match.opponent)}
+              {lastIndex < 0 && index === story.groupMatches.length - 1 && (
+                <span className="path-out"> {t.eliminatedMarker}</span>
+              )}
+            </li>
+          ))}
+        </ul>
+      </li>
+      {story.knockout.map((match, index) => {
+        const place = finalPlace(index);
+        return (
+          <li key={match.round}>
+            {t.round(
+              t.roundNames[match.round],
+              t.match(t.score(match), match.opponent),
+            )}
+            {lostRound(index) && (
+              <span className="path-out">
+                {" "}
+                {semifinalLoss ? t.semifinalLossMarker : t.eliminatedMarker}
+              </span>
+            )}
+            {place !== null && (
+              <span className="path-place"> {t.placeMarker(place)}</span>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+function matchWon(match: MatchScore): boolean {
+  return match.penalties
+    ? match.penalties.goalsFor > match.penalties.goalsAgainst
+    : match.goalsFor > match.goalsAgainst;
 }
