@@ -67,7 +67,8 @@ export const SCENARIOS: Scenario[] = [
       ),
       choose(1),
       ...pick(
-        "michal-skoras",
+        // Replaced michal-skoras when he moved to the forwards (data change).
+        "jakub-piotrowski",
         "robert-lewandowski",
         "karol-swiderski",
         "adam-buksa",
@@ -96,7 +97,8 @@ export const SCENARIOS: Scenario[] = [
         "bartosz-slisz",
         "kacper-kozlowski",
         "kacper-urbanski",
-        "michal-skoras",
+        // Replaced michal-skoras when he moved to the forwards (data change).
+        "jakub-piotrowski",
         "maxi-oyedele",
         "robert-lewandowski",
         "karol-swiderski",
