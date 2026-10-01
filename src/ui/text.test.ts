@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import type { OutcomeId } from "../data/types.ts";
 import { UI_TEXT as text } from "./text.ts";
 
 test("age uses the Polish plural form for the number of years", () => {
@@ -49,6 +50,32 @@ test("an unknown report stage has no outcome sentence", () => {
 
 test("group points in the report speak of Poland as we", () => {
   assert.equal(text.pointsInGroup(5), "Zdobyliśmy 5 pkt w grupie.");
+});
+
+test("tournament scores and closing sentences read as before", () => {
+  const t = text.tournament;
+  assert.equal(
+    t.score({ goalsFor: 2, goalsAgainst: 1, penalties: null }),
+    "2:1",
+  );
+  assert.equal(
+    t.score({
+      goalsFor: 1,
+      goalsAgainst: 1,
+      penalties: { goalsFor: 3, goalsAgainst: 4 },
+    }),
+    "1:1, karne 3:4",
+  );
+  const sentences: [OutcomeId, string][] = [
+    ["group", "Polska zakończyła udział w turnieju po fazie grupowej."],
+    ["roundOf16", "Polska odpadła w 1/8 finału."],
+    ["quarterfinal", "Polska odpadła w ćwierćfinale."],
+    ["semifinal", "Polska odpadła w półfinale."],
+    ["runnerUp", "Polska została wicemistrzem Europy."],
+    ["champion", "Polska została mistrzem Europy."],
+  ];
+  for (const [outcome, expected] of sentences)
+    assert.equal(t.outcomeSentence(outcome), expected, outcome);
 });
 
 // Records every UI string, and every text function's output for fixed sample arguments, so a

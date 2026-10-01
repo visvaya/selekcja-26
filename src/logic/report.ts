@@ -93,7 +93,7 @@ export function buildFinalReport(
     reasonText(reason, evaluation, state, copy.resultReasons);
   const stage = copy.outcomes[evaluation.outcome];
   const story = tournamentStory(
-    stage,
+    evaluation.outcome,
     evaluation.points,
     evaluation.seed,
     copy.tournament,

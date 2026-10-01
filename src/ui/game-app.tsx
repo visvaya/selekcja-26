@@ -330,11 +330,9 @@ export function GameApp() {
         ) : !state.started ? (
           <StartScreen
             system={state.system}
-            priority={state.priority}
             canUndo={state.history.length > 0}
             headingRef={headingRef}
             onSystem={(value) => dispatch({ type: "setSystem", value })}
-            onPriority={(value) => dispatch({ type: "setPriority", value })}
             onStart={() => dispatch({ type: "start" })}
             onUndo={undo}
           />
@@ -344,9 +342,14 @@ export function GameApp() {
             headingRef={headingRef}
             onAutoFill={autoFill}
             onUndo={undo}
-            onQuery={(value) => dispatch({ type: "setQuery", value })}
-            onFilter={(value) => dispatch({ type: "setFilter", value })}
-            onSort={(value) => dispatch({ type: "setSort", value })}
+            onQuery={(query) => dispatch({ type: "setList", patch: { query } })}
+            onFilter={(value) =>
+              dispatch({
+                type: "setList",
+                patch: { positions: value === "ALL" ? [] : [value] },
+              })
+            }
+            onSort={(sort) => dispatch({ type: "setList", patch: { sort } })}
             onToggle={togglePlayer}
             onProfile={(id) => setModal({ kind: "profile", id })}
             onCompare={comparePlayer}

@@ -1,6 +1,7 @@
-// Migration of save schema versions 1 and 2 (players identified by display name, reports
-// holding full player objects) to version 3 (stable player IDs). Works on raw parsed JSON;
-// the caller validates the result against the version 3 shape.
+// Migrations of older save schemas, working on raw parsed JSON: versions 1 and 2 (players
+// identified by display name, reports holding full player objects) to version 3 (stable player
+// IDs), and version 3 to version 4 (list settings, no priority). The caller validates the
+// final result.
 import type { PlayerId } from "../data/types.ts";
 
 // Frozen map from the names that versions 1 and 2 used as identifiers to the stable IDs.
@@ -142,4 +143,38 @@ export function migrateLegacyState(
     if (error instanceof LegacyNameError) return null;
     throw error;
   }
+}
+
+// The priority left the game in version 4 (only the balanced weights remain).
+const DROPPED_KEYS = ["filter", "query", "sort", "priority"] as const;
+
+function withoutDroppedKeys(snapshot: unknown): unknown {
+  if (!isRecord(snapshot)) return snapshot;
+  return Object.fromEntries(
+    Object.entries(snapshot).filter(
+      ([key]) => !(DROPPED_KEYS as readonly string[]).includes(key),
+    ),
+  );
+}
+
+// Migration of save schema version 3 to version 4: the list view settings (filter, query,
+// sort) move from every snapshot into one top-level `list` that undo never records, and the
+// priority is dropped from the state and every snapshot. Values are carried over as they
+// are; the caller validates the result against the version 4 shape.
+export function migrateV3State(state: unknown): unknown {
+  if (!isRecord(state)) return null;
+  const list = {
+    positions: state.filter === "ALL" ? [] : [state.filter],
+    query: state.query,
+    sort: state.sort,
+    foot: { left: false, right: false },
+    traits: [],
+    ranges: {},
+    onlySelected: false,
+    onlyCamp: false,
+  };
+  const history = Array.isArray(state.history)
+    ? state.history.map(withoutDroppedKeys)
+    : state.history;
+  return { ...(withoutDroppedKeys(state) as RawRecord), list, history };
 }

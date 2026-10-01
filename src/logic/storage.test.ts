@@ -3,7 +3,12 @@ import assert from "node:assert/strict";
 import { players } from "../data/catalog.ts";
 import { RULES_REVISION } from "../data/constants.ts";
 import { createInitialState, reduceGameState } from "./state.ts";
+import { decodeSave, encodeSave } from "./save-format.ts";
+import { migrateLegacyState, migrateV3State } from "./save-migration.ts";
 import { clearGame, loadGame, saveGame } from "./storage.ts";
+import { tournamentStory } from "./tournament.ts";
+import type { TournamentStory } from "../data/types.ts";
+import { UI_TEXT } from "../ui/text.ts";
 
 const KEY = "selekcja-26-game";
 
@@ -65,7 +70,7 @@ test("state round-trips through the asynchronous storage adapter", async () => {
     });
     await saveGame(state);
     const saved = JSON.parse(values.get(KEY)!);
-    assert.equal(saved.schemaVersion, 3);
+    assert.equal(saved.schemaVersion, 4);
     assert.equal(saved.rulesRevision, RULES_REVISION);
     assert.deepEqual(saved.state.selected, ["robert-lewandowski"]);
     const restored = (await loadGame()).state;
@@ -113,43 +118,45 @@ test("a version 1 save with a report migrates names to stable IDs", async () => 
   });
 });
 
+// Every version 2 save counts as rules revision 1, so an unfinished one is discarded on load;
+// the migration itself still keeps the version 2 undo history with stable IDs.
 test("a version 2 save keeps its undo history with stable IDs", async () => {
+  const migrated = migrateLegacyState(JSON.parse(V2_FINAL_SAVE).state, 2) as {
+    selected: string[];
+    compare: string[];
+    history: { selected: string[]; trial: Record<string, unknown> }[];
+  };
+  assert.deepEqual(migrated.selected, ["jakub-kiwior", "pawel-wszolek"]);
+  assert.deepEqual(migrated.compare, ["kamil-grosicki", "jakub-kiwior"]);
+  assert.equal(migrated.history.length, 2);
+  assert.deepEqual(migrated.history[0]!.selected, [
+    "jakub-kiwior",
+    "kamil-grosicki",
+  ]);
+  assert.deepEqual(migrated.history[1]!.trial["kamil-grosicki"], {
+    delta: -3,
+    note: "disappointed",
+  });
+  const chained = migrateV3State(migrated) as Record<string, unknown>;
+  assert.deepEqual(chained.list, {
+    positions: ["LŚO"],
+    query: "ki",
+    sort: "form",
+    foot: { left: false, right: false },
+    traits: [],
+    ranges: {},
+    onlySelected: false,
+    onlyCamp: false,
+  });
+  for (const snapshot of chained.history as Record<string, unknown>[])
+    for (const key of ["filter", "query", "sort", "priority"])
+      assert.equal(key in snapshot, false, key);
   await withStorage(async (values) => {
     values.set(KEY, V2_FINAL_SAVE);
-    const state = (await loadGame()).state;
-    assert.ok(state);
-    assert.equal(state.stage, "final");
-    assert.equal(state.filter, "LŚO");
-    assert.equal(state.query, "ki");
-    assert.deepEqual([...state.selected], ["jakub-kiwior", "pawel-wszolek"]);
-    assert.deepEqual(state.compare, ["kamil-grosicki", "jakub-kiwior"]);
-    assert.deepEqual(Object.keys(state.trial), [
-      "jakub-kiwior",
-      "kamil-grosicki",
-    ]);
-    assert.equal(state.history.length, 2);
-    assert.deepEqual(
-      [...state.history[0]!.selected],
-      ["jakub-kiwior", "kamil-grosicki"],
-    );
-    assert.deepEqual(state.history[1]!.trial["kamil-grosicki"], {
-      delta: -3,
-      note: "disappointed",
+    assert.deepEqual(await loadGame(), {
+      state: null,
+      discardedForRulesChange: true,
     });
-    const undone = reduceGameState(state, { type: "undo" });
-    assert.deepEqual([...undone.selected], ["jakub-kiwior"]);
-
-    await saveGame(state);
-    const rewritten = JSON.parse(values.get(KEY)!);
-    assert.equal(rewritten.schemaVersion, 3);
-    assert.deepEqual(rewritten.state.campSquad, [
-      "jakub-kiwior",
-      "kamil-grosicki",
-    ]);
-    assert.deepEqual(rewritten.state.history[0].selected, [
-      "jakub-kiwior",
-      "kamil-grosicki",
-    ]);
   });
 });
 
@@ -497,3 +504,260 @@ function addFailingLocalWrite(
     };
   };
 }
+
+const V3_STATE = `{"system":"3421","priority":"balance","stage":"final","started":true,"selected":["jakub-kiwior"],"campSquad":["jakub-kiwior","kamil-grosicki"],"trial":{"jakub-kiwior":{"delta":4,"note":"impressed"}},"filter":"LŚO","query":"ki","sort":"form","events":["doctor","captain","scout"],"effects":{"chem":0,"fit":4,"quality":1},"compare":[],"seed":4242,"report":null,"history":[{"system":"3421","priority":"balance","stage":"camp","started":true,"selected":[],"campSquad":[],"trial":{},"filter":"ALL","query":"","sort":"model","events":[],"effects":{"chem":0,"fit":0,"quality":0},"compare":[],"seed":4000,"report":null},{"system":"3421","priority":"balance","stage":"camp","started":true,"selected":["jakub-kiwior"],"campSquad":[],"trial":{},"filter":"OP","query":"x","sort":"name","events":[],"effects":{"chem":0,"fit":0,"quality":0},"compare":[],"seed":4001,"report":null}]}`;
+
+test("a version 4 save round-trips every list field", () => {
+  const state = reduceGameState(
+    reduceGameState(createInitialState(8), { type: "start" }),
+    {
+      type: "setList",
+      patch: {
+        positions: ["LS", "ŚO"],
+        query: "kam",
+        sort: "form",
+        foot: { left: true, right: false },
+        traits: ["pace", "winger"],
+        ranges: {
+          age: { min: 20, max: null },
+          campImpact: { min: null, max: 3 },
+        },
+        onlySelected: true,
+        onlyCamp: true,
+      },
+    },
+  );
+  const decoded = decodeSave(encodeSave(state));
+  assert.equal(decoded.discardedForRulesChange, false);
+  assert.deepEqual(decoded.state?.list, state.list);
+  const raw = JSON.parse(encodeSave(state));
+  assert.equal(raw.schemaVersion, 4);
+  assert.equal(raw.state.history.length, 1);
+  assert.equal("list" in raw.state.history[0], false);
+});
+
+test("migrateV3State moves filter, query and sort into list", () => {
+  const migrated = migrateV3State(JSON.parse(V3_STATE)) as Record<
+    string,
+    unknown
+  >;
+  assert.deepEqual(migrated.list, {
+    positions: ["LŚO"],
+    query: "ki",
+    sort: "form",
+    foot: { left: false, right: false },
+    traits: [],
+    ranges: {},
+    onlySelected: false,
+    onlyCamp: false,
+  });
+  for (const key of ["filter", "query", "sort"])
+    assert.equal(key in migrated, false, key);
+  const history = migrated.history as Record<string, unknown>[];
+  assert.equal(history.length, 2);
+  for (const snapshot of history)
+    for (const key of ["filter", "query", "sort", "list"])
+      assert.equal(key in snapshot, false, key);
+  assert.deepEqual(
+    (
+      migrateV3State({ ...JSON.parse(V3_STATE), filter: "ALL" }) as {
+        list: { positions: string[] };
+      }
+    ).list.positions,
+    [],
+  );
+});
+
+test("migrateV3State passes malformed input through for validation", () => {
+  assert.equal(migrateV3State("x"), null);
+  const noHistory = migrateV3State({ filter: "ALL", history: "nope" }) as {
+    history: unknown;
+  };
+  assert.equal(noHistory.history, "nope");
+});
+
+test("a version 4 save with an invalid list is rejected", () => {
+  const valid = JSON.parse(
+    encodeSave(reduceGameState(createInitialState(9), { type: "start" })),
+  );
+  const broken = [
+    { positions: ["XX"] },
+    { ranges: { age: { min: "30", max: null } } },
+    { ranges: { height: { min: 1, max: null } } },
+    { traits: ["flying"] },
+    { onlySelected: "yes" },
+  ];
+  for (const patch of broken) {
+    const raw = JSON.stringify({
+      ...valid,
+      state: { ...valid.state, list: { ...valid.state.list, ...patch } },
+    });
+    assert.deepEqual(
+      decodeSave(raw),
+      { state: null, discardedForRulesChange: false },
+      JSON.stringify(patch),
+    );
+  }
+});
+
+test("migrateV3State drops the priority from the state and every snapshot", () => {
+  const raw = JSON.parse(V3_STATE.replaceAll('"balance"', '"quality"'));
+  const migrated = migrateV3State(raw) as Record<string, unknown>;
+  assert.equal("priority" in migrated, false);
+  for (const snapshot of migrated.history as Record<string, unknown>[])
+    assert.equal("priority" in snapshot, false);
+});
+
+function finishedState(story: unknown) {
+  const started = reduceGameState(createInitialState(5), { type: "start" });
+  return {
+    ...started,
+    stage: "final" as const,
+    report: {
+      rulesRevision: RULES_REVISION,
+      squadIds: ["robert-lewandowski"],
+      quality: 80,
+      chem: 80,
+      coverage: 100,
+      luck: 0,
+      points: 7,
+      stage: "Półfinał",
+      grade: "A",
+      strengths: [],
+      weak: [],
+      story: story as TournamentStory,
+    },
+  };
+}
+
+test("a version 4 save with a structured story round-trips", () => {
+  const story = tournamentStory("semifinal", 7, 31, UI_TEXT.tournament);
+  const state = finishedState(story);
+  const decoded = decodeSave(encodeSave(state));
+  assert.equal(decoded.discardedForRulesChange, false);
+  assert.deepEqual(decoded.state?.report, state.report);
+});
+
+test("a version 3 report with a legacy story migrates to version 4 and keeps it", () => {
+  const legacy = {
+    matches: ["Faza grupowa: 5 pkt", "1/8 finału: Polska 0:1 Dania"],
+    outcome: "Polska odpadła w 1/8 finału.",
+    last: "Polska 0:1 Dania",
+    seed: 9,
+  };
+  const v3 = JSON.parse(V3_STATE);
+  const raw = JSON.stringify({
+    schemaVersion: 3,
+    rulesRevision: 1,
+    state: {
+      ...v3,
+      history: [],
+      report: {
+        rulesRevision: 1,
+        squadIds: ["jakub-kiwior"],
+        quality: 80,
+        chem: 78,
+        coverage: 92,
+        luck: 0,
+        points: 5,
+        stage: "1/8 finału",
+        grade: "B",
+        strengths: [],
+        weak: [],
+        story: legacy,
+      },
+    },
+  });
+  const first = decodeSave(raw).state;
+  assert.ok(first?.report);
+  const again = decodeSave(encodeSave(first)).state;
+  assert.equal(JSON.parse(encodeSave(first)).schemaVersion, 4);
+  assert.deepEqual(again?.report?.story, legacy);
+  assert.equal(again?.report?.grade, "B");
+});
+
+test("a version 4 report with a malformed structured story is rejected", () => {
+  const story = tournamentStory("champion", 9, 4, UI_TEXT.tournament);
+  const valid = JSON.parse(encodeSave(finishedState(story)));
+  const [first, ...rest] = story.groupMatches;
+  const broken = [
+    { ...story, groupMatches: story.groupMatches.slice(0, 2) },
+    { ...story, groupMatches: [{ ...first!, goalsFor: -1 }, ...rest] },
+    {
+      ...story,
+      knockout: [{ ...story.knockout[0]!, round: "eighth" }],
+    },
+    {
+      ...story,
+      groupMatches: [
+        { goalsFor: 1, goalsAgainst: 0, penalties: null },
+        ...rest,
+      ],
+    },
+    {
+      ...story,
+      groupMatches: [{ ...first!, penalties: { goalsFor: 3 } }, ...rest],
+    },
+  ];
+  for (const patch of broken) {
+    const raw = JSON.stringify({
+      ...valid,
+      state: {
+        ...valid.state,
+        report: { ...valid.state.report, story: patch },
+      },
+    });
+    assert.deepEqual(
+      decodeSave(raw),
+      { state: null, discardedForRulesChange: false },
+      JSON.stringify(patch),
+    );
+  }
+});
+
+test("a literal version 3 rules-1 save with a finished report loads frozen without undo", () => {
+  const v3 = JSON.parse(V3_STATE);
+  const raw = JSON.stringify({
+    schemaVersion: 3,
+    rulesRevision: 1,
+    state: {
+      ...v3,
+      report: {
+        rulesRevision: 1,
+        squadIds: ["jakub-kiwior"],
+        quality: 80,
+        chem: 78,
+        coverage: 92,
+        luck: 0,
+        points: 5,
+        stage: "1/8 finału",
+        grade: "B+",
+        strengths: [],
+        weak: [],
+        story: {
+          matches: ["Faza grupowa: 5 pkt"],
+          outcome: "Polska odpadła w 1/8 finału.",
+          last: "Polska 0:1 Dania",
+          seed: 9,
+        },
+      },
+    },
+  });
+  const decoded = decodeSave(raw);
+  assert.equal(decoded.discardedForRulesChange, false);
+  assert.equal(decoded.state?.report?.rulesRevision, 1);
+  assert.equal(decoded.state?.report?.grade, "B+");
+  assert.deepEqual(decoded.state?.history, []);
+});
+
+test("a literal version 3 rules-1 save of an unfinished game is discarded", () => {
+  const raw = JSON.stringify({
+    schemaVersion: 3,
+    rulesRevision: 1,
+    state: JSON.parse(V3_STATE),
+  });
+  assert.deepEqual(decodeSave(raw), {
+    state: null,
+    discardedForRulesChange: true,
+  });
+});

@@ -1,4 +1,24 @@
-import type { OutcomeId } from "./types.ts";
+import type { MatchResultId, MatchScore, OutcomeId } from "./types.ts";
+
+// A frozen match score; the optional pair is a penalty shoot-out after a draw.
+function score(
+  goalsFor: number,
+  goalsAgainst: number,
+  penaltiesFor?: number,
+  penaltiesAgainst?: number,
+): MatchScore {
+  return Object.freeze({
+    goalsFor,
+    goalsAgainst,
+    penalties:
+      penaltiesFor === undefined || penaltiesAgainst === undefined
+        ? null
+        : Object.freeze({
+            goalsFor: penaltiesFor,
+            goalsAgainst: penaltiesAgainst,
+          }),
+  });
+}
 
 export const GAME_RULES = Object.freeze({
   undoHistoryLimitActions: 50,
@@ -60,18 +80,6 @@ export const GAME_RULES = Object.freeze({
       groupWeight: 0.08,
       tacticalWeight: 0.24,
     },
-    other: {
-      qualityWeight: 0.38,
-      formWeight: 0.2,
-      fitnessWeight: 0.12,
-      tacticsWeight: 0.18,
-      chemistryWeight: 0.12,
-      roleBonusPoints: 1.8,
-      formPriorityFormWeight: 0.08,
-      formPriorityQualityPenaltyWeight: 0.04,
-      qualityPriorityQualityWeight: 0.07,
-      qualityPriorityFormPenaltyWeight: 0.03,
-    },
   },
   tournament: {
     qualityWeight: 0.29,
@@ -87,43 +95,64 @@ export const GAME_RULES = Object.freeze({
     fitnessStrengthThresholdPoints: 86,
     favorableLuckThresholdPoints: 3,
     unfavorableLuckThresholdPoints: -3,
+    // Group results for each points total; the order is shuffled when the story is drawn.
+    groupResultsByPoints: {
+      9: [["win", "win", "win"]],
+      7: [["win", "win", "draw"]],
+      5: [["win", "draw", "draw"]],
+      3: [
+        ["win", "loss", "loss"],
+        ["draw", "draw", "draw"],
+      ],
+      1: [["draw", "loss", "loss"]],
+      0: [["loss", "loss", "loss"]],
+    } satisfies Record<number, MatchResultId[][]> as Readonly<
+      Record<number, readonly (readonly MatchResultId[])[]>
+    >,
+    scores: {
+      wins: [score(2, 0), score(2, 1), score(1, 0)],
+      draws: [score(0, 0), score(1, 1), score(2, 2)],
+      losses: [score(0, 1), score(1, 2), score(0, 2)],
+      quarterfinalLosses: [score(1, 1, 3, 4), score(0, 1), score(1, 2)],
+    },
     outcomeBands: [
       {
         minimumScorePoints: 91,
         groupPoints: 9,
         outcome: "champion",
-        grade: "A+",
+        grade: "6",
       },
       {
         minimumScorePoints: 89,
         groupPoints: 7,
         outcome: "runnerUp",
-        grade: "A",
+        grade: "5",
       },
       {
         minimumScorePoints: 87,
         groupPoints: 7,
         outcome: "semifinal",
-        grade: "A",
+        grade: "5",
       },
       {
         minimumScorePoints: 84,
         groupPoints: 5,
         outcome: "quarterfinal",
-        grade: "B+",
+        grade: "4+",
       },
       {
         minimumScorePoints: 80,
         groupPoints: 5,
         outcome: "roundOf16",
-        grade: "B",
+        grade: "4",
       },
-      { minimumScorePoints: 74, groupPoints: 3, outcome: "group", grade: "C+" },
+      { minimumScorePoints: 77, groupPoints: 3, outcome: "group", grade: "3+" },
+      { minimumScorePoints: 75, groupPoints: 1, outcome: "group", grade: "3" },
       {
         minimumScorePoints: Number.NEGATIVE_INFINITY,
-        groupPoints: 1,
+        groupPoints: 0,
         outcome: "group",
-        grade: "C",
+        grade: "2",
       },
     ] satisfies {
       minimumScorePoints: number;
@@ -142,7 +171,7 @@ export const GAME_RULES = Object.freeze({
 // (src/logic/golden-master.test.ts) fails when traces change without a bump. A save from another
 // revision keeps only a finished report (frozen, no undo); an unfinished game is discarded with a
 // notice.
-export const RULES_REVISION = 1;
+export const RULES_REVISION = 2;
 
 // Application configuration that is not a gameplay rule.
 export const APP_CONFIG = Object.freeze({
@@ -151,7 +180,7 @@ export const APP_CONFIG = Object.freeze({
   // Saved games live under this key. Never rename it without a migration of existing saves.
   storageKey: "selekcja-26-game",
   // Shape of the saved game. Bump it only together with an explicit migration in src/logic.
-  saveSchemaVersion: 3,
+  saveSchemaVersion: 4,
   // Used when the browser offers no crypto source for a fresh game seed.
   fallbackSeed: 2028,
 });

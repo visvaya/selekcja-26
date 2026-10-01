@@ -8,9 +8,7 @@ import type {
   GroupPosition,
   Player,
   PlayerId,
-  SortId,
 } from "../data/types.ts";
-import { experienceScore, groupScore, modelScore } from "./scoring.ts";
 
 export const detailedPositions = (player: Player): DetailedPosition[] =>
   player.pos === "BR" ? ["BR"] : (detailedPositionMap[player.id] ?? []);
@@ -175,31 +173,6 @@ export function riskLevel(
     : risk < rules.mediumThresholdPoints
       ? "medium"
       : "high";
-}
-
-export function visiblePlayers(state: GameState): Player[] {
-  const query = state.query.trim().toLocaleLowerCase("pl");
-  const matching = players.filter(
-    (player) =>
-      (state.filter === "ALL" ||
-        detailedPositions(player).includes(state.filter)) &&
-      `${player.name} ${player.club} ${detailedPositions(player).join(" ")}`
-        .toLocaleLowerCase("pl")
-        .includes(query),
-  );
-  const comparators: Record<SortId, (left: Player, right: Player) => number> = {
-    model: (left, right) => modelScore(right, state) - modelScore(left, state),
-    quality: (left, right) => right.ov - left.ov,
-    form: (left, right) => right.form - left.form,
-    fitness: (left, right) => right.fit - left.fit,
-    tactics: (left, right) => right.tact - left.tact,
-    experience: (left, right) => experienceScore(right) - experienceScore(left),
-    group: (left, right) => groupScore(right) - groupScore(left),
-    young: (left, right) => left.age - right.age,
-    old: (left, right) => right.age - left.age,
-    name: (left, right) => left.name.localeCompare(right.name, "pl"),
-  };
-  return matching.sort(comparators[state.sort]);
 }
 
 // The first camp event whose threshold is reached and which is still unresolved. While it is

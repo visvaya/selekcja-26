@@ -2,7 +2,7 @@
 // golden master test compares the resulting traces byte for byte with the files in
 // src/logic/golden/traces, so any change in ratings, draws, events or results shows up there.
 import { players } from "../data/catalog.ts";
-import type { PriorityId, SystemId } from "../data/types.ts";
+import type { SystemId } from "../data/types.ts";
 import { fillSquadRandomly } from "./random-squad.ts";
 import { buildFinalReport, reportReasons } from "./report.ts";
 import type { ReportCopy } from "./report.ts";
@@ -20,7 +20,6 @@ import type { GameState } from "../data/types.ts";
 
 export type ScenarioStep =
   | { do: "setSystem"; value: SystemId }
-  | { do: "setPriority"; value: PriorityId }
   | { do: "start" }
   | { do: "pick"; player: string }
   | { do: "autoFill" }
@@ -47,7 +46,6 @@ function digest(state: GameState) {
     stage: state.stage,
     started: state.started,
     system: state.system,
-    priority: state.priority,
     seed: state.seed,
     selected: selectedPlayers(state).map(playerKey),
     events: [...state.events],
@@ -84,12 +82,11 @@ function applyStep(
 ): { state: GameState; extra?: Record<string, unknown> } {
   switch (step.do) {
     case "setSystem":
-    case "setPriority":
       return {
         state: reduceGameState(state, {
-          type: step.do,
+          type: "setSystem",
           value: step.value,
-        } as Parameters<typeof reduceGameState>[1]),
+        }),
       };
     case "start":
       return {

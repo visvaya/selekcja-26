@@ -5,7 +5,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
-import { RULES_REVISION } from "../data/constants.ts";
+import { GAME_RULES, RULES_REVISION } from "../data/constants.ts";
 import { UI_TEXT } from "../ui/text.ts";
 import { SCENARIOS } from "./golden/scenarios.ts";
 import { formatTrace, replayScenario } from "./replay.ts";
@@ -102,3 +102,24 @@ test(
     );
   },
 );
+
+// A grade can belong to two bands, so a band is identified by grade, outcome and group points.
+test("the scenarios reach every outcome band", { skip: updating }, () => {
+  const bandKey = (band: { grade: string; outcome: string; points: number }) =>
+    `${band.grade}/${band.outcome}/${band.points}`;
+  const reached = new Set(
+    SCENARIOS.map((scenario) => {
+      const steps = replayScenario(scenario, UI_TEXT).steps as {
+        evaluation?: { grade: string; outcome: string; points: number };
+      }[];
+      const evaluation = steps
+        .filter((step) => step.evaluation)
+        .at(-1)?.evaluation;
+      return evaluation ? bandKey(evaluation) : "";
+    }),
+  );
+  for (const band of GAME_RULES.tournament.outcomeBands) {
+    const key = bandKey({ ...band, points: band.groupPoints });
+    assert.ok(reached.has(key), `no scenario reaches band ${key}`);
+  }
+});

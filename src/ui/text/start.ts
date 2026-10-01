@@ -1,4 +1,4 @@
-import type { PriorityId, Stage, SystemId } from "../../data/types.ts";
+import type { Stage, SystemId } from "../../data/types.ts";
 import type { ChangelogVersion } from "../../data/changelog.ts";
 
 // Formats an ISO "YYYY-MM-DD" changelog date as Polish "DD.MM.YYYY". No Intl dependency: the
@@ -19,7 +19,6 @@ export const START_TEXT = {
   rosterTransition: "lista kontrolna i EURO",
   groupMatches: "mecze w grupie",
   systemChoice: "Wybierz model gry",
-  priorityChoice: "Ustal priorytet selekcji",
   start: "Rozpocznij odprawę",
   undo: "Cofnij",
   disclaimer:
@@ -38,21 +37,6 @@ export const START_TEXT = {
       description: "Pressing, mobilna ósemka i szeroko ustawieni skrzydłowi.",
     },
   } satisfies Record<SystemId, { name: string; description: string }>,
-  priorities: {
-    balance: {
-      name: "Zrównoważony",
-      description:
-        "Najbliższy realizmowi: forma, rytm, doświadczenie, kadra, grupa i taktyka.",
-    },
-    form: {
-      name: "Liczy się dziś",
-      description: "Premia za obecną formę i rytm meczowy.",
-    },
-    quality: {
-      name: "Najlepsi piłkarze",
-      description: "Zaufanie do klasy, doświadczenia i sufitu.",
-    },
-  } satisfies Record<PriorityId, { name: string; description: string }>,
   stages: {
     camp: {
       phase: "ZGRUPOWANIE 1/2",

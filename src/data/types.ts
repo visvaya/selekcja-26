@@ -15,7 +15,6 @@ export type DetailedPosition =
   | "N"
   | "PS";
 export type SystemId = "4231" | "3421" | "433";
-export type PriorityId = "balance" | "form" | "quality";
 export type Stage = "camp" | "final";
 export type OutcomeId =
   | "champion"
@@ -86,7 +85,30 @@ export interface Effects {
   fit: number;
   quality: number;
 }
+export type KnockoutRoundId =
+  "roundOf16" | "quarterfinal" | "semifinal" | "final";
+export type MatchResultId = "win" | "draw" | "loss";
+export interface MatchScore {
+  goalsFor: number;
+  goalsAgainst: number;
+  penalties: { goalsFor: number; goalsAgainst: number } | null;
+}
+export interface GroupMatch extends MatchScore {
+  opponent: string;
+}
+export interface KnockoutMatch extends MatchScore {
+  round: KnockoutRoundId;
+  opponent: string;
+}
 export interface TournamentStory {
+  groupPoints: number;
+  groupMatches: GroupMatch[]; // always 3
+  knockout: KnockoutMatch[]; // 0 after a group exit, up to 4
+  outcome: string; // closing sentence
+  seed: number;
+}
+// Shape written under rules revision 1; kept for frozen reports.
+export interface LegacyTournamentStory {
   matches: string[];
   outcome: string;
   last: string;
@@ -106,20 +128,17 @@ export interface FinalReport {
   grade: string;
   strengths: string[];
   weak: string[];
-  story: TournamentStory;
+  story: TournamentStory | LegacyTournamentStory;
 }
 
 export interface GameState {
   system: SystemId;
-  priority: PriorityId;
   stage: Stage;
   started: boolean;
   selected: Set<PlayerId>;
   campSquad: Set<PlayerId>;
   trial: Record<PlayerId, TrialReport>;
-  filter: "ALL" | DetailedPosition;
-  query: string;
-  sort: SortId;
+  list: ListFilters;
   events: Set<string>;
   effects: Effects;
   compare: PlayerId[];
@@ -128,7 +147,36 @@ export interface GameState {
   history: GameSnapshot[];
 }
 
-export type GameSnapshot = Omit<GameState, "history">;
+export type GameSnapshot = Omit<GameState, "history" | "list">;
+
+export type RangeId =
+  | "age"
+  | "score"
+  | "quality"
+  | "form"
+  | "fitness"
+  | "tactics"
+  | "experience"
+  | "chemistry"
+  | "groupImpact"
+  | "campImpact";
+
+export interface RangeBounds {
+  min: number | null;
+  max: number | null;
+}
+
+// Player list view settings. They are saved with the game but never recorded as undo steps.
+export interface ListFilters {
+  positions: DetailedPosition[]; // empty = every position; several = any of them
+  query: string;
+  sort: SortId;
+  foot: { left: boolean; right: boolean };
+  traits: RoleId[]; // a player must have every listed trait
+  ranges: Partial<Record<RangeId, RangeBounds>>;
+  onlySelected: boolean;
+  onlyCamp: boolean;
+}
 
 export type SortId =
   | "model"

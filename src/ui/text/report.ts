@@ -1,4 +1,18 @@
-import type { OutcomeId } from "../../data/types.ts";
+import type {
+  KnockoutRoundId,
+  MatchScore,
+  OutcomeId,
+} from "../../data/types.ts";
+
+// The closing sentence stored in `story.outcome`; part of the golden traces.
+const OUTCOME_SENTENCES: Readonly<Record<OutcomeId, string>> = {
+  group: "Polska zakończyła udział w turnieju po fazie grupowej.",
+  roundOf16: "Polska odpadła w 1/8 finału.",
+  quarterfinal: "Polska odpadła w ćwierćfinale.",
+  semifinal: "Polska odpadła w półfinale.",
+  runnerUp: "Polska została wicemistrzem Europy.",
+  champion: "Polska została mistrzem Europy.",
+};
 
 // The report's closing sentence, speaking of Poland as "we", keyed by the stage label the report
 // stores (`FinalReport.stage`). Built at display time, so older saved reports read the same way;
@@ -43,25 +57,21 @@ export const REPORT_TEXT = {
       "Włochy",
       "Holandia",
     ],
-    wins: ["2:0", "2:1", "1:0"],
-    losses: ["0:1", "1:2", "0:2"],
-    quarterfinalLosses: ["1:1, karne 3:4", "0:1", "1:2"],
-    groupExit: ["1:1", "0:1", "1:2"],
     groupPoints: (points: number) => `Faza grupowa: ${points} pkt`,
     match: (score: string, opponent: string) => `Polska ${score} ${opponent}`,
     round: (name: string, match: string) => `${name}: ${match}`,
-    groupLast: (match: string) => `Ostatni mecz grupy: ${match}`,
-    groupOutcome: "Polska zakończyła udział w turnieju po fazie grupowej.",
-    championOutcome: "Polska została mistrzem Europy.",
-    runnerUpOutcome: "Polska została wicemistrzem Europy.",
-    eliminated: (stage: string) =>
-      `Polska odpadła w ${stage === "Półfinał" ? "półfinale" : stage === "Ćwierćfinał" ? "ćwierćfinale" : "1/8 finału"}.`,
-    rounds: ["1/8 finału", "Ćwierćfinał", "Półfinał", "Finał"],
-    groupStage: "Faza grupowa",
-    championStage: "Mistrz Europy",
-    runnerUpStage: "Wicemistrz Europy",
-    semifinalStage: "Półfinał",
-    quarterfinalStage: "Ćwierćfinał",
+    score: (score: MatchScore) =>
+      `${score.goalsFor}:${score.goalsAgainst}${score.penalties ? `, karne ${score.penalties.goalsFor}:${score.penalties.goalsAgainst}` : ""}`,
+    roundNames: {
+      roundOf16: "1/8 finału",
+      quarterfinal: "Ćwierćfinał",
+      semifinal: "Półfinał",
+      final: "Finał",
+    } satisfies Record<KnockoutRoundId, string>,
+    eliminatedMarker: "Odpadliśmy",
+    semifinalLossMarker: "Przegraliśmy",
+    placeMarker: (place: 1 | 2) => `${place}. miejsce`,
+    outcomeSentence: (outcome: OutcomeId) => OUTCOME_SENTENCES[outcome],
   },
   luck: {
     positive: "Kilka kluczowych momentów ułożyło się po twojej myśli.",

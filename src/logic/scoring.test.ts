@@ -24,3 +24,17 @@ test("trialNote classifies a delta by the campTrial thresholds", () => {
   assert.equal(trialNote(rules.uncertainThresholdPoints - 1), "disappointed");
   assert.equal(trialNote(rules.minimumDeltaPoints), "disappointed");
 });
+
+test("modelScore always uses the balanced weights", () => {
+  const state = createInitialState();
+  const expected: [string, number, number][] = [
+    ["robert-lewandowski", 85, 84],
+    ["lukasz-skorupski", 83, 83],
+    ["jakub-kiwior", 84, 84],
+  ];
+  for (const [id, in4231, in433] of expected) {
+    const player = players.find((candidate) => candidate.id === id)!;
+    assert.equal(modelScore(player, state), in4231, id);
+    assert.equal(modelScore(player, { ...state, system: "433" }), in433, id);
+  }
+});

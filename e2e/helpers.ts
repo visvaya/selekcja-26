@@ -51,12 +51,42 @@ function v3Snapshot(
   };
 }
 
-// An unfinished version 3 save whose rulesRevision does not match the running build, so it gets
-// discarded on load with the "rules changed" notice. Shared by the storage test and the axe scan.
+// A minimal unfinished version 4 save state for the running rules, with list settings that
+// default to an unfiltered list unless overridden.
+export function v4State(
+  list: Record<string, unknown> = {},
+): Record<string, unknown> {
+  const {
+    filter: _filter,
+    query: _query,
+    sort: _sort,
+    ...snapshot
+  } = v3Snapshot();
+  return {
+    ...snapshot,
+    list: {
+      positions: [],
+      query: "",
+      sort: "model",
+      foot: { left: false, right: false },
+      traits: [],
+      ranges: {},
+      onlySelected: false,
+      onlyCamp: false,
+      ...list,
+    },
+    history: [],
+  };
+}
+
+const LEGACY_RULES_REVISION = 1;
+
+// An unfinished version 3 save written under rules revision 1, so it gets discarded on load
+// with the "rules changed" notice. Shared by the storage test and the axe scan.
 export function unfinishedOtherRulesSave(): string {
   return JSON.stringify({
     schemaVersion: 3,
-    rulesRevision: RULES_REVISION + 1,
+    rulesRevision: LEGACY_RULES_REVISION,
     state: { ...v3Snapshot(), history: [] },
   });
 }
@@ -68,45 +98,76 @@ const OLDER_RULES_SQUAD_IDS = [
   "robert-lewandowski",
 ];
 
-// A finished version 3 report for the given rules revision, shown frozen with the older-rules
-// note when that revision differs from the running one. Shared by the storage test, the axe
-// scan and the visual baselines.
-export function finishedReportSave(rulesRevision: number): string {
-  return JSON.stringify({
-    schemaVersion: 3,
+// Rules revision 1 stored letter grades; later revisions grade on the 1-6 scale.
+function finishedReport(rulesRevision: number, story: unknown) {
+  return {
     rulesRevision,
-    state: {
-      ...v3Snapshot({
-        stage: "final",
-        report: {
-          rulesRevision,
-          squadIds: OLDER_RULES_SQUAD_IDS,
-          quality: 80,
-          chem: 78,
-          coverage: 92,
-          luck: 0,
-          points: 5,
-          stage: text.outcomes.roundOf16,
-          grade: "B",
-          strengths: [],
-          weak: [],
-          story: {
-            matches: [`${text.tournament.rounds[0]}: 5 pkt`],
+    squadIds: OLDER_RULES_SQUAD_IDS,
+    quality: 80,
+    chem: 78,
+    coverage: 92,
+    luck: 0,
+    points: 5,
+    stage: text.outcomes.roundOf16,
+    grade: rulesRevision === LEGACY_RULES_REVISION ? "B" : "4",
+    strengths: [],
+    weak: [],
+    story,
+  };
+}
+
+// A finished round of 16 report for the given rules revision, shown frozen with the older-rules
+// note when that revision differs from the running one. Rules revision 1 wrote a version 3 save
+// with the flat legacy story; any later revision gets a version 4 save with a structured story.
+// Shared by the storage test, the axe scan and the visual baselines.
+export function finishedReportSave(rulesRevision: number): string {
+  if (rulesRevision === LEGACY_RULES_REVISION)
+    return JSON.stringify({
+      schemaVersion: 3,
+      rulesRevision,
+      state: {
+        ...v3Snapshot({
+          stage: "final",
+          report: finishedReport(rulesRevision, {
+            matches: ["Faza grupowa: 5 pkt", "1/8 finału: Polska 0:1 Dania"],
             outcome: "Polska odpadła w 1/8 finału.",
             last: "Polska 0:1 Dania",
             seed: 9,
-          },
-        },
+          }),
+        }),
+        history: [],
+      },
+    });
+  const goals = (goalsFor: number, goalsAgainst: number) => ({
+    goalsFor,
+    goalsAgainst,
+    penalties: null,
+  });
+  return JSON.stringify({
+    schemaVersion: 4,
+    rulesRevision,
+    state: {
+      ...v4State(),
+      stage: "final",
+      report: finishedReport(rulesRevision, {
+        groupPoints: 5,
+        groupMatches: [
+          { ...goals(1, 1), opponent: "Szwajcaria" },
+          { ...goals(2, 0), opponent: "Serbia" },
+          { ...goals(0, 0), opponent: "Austria" },
+        ],
+        knockout: [{ ...goals(0, 1), round: "roundOf16", opponent: "Dania" }],
+        outcome: "Polska odpadła w 1/8 finału.",
+        seed: 9,
       }),
-      history: [],
     },
   });
 }
 
-// A finished version 3 report from another rules revision, shown frozen with the older-rules
-// note. Shared by the storage test and the axe scan.
+// A finished report from the older rules revision 1, shown frozen with the older-rules note
+// and its letter grade mapped onto the 1-6 scale. Shared by the storage test and the axe scan.
 export function finishedOtherRulesReportSave(): string {
-  return finishedReportSave(RULES_REVISION + 1);
+  return finishedReportSave(LEGACY_RULES_REVISION);
 }
 
 // An unfinished camp-stage save for the running rules, used by the screenshot baselines.
@@ -120,11 +181,14 @@ export function campSave({
   system?: string;
 }): string {
   return JSON.stringify({
-    schemaVersion: 3,
+    schemaVersion: 4,
     rulesRevision: RULES_REVISION,
     state: {
-      ...v3Snapshot({ system, selected: selectedIds, events, seed: 12345 }),
-      history: [],
+      ...v4State(),
+      system,
+      selected: selectedIds,
+      events,
+      seed: 12345,
     },
   });
 }
@@ -285,38 +349,30 @@ export async function expectNoHorizontalScroll(page: Page): Promise<void> {
   expect(overflow, "page must not scroll horizontally").toBeLessThanOrEqual(0);
 }
 
+// The tournament path: the group's nested match lines, then the knockout rounds (the top-level
+// lines after the group line).
 export async function readReport(page: Page) {
   const report = page.locator(".result");
+  const path = report.locator(".report").first().locator(":scope > ul");
   return {
     stage: await report.locator("h1").innerText(),
     grade: await report.locator(".grade").innerText(),
-    matches: await report
-      .locator(".report")
+    groupMatches: await path
+      .locator(":scope > li")
       .first()
-      .locator("li")
+      .locator("ul > li")
       .allInnerTexts(),
+    knockout: (await path.locator(":scope > li").allInnerTexts()).slice(1),
   };
 }
 
 export async function expectCoherentReport(page: Page): Promise<void> {
   const report = await readReport(page);
-  // The last list item is the last match: "Ostatni mecz grupy: ..." after a group exit,
-  // otherwise the last knockout round played (the final for champion and runner-up).
-  const reachedFinal =
-    report.stage === text.outcomes.champion ||
-    report.stage === text.outcomes.runnerUp;
-  const lastRound = reachedFinal ? text.tournament.rounds.at(-1) : report.stage;
-  const lastMatchPrefix =
-    report.stage === text.outcomes.group
-      ? text.tournament.groupLast("").trim()
-      : `${lastRound}:`;
-  expect(report.matches.length).toBeGreaterThanOrEqual(2);
-  expect(report.matches.at(-1)).toMatch(/Polska \d/);
-  expect(report.matches.at(-1)!.startsWith(lastMatchPrefix)).toBe(true);
+  const t = text.tournament;
   expect(Object.values(text.outcomes)).toContain(report.stage);
-  const knockoutRounds = report.matches.filter((match) =>
-    text.tournament.rounds.some((round) => match.startsWith(`${round}:`)),
-  );
+  expect(report.groupMatches).toHaveLength(3);
+  for (const match of report.groupMatches)
+    expect(match).toMatch(/Polska \d+:\d+/);
   const expectedRounds: Record<string, number> = {
     [text.outcomes.group]: 0,
     [text.outcomes.roundOf16]: 1,
@@ -325,5 +381,28 @@ export async function expectCoherentReport(page: Page): Promise<void> {
     [text.outcomes.runnerUp]: 4,
     [text.outcomes.champion]: 4,
   };
-  expect(knockoutRounds).toHaveLength(expectedRounds[report.stage]!);
+  expect(report.knockout).toHaveLength(expectedRounds[report.stage]!);
+  const lines = [...report.groupMatches, ...report.knockout];
+  const count = (marker: string) =>
+    lines.filter((line) => line.includes(marker)).length;
+  const finalRow = report.knockout.at(-1) ?? "";
+  if (report.stage === text.outcomes.semifinal) {
+    expect(count(t.semifinalLossMarker)).toBe(1);
+    expect(count(t.eliminatedMarker)).toBe(0);
+    expect(finalRow).toContain(t.semifinalLossMarker);
+  } else if (
+    report.stage === text.outcomes.champion ||
+    report.stage === text.outcomes.runnerUp
+  ) {
+    expect(count(t.eliminatedMarker)).toBe(0);
+    expect(count(t.semifinalLossMarker)).toBe(0);
+    expect(finalRow.startsWith(`${t.roundNames.final}:`)).toBe(true);
+    expect(finalRow).toContain(
+      t.placeMarker(report.stage === text.outcomes.champion ? 1 : 2),
+    );
+  } else {
+    expect(count(t.eliminatedMarker)).toBe(1);
+    expect(count(t.semifinalLossMarker)).toBe(0);
+    expect(lines.at(-1)).toContain(t.eliminatedMarker);
+  }
 }

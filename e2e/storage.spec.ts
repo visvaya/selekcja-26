@@ -1,5 +1,4 @@
 import { expect, test } from "@playwright/test";
-import { players } from "../src/data/catalog.ts";
 import { APP_CONFIG, RULES_REVISION } from "../src/data/constants.ts";
 import {
   STORAGE_KEY,
@@ -13,14 +12,17 @@ import {
   saveStatusRegion,
   seedStorage,
   setStorageFailureMode,
-  squadCount,
   text,
   unfinishedOtherRulesSave,
+  v4State,
 } from "./helpers.ts";
 
-test("a version 1 save is migrated without undo history", async ({ page }) => {
+// Version 1 and 2 saves were written under rules revision 1: a finished report survives the
+// migration frozen (letter grade shown on the 1-6 scale), an unfinished game is discarded.
+test("a version 1 save with a finished report is migrated and shown frozen", async ({
+  page,
+}) => {
   const errors = collectPageErrors(page);
-  const picked = players.slice(0, 10).map((player) => player.name);
   await seedStorage(
     page,
     JSON.stringify({
@@ -28,54 +30,89 @@ test("a version 1 save is migrated without undo history", async ({ page }) => {
       state: {
         system: "433",
         priority: "form",
-        stage: "camp",
+        stage: "final",
         started: true,
-        selected: picked,
-        campSquad: [],
+        selected: ["Łukasz Skorupski", "Robert Lewandowski"],
+        campSquad: ["Łukasz Skorupski"],
         trial: {},
         filter: "ALL",
         query: "",
         sort: "model",
-        events: ["doctor"],
-        effects: { chem: 0, fit: 4, quality: -1 },
+        events: ["doctor", "captain", "scout"],
+        effects: { chem: 5, fit: 4, quality: -2 },
         compare: [],
-        seed: 12345,
-        report: null,
+        seed: 77,
+        report: {
+          s: [
+            {
+              name: "Łukasz Skorupski",
+              pos: "BR",
+              club: "Bologna",
+              ov: 83,
+              form: 80,
+              fit: 91,
+              tact: 79,
+              chem: 82,
+              roles: [],
+              age: 35,
+              flags: "",
+            },
+            {
+              name: "Robert Lewandowski",
+              pos: "ATA",
+              club: "FC Barcelona",
+              ov: 88,
+              form: 82,
+              fit: 76,
+              tact: 91,
+              chem: 94,
+              roles: [],
+              age: 39,
+              flags: "",
+            },
+          ],
+          quality: 84,
+          chem: 80,
+          coverage: 100,
+          luck: 0,
+          points: 5,
+          stage: text.outcomes.quarterfinal,
+          grade: "B+",
+          strengths: [],
+          weak: [],
+          story: {
+            matches: ["Faza grupowa: 5 pkt"],
+            last: "Polska 0:1 Dania",
+            outcome: "Polska odpadła w ćwierćfinale.",
+            seed: 9,
+          },
+        },
       },
     }),
   );
   await page.goto("/");
 
   await expect(
-    page.getByRole("heading", { name: text.stages.camp.heading }),
+    page.getByRole("heading", { name: text.outcomes.quarterfinal }),
   ).toBeVisible();
-  await expect(squadCount(page)).toHaveText("10/23");
-  await expect(page.getByRole("main")).toContainText(text.systems["433"].name);
-  await expect(page.getByRole("dialog")).toBeHidden();
-  await expect(page.getByRole("button", { name: text.undo })).toBeDisabled();
-
-  await expect
-    .poll(() =>
-      page.evaluate(
-        (key) => JSON.parse(localStorage.getItem(key) ?? "{}").schemaVersion,
-        STORAGE_KEY,
-      ),
-    )
-    .toBe(APP_CONFIG.saveSchemaVersion);
+  await expect(page.getByText(text.reportFromOlderRules)).toBeVisible();
+  await expect(page.locator(".grade")).toHaveText("4+");
+  await expect(page.getByRole("button", { name: text.undo })).toHaveCount(0);
+  await expectSavedSchemaVersion(page, APP_CONFIG.saveSchemaVersion);
   const rewritten = await page.evaluate(
     (key) => JSON.parse(localStorage.getItem(key) ?? "{}"),
     STORAGE_KEY,
   );
   expect(rewritten.rulesRevision).toBe(RULES_REVISION);
-  expect(rewritten.state.selected).toEqual(
-    players.slice(0, 10).map((player) => player.id),
-  );
-  await page.reload();
-  await expect(squadCount(page)).toHaveText("10/23");
+  expect(rewritten.state.report.rulesRevision).toBe(1);
+  expect(rewritten.state.report.squadIds).toEqual([
+    "lukasz-skorupski",
+    "robert-lewandowski",
+  ]);
   expect(errors).toEqual([]);
 });
 
-test("a version 2 save loads into the final stage and rewrites to version 3", async ({
+test("an unfinished version 2 save is discarded with the rules notice", async ({
   page,
 }) => {
   const errors = collectPageErrors(page);
@@ -90,82 +127,25 @@ test("a version 2 save loads into the final stage and rewrites to version 3", as
         started: true,
         selected: ["Jakub Kiwior", "Paweł Wszołek"],
         campSquad: ["Jakub Kiwior", "Kamil Grosicki"],
-        trial: {
-          "Jakub Kiwior": { delta: 4, note: "impressed" },
-          "Kamil Grosicki": { delta: -3, note: "disappointed" },
-        },
+        trial: {},
         filter: "ALL",
         query: "",
         sort: "model",
         events: ["doctor", "captain", "scout"],
         effects: { chem: 0, fit: 4, quality: 1 },
-        compare: ["Kamil Grosicki", "Jakub Kiwior"],
+        compare: [],
         seed: 4242,
         report: null,
-        history: [
-          {
-            system: "3421",
-            priority: "balance",
-            stage: "camp",
-            started: true,
-            selected: ["Jakub Kiwior", "Kamil Grosicki"],
-            campSquad: [],
-            trial: {},
-            filter: "ALL",
-            query: "",
-            sort: "model",
-            events: ["doctor"],
-            effects: { chem: 0, fit: 4, quality: -1 },
-            compare: [],
-            seed: 4000,
-            report: null,
-          },
-          {
-            system: "3421",
-            priority: "balance",
-            stage: "final",
-            started: true,
-            selected: ["Jakub Kiwior"],
-            campSquad: ["Jakub Kiwior", "Kamil Grosicki"],
-            trial: {
-              "Jakub Kiwior": { delta: 4, note: "impressed" },
-              "Kamil Grosicki": { delta: -3, note: "disappointed" },
-            },
-            filter: "ALL",
-            query: "",
-            sort: "model",
-            events: ["doctor", "captain", "scout"],
-            effects: { chem: 0, fit: 4, quality: 1 },
-            compare: ["Kamil Grosicki"],
-            seed: 4242,
-            report: null,
-          },
-        ],
+        history: [],
       },
     }),
   );
   await page.goto("/");
 
   await expect(
-    page.getByRole("heading", { name: text.stages.final.heading }),
+    page.getByRole("heading", { name: text.rulesChangedTitle }),
   ).toBeVisible();
-  await expect(squadCount(page)).toHaveText("2/26");
-  await expect(page.getByRole("button", { name: text.undo })).toBeEnabled();
-
-  await expect
-    .poll(() =>
-      page.evaluate(
-        (key) => JSON.parse(localStorage.getItem(key) ?? "{}").schemaVersion,
-        STORAGE_KEY,
-      ),
-    )
-    .toBe(3);
-  const saved = await page.evaluate(
-    (key) => JSON.parse(localStorage.getItem(key) ?? "{}"),
-    STORAGE_KEY,
-  );
-  expect(saved.rulesRevision).toBe(RULES_REVISION);
-  expect(saved.state.selected).toEqual(["jakub-kiwior", "pawel-wszolek"]);
+  await expect(dialog(page)).toContainText(text.rulesChangedDiscarded);
   expect(errors).toEqual([]);
 });
 
@@ -203,7 +183,7 @@ test("an unfinished version 3 save from other rules is discarded with a notice",
   expect(errors).toEqual([]);
 });
 
-test("a finished version 3 report from other rules is shown frozen with the older-rules note", async ({
+test("a finished report from other rules is shown frozen with the older-rules note", async ({
   page,
 }) => {
   const errors = collectPageErrors(page);
@@ -214,6 +194,8 @@ test("a finished version 3 report from other rules is shown frozen with the olde
     page.getByRole("heading", { name: text.outcomes.roundOf16 }),
   ).toBeVisible();
   await expect(page.getByText(text.reportFromOlderRules)).toBeVisible();
+  // The stored letter grade "B" is shown on the 1-6 scale.
+  await expect(page.locator(".grade")).toHaveText("4");
   await expect(page.getByRole("button", { name: text.undo })).toHaveCount(0);
   for (const name of [
     "Łukasz Skorupski",
@@ -293,7 +275,7 @@ test("a quota-exceeded save shows a retry banner and recovers", async ({
   await expect(saveAlert(page)).toHaveText("");
   await expect(saveStatusRegion(page)).toHaveText(text.save.recovered);
 
-  await expectSavedSchemaVersion(page, 3);
+  await expectSavedSchemaVersion(page, APP_CONFIG.saveSchemaVersion);
 
   await page.reload();
   await expect(
@@ -351,5 +333,29 @@ test("unavailable storage shows a dismissible banner and keeps the game playable
   await page.getByRole("button", { name: text.autoFill }).click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await expect(saveAlert(page)).toHaveText("");
+  expect(errors).toEqual([]);
+});
+
+test("a version 4 save restores the list position filter and search", async ({
+  page,
+}) => {
+  const errors = collectPageErrors(page);
+  await seedStorage(
+    page,
+    JSON.stringify({
+      schemaVersion: 4,
+      rulesRevision: RULES_REVISION,
+      state: v4State({ positions: ["LŚO"], query: "ki" }),
+    }),
+  );
+  await page.goto("/");
+  await expect(
+    page.getByRole("heading", { name: text.positions["LŚO"] }),
+  ).toBeVisible();
+  await expect(page.getByLabel(text.searchLabel)).toHaveValue("ki");
+  await expect(page.getByRole("button", { name: /^LŚO \(/ })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
   expect(errors).toEqual([]);
 });

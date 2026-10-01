@@ -1,7 +1,52 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { detailedPositionMap, players, systems } from "./catalog.ts";
+import {
+  detailedPositionMap,
+  players,
+  positionOrder,
+  systems,
+} from "./catalog.ts";
 import { UI_TEXT } from "../ui/text.ts";
+import type { DetailedPosition, GroupPosition } from "./types.ts";
+
+const GROUP_BY_FIRST_POSITION: Record<DetailedPosition, GroupPosition> = {
+  BR: "BR",
+  LO: "OBR",
+  LŚO: "OBR",
+  ŚO: "OBR",
+  PŚO: "OBR",
+  PO: "OBR",
+  LWO: "OBR",
+  PWO: "OBR",
+  DP: "POM",
+  ŚP: "POM",
+  OP: "POM",
+  LS: "ATA",
+  N: "ATA",
+  PS: "ATA",
+};
+
+test("every player's group follows the first detailed position", () => {
+  for (const player of players) {
+    if (player.pos === "BR") continue;
+    const first = detailedPositionMap[player.id]![0]!;
+    assert.equal(player.pos, GROUP_BY_FIRST_POSITION[first], player.id);
+  }
+});
+
+test("group sizes after the regrouping", () => {
+  const count = (group: GroupPosition) =>
+    players.filter((player) => player.pos === group).length;
+  assert.deepEqual(
+    {
+      BR: count("BR"),
+      OBR: count("OBR"),
+      POM: count("POM"),
+      ATA: count("ATA"),
+    },
+    { BR: 7, OBR: 22, POM: 17, ATA: 15 },
+  );
+});
 
 test("the candidate list covers every detailed position", () => {
   assert.equal(players.length, 61);
@@ -39,4 +84,26 @@ test("role and availability IDs are English and all have Polish labels", () => {
   for (const player of players)
     if (player.flag)
       assert.ok(UI_TEXT.availabilityFlags[player.flag], player.flag);
+});
+
+test("positions are ordered by line, deeper first, striker before the wingers", () => {
+  const order = (Object.keys(positionOrder) as DetailedPosition[]).sort(
+    (a, b) => positionOrder[a] - positionOrder[b],
+  );
+  assert.deepEqual(order, [
+    "BR",
+    "LO",
+    "LŚO",
+    "ŚO",
+    "PŚO",
+    "PO",
+    "LWO",
+    "PWO",
+    "DP",
+    "ŚP",
+    "OP",
+    "N",
+    "LS",
+    "PS",
+  ]);
 });

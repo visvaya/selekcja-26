@@ -8,18 +8,14 @@ import type {
   GameSnapshot,
   Player,
   PlayerId,
-  PriorityId,
-  SortId,
+  ListFilters,
   SystemId,
-  DetailedPosition,
 } from "../data/types.ts";
+import { DEFAULT_LIST_FILTERS } from "./list-filters.ts";
 
 export type GameAction =
   | { type: "setSystem"; value: SystemId }
-  | { type: "setPriority"; value: PriorityId }
-  | { type: "setFilter"; value: DetailedPosition | "ALL" }
-  | { type: "setQuery"; value: string }
-  | { type: "setSort"; value: SortId }
+  | { type: "setList"; patch: Partial<ListFilters> }
   | { type: "start" }
   | { type: "togglePlayer"; id: PlayerId; limit: number }
   | { type: "autoFill"; selected: Set<string>; seed: number }
@@ -37,15 +33,12 @@ export function createInitialState(
 ): GameState {
   return {
     system: "4231",
-    priority: "balance",
     stage: "camp",
     started: false,
     selected: new Set<string>(),
     campSquad: new Set<string>(),
     trial: {},
-    filter: "ALL",
-    query: "",
-    sort: "model",
+    list: DEFAULT_LIST_FILTERS,
     events: new Set(),
     effects: { chem: 0, fit: 0, quality: 0 },
     compare: [],
@@ -56,7 +49,7 @@ export function createInitialState(
 }
 
 function remember(previous: GameState, next: GameState): GameState {
-  const { history: _history, ...snapshot } = previous;
+  const { history: _history, list: _list, ...snapshot } = previous;
   return {
     ...next,
     history: [...previous.history, snapshot as GameSnapshot].slice(
@@ -74,16 +67,8 @@ export function reduceGameState(
       return action.value === state.system
         ? state
         : remember(state, { ...state, system: action.value });
-    case "setPriority":
-      return action.value === state.priority
-        ? state
-        : remember(state, { ...state, priority: action.value });
-    case "setFilter":
-      return { ...state, filter: action.value };
-    case "setQuery":
-      return { ...state, query: action.value };
-    case "setSort":
-      return { ...state, sort: action.value };
+    case "setList":
+      return { ...state, list: { ...state.list, ...action.patch } };
     case "hydrate":
       return action.state;
     case "undo": {
@@ -91,9 +76,7 @@ export function reduceGameState(
       return snapshot
         ? {
             ...snapshot,
-            filter: state.filter,
-            query: state.query,
-            sort: state.sort,
+            list: state.list,
             compare: state.compare,
             history: state.history.slice(0, -1),
           }

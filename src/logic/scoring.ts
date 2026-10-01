@@ -63,51 +63,29 @@ export function modelScore(player: Player, state: GameState): number {
   const roleHits = player.roles.filter((role) =>
     system.needs.includes(role),
   ).length;
-  let base;
-  if (state.priority === "balance") {
-    const weights = GAME_RULES.selection.balanced;
-    const rhythm =
-      player.form * weights.rhythmFormWeight +
-      player.fit * weights.rhythmFitnessWeight;
-    const national = Math.min(
-      weights.nationalMaximumPoints,
-      player.chem +
-        (player.roles.includes("experience")
-          ? weights.nationalExperienceBonusPoints
-          : 0) +
-        (player.roles.includes("leader")
-          ? weights.nationalLeaderBonusPoints
-          : 0),
-    );
-    const tactical = Math.min(
-      weights.tacticalMaximumPoints,
-      player.tact + roleHits * weights.roleTacticsBonusPoints,
-    );
-    base =
-      rhythm * weights.rhythmWeight +
-      player.ov * weights.qualityWeight +
-      experienceScore(player) * weights.experienceWeight +
-      national * weights.nationalWeight +
-      groupScore(player) * weights.groupWeight +
-      tactical * weights.tacticalWeight;
-  } else {
-    const weights = GAME_RULES.selection.other;
-    base =
-      player.ov * weights.qualityWeight +
-      player.form * weights.formWeight +
-      player.fit * weights.fitnessWeight +
-      player.tact * weights.tacticsWeight +
-      player.chem * weights.chemistryWeight +
-      roleHits * weights.roleBonusPoints;
-    if (state.priority === "form")
-      base +=
-        player.form * weights.formPriorityFormWeight -
-        player.ov * weights.formPriorityQualityPenaltyWeight;
-    if (state.priority === "quality")
-      base +=
-        player.ov * weights.qualityPriorityQualityWeight -
-        player.form * weights.qualityPriorityFormPenaltyWeight;
-  }
+  const weights = GAME_RULES.selection.balanced;
+  const rhythm =
+    player.form * weights.rhythmFormWeight +
+    player.fit * weights.rhythmFitnessWeight;
+  const national = Math.min(
+    weights.nationalMaximumPoints,
+    player.chem +
+      (player.roles.includes("experience")
+        ? weights.nationalExperienceBonusPoints
+        : 0) +
+      (player.roles.includes("leader") ? weights.nationalLeaderBonusPoints : 0),
+  );
+  const tactical = Math.min(
+    weights.tacticalMaximumPoints,
+    player.tact + roleHits * weights.roleTacticsBonusPoints,
+  );
+  let base =
+    rhythm * weights.rhythmWeight +
+    player.ov * weights.qualityWeight +
+    experienceScore(player) * weights.experienceWeight +
+    national * weights.nationalWeight +
+    groupScore(player) * weights.groupWeight +
+    tactical * weights.tacticalWeight;
   const rule = GAME_RULES.selection;
   base -=
     player.flag === "injuryRisk"

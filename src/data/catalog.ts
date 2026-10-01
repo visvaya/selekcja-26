@@ -4,7 +4,6 @@ import type {
   GroupPosition,
   Player,
   PlayerId,
-  PriorityId,
   RoleId,
   System,
 } from "./types.ts";
@@ -59,7 +58,6 @@ const systems: System[] = [
     fits: ["BR", "LO", "LŚO", "ŚO", "PŚO", "PO", "DP", "ŚP", "LS", "PS", "N"],
   },
 ];
-const priorities: PriorityId[] = ["balance", "form", "quality"];
 // The first argument is the stable player ID stored in saves. It must never change; the display
 // name (second argument) may be corrected freely.
 const playerRecord = (
@@ -315,7 +313,7 @@ const initialPlayers = [
   playerRecord(
     "nicola-zalewski",
     "Nicola Zalewski",
-    "POM",
+    "OBR",
     "Atalanta",
     83,
     86,
@@ -432,7 +430,7 @@ const initialPlayers = [
   playerRecord(
     "michal-skoras",
     "Michał Skóraś",
-    "POM",
+    "ATA",
     "Gent",
     78,
     81,
@@ -445,7 +443,7 @@ const initialPlayers = [
   playerRecord(
     "kamil-grosicki",
     "Kamil Grosicki",
-    "POM",
+    "ATA",
     "Pogoń Szczecin",
     77,
     84,
@@ -577,7 +575,7 @@ const initialPlayers = [
   playerRecord(
     "michal-rakoczy",
     "Michał Rakoczy",
-    "ATA",
+    "POM",
     "Cracovia",
     77,
     82,
@@ -749,7 +747,7 @@ const players: Player[] = [
   playerRecord(
     "wiktor-nowak",
     "Wiktor Nowak",
-    "POM",
+    "ATA",
     "Slavia Praga",
     78,
     86,
@@ -801,7 +799,7 @@ const players: Player[] = [
   playerRecord(
     "michael-ameyaw",
     "Michael Ameyaw",
-    "POM",
+    "ATA",
     "Raków Częstochowa",
     77,
     83,
@@ -949,18 +947,18 @@ const detailedPositionMap: Record<PlayerId, DetailedPosition[]> = {
 const positionOrder: Record<DetailedPosition, number> = {
   BR: 0,
   LO: 10,
-  LWO: 11,
-  LŚO: 12,
-  ŚO: 13,
-  PŚO: 14,
-  PO: 15,
+  LŚO: 11,
+  ŚO: 12,
+  PŚO: 13,
+  PO: 14,
+  LWO: 15,
   PWO: 16,
-  LS: 20,
-  DP: 21,
-  ŚP: 22,
-  OP: 23,
-  PS: 24,
+  DP: 20,
+  ŚP: 21,
+  OP: 22,
   N: 30,
+  LS: 31,
+  PS: 32,
 };
 
-export { systems, priorities, players, detailedPositionMap, positionOrder };
+export { systems, players, detailedPositionMap, positionOrder };
