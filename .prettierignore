@@ -6,3 +6,4 @@ playwright-report/
 blob-report/
 src/logic/golden/traces/
 .superpowers/
+src/ui/text-snapshot.json

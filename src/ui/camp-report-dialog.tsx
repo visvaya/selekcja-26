@@ -2,6 +2,7 @@ import { players } from "../data/catalog.ts";
 import type { GameState } from "../data/types.ts";
 import { GameDialog } from "./game-dialog.tsx";
 import { UI_TEXT as text } from "./text.ts";
+import { joinNames } from "./text/polish-format.ts";
 
 export function CampReportDialog({
   state,
@@ -19,14 +20,8 @@ export function CampReportDialog({
         (state.trial[right.id]?.delta ?? 0) -
         (state.trial[left.id]?.delta ?? 0),
     );
-  const best = ranked
-      .slice(0, 3)
-      .map((player) => player.name)
-      .join(", "),
-    doubts = ranked
-      .slice(-2)
-      .map((player) => player.name)
-      .join(" i ");
+  const best = joinNames(ranked.slice(0, 3).map((player) => player.name)),
+    doubts = joinNames(ranked.slice(-2).map((player) => player.name));
   return (
     <GameDialog
       title={text.campReportTitle}
