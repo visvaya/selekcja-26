@@ -86,7 +86,7 @@ test("role and availability IDs are English and all have Polish labels", () => {
       assert.ok(UI_TEXT.availabilityFlags[player.flag], player.flag);
 });
 
-test("positions are ordered by line, deeper first, wingers before the striker", () => {
+test("positions are ordered by line, deeper first, striker before the wingers", () => {
   const order = (Object.keys(positionOrder) as DetailedPosition[]).sort(
     (a, b) => positionOrder[a] - positionOrder[b],
   );
@@ -102,8 +102,8 @@ test("positions are ordered by line, deeper first, wingers before the striker", 
     "DP",
     "ŚP",
     "OP",
+    "N",
     "LS",
     "PS",
-    "N",
   ]);
 });
