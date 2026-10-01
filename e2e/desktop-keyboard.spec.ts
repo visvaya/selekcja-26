@@ -50,16 +50,18 @@ test("desktop game is playable with the keyboard alone", async ({ page }) => {
     page.getByRole("heading", { name: text.introTitle }),
   ).toBeVisible();
 
-  // Tab order reaches the system choices and then the start button.
+  // Tab order reaches every system choice before the start button.
   const system433 = page.getByRole("button", {
     name: new RegExp(text.systems["433"].name),
   });
-  await tabUntil(page, system433);
+  const visitedToSystem = await tabUntil(page, system433);
   await expectVisibleFocus(system433);
   await page.keyboard.press("Space");
   await expect(system433).toHaveAttribute("aria-pressed", "true");
   const start = page.getByRole("button", { name: text.start });
-  await tabUntil(page, start);
+  const visited = [...visitedToSystem, ...(await tabUntil(page, start))];
+  for (const system of Object.values(text.systems))
+    expect(visited.some((label) => label.includes(system.name))).toBe(true);
   await expectVisibleFocus(start);
   await page.keyboard.press("Enter");
   await expect(

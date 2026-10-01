@@ -11,3 +11,8 @@ test("grades already on the 1-6 scale pass through", () => {
   assert.equal(displayGrade("4+"), "4+");
   assert.equal(displayGrade("2"), "2");
 });
+
+test("inherited object keys are not treated as letter grades", () => {
+  assert.equal(displayGrade("constructor"), "constructor");
+  assert.equal(displayGrade("toString"), "toString");
+});

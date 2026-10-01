@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { players } from "../data/catalog.ts";
 import { APP_CONFIG, GAME_RULES, RULES_REVISION } from "../data/constants.ts";
 import { tournamentStory } from "../logic/tournament.ts";
-import type { GroupPosition, Player } from "../data/types.ts";
+import type { GroupPosition, OutcomeId, Player } from "../data/types.ts";
 import { withJsdomWindow } from "./test-jsdom-window.ts";
 import { renderGameApp } from "./test-render-game-app.ts";
 import { UI_TEXT } from "./text.ts";
@@ -303,7 +303,8 @@ const REPORT_BASE = {
 };
 
 // Boots the app from a saved finished report and returns the tournament path lines: the
-// group line's own nested match lines, then every top-level line.
+// group line's own nested match lines, every top-level line's own text, and every
+// top-level row's full text including its markers.
 async function renderSavedReport(report: Record<string, unknown>) {
   return withJsdomWindow(async (dom) => {
     dom.window.localStorage.setItem(
@@ -347,10 +348,13 @@ async function renderSavedReport(report: Record<string, unknown>) {
       const top = [...path.querySelectorAll(":scope > li")].map(
         (item) => item.firstChild?.textContent ?? "",
       );
+      const rows = [...path.querySelectorAll(":scope > li")].map(
+        (item) => item.textContent ?? "",
+      );
       await act(async () => {
         await new Promise((resolve) => setImmediate(resolve));
       });
-      return { nested, top };
+      return { nested, top, rows };
     } finally {
       cleanup();
       await vite.close();
@@ -392,3 +396,63 @@ test("a legacy report keeps its flat tournament lines", async () => {
     "1/8 finału: Polska 0:1 Dania",
   ]);
 });
+
+const MARKER_CASES: readonly {
+  outcome: OutcomeId;
+  points: number;
+  marker: string | null;
+  place: 1 | 2 | null;
+}[] = [
+  { outcome: "group", points: 0, marker: null, place: null },
+  { outcome: "group", points: 1, marker: null, place: null },
+  { outcome: "group", points: 3, marker: null, place: null },
+  { outcome: "roundOf16", points: 3, marker: "eliminated", place: null },
+  { outcome: "quarterfinal", points: 5, marker: "eliminated", place: null },
+  { outcome: "semifinal", points: 7, marker: "semifinal", place: null },
+  { outcome: "runnerUp", points: 7, marker: null, place: 2 },
+  { outcome: "champion", points: 9, marker: null, place: 1 },
+];
+
+function occurrences(haystack: string, needle: string): number {
+  return haystack.split(needle).length - 1;
+}
+
+for (const { outcome, points, marker, place } of MARKER_CASES) {
+  test(`a ${outcome} report with ${points} points marks the right row`, async () => {
+    const t = UI_TEXT.tournament;
+    const story = tournamentStory(outcome, points, 77, t);
+    const { nested, rows } = await renderSavedReport({
+      points,
+      stage: UI_TEXT.outcomes[outcome],
+      grade: "4",
+      story,
+    });
+    const all = rows.join("|");
+    const last = rows[rows.length - 1]!;
+    if (outcome === "group") {
+      assert.equal(rows.length, 1);
+      assert.equal(occurrences(all, t.eliminatedMarker), 1);
+      assert.equal(nested[2]!.endsWith(` ${t.eliminatedMarker}`), true);
+      assert.equal(all.includes(t.semifinalLossMarker), false);
+      assert.equal(all.includes(t.placeMarker(1)), false);
+      assert.equal(all.includes(t.placeMarker(2)), false);
+      return;
+    }
+    if (marker === "eliminated") {
+      assert.equal(occurrences(all, t.eliminatedMarker), 1);
+      assert.equal(last.endsWith(` ${t.eliminatedMarker}`), true);
+      assert.equal(all.includes(t.semifinalLossMarker), false);
+    } else if (marker === "semifinal") {
+      assert.equal(occurrences(all, t.semifinalLossMarker), 1);
+      assert.equal(last.endsWith(` ${t.semifinalLossMarker}`), true);
+      assert.equal(all.includes(t.eliminatedMarker), false);
+    } else {
+      assert.equal(all.includes(t.eliminatedMarker), false);
+      assert.equal(all.includes(t.semifinalLossMarker), false);
+    }
+    if (place !== null) {
+      assert.equal(occurrences(all, t.placeMarker(place)), 1);
+      assert.equal(last.endsWith(` ${t.placeMarker(place)}`), true);
+    }
+  });
+}

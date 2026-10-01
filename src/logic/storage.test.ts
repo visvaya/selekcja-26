@@ -137,6 +137,20 @@ test("a version 2 save keeps its undo history with stable IDs", async () => {
     delta: -3,
     note: "disappointed",
   });
+  const chained = migrateV3State(migrated) as Record<string, unknown>;
+  assert.deepEqual(chained.list, {
+    positions: ["LŚO"],
+    query: "ki",
+    sort: "form",
+    foot: { left: false, right: false },
+    traits: [],
+    ranges: {},
+    onlySelected: false,
+    onlyCamp: false,
+  });
+  for (const snapshot of chained.history as Record<string, unknown>[])
+    for (const key of ["filter", "query", "sort", "priority"])
+      assert.equal(key in snapshot, false, key);
   await withStorage(async (values) => {
     values.set(KEY, V2_FINAL_SAVE);
     assert.deepEqual(await loadGame(), {

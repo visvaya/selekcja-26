@@ -10,5 +10,7 @@ const LETTER_TO_SCALE: Readonly<Record<string, string>> = {
 };
 
 export function displayGrade(grade: string): string {
-  return LETTER_TO_SCALE[grade] ?? grade;
+  return Object.hasOwn(LETTER_TO_SCALE, grade)
+    ? LETTER_TO_SCALE[grade]!
+    : grade;
 }
