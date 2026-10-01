@@ -406,7 +406,7 @@ const MARKER_CASES: readonly {
   { outcome: "group", points: 0, marker: null, place: null },
   { outcome: "group", points: 1, marker: null, place: null },
   { outcome: "group", points: 3, marker: null, place: null },
-  { outcome: "roundOf16", points: 3, marker: "eliminated", place: null },
+  { outcome: "roundOf16", points: 5, marker: "eliminated", place: null },
   { outcome: "quarterfinal", points: 5, marker: "eliminated", place: null },
   { outcome: "semifinal", points: 7, marker: "semifinal", place: null },
   { outcome: "runnerUp", points: 7, marker: null, place: 2 },
