@@ -1,0 +1,674 @@
+{
+  "addToSquad": "Powołaj do kadry",
+  "age": [
+    "0 lat",
+    "1 rok",
+    "2 lata",
+    "5 lat",
+    "12 lat",
+    "22 lata",
+    "X lat",
+    "Półfinał lat",
+    "2026-10-01 lat"
+  ],
+  "allCandidates": "Wszyscy kandydaci",
+  "announcements": {
+    "autoFill": [
+      "Losowo dobrano zawodników: 0. Powołani: 0 z 0.",
+      "Losowo dobrano zawodników: 1. Powołani: 1 z 1.",
+      "Losowo dobrano zawodników: 2. Powołani: 2 z 2.",
+      "Losowo dobrano zawodników: 5. Powołani: 5 z 5.",
+      "Losowo dobrano zawodników: 12. Powołani: 12 z 12.",
+      "Losowo dobrano zawodników: 22. Powołani: 22 z 22.",
+      "Losowo dobrano zawodników: X. Powołani: X z X.",
+      "Losowo dobrano zawodników: Półfinał. Powołani: Półfinał z Półfinał.",
+      "Losowo dobrano zawodników: 2026-10-01. Powołani: 2026-10-01 z 2026-10-01."
+    ],
+    "eventResolved": [
+      "Zdarzenie rozstrzygnięte: 0.",
+      "Zdarzenie rozstrzygnięte: 1.",
+      "Zdarzenie rozstrzygnięte: 2.",
+      "Zdarzenie rozstrzygnięte: 5.",
+      "Zdarzenie rozstrzygnięte: 12.",
+      "Zdarzenie rozstrzygnięte: 22.",
+      "Zdarzenie rozstrzygnięte: X.",
+      "Zdarzenie rozstrzygnięte: Półfinał.",
+      "Zdarzenie rozstrzygnięte: 2026-10-01."
+    ],
+    "undo": [
+      "Cofnięto ostatnią decyzję. Powołani: 0 z 0.",
+      "Cofnięto ostatnią decyzję. Powołani: 1 z 1.",
+      "Cofnięto ostatnią decyzję. Powołani: 2 z 2.",
+      "Cofnięto ostatnią decyzję. Powołani: 5 z 5.",
+      "Cofnięto ostatnią decyzję. Powołani: 12 z 12.",
+      "Cofnięto ostatnią decyzję. Powołani: 22 z 22.",
+      "Cofnięto ostatnią decyzję. Powołani: X z X.",
+      "Cofnięto ostatnią decyzję. Powołani: Półfinał z Półfinał.",
+      "Cofnięto ostatnią decyzję. Powołani: 2026-10-01 z 2026-10-01."
+    ]
+  },
+  "autoFill": "Dobierz losowo",
+  "autoFillErrorTitle": "Nie udało się dobrać zawodników",
+  "autoFillErrors": {
+    "candidateShortage": "Nie ma wystarczającej liczby dostępnych zawodników w wymaganej grupie.",
+    "full": "Kadra jest już pełna. Odwołaj zawodnika, aby zwolnić miejsce.",
+    "insufficientSlots": "Pozostało zbyt mało miejsc, aby spełnić wymagane proporcje. Odwołaj zawodników z nadliczbowych grup i spróbuj ponownie.",
+    "tooManyGoalkeepers": "W finałowej kadrze mogą być dokładnie trzej bramkarze. Odwołaj nadliczbowego bramkarza i spróbuj ponownie."
+  },
+  "availabilityFlags": {
+    "injuryRisk": "Ryzyko urazu",
+    "minutesLimit": "Limit minut"
+  },
+  "availablePlayers": "liczba dostępnych",
+  "brand": "SELEKCJA",
+  "briefTitle": "Notatka sztabu szkoleniowego",
+  "campCount": "zgrupowania",
+  "campReportBody": [
+    "Najlepiej wypadli 0. Najwięcej wątpliwości zostawili 0. Ocena selekcyjna uwzględnia teraz występ i znajomość automatyzmów.",
+    "Najlepiej wypadli 1. Najwięcej wątpliwości zostawili 1. Ocena selekcyjna uwzględnia teraz występ i znajomość automatyzmów.",
+    "Najlepiej wypadli 2. Najwięcej wątpliwości zostawili 2. Ocena selekcyjna uwzględnia teraz występ i znajomość automatyzmów.",
+    "Najlepiej wypadli 5. Najwięcej wątpliwości zostawili 5. Ocena selekcyjna uwzględnia teraz występ i znajomość automatyzmów.",
+    "Najlepiej wypadli 12. Najwięcej wątpliwości zostawili 12. Ocena selekcyjna uwzględnia teraz występ i znajomość automatyzmów.",
+    "Najlepiej wypadli 22. Najwięcej wątpliwości zostawili 22. Ocena selekcyjna uwzględnia teraz występ i znajomość automatyzmów.",
+    "Najlepiej wypadli X. Najwięcej wątpliwości zostawili X. Ocena selekcyjna uwzględnia teraz występ i znajomość automatyzmów.",
+    "Najlepiej wypadli Półfinał. Najwięcej wątpliwości zostawili Półfinał. Ocena selekcyjna uwzględnia teraz występ i znajomość automatyzmów.",
+    "Najlepiej wypadli 2026-10-01. Najwięcej wątpliwości zostawili 2026-10-01. Ocena selekcyjna uwzględnia teraz występ i znajomość automatyzmów."
+  ],
+  "campReportEyebrow": "Raport po zgrupowaniu",
+  "campReportTitle": "Masz więcej danych. Nie wszystkie są wygodne.",
+  "campResult": "Zgrupowanie",
+  "candidateCount": "kandydatów",
+  "changelogHideOlder": "Ukryj wcześniejsze zmiany",
+  "changelogNotes": {
+    "0.1.0": [
+      "Pierwsza wersja: marcowe zgrupowanie na 23 zawodników, kadra turniejowa na 26, trzy systemy gry, zdarzenia ze zgrupowania, cofanie decyzji i raport z turnieju."
+    ],
+    "0.1.1": [
+      "Gdy przeglądarka nie zapisze postępu, na górze ekranu pojawia się pasek z wyjaśnieniem. Przy braku miejsca albo błędzie zapisu można spróbować ponownie, a pasek znika po udanym zapisie.",
+      "Jeśli zmienią się zasady gry, ukończony raport zostaje jako historia z adnotacją, a niedokończonej selekcji nie da się wczytać. Gra mówi o tym wprost.",
+      "Selekcje zapisane w poprzedniej wersji wczytują się dalej bez utraty postępu. W najstarszych zapisach, sprzed wprowadzenia historii cofania, wcześniejszych decyzji nie da się cofnąć.",
+      "Numer wersji na górnym pasku i lista zmian na ekranie startowym."
+    ],
+    "0.1.2": [
+      "Jeśli gra napotka nieoczekiwany błąd, zamiast pustej strony pojawia się komunikat z możliwością odświeżenia strony albo rozpoczęcia od nowa.",
+      "Przy grze klawiaturą fokus po zmianie ekranu trafia na jego nagłówek, a po zamknięciu okna wraca w widoczne miejsce.",
+      "Czytniki ekranu ogłaszają wynik cofnięcia decyzji, losowego doboru i rozstrzygnięcia zdarzenia.",
+      "Przy włączonym w systemie ograniczeniu ruchu strona nie przewija się płynnie, a karty zawodników nie są animowane."
+    ],
+    "0.1.3": [
+      "Obwódka wskazująca aktywny element przy grze klawiaturą jest wyraźniejsza i dobrze widoczna na każdym tle."
+    ],
+    "0.1.4": [
+      "Wiek zawodników ma poprawną formę, np. „34 lata” zamiast „34 lat”.",
+      "Raport turniejowy nie powtarza już ostatniego meczu pod listą spotkań. Ostatni wiersz listy to ostatni mecz."
+    ],
+    "0.1.5": [
+      "Wynik turnieju jest ostateczny: na ekranie raportu nie ma już przycisku „Cofnij”."
+    ],
+    "0.1.6": [
+      "Komunikat po nieudanym losowym doborze ma jaśniejszy tytuł: „Nie udało się dobrać zawodników”."
+    ],
+    "0.1.7": [
+      "Raport turniejowy mówi o reprezentacji w pierwszej osobie, np. „Zakończyliśmy udział w turnieju po fazie grupowej.”."
+    ],
+    "0.1.8": ["Poprawione teksty na ekranie zgrupowania i na starcie."]
+  },
+  "changelogShowOlder": [
+    "Wcześniejsze zmiany (0)",
+    "Wcześniejsze zmiany (1)",
+    "Wcześniejsze zmiany (2)",
+    "Wcześniejsze zmiany (5)",
+    "Wcześniejsze zmiany (12)",
+    "Wcześniejsze zmiany (22)",
+    "Wcześniejsze zmiany (X)",
+    "Wcześniejsze zmiany (Półfinał)",
+    "Wcześniejsze zmiany (2026-10-01)"
+  ],
+  "changelogTitle": "Co nowego",
+  "changelogVersionLabel": [
+    "throws TypeError",
+    "throws TypeError",
+    "throws TypeError",
+    "throws TypeError",
+    "throws TypeError",
+    "throws TypeError",
+    "Wersja X · undefined.undefined.X",
+    "Wersja Półfinał · undefined.undefined.Półfinał",
+    "Wersja 2026-10-01 · 01.10.2026"
+  ],
+  "clearComparison": "Wyczyść porównanie",
+  "compare": "Porównaj",
+  "compared": "Wybrany",
+  "comparisonEyebrow": "Analiza porównawcza",
+  "comparisonTitle": "Dwóch kandydatów, jedno miejsce?",
+  "continueToFinal": "Przejdź do powołań na EURO",
+  "disclaimer": "Nieoficjalna gra fanowska. Nie jest rzeczywistym produktem PZPN/UEFA.",
+  "dockCoverage": "Dotknij, aby zobaczyć obsadę",
+  "dockOpen": "Dotknij, aby zobaczyć podział miejsc",
+  "emptyValue": "Brak",
+  "errorBoundary": {
+    "message": "Gra napotkała nieoczekiwany błąd. Odśwież stronę – ostatni zapisany postęp powinien się wczytać. Jeśli błąd wraca, zacznij od nowa; zapisana gra zostanie wtedy usunięta.",
+    "reload": "Odśwież stronę",
+    "reset": "Zacznij od nowa",
+    "title": "Coś poszło nie tak"
+  },
+  "eventEyebrow": "Sytuacja ze zgrupowania",
+  "events": {
+    "captain": {
+      "choices": [
+        {
+          "description": "Wyższa chemia i odporność na presję.",
+          "title": "Postaw na ciągłość"
+        },
+        {
+          "description": "Więcej dynamiki, ale mniej przewidywalna szatnia.",
+          "title": "Wybierz aktualną formę"
+        }
+      ],
+      "description": "Liderzy chcą zachować trzon znający automatyzmy. Analitycy wskazują jednak dwóch młodszych graczy w lepszej formie.",
+      "title": "Kapitan prosi o ciągłość"
+    },
+    "doctor": {
+      "choices": [
+        {
+          "description": "Mniej jakości w pierwszym składzie, niższe ryzyko.",
+          "title": "Ogranicz jego minuty"
+        },
+        {
+          "description": "Zachowujesz pełną jakość, ale ryzyko rośnie.",
+          "title": "Zaufaj zawodnikowi"
+        }
+      ],
+      "description": "Jeden z najbardziej doświadczonych zawodników może zagrać, ale sztab przewiduje podwyższone ryzyko urazu w trzecim meczu grupowym.",
+      "title": "Raport medyczny: przeciążenie"
+    },
+    "scout": {
+      "choices": [
+        {
+          "description": "Premia za nieprzewidywalność, większa wariancja wyniku.",
+          "title": "Zostaw furtkę młodości"
+        },
+        {
+          "description": "Mniejszy sufit, stabilniejsze minimum.",
+          "title": "Chroń strukturę kadry"
+        }
+      ],
+      "description": "Młody skrzydłowy imponuje w treningu. Dane z krótkiej próby są świetne, lecz sztab nie wie, jak zareaguje na turniejową presję.",
+      "title": "Ostatni raport obserwacyjny"
+    }
+  },
+  "exact": "dokładnie",
+  "excess": [
+    "jest o 0 × 0 za dużo",
+    "jest o 1 × 1 za dużo",
+    "jest o 2 × 2 za dużo",
+    "jest o 5 × 5 za dużo",
+    "jest o 12 × 12 za dużo",
+    "jest o 22 × 22 za dużo",
+    "jest o X × X za dużo",
+    "jest o Półfinał × Półfinał za dużo",
+    "jest o 2026-10-01 × 2026-10-01 za dużo"
+  ],
+  "excessShort": [
+    "O 0 za dużo",
+    "O 1 za dużo",
+    "O 2 za dużo",
+    "O 5 za dużo",
+    "O 12 za dużo",
+    "O 22 za dużo",
+    "O X za dużo",
+    "O Półfinał za dużo",
+    "O 2026-10-01 za dużo"
+  ],
+  "filterLabel": "Filtruj po pozycji",
+  "filtersAll": "Wszyscy",
+  "foot": {
+    "both": "Obunożny",
+    "lead": "Wiodąca noga:",
+    "left": "Lewa",
+    "right": "Prawa"
+  },
+  "fulfilled": "✓ Spełnione",
+  "fullSquadMessage": "Aby powołać kolejnego zawodnika, najpierw zwolnij jedno miejsce.",
+  "fullSquadTitle": "Lista jest pełna",
+  "groupMatches": "mecze w grupie",
+  "groups": {
+    "ATA": "Napastnicy",
+    "BR": "Bramkarze",
+    "OBR": "Obrońcy",
+    "POM": "Pomocnicy"
+  },
+  "introEyebrow": "Symulator selekcjonera • EURO 2028",
+  "introLead": "Wybierz 26 zawodników na mistrzostwa Europy. Nazwiska pomagają, ale turniej wygrywa kadra zbudowana pod plan – nie ranking popularności.",
+  "introPhase": "ODPRAWA",
+  "introTitle": "Jedna lista. Cały kraj ocenia.",
+  "kpis": {
+    "fit": "Dopasowanie",
+    "quality": "Jakość",
+    "risk": "Ryzyko"
+  },
+  "loading": "Wczytywanie gry…",
+  "luck": {
+    "negative": "Drobne zdarzenia boiskowe obróciły się przeciwko drużynie.",
+    "neutral": "Zespół uzyskał wynik odpowiadający jakości i przygotowaniu kadry.",
+    "positive": "Kilka kluczowych momentów ułożyło się po twojej myśli."
+  },
+  "minimum": "min.",
+  "missing": [
+    "brakuje 0 × 0",
+    "brakuje 1 × 1",
+    "brakuje 2 × 2",
+    "brakuje 5 × 5",
+    "brakuje 12 × 12",
+    "brakuje 22 × 22",
+    "brakuje X × X",
+    "brakuje Półfinał × Półfinał",
+    "brakuje 2026-10-01 × 2026-10-01"
+  ],
+  "missingShort": [
+    "Brakuje 0",
+    "Brakuje 1",
+    "Brakuje 2",
+    "Brakuje 5",
+    "Brakuje 12",
+    "Brakuje 22",
+    "Brakuje X",
+    "Brakuje Półfinał",
+    "Brakuje 2026-10-01"
+  ],
+  "noCandidates": "Brak zawodników spełniających kryteria.",
+  "noStrengths": "Nie zbudowano wyraźnej przewagi strukturalnej.",
+  "noWeaknesses": "Analiza nie wykryła krytycznej luki w konstrukcji kadry.",
+  "notice": "Uwaga",
+  "occupied": [
+    "0: 0 powołanych",
+    "1: 1 powołanych",
+    "2: 2 powołanych",
+    "5: 5 powołanych",
+    "12: 12 powołanych",
+    "22: 22 powołanych",
+    "X: X powołanych",
+    "Półfinał: Półfinał powołanych",
+    "2026-10-01: 2026-10-01 powołanych"
+  ],
+  "outOfFormation": "Poza ustawieniem",
+  "outOfFormationCount": [
+    "0 poza ustawieniem",
+    "1 poza ustawieniem",
+    "2 poza ustawieniem",
+    "5 poza ustawieniem",
+    "12 poza ustawieniem",
+    "22 poza ustawieniem",
+    "X poza ustawieniem",
+    "Półfinał poza ustawieniem",
+    "2026-10-01 poza ustawieniem"
+  ],
+  "outOfFormationExplanation": "Ci zawodnicy nie mają żadnej naturalnej pozycji w wybranej formacji. Możesz ich powołać, ale będzie to wymagało zmiany ustawienia lub gry poza nominalną rolą.",
+  "outOfFormationEyebrow": "Dopasowanie do ustawienia",
+  "outOfFormationTitle": [
+    "Poza ustawieniem: 0",
+    "Poza ustawieniem: 1",
+    "Poza ustawieniem: 2",
+    "Poza ustawieniem: 5",
+    "Poza ustawieniem: 12",
+    "Poza ustawieniem: 22",
+    "Poza ustawieniem: X",
+    "Poza ustawieniem: Półfinał",
+    "Poza ustawieniem: 2026-10-01"
+  ],
+  "outcomes": {
+    "champion": "Mistrz Europy",
+    "group": "Faza grupowa",
+    "quarterfinal": "Ćwierćfinał",
+    "roundOf16": "1/8 finału",
+    "runnerUp": "Wicemistrz Europy",
+    "semifinal": "Półfinał"
+  },
+  "pitchDescription": "Liczby pokazują, ilu powołanych może grać na danej pozycji.",
+  "playerMetrics": {
+    "fitness": "Zdrowie",
+    "form": "Forma",
+    "quality": "Jakość",
+    "tactics": "Taktyka"
+  },
+  "pointsInGroup": [
+    "Zdobyliśmy 0 pkt w grupie.",
+    "Zdobyliśmy 1 pkt w grupie.",
+    "Zdobyliśmy 2 pkt w grupie.",
+    "Zdobyliśmy 5 pkt w grupie.",
+    "Zdobyliśmy 12 pkt w grupie.",
+    "Zdobyliśmy 22 pkt w grupie.",
+    "Zdobyliśmy X pkt w grupie.",
+    "Zdobyliśmy Półfinał pkt w grupie.",
+    "Zdobyliśmy 2026-10-01 pkt w grupie."
+  ],
+  "positions": {
+    "BR": "Bramkarz",
+    "DP": "Defensywny pomocnik",
+    "LO": "Lewy obrońca",
+    "LS": "Lewe skrzydło",
+    "LWO": "Lewy wahadłowy",
+    "LŚO": "Lewy środkowy obrońca",
+    "N": "Napastnik",
+    "OP": "Ofensywny pomocnik",
+    "PO": "Prawy obrońca",
+    "PS": "Prawe skrzydło",
+    "PWO": "Prawy wahadłowy",
+    "PŚO": "Prawy środkowy obrońca",
+    "ŚO": "Środkowy obrońca",
+    "ŚP": "Środkowy pomocnik"
+  },
+  "priorities": {
+    "balance": {
+      "description": "Najbliższy realizmowi: forma, rytm, doświadczenie, kadra, grupa i taktyka.",
+      "name": "Zrównoważony"
+    },
+    "form": {
+      "description": "Premia za obecną formę i rytm meczowy.",
+      "name": "Liczy się dziś"
+    },
+    "quality": {
+      "description": "Zaufanie do klasy, doświadczenia i sufitu.",
+      "name": "Najlepsi piłkarze"
+    }
+  },
+  "priorityChoice": "Ustal priorytet selekcji",
+  "profile": "Profil",
+  "profileMetrics": [
+    "Ocena selekcyjna",
+    "Jakość",
+    "Forma i rytm",
+    "Zdrowie",
+    "Taktyka",
+    "Doświadczenie",
+    "Zgranie kadrowe",
+    "Wpływ na grupę"
+  ],
+  "remaining": [
+    "Zostało 0 miejsc",
+    "Zostało 1 miejsc",
+    "Zostało 2 miejsc",
+    "Zostało 5 miejsc",
+    "Zostało 12 miejsc",
+    "Zostało 22 miejsc",
+    "Zostało X miejsc",
+    "Zostało Półfinał miejsc",
+    "Zostało 2026-10-01 miejsc"
+  ],
+  "removeFromSquad": "Odwołaj z kadry",
+  "removeShort": "Odwołaj",
+  "reportEyebrow": "Raport turniejowy",
+  "reportFromOlderRules": "Ten raport powstał według wcześniejszej wersji zasad gry.",
+  "reportKpis": {
+    "chemistry": "Chemia",
+    "quality": "Jakość",
+    "roles": "Role"
+  },
+  "reportOutcome": [
+    "undefined",
+    "undefined",
+    "undefined",
+    "undefined",
+    "undefined",
+    "undefined",
+    "undefined",
+    "Odpadliśmy w półfinale.",
+    "undefined"
+  ],
+  "restart": "Zagraj od początku",
+  "resultPhase": "RAPORT",
+  "resultReasons": {
+    "chemHigh": "Trzon zespołu powinien dobrze reagować na kryzysy w meczu.",
+    "chemLow": "Relacje i hierarchia mogą pęknąć pod presją wyniku.",
+    "coverageHigh": "Każda kluczowa rola w modelu gry ma co najmniej jednego wykonawcę.",
+    "coverageLow": "Nie wszystkie role potrzebne w wybranym systemie zostały pokryte.",
+    "fitnessHigh": "Kadra ma dobry poziom dostępności i energii na trzy mecze.",
+    "fitnessLow": "Profil zdrowotny kadry może wymusić nieplanowane rotacje.",
+    "qualityHigh": "Wysoka jakość indywidualna daje rozwiązania przy zamkniętym meczu.",
+    "qualityLow": "Brakuje jakości do samodzielnego rozstrzygania trudnych spotkań.",
+    "testedHigh": [
+      "0 powołanych przeszło wcześniejszy test w twoim systemie.",
+      "1 powołanych przeszło wcześniejszy test w twoim systemie.",
+      "2 powołanych przeszło wcześniejszy test w twoim systemie.",
+      "5 powołanych przeszło wcześniejszy test w twoim systemie.",
+      "12 powołanych przeszło wcześniejszy test w twoim systemie.",
+      "22 powołanych przeszło wcześniejszy test w twoim systemie.",
+      "X powołanych przeszło wcześniejszy test w twoim systemie.",
+      "Półfinał powołanych przeszło wcześniejszy test w twoim systemie.",
+      "2026-10-01 powołanych przeszło wcześniejszy test w twoim systemie."
+    ],
+    "testedLow": [
+      "Aż 0 zawodników jedzie na EURO bez testu w marcowym zgrupowaniu.",
+      "Aż 1 zawodników jedzie na EURO bez testu w marcowym zgrupowaniu.",
+      "Aż 2 zawodników jedzie na EURO bez testu w marcowym zgrupowaniu.",
+      "Aż 5 zawodników jedzie na EURO bez testu w marcowym zgrupowaniu.",
+      "Aż 12 zawodników jedzie na EURO bez testu w marcowym zgrupowaniu.",
+      "Aż 22 zawodników jedzie na EURO bez testu w marcowym zgrupowaniu.",
+      "Aż X zawodników jedzie na EURO bez testu w marcowym zgrupowaniu.",
+      "Aż Półfinał zawodników jedzie na EURO bez testu w marcowym zgrupowaniu.",
+      "Aż 2026-10-01 zawodników jedzie na EURO bez testu w marcowym zgrupowaniu."
+    ]
+  },
+  "returnToList": "Wróć do listy",
+  "returnToPitch": "Wróć do mapy",
+  "returnWithoutClearing": "Wróć bez czyszczenia",
+  "risk": {
+    "high": "Wysokie",
+    "low": "Niskie",
+    "medium": "Średnie",
+    "none": "Brak"
+  },
+  "roles": {
+    "aerial": "Powietrze",
+    "ballPlaying": "Gra nogami",
+    "ballWinning": "Odbiór",
+    "boxPresence": "Pole karne",
+    "buildUp": "Wyprowadzenie",
+    "centreBack": "Stoper",
+    "dribbling": "Drybling",
+    "experience": "Doświadczenie",
+    "leader": "Lider",
+    "leftFoot": "Lewa noga",
+    "linkUp": "Łączenie gry",
+    "longShots": "Strzał z dystansu",
+    "pace": "Szybkość",
+    "playmaker": "Kreator",
+    "potential": "Potencjał",
+    "pressing": "Pressing",
+    "reach": "Zasięg",
+    "reflexes": "Refleks",
+    "rightBack": "Prawy obrońca",
+    "setPieces": "Stałe fragmenty",
+    "striker": "Napastnik",
+    "wingBack": "Wahadło",
+    "winger": "Skrzydło"
+  },
+  "rosterTransition": "lista kontrolna i EURO",
+  "rulesChangedDiscarded": "Od twojej ostatniej wizyty zmieniły się zasady gry i nie ma możliwości wczytania niedokończonej selekcji. Zaczynasz od nowa.",
+  "rulesChangedTitle": "Zmieniły się zasady gry",
+  "save": {
+    "messages": {
+      "failed": "Nie udało się zapisać postępu. Ostatnie zmiany mogą przepaść po zamknięciu karty.",
+      "quota": "Nie udało się zapisać postępu: w pamięci przeglądarki brakuje miejsca. Zwolnij miejsce i spróbuj ponownie.",
+      "unavailable": "Postęp nie jest zapisywany: przeglądarka nie udostępnia pamięci (np. tryb prywatny). Możesz grać dalej, ale po zamknięciu karty gra zacznie się od nowa."
+    },
+    "recovered": "Postęp zapisany.",
+    "retry": "Spróbuj ponownie"
+  },
+  "searchLabel": "Szukaj zawodnika",
+  "searchPlaceholder": "Szukaj zawodnika lub klubu…",
+  "select": "Powołaj",
+  "selected": "Powołany ✓",
+  "selectionScore": "Ocena selekcyjna",
+  "simulationDisclaimer": "Symulacja ocenia strukturę decyzji i zawiera kontrolowaną losowość. Nie jest prognozą rzeczywistego wyniku sportowego.",
+  "sort": {
+    "experience": "Doświadczenie",
+    "fitness": "Zdrowie",
+    "form": "Forma i rytm",
+    "group": "Wpływ na grupę",
+    "model": "Ocena selekcyjna",
+    "name": "Nazwisko A–Z",
+    "old": "Wiek: najstarsi",
+    "quality": "Jakość",
+    "tactics": "Dopasowanie taktyczne",
+    "young": "Wiek: najmłodsi"
+  },
+  "sortLabel": "Sortuj zawodników",
+  "stages": {
+    "camp": {
+      "completed": "Lista kontrolna gotowa",
+      "eyebrow": "MARZEC 2028",
+      "finalize": "Jedź na zgrupowanie",
+      "heading": "Wybierz 23 zawodników na test",
+      "hint": "To moment na sprawdzenie nowych twarzy. Występ na zgrupowaniu ujawni dodatkowe informacje przed EURO.",
+      "phase": "ZGRUPOWANIE 1/2",
+      "suffix": "LISTA KONTROLNA"
+    },
+    "final": {
+      "completed": "Kadra jest kompletna",
+      "eyebrow": "CZERWIEC 2028",
+      "finalize": "Zatwierdź",
+      "heading": "Wybierz finałową kadrę 26",
+      "hint": "Masz raport z marcowego zgrupowania. Możesz zaufać obserwacji albo powołać nieprzetestowanego zawodnika.",
+      "phase": "ZGRUPOWANIE 2/2",
+      "suffix": "EURO"
+    }
+  },
+  "start": "Rozpocznij odprawę",
+  "strengths": "Co zadziałało",
+  "systemChoice": "Wybierz model gry",
+  "systems": {
+    "433": {
+      "description": "Pressing, mobilna ósemka i szeroko ustawieni skrzydłowi.",
+      "name": "4–3–3"
+    },
+    "3421": {
+      "description": "Trzech stoperów, wahadła i dwóch graczy między liniami.",
+      "name": "3–4–2–1"
+    },
+    "4231": {
+      "description": "Kontrola środka, skrzydła schodzące do półprzestrzeni.",
+      "name": "4–2–3–1"
+    }
+  },
+  "topBarVersion": [
+    "v0",
+    "v1",
+    "v2",
+    "v5",
+    "v12",
+    "v22",
+    "vX",
+    "vPółfinał",
+    "v2026-10-01"
+  ],
+  "topBarVersionAccessible": [
+    "Wersja 0",
+    "Wersja 1",
+    "Wersja 2",
+    "Wersja 5",
+    "Wersja 12",
+    "Wersja 22",
+    "Wersja X",
+    "Wersja Półfinał",
+    "Wersja 2026-10-01"
+  ],
+  "tournament": {
+    "championOutcome": "Polska została mistrzem Europy.",
+    "championStage": "Mistrz Europy",
+    "eliminated": [
+      "Polska odpadła w 1/8 finału.",
+      "Polska odpadła w 1/8 finału.",
+      "Polska odpadła w 1/8 finału.",
+      "Polska odpadła w 1/8 finału.",
+      "Polska odpadła w 1/8 finału.",
+      "Polska odpadła w 1/8 finału.",
+      "Polska odpadła w 1/8 finału.",
+      "Polska odpadła w półfinale.",
+      "Polska odpadła w 1/8 finału."
+    ],
+    "groupExit": ["1:1", "0:1", "1:2"],
+    "groupLast": [
+      "Ostatni mecz grupy: 0",
+      "Ostatni mecz grupy: 1",
+      "Ostatni mecz grupy: 2",
+      "Ostatni mecz grupy: 5",
+      "Ostatni mecz grupy: 12",
+      "Ostatni mecz grupy: 22",
+      "Ostatni mecz grupy: X",
+      "Ostatni mecz grupy: Półfinał",
+      "Ostatni mecz grupy: 2026-10-01"
+    ],
+    "groupOpponents": [
+      "Dania",
+      "Szwajcaria",
+      "Serbia",
+      "Austria",
+      "Szkocja",
+      "Turcja"
+    ],
+    "groupOutcome": "Polska zakończyła udział w turnieju po fazie grupowej.",
+    "groupPoints": [
+      "Faza grupowa: 0 pkt",
+      "Faza grupowa: 1 pkt",
+      "Faza grupowa: 2 pkt",
+      "Faza grupowa: 5 pkt",
+      "Faza grupowa: 12 pkt",
+      "Faza grupowa: 22 pkt",
+      "Faza grupowa: X pkt",
+      "Faza grupowa: Półfinał pkt",
+      "Faza grupowa: 2026-10-01 pkt"
+    ],
+    "groupStage": "Faza grupowa",
+    "knockoutOpponents": [
+      "Francja",
+      "Hiszpania",
+      "Anglia",
+      "Niemcy",
+      "Portugalia",
+      "Włochy",
+      "Holandia"
+    ],
+    "losses": ["0:1", "1:2", "0:2"],
+    "match": [
+      "Polska 0 0",
+      "Polska 1 1",
+      "Polska 2 2",
+      "Polska 5 5",
+      "Polska 12 12",
+      "Polska 22 22",
+      "Polska X X",
+      "Polska Półfinał Półfinał",
+      "Polska 2026-10-01 2026-10-01"
+    ],
+    "quarterfinalLosses": ["1:1, karne 3:4", "0:1", "1:2"],
+    "quarterfinalStage": "Ćwierćfinał",
+    "round": [
+      "0: 0",
+      "1: 1",
+      "2: 2",
+      "5: 5",
+      "12: 12",
+      "22: 22",
+      "X: X",
+      "Półfinał: Półfinał",
+      "2026-10-01: 2026-10-01"
+    ],
+    "rounds": ["1/8 finału", "Ćwierćfinał", "Półfinał", "Finał"],
+    "runnerUpOutcome": "Polska została wicemistrzem Europy.",
+    "runnerUpStage": "Wicemistrz Europy",
+    "semifinalStage": "Półfinał",
+    "wins": ["2:0", "2:1", "1:0"]
+  },
+  "tournamentProgress": "Przebieg turnieju",
+  "trialNotes": {
+    "disappointed": "rozczarował",
+    "impressed": "przekonał",
+    "solid": "bez zarzutu",
+    "uncertain": "niepewny"
+  },
+  "understood": "Rozumiem",
+  "undo": "Cofnij",
+  "weaknesses": "Ryzyka selekcji",
+  "yourSquad": "Twoja kadra"
+}

@@ -50,3 +50,57 @@ test("an unknown report stage has no outcome sentence", () => {
 test("group points in the report speak of Poland as we", () => {
   assert.equal(text.pointsInGroup(5), "Zdobyliśmy 5 pkt w grupie.");
 });
+
+// Records every UI string, and every text function's output for fixed sample arguments, so a
+// reorganisation of the text module is proven not to change a single character.
+const SNAPSHOT_URL = new URL("./text-snapshot.json", import.meta.url);
+const SAMPLE_ARGUMENTS: readonly (number | string)[] = [
+  0,
+  1,
+  2,
+  5,
+  12,
+  22,
+  "X",
+  "Półfinał",
+  "2026-10-01",
+];
+
+function snapshotValue(value: unknown): unknown {
+  if (typeof value === "function")
+    return SAMPLE_ARGUMENTS.map((sample) => {
+      try {
+        return String(
+          (value as (...args: unknown[]) => unknown)(
+            ...Array.from({ length: value.length }, () => sample),
+          ),
+        );
+      } catch (error) {
+        return `throws ${(error as Error).name}`;
+      }
+    });
+  if (Array.isArray(value)) return value.map(snapshotValue);
+  if (value !== null && typeof value === "object")
+    return Object.fromEntries(
+      Object.keys(value)
+        .sort()
+        .map((key) => [
+          key,
+          snapshotValue((value as Record<string, unknown>)[key]),
+        ]),
+    );
+  return value;
+}
+
+test("the UI text matches the committed snapshot", async () => {
+  const { readFile, writeFile } = await import("node:fs/promises");
+  const actual = snapshotValue(text);
+  if (process.env.UPDATE_TEXT_SNAPSHOT === "1")
+    await writeFile(
+      SNAPSHOT_URL,
+      `${JSON.stringify(actual, null, 2)}
+`,
+    );
+  const expected: unknown = JSON.parse(await readFile(SNAPSHOT_URL, "utf8"));
+  assert.deepStrictEqual(actual, expected);
+});
