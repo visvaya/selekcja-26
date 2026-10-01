@@ -146,4 +146,7 @@ export const SCENARIOS: Scenario[] = [
   randomRun(7, "3421", [1, 1, 1]),
   randomRun(27, "4231", [1, 1, 0]),
   randomRun(67, "3421", [1, 1, 0]),
+  // Added with rules revision 2 to reach the two lowest bands (grades "3" and "2").
+  randomRun(14, "4231", [0, 0, 0]),
+  randomRun(144, "4231", [0, 0, 0]),
 ];

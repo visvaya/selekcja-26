@@ -1,3 +1,4 @@
 # Append-only: one "<RULES_REVISION> <sha256 of src/logic/golden/traces>" line per rules revision.
 # Never edit or delete a line; the pre-commit hook rejects it. See src/logic/golden-master.test.ts.
 1 9fb9b99719dff33086b4168375efb8d8cda25c7defe61ba7a3d67cc75313a2da
+2 e43e1cf1bec70d36aa8048b5ded0641bd1649f132176f7d8dfc12b0596931e7e

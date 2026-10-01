@@ -12,6 +12,7 @@ import {
   playersByIds,
   positionShort,
 } from "../logic/selection.ts";
+import { displayGrade } from "../logic/report-grade.ts";
 import { groupPositions } from "./group-order.ts";
 import { UI_TEXT as text } from "./text.ts";
 
@@ -34,7 +35,7 @@ export function ReportScreen({
     <section className="result">
       <div className="result-hero">
         <div className="eyebrow result-eyebrow">{text.reportEyebrow}</div>
-        <div className="grade">{report.grade}</div>
+        <div className="grade">{displayGrade(report.grade)}</div>
         <h1 ref={headingRef} tabIndex={-1}>
           {report.stage}
         </h1>

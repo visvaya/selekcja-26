@@ -79,12 +79,14 @@ export function v4State(
   };
 }
 
-// An unfinished version 3 save whose rulesRevision does not match the running build, so it gets
-// discarded on load with the "rules changed" notice. Shared by the storage test and the axe scan.
+const LEGACY_RULES_REVISION = 1;
+
+// An unfinished version 3 save written under rules revision 1, so it gets discarded on load
+// with the "rules changed" notice. Shared by the storage test and the axe scan.
 export function unfinishedOtherRulesSave(): string {
   return JSON.stringify({
     schemaVersion: 3,
-    rulesRevision: RULES_REVISION + 1,
+    rulesRevision: LEGACY_RULES_REVISION,
     state: { ...v3Snapshot(), history: [] },
   });
 }
@@ -96,8 +98,7 @@ const OLDER_RULES_SQUAD_IDS = [
   "robert-lewandowski",
 ];
 
-const LEGACY_RULES_REVISION = 1;
-
+// Rules revision 1 stored letter grades; later revisions grade on the 1-6 scale.
 function finishedReport(rulesRevision: number, story: unknown) {
   return {
     rulesRevision,
@@ -108,7 +109,7 @@ function finishedReport(rulesRevision: number, story: unknown) {
     luck: 0,
     points: 5,
     stage: text.outcomes.roundOf16,
-    grade: "B",
+    grade: rulesRevision === LEGACY_RULES_REVISION ? "B" : "4",
     strengths: [],
     weak: [],
     story,
@@ -163,10 +164,10 @@ export function finishedReportSave(rulesRevision: number): string {
   });
 }
 
-// A finished report from another rules revision, shown frozen with the older-rules
-// note. Shared by the storage test and the axe scan.
+// A finished report from the older rules revision 1, shown frozen with the older-rules note
+// and its letter grade mapped onto the 1-6 scale. Shared by the storage test and the axe scan.
 export function finishedOtherRulesReportSave(): string {
-  return finishedReportSave(RULES_REVISION + 1);
+  return finishedReportSave(LEGACY_RULES_REVISION);
 }
 
 // An unfinished camp-stage save for the running rules, used by the screenshot baselines.
@@ -180,11 +181,14 @@ export function campSave({
   system?: string;
 }): string {
   return JSON.stringify({
-    schemaVersion: 3,
+    schemaVersion: 4,
     rulesRevision: RULES_REVISION,
     state: {
-      ...v3Snapshot({ system, selected: selectedIds, events, seed: 12345 }),
-      history: [],
+      ...v4State(),
+      system,
+      selected: selectedIds,
+      events,
+      seed: 12345,
     },
   });
 }

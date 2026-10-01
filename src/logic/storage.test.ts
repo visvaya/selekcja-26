@@ -4,7 +4,7 @@ import { players } from "../data/catalog.ts";
 import { RULES_REVISION } from "../data/constants.ts";
 import { createInitialState, reduceGameState } from "./state.ts";
 import { decodeSave, encodeSave } from "./save-format.ts";
-import { migrateV3State } from "./save-migration.ts";
+import { migrateLegacyState, migrateV3State } from "./save-migration.ts";
 import { clearGame, loadGame, saveGame } from "./storage.ts";
 import { tournamentStory } from "./tournament.ts";
 import type { TournamentStory } from "../data/types.ts";
@@ -118,44 +118,31 @@ test("a version 1 save with a report migrates names to stable IDs", async () => 
   });
 });
 
+// Every version 2 save counts as rules revision 1, so an unfinished one is discarded on load;
+// the migration itself still keeps the version 2 undo history with stable IDs.
 test("a version 2 save keeps its undo history with stable IDs", async () => {
+  const migrated = migrateLegacyState(JSON.parse(V2_FINAL_SAVE).state, 2) as {
+    selected: string[];
+    compare: string[];
+    history: { selected: string[]; trial: Record<string, unknown> }[];
+  };
+  assert.deepEqual(migrated.selected, ["jakub-kiwior", "pawel-wszolek"]);
+  assert.deepEqual(migrated.compare, ["kamil-grosicki", "jakub-kiwior"]);
+  assert.equal(migrated.history.length, 2);
+  assert.deepEqual(migrated.history[0]!.selected, [
+    "jakub-kiwior",
+    "kamil-grosicki",
+  ]);
+  assert.deepEqual(migrated.history[1]!.trial["kamil-grosicki"], {
+    delta: -3,
+    note: "disappointed",
+  });
   await withStorage(async (values) => {
     values.set(KEY, V2_FINAL_SAVE);
-    const state = (await loadGame()).state;
-    assert.ok(state);
-    assert.equal(state.stage, "final");
-    assert.deepEqual(state.list.positions, ["LŚO"]);
-    assert.equal(state.list.query, "ki");
-    assert.equal(state.list.sort, "form");
-    assert.deepEqual([...state.selected], ["jakub-kiwior", "pawel-wszolek"]);
-    assert.deepEqual(state.compare, ["kamil-grosicki", "jakub-kiwior"]);
-    assert.deepEqual(Object.keys(state.trial), [
-      "jakub-kiwior",
-      "kamil-grosicki",
-    ]);
-    assert.equal(state.history.length, 2);
-    assert.deepEqual(
-      [...state.history[0]!.selected],
-      ["jakub-kiwior", "kamil-grosicki"],
-    );
-    assert.deepEqual(state.history[1]!.trial["kamil-grosicki"], {
-      delta: -3,
-      note: "disappointed",
+    assert.deepEqual(await loadGame(), {
+      state: null,
+      discardedForRulesChange: true,
     });
-    const undone = reduceGameState(state, { type: "undo" });
-    assert.deepEqual([...undone.selected], ["jakub-kiwior"]);
-
-    await saveGame(state);
-    const rewritten = JSON.parse(values.get(KEY)!);
-    assert.equal(rewritten.schemaVersion, 4);
-    assert.deepEqual(rewritten.state.campSquad, [
-      "jakub-kiwior",
-      "kamil-grosicki",
-    ]);
-    assert.deepEqual(rewritten.state.history[0].selected, [
-      "jakub-kiwior",
-      "kamil-grosicki",
-    ]);
   });
 });
 
@@ -712,4 +699,51 @@ test("a version 4 report with a malformed structured story is rejected", () => {
       JSON.stringify(patch),
     );
   }
+});
+
+test("a literal version 3 rules-1 save with a finished report loads frozen without undo", () => {
+  const v3 = JSON.parse(V3_STATE);
+  const raw = JSON.stringify({
+    schemaVersion: 3,
+    rulesRevision: 1,
+    state: {
+      ...v3,
+      report: {
+        rulesRevision: 1,
+        squadIds: ["jakub-kiwior"],
+        quality: 80,
+        chem: 78,
+        coverage: 92,
+        luck: 0,
+        points: 5,
+        stage: "1/8 finału",
+        grade: "B+",
+        strengths: [],
+        weak: [],
+        story: {
+          matches: ["Faza grupowa: 5 pkt"],
+          outcome: "Polska odpadła w 1/8 finału.",
+          last: "Polska 0:1 Dania",
+          seed: 9,
+        },
+      },
+    },
+  });
+  const decoded = decodeSave(raw);
+  assert.equal(decoded.discardedForRulesChange, false);
+  assert.equal(decoded.state?.report?.rulesRevision, 1);
+  assert.equal(decoded.state?.report?.grade, "B+");
+  assert.deepEqual(decoded.state?.history, []);
+});
+
+test("a literal version 3 rules-1 save of an unfinished game is discarded", () => {
+  const raw = JSON.stringify({
+    schemaVersion: 3,
+    rulesRevision: 1,
+    state: JSON.parse(V3_STATE),
+  });
+  assert.deepEqual(decodeSave(raw), {
+    state: null,
+    discardedForRulesChange: true,
+  });
 });

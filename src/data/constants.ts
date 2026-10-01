@@ -120,38 +120,39 @@ export const GAME_RULES = Object.freeze({
         minimumScorePoints: 91,
         groupPoints: 9,
         outcome: "champion",
-        grade: "A+",
+        grade: "6",
       },
       {
         minimumScorePoints: 89,
         groupPoints: 7,
         outcome: "runnerUp",
-        grade: "A",
+        grade: "5",
       },
       {
         minimumScorePoints: 87,
         groupPoints: 7,
         outcome: "semifinal",
-        grade: "A",
+        grade: "5",
       },
       {
         minimumScorePoints: 84,
         groupPoints: 5,
         outcome: "quarterfinal",
-        grade: "B+",
+        grade: "4+",
       },
       {
         minimumScorePoints: 80,
         groupPoints: 5,
         outcome: "roundOf16",
-        grade: "B",
+        grade: "4",
       },
-      { minimumScorePoints: 74, groupPoints: 3, outcome: "group", grade: "C+" },
+      { minimumScorePoints: 77, groupPoints: 3, outcome: "group", grade: "3+" },
+      { minimumScorePoints: 75, groupPoints: 1, outcome: "group", grade: "3" },
       {
         minimumScorePoints: Number.NEGATIVE_INFINITY,
-        groupPoints: 1,
+        groupPoints: 0,
         outcome: "group",
-        grade: "C",
+        grade: "2",
       },
     ] satisfies {
       minimumScorePoints: number;
@@ -170,7 +171,7 @@ export const GAME_RULES = Object.freeze({
 // (src/logic/golden-master.test.ts) fails when traces change without a bump. A save from another
 // revision keeps only a finished report (frozen, no undo); an unfinished game is discarded with a
 // notice.
-export const RULES_REVISION = 1;
+export const RULES_REVISION = 2;
 
 // Application configuration that is not a gameplay rule.
 export const APP_CONFIG = Object.freeze({
