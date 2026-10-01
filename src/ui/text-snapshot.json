@@ -111,7 +111,9 @@
     "0.1.7": [
       "Raport turniejowy mówi o reprezentacji w pierwszej osobie, np. „Zakończyliśmy udział w turnieju po fazie grupowej.”."
     ],
-    "0.1.8": ["Poprawione teksty na ekranie zgrupowania i na starcie."]
+    "0.1.8": [
+      "Poprawione teksty na ekranie zgrupowania i na starcie."
+    ]
   },
   "changelogShowOlder": [
     "Wcześniejsze zmiany (0)",
@@ -587,7 +589,11 @@
       "Polska odpadła w półfinale.",
       "Polska odpadła w 1/8 finału."
     ],
-    "groupExit": ["1:1", "0:1", "1:2"],
+    "groupExit": [
+      "1:1",
+      "0:1",
+      "1:2"
+    ],
     "groupLast": [
       "Ostatni mecz grupy: 0",
       "Ostatni mecz grupy: 1",
@@ -629,7 +635,11 @@
       "Włochy",
       "Holandia"
     ],
-    "losses": ["0:1", "1:2", "0:2"],
+    "losses": [
+      "0:1",
+      "1:2",
+      "0:2"
+    ],
     "match": [
       "Polska 0 0",
       "Polska 1 1",
@@ -641,7 +651,11 @@
       "Polska Półfinał Półfinał",
       "Polska 2026-10-01 2026-10-01"
     ],
-    "quarterfinalLosses": ["1:1, karne 3:4", "0:1", "1:2"],
+    "quarterfinalLosses": [
+      "1:1, karne 3:4",
+      "0:1",
+      "1:2"
+    ],
     "quarterfinalStage": "Ćwierćfinał",
     "round": [
       "0: 0",
@@ -654,11 +668,20 @@
       "Półfinał: Półfinał",
       "2026-10-01: 2026-10-01"
     ],
-    "rounds": ["1/8 finału", "Ćwierćfinał", "Półfinał", "Finał"],
+    "rounds": [
+      "1/8 finału",
+      "Ćwierćfinał",
+      "Półfinał",
+      "Finał"
+    ],
     "runnerUpOutcome": "Polska została wicemistrzem Europy.",
     "runnerUpStage": "Wicemistrz Europy",
     "semifinalStage": "Półfinał",
-    "wins": ["2:0", "2:1", "1:0"]
+    "wins": [
+      "2:0",
+      "2:1",
+      "1:0"
+    ]
   },
   "tournamentProgress": "Przebieg turnieju",
   "trialNotes": {
