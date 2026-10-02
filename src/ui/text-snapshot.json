@@ -61,6 +61,10 @@
     "minutesLimit": "Limit minut"
   },
   "availablePlayers": "liczba dostępnych",
+  "boardRegion": {
+    "camp": "Tablica kadry – zgrupowanie",
+    "final": "Tablica kadry – kadra turniejowa"
+  },
   "brand": "SELEKCJA",
   "campReportBody": [
     "Najlepiej wypadli 0. Najwięcej wątpliwości zostawili 0. Ocena selekcyjna uwzględnia teraz występ i znajomość automatyzmów.",
@@ -254,6 +258,17 @@
     }
   },
   "exact": "dokładnie",
+  "exactGoalkeepers": [
+    "Turniej wymaga dokładnie 0 bramkarzy.",
+    "Turniej wymaga dokładnie 1 bramkarzy.",
+    "Turniej wymaga dokładnie 2 bramkarzy.",
+    "Turniej wymaga dokładnie 5 bramkarzy.",
+    "Turniej wymaga dokładnie 12 bramkarzy.",
+    "Turniej wymaga dokładnie 22 bramkarzy.",
+    "Turniej wymaga dokładnie X bramkarzy.",
+    "Turniej wymaga dokładnie Półfinał bramkarzy.",
+    "Turniej wymaga dokładnie 2026-10-01 bramkarzy."
+  ],
   "excess": [
     "jest o 0 × 0 za dużo",
     "jest o 1 × 1 za dużo",
@@ -264,6 +279,28 @@
     "jest o X × X za dużo",
     "jest o Półfinał × Półfinał za dużo",
     "jest o 2026-10-01 × 2026-10-01 za dużo"
+  ],
+  "excessMarker": [
+    "W tym ponad limit: 0",
+    "W tym ponad limit: 1",
+    "W tym ponad limit: 2",
+    "W tym ponad limit: 5",
+    "W tym ponad limit: 12",
+    "W tym ponad limit: 22",
+    "W tym ponad limit: X",
+    "W tym ponad limit: Półfinał",
+    "W tym ponad limit: 2026-10-01"
+  ],
+  "excessReason": [
+    "W tym ponad limit: 0.",
+    "W tym ponad limit: 1.",
+    "W tym ponad limit: 2.",
+    "W tym ponad limit: 5.",
+    "W tym ponad limit: 12.",
+    "W tym ponad limit: 22.",
+    "W tym ponad limit: X.",
+    "W tym ponad limit: Półfinał.",
+    "W tym ponad limit: 2026-10-01."
   ],
   "excessShort": [
     "O 0 za dużo",
@@ -302,9 +339,72 @@
     "Półfinał. Mapa pozycji dla wybranej formacji.",
     "2026-10-01. Mapa pozycji dla wybranej formacji."
   ],
+  "freeSlots": [
+    "Dowolne 0/0",
+    "Dowolne 1/1",
+    "Dowolne 2/2",
+    "Dowolne 5/5",
+    "Dowolne 12/12",
+    "Dowolne 22/22",
+    "Dowolne X/X",
+    "Dowolne Półfinał/Półfinał",
+    "Dowolne 2026-10-01/2026-10-01"
+  ],
   "fulfilled": "✓ Spełnione",
   "fullSquadMessage": "Aby powołać kolejnego zawodnika, najpierw zwolnij jedno miejsce.",
   "fullSquadTitle": "Lista jest pełna",
+  "groupPlayers": {
+    "ATA": [
+      "0 napastników",
+      "1 napastnik",
+      "2 napastników",
+      "5 napastników",
+      "12 napastników",
+      "22 napastników",
+      "X napastników",
+      "Półfinał napastników",
+      "2026-10-01 napastników"
+    ],
+    "BR": [
+      "0 bramkarzy",
+      "1 bramkarz",
+      "2 bramkarzy",
+      "5 bramkarzy",
+      "12 bramkarzy",
+      "22 bramkarzy",
+      "X bramkarzy",
+      "Półfinał bramkarzy",
+      "2026-10-01 bramkarzy"
+    ],
+    "OBR": [
+      "0 obrońców",
+      "1 obrońca",
+      "2 obrońców",
+      "5 obrońców",
+      "12 obrońców",
+      "22 obrońców",
+      "X obrońców",
+      "Półfinał obrońców",
+      "2026-10-01 obrońców"
+    ],
+    "POM": [
+      "0 pomocników",
+      "1 pomocnik",
+      "2 pomocników",
+      "5 pomocników",
+      "12 pomocników",
+      "22 pomocników",
+      "X pomocników",
+      "Półfinał pomocników",
+      "2026-10-01 pomocników"
+    ]
+  },
+  "groupShort": {
+    "ATA": "NAP",
+    "BR": "BR",
+    "OBR": "OBR",
+    "POM": "POM"
+  },
   "groups": {
     "ATA": "Napastnicy",
     "BR": "Bramkarze",
@@ -430,6 +530,17 @@
     "runnerUp": "Wicemistrz Europy",
     "semifinal": "Półfinał"
   },
+  "outsideMarker": [
+    "W tym poza ustawieniem: 0",
+    "W tym poza ustawieniem: 1",
+    "W tym poza ustawieniem: 2",
+    "W tym poza ustawieniem: 5",
+    "W tym poza ustawieniem: 12",
+    "W tym poza ustawieniem: 22",
+    "W tym poza ustawieniem: X",
+    "W tym poza ustawieniem: Półfinał",
+    "W tym poza ustawieniem: 2026-10-01"
+  ],
   "phaseLabel": "Etap:",
   "pitchDescription": "Liczby pokazują, ilu powołanych może grać na danej pozycji.",
   "plannedDisclaimer": "Plany mogą się zmienić.",
@@ -554,11 +665,11 @@
   "rangesLegend": "Zakresy",
   "remaining": [
     "Zostało 0 miejsc",
-    "Zostało 1 miejsc",
-    "Zostało 2 miejsc",
+    "Zostało 1 miejsce",
+    "Zostały 2 miejsca",
     "Zostało 5 miejsc",
     "Zostało 12 miejsc",
-    "Zostało 22 miejsc",
+    "Zostały 22 miejsca",
     "Zostało X miejsc",
     "Zostało Półfinał miejsc",
     "Zostało 2026-10-01 miejsc"
@@ -681,6 +792,28 @@
   ],
   "simulationDisclaimer": "Symulacja ocenia strukturę decyzji i zawiera kontrolowaną losowość. Nie jest prognozą rzeczywistego wyniku sportowego.",
   "skipToList": "Przejdź do listy kandydatów",
+  "slotGroupAboveMinimum": [
+    "0 0 (min. 0)",
+    "1 1 (min. 1)",
+    "2 2 (min. 2)",
+    "5 5 (min. 5)",
+    "12 12 (min. 12)",
+    "22 22 (min. 22)",
+    "X X (min. X)",
+    "Półfinał Półfinał (min. Półfinał)",
+    "2026-10-01 2026-10-01 (min. 2026-10-01)"
+  ],
+  "slotGroupLabel": [
+    "0 0/0",
+    "1 1/1",
+    "2 2/2",
+    "5 5/5",
+    "12 12/12",
+    "22 22/22",
+    "X X/X",
+    "Półfinał Półfinał/Półfinał",
+    "2026-10-01 2026-10-01/2026-10-01"
+  ],
   "sort": {
     "experience": "Doświadczenie",
     "fitness": "Zdrowie",

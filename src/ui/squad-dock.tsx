@@ -45,8 +45,8 @@ export function SquadDock({
   const issueText = issues
     .map((issue) =>
       issue.kind === "missing"
-        ? text.missing(issue.count, issue.group)
-        : text.excess(issue.count, issue.group),
+        ? text.missing(issue.count, text.groupShort[issue.group])
+        : text.excess(issue.count, text.groupShort[issue.group]),
     )
     .join(" • ");
   return (
