@@ -6,6 +6,7 @@ import { encodeSave } from "../logic/save-format.ts";
 import { createInitialState, reduceGameState } from "../logic/state.ts";
 import { tournamentStory } from "../logic/tournament.ts";
 import type { GroupPosition, OutcomeId, Player } from "../data/types.ts";
+import type { JSDOM } from "jsdom";
 import { withJsdomWindow } from "./test-jsdom-window.ts";
 import { renderGameApp } from "./test-render-game-app.ts";
 import { UI_TEXT } from "./text.ts";
@@ -599,4 +600,51 @@ test("clear-squad and new-game actions on the list", async () => {
       await vite.close();
     }
   });
+});
+
+function stubMatchMedia(dom: JSDOM, matching: string | null) {
+  Object.defineProperty(dom.window, "matchMedia", {
+    configurable: true,
+    value: (query: string) =>
+      ({
+        matches: query === matching,
+        media: query,
+        addEventListener: () => {},
+        removeEventListener: () => {},
+      }) as unknown as MediaQueryList,
+  });
+}
+
+test("one board per width: the side board from 1024 px, the bottom dock below", async () => {
+  for (const wide of [true, false]) {
+    await withJsdomWindow(async (dom) => {
+      stubMatchMedia(dom, wide ? "(min-width: 1024px)" : null);
+      const { fireEvent, cleanup, vite, view } = await renderGameApp(dom);
+      try {
+        fireEvent.click(
+          await view.findByRole("button", { name: "Rozpocznij odprawę" }),
+        );
+        await view.findByRole("heading", {
+          name: "Wybierz 23 zawodników na test",
+        });
+        const doc = dom.window.document;
+        const regions = view.queryAllByRole("region", {
+          name: "Tablica kadry – zgrupowanie",
+        });
+        if (wide) {
+          assert.equal(doc.querySelectorAll(".dock").length, 1);
+          assert.equal(regions.length, 1);
+          assert.equal(regions[0]!.classList.contains("dock"), true);
+          assert.equal(doc.querySelector("aside.dock") === null, true);
+        } else {
+          assert.equal(doc.querySelectorAll("aside.dock").length, 1);
+          assert.equal(regions.length, 0);
+        }
+        assert.equal(view.getAllByRole("button", { name: "Cofnij" }).length, 1);
+      } finally {
+        cleanup();
+        await vite.close();
+      }
+    });
+  }
 });

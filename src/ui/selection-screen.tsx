@@ -9,11 +9,9 @@ import { GAME_HEADING_ID, GameHead } from "./game-head.tsx";
 import { ListHeading } from "./list-heading.tsx";
 import { PlayerCard } from "./player-card.tsx";
 import { PositionChips } from "./position-chips.tsx";
+import { SideBoard } from "./side-board.tsx";
 import { SideColumn } from "./side-column.tsx";
 import { UI_TEXT as text } from "./text.ts";
-import { useMediaQuery } from "./use-media-query.ts";
-
-const WIDE_LAYOUT_QUERY = "(min-width: 1024px)";
 
 export function SelectionScreen({
   state,
@@ -27,6 +25,9 @@ export function SelectionScreen({
   onToggle,
   onProfile,
   onCompare,
+  wide,
+  onOutsiders,
+  onFinalize,
 }: {
   state: GameState;
   headingRef: RefObject<HTMLHeadingElement | null>;
@@ -39,8 +40,10 @@ export function SelectionScreen({
   onToggle: (id: PlayerId) => void;
   onProfile: (id: PlayerId) => void;
   onCompare: (id: PlayerId) => void;
+  wide: boolean;
+  onOutsiders: () => void;
+  onFinalize: () => void;
 }) {
-  const wide = useMediaQuery(WIDE_LAYOUT_QUERY);
   // Screen state, not saved: the panel starts collapsed on every visit.
   const [filtersOpen, setFiltersOpen] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
@@ -101,7 +104,20 @@ export function SelectionScreen({
           )}
         </div>
       </section>
-      {wide && <SideColumn state={state}>{actions}</SideColumn>}
+      {wide && (
+        <SideColumn
+          state={state}
+          board={
+            <SideBoard
+              state={state}
+              onOutsiders={onOutsiders}
+              onFinalize={onFinalize}
+            />
+          }
+        >
+          {actions}
+        </SideColumn>
+      )}
     </div>
   );
 }

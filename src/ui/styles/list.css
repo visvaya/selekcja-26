@@ -150,21 +150,9 @@
     font-size: var(--text-3xl);
   }
 
-  .dock-side {
-    display: flex;
-    flex-direction: column;
-  }
-
   .kpis-side {
     margin-top: 0;
     margin-bottom: var(--space-4);
-  }
-
-  .dock-side .side-actions {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-2);
-    margin: 0;
   }
 }
 

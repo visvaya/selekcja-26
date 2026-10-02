@@ -118,12 +118,12 @@
   cursor: pointer;
 }
 
-.dock-copy:hover {
+button.dock-copy:hover {
   background: color-mix(in oklab, var(--action) 14%, transparent);
   border-color: color-mix(in oklab, var(--action) 35%, transparent);
 }
 
-.dock-copy:active {
+button.dock-copy:active {
   background: color-mix(in oklab, var(--action) 22%, transparent);
   transform: translateY(1px);
 }
@@ -366,5 +366,97 @@
   .dock-breakdown,
   .dock-copy-chevron {
     transition: none;
+  }
+}
+
+/* The desktop side column (from 1024 px): sticky beside the list, the KPIs and actions at
+   their own height and the board taking the rest, scrolling inside itself. */
+@media (min-width: 1024px) {
+  .dock-side {
+    position: sticky;
+    top: calc(
+      var(--topbar-height) + var(--space-4) + var(--save-banner-offset, 0px)
+    );
+    display: flex;
+    flex-direction: column;
+    max-height: calc(
+      100vh - var(--topbar-height) - var(--space-4) * 2 -
+        var(--save-banner-offset, 0px)
+    );
+  }
+
+  .dock-side > .kpis-side,
+  .dock-side > .side-actions {
+    flex: none;
+  }
+
+  .dock-side > .dock {
+    position: static;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    background: var(--board-deep);
+    border: var(--board-frame-width) solid var(--frame);
+    border-radius: var(--radius-md);
+  }
+
+  .dock-side .dock-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background: none;
+    border: none;
+  }
+
+  .dock-side .dock-slots {
+    flex: 1 1 0;
+    max-width: none;
+  }
+
+  /* The copy and the stage button take full rows under the ring and the squares. */
+  .dock-side .dock-copy,
+  .dock-side .finalize {
+    flex: 1 1 100%;
+    margin: 0;
+  }
+
+  .dock-side .dock-copy {
+    min-height: 0;
+    padding: 0;
+    border: none;
+    cursor: default;
+  }
+
+  .dock-side .dock-breakdown {
+    max-height: none;
+    overflow: visible;
+    margin: 0;
+    padding: 0 var(--space-4) var(--space-4);
+    background: none;
+    border: none;
+    border-radius: 0;
+  }
+
+  .dock-side .side-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
+    margin: var(--space-3) 0 0;
+  }
+
+  .dock-side .side-actions .action-button {
+    min-height: var(--side-action-height);
+    margin: 0;
+    padding: 0 var(--space-2);
+    font-size: var(--text-sm);
+  }
+}
+
+@media (min-width: 1024px) and (pointer: fine) {
+  .dock-side > .dock {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
   }
 }

@@ -33,6 +33,8 @@ import { SelectionScreen } from "./selection-screen.tsx";
 import { SquadDock } from "./squad-dock.tsx";
 import { ReportScreen } from "./report-screen.tsx";
 import { UI_TEXT as text } from "./text.ts";
+import { UI_CONFIG } from "./ui-config.ts";
+import { useMediaQuery } from "./use-media-query.ts";
 
 type ModalState =
   | { kind: "profile"; id: PlayerId }
@@ -68,6 +70,14 @@ export function GameApp() {
   const [ready, setReady] = useState(false);
   const [modal, setModal] = useState<ModalState | null>(null);
   const [expanded, setExpanded] = useState(false);
+  // Decided once for the whole app, so exactly one board renders: the side board from
+  // 1024 px, the bottom dock below. A width change closes the phone breakdown.
+  const wide = useMediaQuery(UI_CONFIG.wideLayoutQuery);
+  const [layoutWide, setLayoutWide] = useState(wide);
+  if (layoutWide !== wide) {
+    setLayoutWide(wide);
+    setExpanded(false);
+  }
   const [saveStatus, dispatchSaveStatus] = useReducer(
     reduceSaveStatus,
     initialSaveStatus,
@@ -379,10 +389,13 @@ export function GameApp() {
             onToggle={togglePlayer}
             onProfile={(id) => setModal({ kind: "profile", id })}
             onCompare={comparePlayer}
+            wide={wide}
+            onOutsiders={() => setModal({ kind: "outsiders" })}
+            onFinalize={finishStage}
           />
         )}
       </main>
-      {state.started && !state.report && (
+      {state.started && !state.report && !wide && (
         <SquadDock
           state={state}
           expanded={expanded}

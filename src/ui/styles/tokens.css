@@ -249,6 +249,8 @@
   --hatch-stripe: 3.5px;
   --board-frame-width: 3px;
   --finalize-min-height: 44px;
+  /* Side column actions under the desktop board: 36 px buttons. */
+  --side-action-height: 36px;
 }
 
 @media (min-width: 1024px) {
