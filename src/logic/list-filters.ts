@@ -1,5 +1,6 @@
 // Player list filters: which catalogue players the list shows for the current list settings.
 import { players } from "../data/catalog.ts";
+import { GAME_RULES } from "../data/constants.ts";
 import type {
   GameState,
   SortId,
@@ -51,6 +52,40 @@ export function clearDetailFilters(): Pick<
 
 const rangeShown = (id: RangeId, stage: Stage): boolean =>
   !(id === "campImpact" && stage === "camp");
+
+const RANGE_ORDER: readonly RangeId[] = [
+  "age",
+  "score",
+  "quality",
+  "form",
+  "fitness",
+  "tactics",
+  "experience",
+  "chemistry",
+  "groupImpact",
+  "campImpact",
+];
+
+// Ranges the panel offers at a stage, in display order ("campImpact" only at the final).
+export function rangeIdsForStage(stage: Stage): RangeId[] {
+  return RANGE_ORDER.filter((id) => rangeShown(id, stage));
+}
+
+// Scale of a range: min and max of its value over the catalogue for the current state, so the
+// selection score follows the system and stage. The camp impact uses the fixed rule bounds.
+export function rangeScale(
+  id: RangeId,
+  state: GameState,
+): { min: number; max: number } {
+  if (id === "campImpact") {
+    const limit = GAME_RULES.selection.trialImpactMaximumPoints;
+    return { min: -limit, max: limit };
+  }
+  const values = players
+    .map((player) => rangeValue(id, player, state))
+    .filter((value): value is number => value !== null);
+  return { min: Math.min(...values), max: Math.max(...values) };
+}
 
 export function rangeValue(
   id: RangeId,

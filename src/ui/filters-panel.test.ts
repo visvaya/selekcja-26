@@ -2,7 +2,10 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { createServer } from "vite";
 import type { GameState, ListFilters } from "../data/types.ts";
-import { clearDetailFilters } from "../logic/list-filters.ts";
+import {
+  appliedCriteriaCount,
+  clearDetailFilters,
+} from "../logic/list-filters.ts";
 import { createInitialState, reduceGameState } from "../logic/state.ts";
 import { LIST_HEADING_ID } from "./list-heading-id.ts";
 import { UI_TEXT as text } from "./text.ts";
@@ -160,5 +163,58 @@ test("Wyczyść filtry clears the detail filters", async () => {
       fireEvent.click(getByRole("button", { name: text.clearFilters }));
       assert.deepEqual(patches, [clearDetailFilters()]);
     },
+  );
+});
+
+test("the ranges follow the stage and a commit patches the ranges", async () => {
+  await withPanel(
+    campState({ ranges: { quality: { min: 70, max: null } } }),
+    async ({ getByRole, queryByRole, patches }) => {
+      const { fireEvent } = await import("@testing-library/react");
+      fireEvent.click(getByRole("button", { name: /Filtry szczegółowe/ }));
+      assert.equal(
+        queryByRole("spinbutton", {
+          name: text.rangeFrom(text.ranges.campImpact),
+        }) === null,
+        true,
+      );
+      const age = getByRole("spinbutton", {
+        name: text.rangeTo(text.ranges.age),
+      });
+      fireEvent.change(age, { target: { value: "30" } });
+      fireEvent.blur(age);
+      const quality = getByRole("spinbutton", {
+        name: text.rangeFrom(text.ranges.quality),
+      });
+      fireEvent.change(quality, { target: { value: "" } });
+      fireEvent.blur(quality);
+      assert.deepEqual(patches, [
+        {
+          ranges: {
+            quality: { min: 70, max: null },
+            age: { min: null, max: 30 },
+          },
+        },
+        { ranges: {} },
+      ]);
+    },
+  );
+});
+
+test("a range with a set bound counts in the badge, an unset one does not", () => {
+  const stage = "camp";
+  assert.equal(
+    appliedCriteriaCount(
+      { ...campState().list, ranges: { age: { min: null, max: 30 } } },
+      stage,
+    ),
+    1,
+  );
+  assert.equal(
+    appliedCriteriaCount(
+      { ...campState().list, ranges: { age: { min: null, max: null } } },
+      stage,
+    ),
+    0,
   );
 });

@@ -13,6 +13,8 @@ import {
   clearDetailFilters,
   DEFAULT_LIST_FILTERS,
   matchesListFilters,
+  rangeIdsForStage,
+  rangeScale,
   rangeValue,
   visiblePlayers,
 } from "./list-filters.ts";
@@ -244,4 +246,40 @@ test("clearDetailFilters resets foot, traits and ranges to the defaults", () => 
     traits: DEFAULT_LIST_FILTERS.traits,
     ranges: DEFAULT_LIST_FILTERS.ranges,
   });
+});
+
+test("rangeScale spans the catalogue values of the current state", () => {
+  const state = createInitialState(1);
+  const ages = players.map((player) => player.age);
+  assert.deepEqual(rangeScale("age", state), {
+    min: Math.min(...ages),
+    max: Math.max(...ages),
+  });
+  const scores = players.map((player) => modelScore(player, state));
+  assert.deepEqual(rangeScale("score", state), {
+    min: Math.min(...scores),
+    max: Math.max(...scores),
+  });
+  assert.deepEqual(rangeScale("campImpact", finalStage([])), {
+    min: -2,
+    max: 2,
+  });
+});
+
+test("rangeIdsForStage lists nine ranges at camp and adds campImpact at the final", () => {
+  const camp = rangeIdsForStage("camp");
+  assert.equal(camp.length, 9);
+  assert.equal(camp.includes("campImpact"), false);
+  assert.deepEqual(rangeIdsForStage("final"), [
+    "age",
+    "score",
+    "quality",
+    "form",
+    "fitness",
+    "tactics",
+    "experience",
+    "chemistry",
+    "groupImpact",
+    "campImpact",
+  ]);
 });

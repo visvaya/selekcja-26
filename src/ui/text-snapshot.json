@@ -413,6 +413,40 @@
     "Zgranie kadrowe",
     "Wpływ na grupę"
   ],
+  "rangeFrom": [
+    "0 od",
+    "1 od",
+    "2 od",
+    "5 od",
+    "12 od",
+    "22 od",
+    "X od",
+    "Półfinał od",
+    "2026-10-01 od"
+  ],
+  "rangeTo": [
+    "0 do",
+    "1 do",
+    "2 do",
+    "5 do",
+    "12 do",
+    "22 do",
+    "X do",
+    "Półfinał do",
+    "2026-10-01 do"
+  ],
+  "ranges": {
+    "age": "Wiek",
+    "campImpact": "Wynik zgrupowania",
+    "chemistry": "Zgranie kadrowe",
+    "experience": "Doświadczenie",
+    "fitness": "Zdrowie",
+    "form": "Forma",
+    "groupImpact": "Wpływ na grupę",
+    "quality": "Jakość",
+    "score": "Ocena selekcyjna",
+    "tactics": "Taktyka"
+  },
   "rangesLegend": "Zakresy",
   "remaining": [
     "Zostało 0 miejsc",

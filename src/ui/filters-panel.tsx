@@ -1,10 +1,19 @@
 import { useId, type ReactNode } from "react";
-import type { GameState, ListFilters, RoleId } from "../data/types.ts";
+import type {
+  GameState,
+  ListFilters,
+  RangeBounds,
+  RangeId,
+  RoleId,
+} from "../data/types.ts";
 import {
   appliedCriteriaCount,
   clearDetailFilters,
+  rangeIdsForStage,
+  rangeScale,
 } from "../logic/list-filters.ts";
 import { LIST_HEADING_ID } from "./list-heading-id.ts";
+import { RangeField } from "./range-field.tsx";
 import { UI_TEXT as text } from "./text.ts";
 import { TRAIT_FILTER_ORDER } from "./trait-filter-order.ts";
 
@@ -37,6 +46,22 @@ function toggledTraits(
   return checked
     ? [...traits.filter((item) => item !== trait), trait]
     : traits.filter((item) => item !== trait);
+}
+
+const EMPTY_BOUNDS: RangeBounds = Object.freeze({ min: null, max: null });
+
+// A range with neither bound set is dropped from the saved filters.
+function withRange(
+  ranges: ListFilters["ranges"],
+  id: RangeId,
+  bounds: RangeBounds,
+): ListFilters["ranges"] {
+  const rest = Object.fromEntries(
+    Object.entries(ranges).filter(([key]) => key !== id),
+  ) as ListFilters["ranges"];
+  return bounds.min === null && bounds.max === null
+    ? rest
+    : { ...rest, [id]: bounds };
 }
 
 // Toolbar of the candidate list: search, the "Filtry szczegółowe" disclosure and its panel
@@ -124,6 +149,19 @@ export function FiltersPanel({
           </fieldset>
           <fieldset className="filter-group filter-group-ranges">
             <legend>{text.rangesLegend}</legend>
+            {rangeIdsForStage(state.stage).map((id) => (
+              <RangeField
+                key={id}
+                id={id}
+                label={text.ranges[id]}
+                scale={rangeScale(id, state)}
+                bounds={list.ranges[id] ?? EMPTY_BOUNDS}
+                signed={id === "campImpact"}
+                onCommit={(bounds) =>
+                  onList({ ranges: withRange(list.ranges, id, bounds) })
+                }
+              />
+            ))}
           </fieldset>
         </div>
         <div className="filters-panel-actions">
