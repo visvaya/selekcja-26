@@ -77,8 +77,9 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
   await page.locator(".select-btn").first().tap();
   await expect(squadCount(page)).toHaveText("1/23");
   await search.fill("");
-  // Back to the top, as before the call-up: the journey's focus checks start from there.
-  await page.evaluate(() => window.scrollTo(0, 0));
+  // Scrolled down the list: when the event dialogs close, focus falls back to the heading,
+  // which must come out from under the sticky top bar.
+  await page.evaluate(() => window.scrollTo(0, 600));
 
   await page.getByRole("button", { name: text.autoFill }).tap();
   for (const choice of CAMP_EVENT_CHOICES) {

@@ -191,6 +191,7 @@ test("desktop game is playable with the keyboard alone", async ({ page }) => {
   // The skip link moves focus to the list heading.
   await activate(page, skipLink);
   await expect(page.locator(".section-label h2")).toBeFocused();
+  await expectFocusVisible(page, "skip link to the list heading");
 
   // With the panel closed every position chip is a Tab stop with a visible focus ring.
   await activate(page, filtersToggle);
