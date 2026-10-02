@@ -217,21 +217,41 @@ test("checked formation keeps an outline in forced colours", async ({
     browserName !== "chromium",
     "forced colours emulation is Chromium-only",
   );
-  await page.emulateMedia({ forcedColors: "active" });
   await page.goto("/");
   const checked = page.getByRole("radio", { checked: true });
+  // Without forced colours the dot keeps the --select token.
+  const normal = await checked.evaluate((element) => {
+    const probe = document.createElement("div");
+    probe.style.background = "var(--select)";
+    document.body.append(probe);
+    const select = getComputedStyle(probe).backgroundColor;
+    probe.remove();
+    return { dot: getComputedStyle(element).backgroundColor, select };
+  });
+  expect(normal.dot).toBe(normal.select);
+
+  await page.emulateMedia({ forcedColors: "active" });
   const outline = await checked
     .locator("xpath=..")
     .evaluate((element) => getComputedStyle(element).outlineStyle);
   expect(outline).not.toBe("none");
 
-  // The checked dot stays filled and distinct from its card.
-  const fill = await checked.evaluate((element) => ({
-    dot: getComputedStyle(element).backgroundColor,
-    card: getComputedStyle(element.parentElement!).backgroundColor,
-  }));
+  // The checked dot is filled with the system Highlight colour.
+  const fill = await checked.evaluate((element) => {
+    const probe = document.createElement("div");
+    probe.style.background = "Highlight";
+    document.body.append(probe);
+    const highlight = getComputedStyle(probe).backgroundColor;
+    probe.remove();
+    return {
+      dot: getComputedStyle(element).backgroundColor,
+      card: getComputedStyle(element.parentElement!).backgroundColor,
+      highlight,
+    };
+  });
   expect(fill.dot).not.toBe("rgba(0, 0, 0, 0)");
   expect(fill.dot).not.toBe(fill.card);
+  expect(fill.dot).toBe(fill.highlight);
 
   // Keyboard focus on the checked card must look different from checked alone.
   const ring = (element: Element) => {
