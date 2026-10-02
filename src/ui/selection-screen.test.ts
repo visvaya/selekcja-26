@@ -1,4 +1,4 @@
-import test from "node:test";
+import test, { mock } from "node:test";
 import assert from "node:assert/strict";
 import { createServer } from "vite";
 import { players } from "../data/catalog.ts";
@@ -304,6 +304,52 @@ test("empty list clears every narrowing filter, keeps the sort and focuses searc
       const search = getByRole("searchbox", { name: "Szukaj zawodnika" });
       assert.equal(dom.window.document.activeElement === search, true);
     } finally {
+      cleanup();
+      await vite.close();
+    }
+  });
+});
+
+test("a narrowed list announces the visible count once after the pause", async () => {
+  await withJsdomWindow(async () => {
+    const React = await import("react");
+    const { cleanup, act } = await import("@testing-library/react");
+    mock.timers.enable({ apis: ["setTimeout"] });
+    const { vite, container, rerender } = await renderScreen(campState());
+    try {
+      const status = () =>
+        container.querySelector('.list-heading [role="status"]')?.textContent;
+      const { SelectionScreen } = (await vite.ssrLoadModule(
+        "/src/ui/selection-screen.tsx",
+      )) as typeof import("./selection-screen.tsx");
+      const narrowed = withList(campState(), { query: "Kochalski" });
+      const noop = () => {};
+      rerender(
+        React.createElement(SelectionScreen, {
+          state: narrowed,
+          headingRef: React.createRef<HTMLHeadingElement>(),
+          onAutoFill: noop,
+          onUndo: noop,
+          onClearSquad: noop,
+          onNewGame: noop,
+          undoRef: React.createRef<HTMLButtonElement>(),
+          onList: noop,
+          onToggle: noop,
+          onProfile: noop,
+          onCompare: noop,
+        }),
+      );
+      const expected = `Widoczni: ${visiblePlayers(narrowed).length} z 61`;
+      assert.equal(
+        container.querySelector(".list-count")?.textContent,
+        expected,
+      );
+      await act(async () => mock.timers.tick(499));
+      assert.equal(status(), "");
+      await act(async () => mock.timers.tick(1));
+      assert.equal(status(), expected);
+    } finally {
+      mock.timers.reset();
       cleanup();
       await vite.close();
     }

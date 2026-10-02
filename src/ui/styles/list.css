@@ -170,10 +170,10 @@
 }
 
 .chip {
-  min-height: 32px;
+  min-height: var(--chip-min-height);
   padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-sm);
-  border: 2px solid var(--frame);
+  border: var(--control-border) solid var(--frame);
   background: var(--board-deep);
   color: var(--ink);
   font-size: var(--text-sm);
@@ -205,7 +205,7 @@
 }
 
 .chip:active {
-  transform: translateY(1px);
+  transform: translateY(var(--divider-border));
 }
 
 @media (max-width: 767.98px) {
@@ -216,7 +216,7 @@
     padding-bottom: var(--space-1);
     --fade-left: 0px;
     --fade-right: 0px;
-    scroll-padding-inline: 32px;
+    scroll-padding-inline: var(--chip-scroll-padding);
     mask-image: linear-gradient(
       to right,
       transparent 0,
@@ -227,11 +227,11 @@
   }
 
   .filters.fade-left {
-    --fade-left: 28px;
+    --fade-left: var(--chip-fade-size);
   }
 
   .filters.fade-right {
-    --fade-right: 28px;
+    --fade-right: var(--chip-fade-size);
   }
 
   .chip {
@@ -306,11 +306,11 @@
 
 .sort {
   appearance: none;
-  height: 40px;
+  height: var(--sort-height);
   min-width: 0;
   max-width: 100%;
-  padding: 0 30px 0 var(--space-3);
-  border: 2px solid var(--frame);
+  padding: 0 var(--sort-chevron-room) 0 var(--space-3);
+  border: var(--control-border) solid var(--frame);
   border-radius: var(--radius-sm);
   background: var(--surface);
   color: var(--ink);
@@ -324,13 +324,13 @@
 /* chevron drawn from two borders of a rotated square */
 .select-chevron {
   position: absolute;
-  right: 12px;
+  right: var(--chevron-inset);
   top: 50%;
-  width: 7px;
-  height: 7px;
-  margin-top: -5px;
+  width: var(--chevron-size);
+  height: var(--chevron-size);
+  margin-top: calc(var(--chevron-size) / -2 - var(--divider-border));
   border: solid var(--ink-soft);
-  border-width: 0 2px 2px 0;
+  border-width: 0 var(--chevron-stroke) var(--chevron-stroke) 0;
   transform: rotate(45deg);
   pointer-events: none;
 }
@@ -352,7 +352,7 @@
   grid-column: 1 / -1;
   padding: var(--space-4);
   background: var(--board-deep);
-  border: 1px dashed var(--frame-soft);
+  border: var(--divider-border) dashed var(--frame-soft);
   border-radius: var(--radius-md);
 }
 
@@ -366,8 +366,8 @@
 
 @media (forced-colors: active) {
   .chip.active {
-    outline: 3px solid Highlight;
-    outline-offset: -3px;
+    outline: var(--forced-outline-width) solid Highlight;
+    outline-offset: calc(var(--forced-outline-width) * -1);
   }
 
   .select-chevron {
@@ -378,5 +378,5 @@
 /* The fixed squad dock covers the bottom of the viewport: focus and scroll-into-view keep
    the focused control above it (stage 7 replaces the dock). */
 html:has(.dock) {
-  scroll-padding-bottom: calc(var(--space-8) * 2);
+  scroll-padding-bottom: var(--dock-scroll-padding);
 }

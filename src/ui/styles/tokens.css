@@ -146,6 +146,23 @@
   --range-handle-size: 24px;
   --range-handle-ring: 2px;
   --range-slider-inset: 10px;
+
+  /* Candidate list head: 32 px position chips with a 28 px edge fade on phones, a 40 px
+     sort select with room for its 7 px chevron, and 2 px control borders. */
+  --chip-min-height: 32px;
+  --chip-fade-size: 28px;
+  --chip-scroll-padding: var(--space-7);
+  --control-border: 2px;
+  --divider-border: 1px;
+  --sort-height: 40px;
+  --sort-chevron-room: 30px;
+  --chevron-size: 7px;
+  --chevron-stroke: 2px;
+  --chevron-inset: var(--space-3);
+  --forced-outline-width: 3px;
+  /* Estimate of the fixed squad dock height (not measured), so focus scrolling keeps the
+     focused control above it; replaced by a measured height when the dock is rebuilt. */
+  --dock-scroll-padding: calc(var(--space-8) * 2);
 }
 
 @media (min-width: 760px) {
