@@ -102,7 +102,10 @@ for (const size of SIZES) {
         campSave({ selectedIds: firstIds(10), events: ["doctor"] }),
       );
       await page.goto("/");
-      await page.getByRole("button", { name: text.profile }).first().click();
+      await page
+        .getByRole("button", { name: new RegExp(`^${text.profile}: `) })
+        .first()
+        .click();
       await expect(dialog(page)).toBeVisible();
       await shot(page, `${size.name}-profile`);
     });

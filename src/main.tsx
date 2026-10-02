@@ -13,6 +13,10 @@ import "./ui/styles/tokens.css";
 import "./ui/styles/base.css";
 import "./ui/styles/topbar.css";
 import "./ui/styles/start.css";
+import "./ui/styles/list.css";
+import "./ui/styles/filters.css";
+import "./ui/styles/range-field.css";
+import "./ui/styles/player-strip.css";
 import "./ui/styles/legacy.css";
 
 createRoot(document.getElementById("root")!).render(

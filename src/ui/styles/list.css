@@ -1,0 +1,399 @@
+/* Candidate list screen: the game head with facts and squad indicators, and from 1024 px the
+   two-column layout with the side column. */
+
+.game-head {
+  margin-bottom: var(--space-4);
+}
+
+.game-head h1 {
+  font-size: var(--text-2xl);
+}
+
+/* labelled facts under the heading */
+.game-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-5);
+  margin: var(--space-2) 0 var(--space-3);
+}
+
+.game-facts div {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.game-facts dt {
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.game-facts dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-sm);
+  color: var(--ink);
+}
+
+/* KPI tiles: three in one row at every width, each a label segment over a value segment */
+.kpis {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: stretch;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.kpi {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 0;
+  overflow: hidden;
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--frame-soft);
+  border-radius: var(--radius-md);
+}
+
+.kpi span,
+.kpi b {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-1) var(--space-2);
+  margin: 0;
+  min-height: 0;
+  line-height: 1.15;
+}
+
+.kpi span {
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+  border-bottom: 1px solid var(--frame-soft);
+}
+
+.kpi b {
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-lg);
+}
+
+/* List actions: undo, random fill, clear squad, new game */
+.game-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.confirm-actions .action-button {
+  margin-top: 0;
+}
+
+/* The design's buttons for the list actions and the empty-list card: the legacy
+   .action-button (stretching, thin border, 800 weight, padding on all sides) stays for the
+   screens that have not been restyled yet. */
+.game-actions .action-button,
+.noCandidates .action-button {
+  flex: 0 0 auto;
+  margin-top: 0;
+  padding: 0 var(--space-4);
+  border-width: var(--control-border);
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+}
+
+.game-actions .action-button:disabled,
+.noCandidates .action-button:disabled {
+  opacity: 1;
+}
+
+.confirm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+@media (max-width: 767.98px) {
+  .game-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2) var(--space-3);
+  }
+
+  .kpi span {
+    font-size: var(--text-2xs);
+  }
+
+  .kpi b {
+    font-size: var(--text-md);
+  }
+}
+
+@media (min-width: 1024px) {
+  .screen-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--side-column-width);
+    gap: var(--space-6);
+    align-items: start;
+  }
+
+  .game-head h1 {
+    font-size: var(--text-3xl);
+  }
+
+  .dock-side {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .kpis-side {
+    margin-top: 0;
+    margin-bottom: var(--space-4);
+  }
+
+  .dock-side .side-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
+    margin: 0;
+  }
+}
+
+/* Position chips: several can be pressed; on phones the row scrolls with edge fades */
+.toolbar > .filters-plain-label {
+  margin-bottom: calc(var(--space-2) * -1);
+}
+
+.filters-plain-label {
+  display: block;
+  margin-bottom: var(--space-1);
+  font-size: var(--text-sm);
+  color: var(--ink);
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.chip {
+  min-height: var(--chip-min-height);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  border: var(--control-border) solid var(--frame);
+  background: var(--board-deep);
+  color: var(--ink);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  white-space: nowrap;
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
+}
+
+.chip:hover {
+  border-color: var(--action);
+  color: var(--action);
+}
+
+.chip.active {
+  background: var(--action);
+  border-color: var(--action);
+  color: var(--on-action);
+}
+
+.chip.active:hover {
+  background: var(--action-strong);
+  border-color: var(--action-strong);
+  color: var(--on-action);
+}
+
+.chip:active {
+  transform: translateY(var(--divider-border));
+}
+
+@media (max-width: 767.98px) {
+  .filters {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    padding-bottom: var(--space-1);
+    --fade-left: 0px;
+    --fade-right: 0px;
+    scroll-padding-inline: var(--chip-scroll-padding);
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      black var(--fade-left),
+      black calc(100% - var(--fade-right)),
+      transparent 100%
+    );
+  }
+
+  .filters.fade-left {
+    --fade-left: var(--chip-fade-size);
+  }
+
+  .filters.fade-right {
+    --fade-right: var(--chip-fade-size);
+  }
+
+  .chip {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+  }
+}
+
+@media (max-width: 767.98px) and (pointer: fine) {
+  .filters {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  }
+}
+
+@media (max-width: 767.98px) and (pointer: coarse) {
+  .filters {
+    scrollbar-width: none;
+  }
+}
+
+/* List head: heading and count on one row, then the sort and the ticks, which wrap together */
+.section-label {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  margin-bottom: var(--space-3);
+}
+
+.section-label > .list-heading {
+  flex: 1 1 100%;
+}
+
+.section-label h2 {
+  font-size: var(--text-lg);
+  min-width: 0;
+}
+
+.list-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-3);
+}
+
+.list-count {
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}
+
+.sort-field {
+  display: flex;
+  align-items: center;
+  flex-shrink: 1;
+  min-width: 0;
+  gap: var(--space-2);
+}
+
+.sort-field label {
+  font-size: var(--text-sm);
+  color: var(--ink);
+}
+
+.select-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.sort {
+  appearance: none;
+  height: var(--sort-height);
+  min-width: 0;
+  max-width: 100%;
+  padding: 0 var(--sort-chevron-room) 0 var(--space-3);
+  border: var(--control-border) solid var(--frame);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: var(--text-sm);
+}
+
+.sort:hover {
+  border-color: var(--ink);
+}
+
+/* chevron drawn from two borders of a rotated square */
+.select-chevron {
+  position: absolute;
+  right: var(--chevron-inset);
+  top: 50%;
+  width: var(--chevron-size);
+  height: var(--chevron-size);
+  margin-top: calc(var(--chevron-size) / -2 - var(--divider-border));
+  border: solid var(--ink-soft);
+  border-width: 0 var(--chevron-stroke) var(--chevron-stroke) 0;
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+.list-toggles {
+  display: flex;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  min-width: 0;
+  gap: var(--space-1) var(--space-4);
+}
+
+.list-toggle {
+  font-size: var(--text-sm);
+}
+
+/* Empty list */
+.noCandidates {
+  grid-column: 1 / -1;
+  padding: var(--space-4);
+  background: var(--board-deep);
+  border: var(--divider-border) dashed var(--frame-soft);
+  border-radius: var(--radius-md);
+}
+
+.noCandidates p {
+  margin: 0 0 var(--space-3);
+}
+
+.noCandidates .fineprint {
+  margin-top: var(--space-5);
+}
+
+@media (forced-colors: active) {
+  .chip.active {
+    outline: var(--forced-outline-width) solid Highlight;
+    outline-offset: calc(var(--forced-outline-width) * -1);
+  }
+
+  .select-chevron {
+    border-color: CanvasText;
+  }
+}
+
+/* The fixed squad dock covers the bottom of the viewport: focus and scroll-into-view keep
+   the focused control above it (stage 7 replaces the dock). */
+html:has(.dock) {
+  scroll-padding-bottom: var(--dock-scroll-padding);
+}

@@ -12,16 +12,14 @@
   align-items: center;
   border-radius: var(--radius-sm);
   /* Inset, not full-bleed: the bar spans the same column as the page content below it, so
-     on wide screens its edges line up with the content. The gutters and the 1180 px column
-     follow the main content area. */
-  width: calc(min(100%, 1180px) - 2 * var(--legacy-space-7));
-  margin: 0 auto var(--space-5);
-}
-
-@media (min-width: 760px) {
-  .topbar {
-    width: calc(min(100%, 1180px) - 2 * var(--legacy-space-12));
-  }
+     on wide screens its edges line up with the content. */
+  width: calc(min(100%, var(--page-max-width)) - 2 * var(--page-gutter));
+  margin: 0 auto var(--topbar-gap);
+  /* A page-coloured backdrop around the sticky bar: the shadow is lifted by its own spread,
+     so it covers the gutters beside the bar, its rounded corners and the strip above it, but
+     never the content directly below the bar. A shadow paints outside the box only, so the
+     bar keeps its ink fill. */
+  box-shadow: 0 calc(-1 * var(--page-gutter)) 0 var(--page-gutter) var(--board);
 }
 
 .topbar-inner {

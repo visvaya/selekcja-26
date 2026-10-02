@@ -9,8 +9,16 @@ import type {
   SortId,
 } from "../data/types.ts";
 import {
+  appliedCriteriaCount,
+  catalogueCounts,
+  clearAllFilters,
+  clearDetailFilters,
+  FILTER_POSITIONS,
+  togglePosition,
   DEFAULT_LIST_FILTERS,
   matchesListFilters,
+  rangeIdsForStage,
+  rangeScale,
   rangeValue,
   visiblePlayers,
 } from "./list-filters.ts";
@@ -210,4 +218,101 @@ test("visiblePlayers orders by every sort without dropping players", () => {
     query.map((player) => player.id),
     ["robert-lewandowski"],
   );
+});
+
+test("appliedCriteriaCount is 0 for the defaults", () => {
+  assert.equal(appliedCriteriaCount(DEFAULT_LIST_FILTERS, "camp"), 0);
+});
+
+test("appliedCriteriaCount counts foot boxes, traits and set ranges only", () => {
+  const list: ListFilters = {
+    ...DEFAULT_LIST_FILTERS,
+    positions: ["BR", "LO"],
+    query: "ki",
+    onlySelected: true,
+    onlyCamp: true,
+    foot: { left: true, right: true },
+    traits: ["pace", "leader", "aerial"],
+    ranges: {
+      age: { min: 20, max: null },
+      form: { min: null, max: 90 },
+      quality: { min: null, max: null },
+      campImpact: { min: -2, max: null },
+    },
+  };
+  assert.equal(appliedCriteriaCount(list, "final"), 8);
+  assert.equal(appliedCriteriaCount(list, "camp"), 7);
+});
+
+test("clearDetailFilters resets foot, traits and ranges to the defaults", () => {
+  assert.deepEqual(clearDetailFilters(), {
+    foot: DEFAULT_LIST_FILTERS.foot,
+    traits: DEFAULT_LIST_FILTERS.traits,
+    ranges: DEFAULT_LIST_FILTERS.ranges,
+  });
+});
+
+test("rangeScale spans the catalogue values of the current state", () => {
+  const state = createInitialState(1);
+  const ages = players.map((player) => player.age);
+  assert.deepEqual(rangeScale("age", state), {
+    min: Math.min(...ages),
+    max: Math.max(...ages),
+  });
+  const scores = players.map((player) => modelScore(player, state));
+  assert.deepEqual(rangeScale("score", state), {
+    min: Math.min(...scores),
+    max: Math.max(...scores),
+  });
+  assert.deepEqual(rangeScale("campImpact", finalStage([])), {
+    min: -2,
+    max: 2,
+  });
+});
+
+test("rangeIdsForStage lists nine ranges at camp and adds campImpact at the final", () => {
+  const camp = rangeIdsForStage("camp");
+  assert.equal(camp.length, 9);
+  assert.equal(camp.includes("campImpact"), false);
+  assert.deepEqual(rangeIdsForStage("final"), [
+    "age",
+    "score",
+    "quality",
+    "form",
+    "fitness",
+    "tactics",
+    "experience",
+    "chemistry",
+    "groupImpact",
+    "campImpact",
+  ]);
+});
+
+test("catalogueCounts counts catalogue players per detailed position", () => {
+  const counts = catalogueCounts();
+  assert.deepEqual(Object.keys(counts), [...FILTER_POSITIONS]);
+  for (const position of FILTER_POSITIONS)
+    assert.equal(
+      counts[position],
+      players.filter((player) => detailedPositions(player).includes(position))
+        .length,
+    );
+  assert.equal(catalogueCounts() === counts, true);
+});
+
+test("togglePosition adds and removes a position in display order", () => {
+  assert.deepEqual(togglePosition([], "BR"), ["BR"]);
+  assert.deepEqual(togglePosition(["BR"], "BR"), []);
+  assert.deepEqual(togglePosition(["N"], "BR"), ["BR", "N"]);
+  assert.deepEqual(togglePosition(["BR", "N"], "LO"), ["BR", "LO", "N"]);
+  const input = Object.freeze(["N"]) as readonly ("N" | "BR")[];
+  togglePosition(input, "BR");
+  assert.deepEqual(input, ["N"]);
+});
+
+test("clearAllFilters resets every narrowing filter and keeps the sort", () => {
+  assert.deepEqual(clearAllFilters("name"), {
+    ...DEFAULT_LIST_FILTERS,
+    sort: "name",
+  });
 });

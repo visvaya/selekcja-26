@@ -112,6 +112,12 @@
 
   /* Layout and safe areas */
   --topbar-height: 56px;
+  /* The page column: the top bar, the content and the dock share it. At most 1280 px wide
+     with the gutters; the gutter widens from 1024 px (below), where the side column starts. */
+  --page-max-width: 1280px;
+  --page-gutter: var(--space-4);
+  /* space between the top bar and the first content of every screen */
+  --topbar-gap: var(--space-5);
   --button-primary-size: var(--text-base);
   --cta-min-width: 240px;
   --scrollbar-thumb: var(--frame-soft);
@@ -127,4 +133,94 @@
   --sheet-handle-width: 44px;
   --sheet-handle-height: 4px;
   --sheet-head-gap: var(--space-3);
+
+  /* Range filter: two 56 px number fields, a 16 px separator and two 4 px gaps form the 136 px pair; the
+     handles are 24 px targets with a 2 px ring, inset 10 px so they meet the track ends. */
+  --range-input-width: 56px;
+  --range-sep-width: 16px;
+  --range-inputs-width: calc(
+    var(--range-input-width) * 2 + var(--range-sep-width) + var(--space-1) * 2
+  );
+  --range-input-height: 36px;
+  --range-input-border: 2px;
+  --range-row-gap: 2px;
+  --range-track-height: 6px;
+  --range-handle-size: 24px;
+  --range-handle-ring: 2px;
+  --range-slider-inset: 10px;
+
+  /* Candidate list head: 32 px position chips with a 28 px edge fade on phones, a 40 px
+     sort select with room for its 7 px chevron, and 2 px control borders. */
+  --chip-min-height: 32px;
+  --chip-fade-size: 28px;
+  --chip-scroll-padding: var(--space-7);
+  --control-border: 2px;
+  --divider-border: 1px;
+  --sort-height: 40px;
+  --sort-chevron-room: 30px;
+  --chevron-size: 7px;
+  --chevron-stroke: 2px;
+  --chevron-inset: var(--space-3);
+  --forced-outline-width: 3px;
+  /* Filters toolbar: 44 px search and toggle with a 200 px search basis (120 px on phones), a
+     20 px count badge, and checkboxes with a 24 px hit area around an 18 px box whose 5 x 9 px
+     check mark sits 9 px from the left and 5 px from the top. */
+  --control-height: 44px;
+  --search-basis: 200px;
+  --search-basis-narrow: 120px;
+  --count-badge-size: 20px;
+  --check-target: 24px;
+  --check-box-size: 18px;
+  --check-mark-left: 9px;
+  --check-mark-top: 5px;
+  --check-mark-width: 5px;
+  --check-mark-height: 9px;
+  /* Selection screen: a 360 px side column for the squad dock on desktop. */
+  --side-column-width: 360px;
+  /* Player strip: a 46 x 42 px position magnet with a 4 px group bar, a 4 px strip bar that
+     grows to 8 px when called up, 6 px meters, 44 px buttons (28 px in the desktop stack) and
+     24 px name and popover targets. The desktop tracks leave the name column room for full
+     catalogue names. */
+  --strip-bar: 4px;
+  --strip-bar-selected: 8px;
+  --strip-edge: 2px;
+  --badge-width: 46px;
+  --badge-height: 42px;
+  --badge-pad: 3px;
+  --badge-code-gap: 2px;
+  --tag-pad-block: 3px;
+  --meter-height: 6px;
+  --meter-label-gap: 3px;
+  --strip-button-height: 44px;
+  --strip-button-height-desktop: 28px;
+  --name-target: 24px;
+  --name-lift: 4px;
+  --club-nudge: 2px;
+  --strip-name-offset: 14px;
+  --score-gap: 2px;
+  --score-max-width: 96px;
+  --compare-outline: 3px;
+  --strip-min-height-desktop: 88px;
+  --strip-name-min: 240px;
+  --strip-name-max: 340px;
+  --strip-meters-min: 240px;
+  --strip-meters-max: 300px;
+  --strip-score-col: 56px;
+  --strip-actions-min: 96px;
+  --strip-actions-max: 116px;
+  --strip-score-col-mid: 60px;
+  --strip-actions-min-mid: 108px;
+  --strip-actions-max-mid: 132px;
+  --popover-max-width: 260px;
+  --popover-border: 2px;
+  --popover-shadow-offset: 3px;
+  /* Estimate of the fixed squad dock height (not measured), so focus scrolling keeps the
+     focused control above it; replaced by a measured height when the dock is rebuilt. */
+  --dock-scroll-padding: calc(var(--space-8) * 2);
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --page-gutter: var(--space-6);
+  }
 }

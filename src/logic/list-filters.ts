@@ -1,12 +1,15 @@
 // Player list filters: which catalogue players the list shows for the current list settings.
 import { players } from "../data/catalog.ts";
+import { GAME_RULES } from "../data/constants.ts";
 import type {
+  DetailedPosition,
   GameState,
   SortId,
   ListFilters,
   Player,
   RangeBounds,
   RangeId,
+  Stage,
 } from "../data/types.ts";
 import {
   experienceScore,
@@ -26,6 +29,116 @@ export const DEFAULT_LIST_FILTERS: ListFilters = Object.freeze({
   onlySelected: false,
   onlyCamp: false,
 });
+
+// Applied criteria of the detailed filters panel: each foot box, each trait and each range
+// with a set bound. Ranges hidden at the current stage do not count.
+export function appliedCriteriaCount(list: ListFilters, stage: Stage): number {
+  const feet = Number(list.foot.left) + Number(list.foot.right);
+  const ranges = (
+    Object.entries(list.ranges) as [RangeId, RangeBounds][]
+  ).filter(([id, bounds]) => isSet(bounds) && rangeShown(id, stage)).length;
+  return feet + list.traits.length + ranges;
+}
+
+export function clearDetailFilters(): Pick<
+  ListFilters,
+  "foot" | "traits" | "ranges"
+> {
+  return {
+    foot: DEFAULT_LIST_FILTERS.foot,
+    traits: DEFAULT_LIST_FILTERS.traits,
+    // a fresh object on every clear, so range fields see a new version and reset
+    ranges: {},
+  };
+}
+
+// Everything that narrows the list back to defaults; only the sort stays.
+export function clearAllFilters(sort: SortId): ListFilters {
+  return { ...DEFAULT_LIST_FILTERS, sort, ranges: {} };
+}
+
+// Position chips in display order.
+export const FILTER_POSITIONS: readonly DetailedPosition[] = Object.freeze([
+  "BR",
+  "LO",
+  "LŚO",
+  "ŚO",
+  "PŚO",
+  "PO",
+  "LWO",
+  "DP",
+  "ŚP",
+  "OP",
+  "PWO",
+  "LS",
+  "N",
+  "PS",
+]);
+
+let cachedCatalogueCounts: Readonly<Record<DetailedPosition, number>> | null =
+  null;
+
+// Catalogue players per detailed position (a player counts for each of his positions).
+export function catalogueCounts(): Readonly<Record<DetailedPosition, number>> {
+  cachedCatalogueCounts ??= Object.freeze(
+    Object.fromEntries(
+      FILTER_POSITIONS.map((position) => [
+        position,
+        players.filter((player) => detailedPositions(player).includes(position))
+          .length,
+      ]),
+    ) as Record<DetailedPosition, number>,
+  );
+  return cachedCatalogueCounts;
+}
+
+// Adds or removes one position; the result keeps the chip order.
+export function togglePosition(
+  positions: readonly DetailedPosition[],
+  position: DetailedPosition,
+): DetailedPosition[] {
+  const next = positions.includes(position)
+    ? positions.filter((item) => item !== position)
+    : [...positions, position];
+  return FILTER_POSITIONS.filter((item) => next.includes(item));
+}
+
+const rangeShown = (id: RangeId, stage: Stage): boolean =>
+  !(id === "campImpact" && stage === "camp");
+
+const RANGE_ORDER: readonly RangeId[] = [
+  "age",
+  "score",
+  "quality",
+  "form",
+  "fitness",
+  "tactics",
+  "experience",
+  "chemistry",
+  "groupImpact",
+  "campImpact",
+];
+
+// Ranges the panel offers at a stage, in display order ("campImpact" only at the final).
+export function rangeIdsForStage(stage: Stage): RangeId[] {
+  return RANGE_ORDER.filter((id) => rangeShown(id, stage));
+}
+
+// Scale of a range: min and max of its value over the catalogue for the current state, so the
+// selection score follows the system and stage. The camp impact uses the fixed rule bounds.
+export function rangeScale(
+  id: RangeId,
+  state: GameState,
+): { min: number; max: number } {
+  if (id === "campImpact") {
+    const limit = GAME_RULES.selection.trialImpactMaximumPoints;
+    return { min: -limit, max: limit };
+  }
+  const values = players
+    .map((player) => rangeValue(id, player, state))
+    .filter((value): value is number => value !== null);
+  return { min: Math.min(...values), max: Math.max(...values) };
+}
 
 export function rangeValue(
   id: RangeId,
@@ -63,10 +176,7 @@ const isSet = (bounds: RangeBounds | undefined): bounds is RangeBounds =>
 
 function withinRanges(player: Player, state: GameState): boolean {
   return (Object.entries(state.list.ranges) as [RangeId, RangeBounds][])
-    .filter(
-      ([id, bounds]) =>
-        isSet(bounds) && !(id === "campImpact" && state.stage === "camp"),
-    )
+    .filter(([id, bounds]) => isSet(bounds) && rangeShown(id, state.stage))
     .every(([id, bounds]) => {
       const value = rangeValue(id, player, state);
       return (

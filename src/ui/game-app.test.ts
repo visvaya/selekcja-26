@@ -31,7 +31,7 @@ test("start, profile, comparison, event and position filter work together", asyn
       // (the start screen unmounted), so focus must move to the new screen's own heading
       // rather than falling back to the body.
       assert.equal(isFocused(campHeading), true);
-      fireEvent.click(screen.getAllByRole("button", { name: "Profil" })[0]!);
+      fireEvent.click(screen.getAllByRole("button", { name: /^Profil: / })[0]!);
       assert.ok(screen.getByRole("dialog"));
       assert.equal(
         dom.window.document.activeElement?.tagName,
@@ -42,8 +42,12 @@ test("start, profile, comparison, event and position filter work together", asyn
       // Closing the dialog must not drop focus to the body, whether or not the button that
       // opened it was itself focused beforehand.
       assert.equal(isFocused(dom.window.document.body), false);
-      fireEvent.click(screen.getAllByRole("button", { name: "Porównaj" })[0]!);
-      fireEvent.click(screen.getAllByRole("button", { name: "Porównaj" })[0]!);
+      fireEvent.click(
+        screen.getAllByRole("button", { name: /^Porównaj: / })[0]!,
+      );
+      fireEvent.click(
+        screen.getAllByRole("button", { name: /^Porównaj: / })[0]!,
+      );
       assert.ok(
         screen.getByRole("heading", {
           name: "Dwóch kandydatów, jedno miejsce?",
@@ -54,9 +58,11 @@ test("start, profile, comparison, event and position filter work together", asyn
       );
       assert.equal(view.container.querySelectorAll(".compare-on").length, 0);
       assert.equal(isFocused(dom.window.document.body), false);
-      fireEvent.click(screen.getByRole("button", { name: "LO (0)" }));
+      fireEvent.click(screen.getByRole("button", { name: /^LO \(0\// }));
       assert.ok(screen.getByRole("heading", { name: "Lewy obrońca" }));
-      fireEvent.click(screen.getByRole("button", { name: "Wszyscy (0)" }));
+      fireEvent.click(
+        screen.getByRole("button", { name: /^Wszyscy \(0\/61\)/ }),
+      );
       fireEvent.click(screen.getByRole("button", { name: "Dobierz losowo" }));
       assert.ok(
         screen.getByRole("heading", { name: "Raport medyczny: przeciążenie" }),
@@ -71,7 +77,9 @@ test("start, profile, comparison, event and position filter work together", asyn
         0,
       );
       for (let count = 0; count < 9; count++)
-        fireEvent.click(screen.getAllByRole("button", { name: "Powołaj" })[0]!);
+        fireEvent.click(
+          screen.getAllByRole("button", { name: /^Powołaj: / })[0]!,
+        );
       assert.ok(
         screen.getByRole("heading", { name: "Raport medyczny: przeciążenie" }),
       );
@@ -500,3 +508,95 @@ for (const { outcome, points, marker, place } of MARKER_CASES) {
     }
   });
 }
+
+test("clear-squad and new-game actions on the list", async () => {
+  await withJsdomWindow(async (dom) => {
+    const { fireEvent, waitFor, cleanup, vite, view } =
+      await renderGameApp(dom);
+    try {
+      const doc = dom.window.document;
+      function focusedName(): string {
+        return doc.activeElement?.textContent ?? "";
+      }
+      fireEvent.click(
+        await view.findByRole("button", { name: "Rozpocznij odprawę" }),
+      );
+      await view.findByRole("heading", {
+        name: "Wybierz 23 zawodników na test",
+      });
+      const actions = [
+        ...view.container.querySelectorAll(".game-actions button"),
+      ];
+      assert.deepEqual(
+        actions.map((button) => button.textContent),
+        ["Cofnij", "Dobierz losowo", "Odwołaj wszystkich", "Nowa gra"],
+      );
+      assert.equal(actions[3]!.classList.contains("danger"), true);
+      const clear = view.getByRole("button", { name: "Odwołaj wszystkich" });
+      assert.equal((clear as HTMLButtonElement).disabled, true);
+
+      fireEvent.click(view.getByRole("button", { name: "Dobierz losowo" }));
+      await waitFor(() =>
+        assert.equal(
+          (
+            view.getByRole("button", {
+              name: "Odwołaj wszystkich",
+            }) as HTMLButtonElement
+          ).disabled,
+          false,
+        ),
+      );
+      fireEvent.click(view.getByRole("button", { name: "Odwołaj wszystkich" }));
+      await waitFor(() =>
+        assert.equal(
+          view.container.querySelector(".count-ring b")?.textContent,
+          "0/23",
+        ),
+      );
+      await waitFor(() =>
+        assert.equal(
+          view.container.querySelector('[aria-live="polite"]')?.textContent,
+          UI_TEXT.announcements.clearSquad,
+        ),
+      );
+      assert.equal(focusedName(), "Cofnij");
+
+      const newGame = view.getByRole("button", { name: "Nowa gra" });
+      newGame.focus();
+      fireEvent.click(newGame);
+      assert.ok(view.getByRole("dialog", { name: "Zacząć nową grę?" }));
+      assert.equal(focusedName(), "Wróć do gry");
+      fireEvent.click(view.getByRole("button", { name: "Wróć do gry" }));
+      assert.equal(view.queryByRole("dialog"), null);
+      assert.equal(focusedName(), "Nowa gra");
+      assert.ok(
+        view.getByRole("heading", { name: "Wybierz 23 zawodników na test" }),
+      );
+
+      fireEvent.click(view.getByRole("button", { name: "Nowa gra" }));
+      fireEvent.click(view.getByRole("button", { name: "Zacznij nową grę" }));
+      const startHeading = await view.findByRole("heading", {
+        name: /Bilet na EURO/,
+      });
+      await waitFor(() =>
+        assert.equal(doc.activeElement === startHeading, true),
+      );
+      fireEvent.click(view.getByRole("button", { name: "Rozpocznij odprawę" }));
+      // the new game's history holds only its start step: one undo leads back to the start
+      // screen, not into the previous game
+      fireEvent.click(await view.findByRole("button", { name: "Cofnij" }));
+      assert.ok(await view.findByRole("heading", { name: /Bilet na EURO/ }));
+      // nothing is left to undo: the saved game has an empty history
+      await waitFor(() => {
+        const saved = JSON.parse(
+          dom.window.localStorage.getItem(APP_CONFIG.storageKey) ?? "{}",
+        ) as { state?: { started?: boolean; history?: unknown[] } };
+        assert.equal(saved.state?.started, false);
+        assert.equal(saved.state?.history?.length, 0);
+      });
+    } finally {
+      cleanup();
+      await vite.close();
+    }
+  });
+});

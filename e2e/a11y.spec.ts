@@ -33,6 +33,8 @@ const EXPECTED_STATES = [
   "intro",
   "intro changelog expanded",
   "camp list",
+  "filters panel open",
+  "empty list",
   "save error banner",
   "profile dialog",
   "comparison dialog",
@@ -40,6 +42,7 @@ const EXPECTED_STATES = [
   "formation map",
   "camp report dialog",
   "final list",
+  "final list camp squad only",
   "tournament report",
   "rules changed notice",
   "older rules report",
@@ -84,7 +87,7 @@ test.describe.serial("axe WCAG 2.2 AA scan", () => {
   test("every screen and dialog passes an axe WCAG 2.2 AA scan", async ({
     page,
   }) => {
-    // Eleven axe scans across a full game, two of them full 61-card list scans, still take
+    // Fourteen axe scans across a full game, three of them full list scans, still take
     // longer than a plain journey.
     test.setTimeout(300_000);
     await patchStorageFailures(page, STORAGE_KEY);
@@ -112,6 +115,21 @@ test.describe.serial("axe WCAG 2.2 AA scan", () => {
     ).toBeVisible();
     await scan(page, "camp list", scanned, { fullList: true });
 
+    const filtersToggle = page.locator(".filters-toggle");
+    await filtersToggle.click();
+    await expect(filtersToggle).toHaveAttribute("aria-expanded", "true");
+    await scan(page, "filters panel open", scanned);
+    await filtersToggle.click();
+
+    const search = page.getByLabel(text.searchLabel);
+    await search.fill("xyz");
+    await expect(page.getByText(text.noCandidates)).toBeVisible();
+    await scan(page, "empty list", scanned);
+    await page.getByRole("button", { name: text.clearFilters }).click();
+    await expect(page.locator(".list-count")).toHaveText(
+      text.visibleCount(61, 61),
+    );
+
     await setStorageFailureMode(page, "failed");
     await page.locator(".select-btn").first().click();
     await expect(saveAlert(page)).toHaveText(text.save.messages.failed);
@@ -122,7 +140,10 @@ test.describe.serial("axe WCAG 2.2 AA scan", () => {
     await page.locator(".select-btn").first().click();
     await expect(saveAlert(page)).toHaveText("");
 
-    await page.getByRole("button", { name: text.profile }).first().click();
+    await page
+      .getByRole("button", { name: new RegExp(`^${text.profile}: `) })
+      .first()
+      .click();
     await expect(dialog(page)).toBeVisible();
     await scan(page, "profile dialog", scanned);
     await dialog(page).getByRole("button", { name: text.returnToList }).click();
@@ -161,6 +182,14 @@ test.describe.serial("axe WCAG 2.2 AA scan", () => {
       page.getByRole("heading", { name: text.stages.final.heading }),
     ).toBeVisible();
     await scan(page, "final list", scanned, { fullList: true });
+
+    const onlyCamp = page.getByRole("checkbox", { name: text.onlyCamp(23) });
+    await onlyCamp.check();
+    await expect(page.locator(".list-count")).toHaveText(
+      text.visibleCount(23, 61),
+    );
+    await scan(page, "final list camp squad only", scanned, { fullList: true });
+    await onlyCamp.uncheck();
 
     await page.getByRole("button", { name: text.autoFill }).click();
     await finalizeButton(page).click();

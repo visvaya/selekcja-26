@@ -1,46 +1,29 @@
-import type { RefObject } from "react";
-import type {
-  DetailedPosition,
-  GameState,
-  PlayerId,
-  SortId,
-} from "../data/types.ts";
-import { visiblePlayers } from "../logic/list-filters.ts";
-import {
-  detailedCounts,
-  riskLevel,
-  selectedPlayers,
-  squadLimit,
-} from "../logic/selection.ts";
+import { useRef, useState, type RefObject } from "react";
+import type { GameState, ListFilters, PlayerId } from "../data/types.ts";
+import { clearAllFilters, visiblePlayers } from "../logic/list-filters.ts";
+import { squadLimit } from "../logic/selection.ts";
+import { EmptyList } from "./empty-list.tsx";
+import { FiltersPanel } from "./filters-panel.tsx";
+import { GameActions } from "./game-actions.tsx";
+import { GAME_HEADING_ID, GameHead } from "./game-head.tsx";
+import { ListHeading } from "./list-heading.tsx";
 import { PlayerCard } from "./player-card.tsx";
+import { PositionChips } from "./position-chips.tsx";
+import { SideColumn } from "./side-column.tsx";
 import { UI_TEXT as text } from "./text.ts";
+import { useMediaQuery } from "./use-media-query.ts";
 
-const filterPositions: ("ALL" | DetailedPosition)[] = [
-  "ALL",
-  "BR",
-  "LO",
-  "LŚO",
-  "ŚO",
-  "PŚO",
-  "PO",
-  "LWO",
-  "DP",
-  "ŚP",
-  "OP",
-  "PWO",
-  "LS",
-  "N",
-  "PS",
-];
+const WIDE_LAYOUT_QUERY = "(min-width: 1024px)";
 
 export function SelectionScreen({
   state,
   headingRef,
   onAutoFill,
   onUndo,
-  onQuery,
-  onFilter,
-  onSort,
+  onClearSquad,
+  onNewGame,
+  undoRef,
+  onList,
   onToggle,
   onProfile,
   onCompare,
@@ -49,141 +32,76 @@ export function SelectionScreen({
   headingRef: RefObject<HTMLHeadingElement | null>;
   onAutoFill: () => void;
   onUndo: () => void;
-  onQuery: (value: string) => void;
-  onFilter: (value: "ALL" | DetailedPosition) => void;
-  onSort: (value: SortId) => void;
+  onClearSquad: () => void;
+  onNewGame: () => void;
+  undoRef: RefObject<HTMLButtonElement | null>;
+  onList: (patch: Partial<ListFilters>) => void;
   onToggle: (id: PlayerId) => void;
   onProfile: (id: PlayerId) => void;
   onCompare: (id: PlayerId) => void;
 }) {
-  const stageText = text.stages[state.stage];
-  const currentSystem = text.systems[state.system];
-  const selected = selectedPlayers(state);
-  const detailed = detailedCounts(state);
-  const risk = riskLevel(state);
-  // The chip row shows a single position at most; several positions press no chip.
+  const wide = useMediaQuery(WIDE_LAYOUT_QUERY);
+  // Screen state, not saved: the panel starts collapsed on every visit.
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const searchRef = useRef<HTMLInputElement>(null);
   const positions = state.list.positions;
-  const activeFilter: "ALL" | DetailedPosition | null =
-    positions.length === 0
-      ? "ALL"
-      : positions.length === 1
-        ? positions[0]!
-        : null;
+  // A single chosen position names the list; none or several keep the general heading.
+  const title =
+    positions.length === 1 ? text.positions[positions[0]!] : text.allCandidates;
+  const visible = visiblePlayers(state);
+  const actions = (
+    <GameActions
+      canUndo={state.history.length > 0}
+      canAutoFill={state.selected.size < squadLimit(state)}
+      canClear={state.selected.size > 0}
+      onUndo={onUndo}
+      onAutoFill={onAutoFill}
+      onClear={onClearSquad}
+      onNewGame={onNewGame}
+      undoRef={undoRef}
+      className={wide ? "side-actions" : undefined}
+    />
+  );
   return (
-    <section>
-      <div className="game-head">
-        <div>
-          <div className="eyebrow">
-            {stageText.eyebrow} • {currentSystem.name} • {stageText.suffix}
-          </div>
-          <h1 ref={headingRef} tabIndex={-1}>
-            {stageText.heading}
-          </h1>
-          <p>{stageText.hint}</p>
-        </div>
-        <div className="kpis">
-          <div className="kpi">
-            <span>{text.kpis.quality}</span>
-            <b>
-              {selected.length
-                ? Math.round(
-                    selected.reduce((sum, player) => sum + player.ov, 0) /
-                      selected.length +
-                      state.effects.quality,
-                  )
-                : text.emptyValue}
-            </b>
-          </div>
-          <div className="kpi">
-            <span>{text.kpis.fit}</span>
-            <b>
-              {selected.length
-                ? `${Math.round(selected.reduce((sum, player) => sum + player.tact, 0) / selected.length)}%`
-                : text.emptyValue}
-            </b>
-          </div>
-          <div className="kpi">
-            <span>{text.kpis.risk}</span>
-            <b>{text.risk[risk]}</b>
-          </div>
-        </div>
-      </div>
-      <div className="game-actions">
-        <button
-          className="action-button"
-          onClick={onAutoFill}
-          disabled={state.selected.size >= squadLimit(state)}
+    <div className="screen-layout">
+      <section aria-labelledby={GAME_HEADING_ID}>
+        <GameHead state={state} headingRef={headingRef} showKpis={!wide} />
+        {!wide && actions}
+        <FiltersPanel
+          state={state}
+          open={filtersOpen}
+          onToggle={() => setFiltersOpen((open) => !open)}
+          onList={onList}
+          searchRef={searchRef}
         >
-          {text.autoFill}
-        </button>
-        <button
-          className="action-button"
-          onClick={onUndo}
-          disabled={!state.history.length}
-        >
-          {text.undo}
-        </button>
-      </div>
-      <div className="toolbar">
-        <input
-          className="search"
-          type="search"
-          value={state.list.query}
-          onChange={(event) => onQuery(event.target.value)}
-          placeholder={text.searchPlaceholder}
-          aria-label={text.searchLabel}
+          <PositionChips state={state} onList={onList} />
+        </FiltersPanel>
+        <ListHeading
+          state={state}
+          title={title}
+          visibleCount={visible.length}
+          onList={onList}
         />
-        <div className="filters" aria-label={text.filterLabel}>
-          {filterPositions.map((position) => (
-            <button
-              className={`chip ${activeFilter === position ? "active" : ""}`}
-              aria-pressed={activeFilter === position}
-              key={position}
-              title={
-                position === "ALL" ? text.filtersAll : text.positions[position]
-              }
-              onClick={() => onFilter(position)}
-            >
-              {position === "ALL" ? text.filtersAll : position} (
-              {position === "ALL" ? selected.length : detailed[position]})
-            </button>
+        <div className="players">
+          {visible.map((player) => (
+            <PlayerCard
+              key={player.id}
+              player={player}
+              state={state}
+              onToggle={onToggle}
+              onProfile={onProfile}
+              onCompare={onCompare}
+            />
           ))}
+          {visible.length === 0 && (
+            <EmptyList
+              onClearAll={() => onList(clearAllFilters(state.list.sort))}
+              searchRef={searchRef}
+            />
+          )}
         </div>
-      </div>
-      <div className="section-label">
-        <h2>
-          {activeFilter === "ALL" || activeFilter === null
-            ? text.allCandidates
-            : text.positions[activeFilter]}
-        </h2>
-        <select
-          className="sort"
-          aria-label={text.sortLabel}
-          value={state.list.sort}
-          onChange={(event) => onSort(event.target.value as SortId)}
-        >
-          {(Object.keys(text.sort) as SortId[]).map((sort) => (
-            <option key={sort} value={sort}>
-              {text.sort[sort]}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div className="players">
-        {visiblePlayers(state).map((player) => (
-          <PlayerCard
-            key={player.id}
-            player={player}
-            state={state}
-            onToggle={onToggle}
-            onProfile={onProfile}
-            onCompare={onCompare}
-          />
-        ))}
-        {visiblePlayers(state).length === 0 && (
-          <div className="report">{text.noCandidates}</div>
-        )}
-      </div>
-    </section>
+      </section>
+      {wide && <SideColumn state={state}>{actions}</SideColumn>}
+    </div>
   );
 }

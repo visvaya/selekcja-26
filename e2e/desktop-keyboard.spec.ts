@@ -105,7 +105,9 @@ test("desktop game is playable with the keyboard alone", async ({ page }) => {
   await expectFocusVisible(page, "start -> camp");
 
   // Profile dialog: focus moves in, Tab is trapped, Escape closes and restores focus.
-  const profile = page.getByRole("button", { name: text.profile }).first();
+  const profile = page
+    .getByRole("button", { name: new RegExp(`^${text.profile}: `) })
+    .first();
   await activate(page, profile);
   await expect(dialog(page)).toBeVisible();
   const dialogButtons = dialog(page).getByRole("button");
@@ -140,19 +142,69 @@ test("desktop game is playable with the keyboard alone", async ({ page }) => {
   await expectFocusVisible(page, "comparison dialog close");
 
   // Position filter and search.
-  const leftBack = page.getByRole("button", { name: "LO (0)" });
+  const leftBack = page.getByRole("button", { name: /^LO \(0\// });
   await activate(page, leftBack, "Space");
   await expect(leftBack).toHaveAttribute("aria-pressed", "true");
   await expect(
     page.getByRole("heading", { name: text.positions.LO }),
   ).toBeVisible();
-  await activate(page, page.getByRole("button", { name: "Wszyscy (0)" }));
+  await activate(
+    page,
+    page.getByRole("button", { name: /^Wszyscy \(0\/61\)/ }),
+  );
   const search = page.getByRole("searchbox", { name: text.searchLabel });
   await search.focus();
   await page.keyboard.type("Kochalski");
   await expect(page.locator(".player")).toHaveCount(1);
   await page.keyboard.press("Control+A");
   await page.keyboard.press("Backspace");
+
+  // Detailed filters: the disclosure follows the search field; its skip link leads to the list.
+  await page.keyboard.press("Tab");
+  const filtersToggle = page.getByRole("button", { name: text.detailFilters });
+  await expect(filtersToggle).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(filtersToggle).toHaveAttribute("aria-expanded", "true");
+  await page.keyboard.press("Tab");
+  const skipLink = page.getByRole("link", { name: text.skipToList });
+  await expect(skipLink).toBeFocused();
+  await expectFocusVisible(page, "filters panel skip link");
+
+  // Inside the panel Space ticks a trait and the visible count follows at once; Escape is
+  // harmless (no dialog to close, the tick and the focus stay).
+  const count = page.locator(".list-count");
+  await expect(count).toHaveText(text.visibleCount(61, 61));
+  const pace = page.getByRole("checkbox", { name: text.roles.pace });
+  await tabUntil(page, pace);
+  await expectVisibleFocus(pace);
+  await page.keyboard.press("Space");
+  await expect(pace).toBeChecked();
+  await expect(count).not.toHaveText(text.visibleCount(61, 61));
+  await page.keyboard.press("Escape");
+  await expect(pace).toBeChecked();
+  await expect(pace).toBeFocused();
+  await expect(filtersToggle).toHaveAttribute("aria-expanded", "true");
+  await page.keyboard.press("Space");
+  await expect(pace).not.toBeChecked();
+  await expect(count).toHaveText(text.visibleCount(61, 61));
+
+  // The skip link moves focus to the list heading.
+  await activate(page, skipLink);
+  await expect(page.locator(".section-label h2")).toBeFocused();
+
+  // With the panel closed every position chip is a Tab stop with a visible focus ring.
+  await activate(page, filtersToggle);
+  await expect(filtersToggle).toHaveAttribute("aria-expanded", "false");
+  const chips = page
+    .getByRole("group", { name: text.positionChipsLabel })
+    .getByRole("button");
+  const chipCount = await chips.count();
+  expect(chipCount).toBeGreaterThan(1);
+  await tabUntil(page, chips.first());
+  for (let index = 0; index < chipCount; index++) {
+    await expectVisibleFocus(chips.nth(index));
+    if (index < chipCount - 1) await page.keyboard.press("Tab");
+  }
 
   // Event dialogs are blocking: Escape does not dismiss them.
   await activate(page, page.getByRole("button", { name: text.autoFill }));

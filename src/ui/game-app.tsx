@@ -10,6 +10,7 @@ import type { LoadedSave } from "../logic/save-format.ts";
 import { createLatestRequestTracker } from "../logic/latest-request.ts";
 import { initialSaveStatus, reduceSaveStatus } from "../logic/save-status.ts";
 import { SaveStatusBanner } from "./save-status-banner.tsx";
+import { usePopoverAnchoring } from "./use-popover-anchoring.ts";
 import { LiveAnnouncer } from "./live-announcer.tsx";
 import { AppHeader } from "./app-header.tsx";
 import { StartScreen } from "./start-screen.tsx";
@@ -19,6 +20,7 @@ import { CampReportDialog } from "./camp-report-dialog.tsx";
 import { OutsidersDialog } from "./outsiders-dialog.tsx";
 import { ProfileDialog } from "./profile-dialog.tsx";
 import { ComparisonDialog } from "./comparison-dialog.tsx";
+import { ConfirmDialog } from "./confirm-dialog.tsx";
 import { buildFinalReport } from "../logic/report.ts";
 import {
   canFinalize,
@@ -37,6 +39,7 @@ type ModalState =
   | { kind: "comparison" }
   | { kind: "outsiders" }
   | { kind: "campReport" }
+  | { kind: "confirmNewGame" }
   | { kind: "message"; title: string; description: string };
 
 // A player stuck with a broken save can open the game with ?reset to start over.
@@ -58,6 +61,7 @@ function randomSeed(): number {
 }
 
 export function GameApp() {
+  usePopoverAnchoring();
   const [state, dispatch] = useReducer(reduceGameState, 0, () =>
     createInitialState(randomSeed()),
   );
@@ -78,6 +82,9 @@ export function GameApp() {
   // every full-screen transition somewhere safe to send focus.
   const headingRef = useRef<HTMLHeadingElement>(null);
   const focusHeading = useCallback(() => headingRef.current?.focus(), []);
+  // The list's "Cofnij" button: focus target after clearing the squad, because the clicked
+  // button becomes disabled and would otherwise drop focus to the page.
+  const undoRef = useRef<HTMLButtonElement>(null);
   // Screen-reader announcements for actions that change the squad without moving focus
   // (undo, a successful random fill, resolving a camp event). Local UI state, never saved,
   // no undo step. flushSync commits the empty string as its own render before the real
@@ -195,6 +202,18 @@ export function GameApp() {
     setModal(null);
     setExpanded(false);
   }
+  function clearSquad() {
+    if (state.selected.size === 0) return;
+    // flushSync commits the cleared squad (and the enabled "Cofnij") before focus moves.
+    flushSync(() => dispatch({ type: "clearSquad" }));
+    announce(text.announcements.clearSquad);
+    undoRef.current?.focus();
+  }
+  function restart() {
+    dispatch({ type: "reset", seed: randomSeed() });
+    setModal(null);
+    setExpanded(false);
+  }
   function comparePlayer(id: PlayerId) {
     const willCompare = !state.compare.includes(id);
     dispatch({ type: "toggleCompare", id });
@@ -245,6 +264,21 @@ export function GameApp() {
           restoreFocusFallback={focusHeading}
         />
       );
+    if (activeModal.kind === "confirmNewGame") {
+      const copy = text.confirmNewGame;
+      return (
+        <ConfirmDialog
+          eyebrow={copy.eyebrow}
+          title={copy.title}
+          description={copy.description}
+          confirmLabel={copy.confirm}
+          cancelLabel={copy.cancel}
+          onConfirm={restart}
+          onClose={close}
+          restoreFocusFallback={focusHeading}
+        />
+      );
+    }
     if (activeModal.kind === "campReport")
       return (
         <CampReportDialog
@@ -320,11 +354,7 @@ export function GameApp() {
         {state.report ? (
           <ReportScreen
             report={state.report}
-            onRestart={() => {
-              dispatch({ type: "reset", seed: randomSeed() });
-              setModal(null);
-              setExpanded(false);
-            }}
+            onRestart={restart}
             headingRef={headingRef}
           />
         ) : !state.started ? (
@@ -342,14 +372,10 @@ export function GameApp() {
             headingRef={headingRef}
             onAutoFill={autoFill}
             onUndo={undo}
-            onQuery={(query) => dispatch({ type: "setList", patch: { query } })}
-            onFilter={(value) =>
-              dispatch({
-                type: "setList",
-                patch: { positions: value === "ALL" ? [] : [value] },
-              })
-            }
-            onSort={(sort) => dispatch({ type: "setList", patch: { sort } })}
+            onClearSquad={clearSquad}
+            onNewGame={() => setModal({ kind: "confirmNewGame" })}
+            undoRef={undoRef}
+            onList={(patch) => dispatch({ type: "setList", patch })}
             onToggle={togglePlayer}
             onProfile={(id) => setModal({ kind: "profile", id })}
             onCompare={comparePlayer}

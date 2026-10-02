@@ -24,6 +24,7 @@
       "Losowo dobrano zawodników: Półfinał. Powołani: Półfinał z Półfinał.",
       "Losowo dobrano zawodników: 2026-10-01. Powołani: 2026-10-01 z 2026-10-01."
     ],
+    "clearSquad": "Odwołano wszystkich zawodników. Możesz to cofnąć przyciskiem „Cofnij”.",
     "eventResolved": [
       "Zdarzenie rozstrzygnięte: 0.",
       "Zdarzenie rozstrzygnięte: 1.",
@@ -135,12 +136,68 @@
     "Wersja Półfinał · undefined.undefined.Półfinał",
     "Wersja 2026-10-01 · 01.10.2026"
   ],
+  "chip": [
+    "0 (0/0)",
+    "1 (1/1)",
+    "2 (2/2)",
+    "5 (5/5)",
+    "12 (12/12)",
+    "22 (22/22)",
+    "X (X/X)",
+    "Półfinał (Półfinał/Półfinał)",
+    "2026-10-01 (2026-10-01/2026-10-01)"
+  ],
+  "chipAllName": [
+    "Wszyscy (0/0): powołani 0 z 0",
+    "Wszyscy (1/1): powołani 1 z 1",
+    "Wszyscy (2/2): powołani 2 z 2",
+    "Wszyscy (5/5): powołani 5 z 5",
+    "Wszyscy (12/12): powołani 12 z 12",
+    "Wszyscy (22/22): powołani 22 z 22",
+    "Wszyscy (X/X): powołani X z X",
+    "Wszyscy (Półfinał/Półfinał): powołani Półfinał z Półfinał",
+    "Wszyscy (2026-10-01/2026-10-01): powołani 2026-10-01 z 2026-10-01"
+  ],
+  "chipName": [
+    "0 (0/0): 0, powołani 0 z 0",
+    "1 (1/1): 1, powołani 1 z 1",
+    "2 (2/2): 2, powołani 2 z 2",
+    "5 (5/5): 5, powołani 5 z 5",
+    "12 (12/12): 12, powołani 12 z 12",
+    "22 (22/22): 22, powołani 22 z 22",
+    "X (X/X): X, powołani X z X",
+    "Półfinał (Półfinał/Półfinał): Półfinał, powołani Półfinał z Półfinał",
+    "2026-10-01 (2026-10-01/2026-10-01): 2026-10-01, powołani 2026-10-01 z 2026-10-01"
+  ],
   "clearComparison": "Wyczyść porównanie",
+  "clearFilters": "Wyczyść filtry",
+  "clearSquad": "Odwołaj wszystkich",
+  "collapseTraits": "Zwiń",
+  "collapseTraitsName": "Zwiń cechy",
   "compare": "Porównaj",
   "compared": "Wybrany",
   "comparisonEyebrow": "Analiza porównawcza",
   "comparisonTitle": "Dwóch kandydatów, jedno miejsce?",
+  "confirmNewGame": {
+    "cancel": "Wróć do gry",
+    "confirm": "Zacznij nową grę",
+    "description": "Obecna selekcja i historia decyzji przepadną. Tego nie da się cofnąć.",
+    "eyebrow": "Nowa gra",
+    "title": "Zacząć nową grę?"
+  },
   "continueToFinal": "Przejdź do powołań na EURO",
+  "detailFilters": "Filtry szczegółowe",
+  "detailFiltersActive": [
+    "Filtry szczegółowe, aktywne: 0",
+    "Filtry szczegółowe, aktywne: 1",
+    "Filtry szczegółowe, aktywne: 2",
+    "Filtry szczegółowe, aktywne: 5",
+    "Filtry szczegółowe, aktywne: 12",
+    "Filtry szczegółowe, aktywne: 22",
+    "Filtry szczegółowe, aktywne: X",
+    "Filtry szczegółowe, aktywne: Półfinał",
+    "Filtry szczegółowe, aktywne: 2026-10-01"
+  ],
   "disclaimer": "Nieoficjalna gra fanowska. Nie jest rzeczywistym produktem PZPN/UEFA.",
   "dockCoverage": "Dotknij, aby zobaczyć obsadę",
   "dockOpen": "Dotknij, aby zobaczyć podział miejsc",
@@ -219,7 +276,10 @@
     "O Półfinał za dużo",
     "O 2026-10-01 za dużo"
   ],
-  "filterLabel": "Filtruj po pozycji",
+  "facts": {
+    "formation": "Formacja",
+    "term": "Termin"
+  },
   "filtersAll": "Wszyscy",
   "foot": {
     "both": "Obunożny",
@@ -227,6 +287,10 @@
     "left": "Lewa",
     "right": "Prawa"
   },
+  "footHint": "Zaznacz obie, aby pokazać obunożnych.",
+  "footLeft": "Lewa noga",
+  "footLegend": "Noga wiodąca",
+  "footRight": "Prawa noga",
   "formationMap": [
     "0. Mapa pozycji dla wybranej formacji.",
     "1. Mapa pozycji dla wybranej formacji.",
@@ -251,7 +315,7 @@
   "kpis": {
     "fit": "Dopasowanie",
     "quality": "Jakość",
-    "risk": "Ryzyko"
+    "risk": "Ryzyko urazu"
   },
   "loading": "Wczytywanie gry…",
   "luck": {
@@ -282,7 +346,20 @@
     "Brakuje Półfinał",
     "Brakuje 2026-10-01"
   ],
+  "moreTraits": [
+    "+0: pokaż jeszcze 0 cech",
+    "+1: pokaż jeszcze 1 cechę, w tym ostrzeżenie",
+    "+2: pokaż jeszcze 2 cechy, w tym 2 ostrzeżenia",
+    "+5: pokaż jeszcze 5 cech, w tym 5 ostrzeżeń",
+    "+12: pokaż jeszcze 12 cech, w tym 12 ostrzeżeń",
+    "+22: pokaż jeszcze 22 cechy, w tym 22 ostrzeżenia",
+    "+X: pokaż jeszcze X cech, w tym X ostrzeżeń",
+    "+Półfinał: pokaż jeszcze Półfinał cech, w tym Półfinał ostrzeżeń",
+    "+2026-10-01: pokaż jeszcze 2026-10-01 cech, w tym 2026-10-01 ostrzeżeń"
+  ],
+  "newGame": "Nowa gra",
   "noCandidates": "Brak zawodników spełniających kryteria.",
+  "noCandidatesHint": "Wyczyść wyszukiwanie albo filtry, aby zobaczyć więcej kandydatów.",
   "noStrengths": "Nie zbudowano wyraźnej przewagi strukturalnej.",
   "noWeaknesses": "Analiza nie wykryła krytycznej luki w konstrukcji kadry.",
   "notice": "Uwaga",
@@ -296,6 +373,29 @@
     "X: X powołanych",
     "Półfinał: Półfinał powołanych",
     "2026-10-01: 2026-10-01 powołanych"
+  ],
+  "onlyCamp": [
+    "Tylko z marcowego zgrupowania (0)",
+    "Tylko z marcowego zgrupowania (1)",
+    "Tylko z marcowego zgrupowania (2)",
+    "Tylko z marcowego zgrupowania (5)",
+    "Tylko z marcowego zgrupowania (12)",
+    "Tylko z marcowego zgrupowania (22)",
+    "Tylko z marcowego zgrupowania (X)",
+    "Tylko z marcowego zgrupowania (Półfinał)",
+    "Tylko z marcowego zgrupowania (2026-10-01)"
+  ],
+  "onlyGroupLabel": "Pokaż tylko",
+  "onlySelected": [
+    "Tylko powołani (0)",
+    "Tylko powołani (1)",
+    "Tylko powołani (2)",
+    "Tylko powołani (5)",
+    "Tylko powołani (12)",
+    "Tylko powołani (22)",
+    "Tylko powołani (X)",
+    "Tylko powołani (Półfinał)",
+    "Tylko powołani (2026-10-01)"
   ],
   "outOfFormation": "Poza ustawieniem",
   "outOfFormationCount": [
@@ -338,6 +438,17 @@
     "Możliwość zmiany systemu gry po marcowym zgrupowaniu."
   ],
   "plannedTitle": "Co planujemy",
+  "playerAction": [
+    "0: 0",
+    "1: 1",
+    "2: 2",
+    "5: 5",
+    "12: 12",
+    "22: 22",
+    "X: X",
+    "Półfinał: Półfinał",
+    "2026-10-01: 2026-10-01"
+  ],
   "playerMetrics": {
     "fitness": "Zdrowie",
     "form": "Forma",
@@ -355,6 +466,30 @@
     "Zdobyliśmy Półfinał pkt w grupie.",
     "Zdobyliśmy 2026-10-01 pkt w grupie."
   ],
+  "positionBadgeName": [
+    "0: 0",
+    "1: 1",
+    "2: 2",
+    "5: 5",
+    "12: 12",
+    "22: 22",
+    "X: x",
+    "Półfinał: półfinał",
+    "2026-10-01: 2026-10-01"
+  ],
+  "positionChipsLabel": "Filtry pozycyjne (wybrani/dostępni):",
+  "positionMore": [
+    "+0",
+    "+1",
+    "+2",
+    "+5",
+    "+12",
+    "+22",
+    "+X",
+    "+Półfinał",
+    "+2026-10-01"
+  ],
+  "positionPopoverSeparator": " · ",
   "positions": {
     "BR": "Bramkarz",
     "DP": "Defensywny pomocnik",
@@ -382,6 +517,41 @@
     "Zgranie kadrowe",
     "Wpływ na grupę"
   ],
+  "rangeFrom": [
+    "0 od",
+    "1 od",
+    "2 od",
+    "5 od",
+    "12 od",
+    "22 od",
+    "X od",
+    "Półfinał od",
+    "2026-10-01 od"
+  ],
+  "rangeTo": [
+    "0 do",
+    "1 do",
+    "2 do",
+    "5 do",
+    "12 do",
+    "22 do",
+    "X do",
+    "Półfinał do",
+    "2026-10-01 do"
+  ],
+  "ranges": {
+    "age": "Wiek",
+    "campImpact": "Wynik zgrupowania",
+    "chemistry": "Zgranie kadrowe",
+    "experience": "Doświadczenie",
+    "fitness": "Zdrowie",
+    "form": "Forma",
+    "groupImpact": "Wpływ na grupę",
+    "quality": "Jakość",
+    "score": "Ocena selekcyjna",
+    "tactics": "Taktyka"
+  },
+  "rangesLegend": "Zakresy",
   "remaining": [
     "Zostało 0 miejsc",
     "Zostało 1 miejsc",
@@ -464,7 +634,7 @@
     "buildUp": "Wyprowadzenie",
     "centreBack": "Stoper",
     "dribbling": "Drybling",
-    "experience": "Doświadczenie",
+    "experience": "Weteran",
     "leader": "Lider",
     "leftFoot": "Lewa noga",
     "linkUp": "Łączenie gry",
@@ -475,9 +645,9 @@
     "pressing": "Pressing",
     "reach": "Zasięg",
     "reflexes": "Refleks",
-    "rightBack": "Prawy obrońca",
+    "rightBack": "Gra na boku",
     "setPieces": "Stałe fragmenty",
-    "striker": "Napastnik",
+    "striker": "Wykończenie",
     "wingBack": "Wahadło",
     "winger": "Skrzydło"
   },
@@ -496,39 +666,50 @@
   "searchPlaceholder": "Szukaj zawodnika lub klubu…",
   "select": "Powołaj",
   "selected": "Powołany ✓",
+  "selectedName": "Powołany",
   "selectionScore": "Ocena selekcyjna",
+  "shortName": [
+    "0 (0)",
+    "1 (1)",
+    "2 (2)",
+    "5 (5)",
+    "12 (12)",
+    "22 (22)",
+    "X (X)",
+    "Półfinał (Półfinał)",
+    "2026-10-01 (2026-10-01)"
+  ],
   "simulationDisclaimer": "Symulacja ocenia strukturę decyzji i zawiera kontrolowaną losowość. Nie jest prognozą rzeczywistego wyniku sportowego.",
+  "skipToList": "Przejdź do listy kandydatów",
   "sort": {
     "experience": "Doświadczenie",
     "fitness": "Zdrowie",
-    "form": "Forma i rytm",
+    "form": "Forma",
     "group": "Wpływ na grupę",
     "model": "Ocena selekcyjna",
     "name": "Nazwisko A–Z",
     "old": "Wiek: najstarsi",
     "quality": "Jakość",
-    "tactics": "Dopasowanie taktyczne",
+    "tactics": "Taktyka",
     "young": "Wiek: najmłodsi"
   },
-  "sortLabel": "Sortuj zawodników",
+  "sortVisibleLabel": "Sortuj:",
   "stages": {
     "camp": {
       "completed": "Lista kontrolna gotowa",
-      "eyebrow": "MARZEC 2028",
       "finalize": "Jedź na zgrupowanie",
       "heading": "Wybierz 23 zawodników na test",
       "hint": "To moment na sprawdzenie nowych twarzy. Występ na zgrupowaniu ujawni dodatkowe informacje przed EURO.",
       "phase": "ZGRUPOWANIE 1/2",
-      "suffix": "LISTA KONTROLNA"
+      "term": "marzec 2028"
     },
     "final": {
       "completed": "Kadra jest kompletna",
-      "eyebrow": "CZERWIEC 2028",
       "finalize": "Zatwierdź",
       "heading": "Wybierz finałową kadrę 26",
       "hint": "Masz raport z marcowego zgrupowania. Możesz zaufać obserwacji albo powołać nieprzetestowanego zawodnika.",
       "phase": "ZGRUPOWANIE 2/2",
-      "suffix": "EURO"
+      "term": "czerwiec 2028"
     }
   },
   "start": "Rozpocznij odprawę",
@@ -685,6 +866,7 @@
     "semifinalLossMarker": "Przegraliśmy"
   },
   "tournamentProgress": "Przebieg turnieju",
+  "traitsLegend": "Cechy",
   "trialNotes": {
     "disappointed": "rozczarował",
     "impressed": "przekonał",
@@ -693,6 +875,17 @@
   },
   "understood": "Rozumiem",
   "undo": "Cofnij",
+  "visibleCount": [
+    "Widoczni: 0 z 0",
+    "Widoczni: 1 z 1",
+    "Widoczni: 2 z 2",
+    "Widoczni: 5 z 5",
+    "Widoczni: 12 z 12",
+    "Widoczni: 22 z 22",
+    "Widoczni: X z X",
+    "Widoczni: Półfinał z Półfinał",
+    "Widoczni: 2026-10-01 z 2026-10-01"
+  ],
   "weaknesses": "Ryzyka selekcji",
   "yourSquad": "Twoja kadra"
 }

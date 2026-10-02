@@ -1,6 +1,7 @@
 import type {
   AvailabilityFlagId,
   DetailedPosition,
+  RangeId,
   RoleId,
   SortId,
   TrialNoteId,
@@ -13,6 +14,8 @@ function formatAge(years: number): string {
 
 export const LIST_TEXT = {
   autoFill: "Dobierz losowo",
+  clearSquad: "Odwołaj wszystkich",
+  newGame: "Nowa gra",
   roles: {
     aerial: "Powietrze",
     ballPlaying: "Gra nogami",
@@ -21,7 +24,7 @@ export const LIST_TEXT = {
     buildUp: "Wyprowadzenie",
     centreBack: "Stoper",
     dribbling: "Drybling",
-    experience: "Doświadczenie",
+    experience: "Weteran",
     leader: "Lider",
     leftFoot: "Lewa noga",
     linkUp: "Łączenie gry",
@@ -32,9 +35,9 @@ export const LIST_TEXT = {
     pressing: "Pressing",
     reach: "Zasięg",
     reflexes: "Refleks",
-    rightBack: "Prawy obrońca",
+    rightBack: "Gra na boku",
     setPieces: "Stałe fragmenty",
-    striker: "Napastnik",
+    striker: "Wykończenie",
     winger: "Skrzydło",
     wingBack: "Wahadło",
   } satisfies Record<RoleId, string>,
@@ -42,21 +45,60 @@ export const LIST_TEXT = {
     injuryRisk: "Ryzyko urazu",
     minutesLimit: "Limit minut",
   } satisfies Record<AvailabilityFlagId, string>,
-  kpis: { quality: "Jakość", fit: "Dopasowanie", risk: "Ryzyko" },
+  kpis: { quality: "Jakość", fit: "Dopasowanie", risk: "Ryzyko urazu" },
+  facts: { term: "Termin", formation: "Formacja" },
   risk: { none: "Brak", low: "Niskie", medium: "Średnie", high: "Wysokie" },
   emptyValue: "Brak",
   searchPlaceholder: "Szukaj zawodnika lub klubu…",
   searchLabel: "Szukaj zawodnika",
-  filterLabel: "Filtruj po pozycji",
-  sortLabel: "Sortuj zawodników",
+  positionChipsLabel: "Filtry pozycyjne (wybrani/dostępni):",
+  chip: (code: string, picked: number, total: number) =>
+    `${code} (${picked}/${total})`,
+  chipName: (code: string, picked: number, total: number, name: string) =>
+    `${code} (${picked}/${total}): ${name}, powołani ${picked} z ${total}`,
+  chipAllName: (picked: number, total: number) =>
+    `Wszyscy (${picked}/${total}): powołani ${picked} z ${total}`,
+  detailFilters: "Filtry szczegółowe",
+  detailFiltersActive: (count: number) =>
+    `Filtry szczegółowe, aktywne: ${count}`,
+  skipToList: "Przejdź do listy kandydatów",
+  footLegend: "Noga wiodąca",
+  footLeft: "Lewa noga",
+  footRight: "Prawa noga",
+  footHint: "Zaznacz obie, aby pokazać obunożnych.",
+  traitsLegend: "Cechy",
+  rangesLegend: "Zakresy",
+  ranges: {
+    age: "Wiek",
+    score: "Ocena selekcyjna",
+    quality: "Jakość",
+    form: "Forma",
+    fitness: "Zdrowie",
+    tactics: "Taktyka",
+    experience: "Doświadczenie",
+    chemistry: "Zgranie kadrowe",
+    groupImpact: "Wpływ na grupę",
+    campImpact: "Wynik zgrupowania",
+  } satisfies Record<RangeId, string>,
+  rangeFrom: (label: string) => `${label} od`,
+  rangeTo: (label: string) => `${label} do`,
+  clearFilters: "Wyczyść filtry",
+  sortVisibleLabel: "Sortuj:",
+  visibleCount: (count: number, total: number) =>
+    `Widoczni: ${count} z ${total}`,
+  onlyGroupLabel: "Pokaż tylko",
+  onlySelected: (count: number) => `Tylko powołani (${count})`,
+  onlyCamp: (count: number) => `Tylko z marcowego zgrupowania (${count})`,
   allCandidates: "Wszyscy kandydaci",
   noCandidates: "Brak zawodników spełniających kryteria.",
+  noCandidatesHint:
+    "Wyczyść wyszukiwanie albo filtry, aby zobaczyć więcej kandydatów.",
   sort: {
     model: "Ocena selekcyjna",
     quality: "Jakość",
-    form: "Forma i rytm",
+    form: "Forma",
     fitness: "Zdrowie",
-    tactics: "Dopasowanie taktyczne",
+    tactics: "Taktyka",
     experience: "Doświadczenie",
     group: "Wpływ na grupę",
     young: "Wiek: najmłodsi",
@@ -82,9 +124,28 @@ export const LIST_TEXT = {
   filtersAll: "Wszyscy",
   select: "Powołaj",
   selected: "Powołany ✓",
+  selectedName: "Powołany",
   profile: "Profil",
   compare: "Porównaj",
   compared: "Wybrany",
+  playerAction: (label: string, name: string) => `${label}: ${name}`,
+  // codes and names arrive joined with ", "; the names read lowercase inside the sentence
+  positionBadgeName: (codes: string, names: string) =>
+    `${codes}: ${`${names}`.toLocaleLowerCase("pl")}`,
+  positionPopoverSeparator: " · ",
+  positionMore: (count: number) => `+${count}`,
+  // shortened strip name: the visible form first, the full name in brackets
+  shortName: (shown: string, full: string) => `${shown} (${full})`,
+  moreTraits: (count: number, flags: number) =>
+    `+${count}: pokaż jeszcze ${count} ${plural(count, "cechę", "cechy", "cech")}${
+      flags === 0
+        ? ""
+        : flags === 1
+          ? ", w tym ostrzeżenie"
+          : `, w tym ${flags} ${plural(flags, "ostrzeżenie", "ostrzeżenia", "ostrzeżeń")}`
+    }`,
+  collapseTraits: "Zwiń",
+  collapseTraitsName: "Zwiń cechy",
   playerMetrics: {
     quality: "Jakość",
     form: "Forma",
