@@ -203,7 +203,22 @@
   ],
   "disclaimer": "Nieoficjalna gra fanowska. Nie jest rzeczywistym produktem PZPN/UEFA.",
   "dockCoverage": "Dotknij, aby zobaczyć obsadę",
+  "dockHint": {
+    "closed": "Dotknij, aby rozwinąć",
+    "open": "Dotknij, aby zwinąć"
+  },
   "dockOpen": "Dotknij, aby zobaczyć podział miejsc",
+  "dockToggleName": [
+    "0: rozwiń tablicę",
+    "1: zwiń tablicę",
+    "2: zwiń tablicę",
+    "5: zwiń tablicę",
+    "12: zwiń tablicę",
+    "22: zwiń tablicę",
+    "X: zwiń tablicę",
+    "Półfinał: zwiń tablicę",
+    "2026-10-01: zwiń tablicę"
+  ],
   "emptyValue": "Brak",
   "errorBoundary": {
     "message": "Gra napotkała nieoczekiwany błąd. Odśwież stronę – ostatni zapisany postęp powinien się wczytać. Jeśli błąd wraca, zacznij od nowa; zapisana gra zostanie wtedy usunięta.",
@@ -288,6 +303,17 @@
     "W tym ponad limit: X",
     "W tym ponad limit: Półfinał",
     "W tym ponad limit: 2026-10-01"
+  ],
+  "excessNote": [
+    "w tym ponad limit: 0",
+    "w tym ponad limit: 1",
+    "w tym ponad limit: 2",
+    "w tym ponad limit: 5",
+    "w tym ponad limit: 12",
+    "w tym ponad limit: 22",
+    "w tym ponad limit: X",
+    "w tym ponad limit: Półfinał",
+    "w tym ponad limit: 2026-10-01"
   ],
   "excessReason": [
     "W tym ponad limit: 0.",
@@ -514,6 +540,17 @@
     "W tym poza ustawieniem: X",
     "W tym poza ustawieniem: Półfinał",
     "W tym poza ustawieniem: 2026-10-01"
+  ],
+  "outsideNote": [
+    "w tym poza ustawieniem: 0",
+    "w tym poza ustawieniem: 1",
+    "w tym poza ustawieniem: 2",
+    "w tym poza ustawieniem: 5",
+    "w tym poza ustawieniem: 12",
+    "w tym poza ustawieniem: 22",
+    "w tym poza ustawieniem: X",
+    "w tym poza ustawieniem: Półfinał",
+    "w tym poza ustawieniem: 2026-10-01"
   ],
   "phaseLabel": "Etap:",
   "pitchDescription": "Liczby pokazują, ilu powołanych może grać na danej pozycji.",
@@ -753,6 +790,8 @@
   "selected": "Powołany ✓",
   "selectedName": "Powołany",
   "selectionScore": "Ocena selekcyjna",
+  "sheetHandle": "Zwiń tablicę",
+  "sheetTitle": "Tablica kadry",
   "shortName": [
     "0 (0)",
     "1 (1)",

@@ -62,3 +62,24 @@ export function boardHeadline(state: GameState): string {
   const left = squadLimit(state) - state.selected.size;
   return left > 0 ? text.remaining(left) : blockedReason(state);
 }
+
+// The phone bar toggle: "Zostało 14 miejsc: rozwiń tablicę".
+export function boardToggleName(state: GameState, open: boolean): string {
+  return text.dockToggleName(boardHeadline(state), open);
+}
+
+// The toggle's description: missing groups, then outsiders, then the excess.
+export function boardToggleDescription(state: GameState): string {
+  const markers = boardMarkers(state);
+  return [
+    ...squadProblems(state)
+      .filter((issue) => issue.kind === "missing")
+      .map((issue) => text.missing(issue.count, text.groupShort[issue.group])),
+    markers.outside.total > 0 ? text.outsideNote(markers.outside.total) : "",
+    markers.excess.total > 0
+      ? text.excessNote(groupPlayersText(markers.excess.byGroup))
+      : "",
+  ]
+    .filter(Boolean)
+    .join(" • ");
+}

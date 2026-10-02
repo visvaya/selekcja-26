@@ -43,6 +43,13 @@ export const BOARD_TEXT = {
     "Liczby pokazują, ilu powołanych może grać na danej pozycji.",
   dockOpen: "Dotknij, aby zobaczyć podział miejsc",
   dockCoverage: "Dotknij, aby zobaczyć obsadę",
+  dockHint: { closed: "Dotknij, aby rozwinąć", open: "Dotknij, aby zwinąć" },
+  dockToggleName: (headline: string, open: boolean) =>
+    `${headline}: ${open ? "zwiń" : "rozwiń"} tablicę`,
+  sheetTitle: "Tablica kadry",
+  sheetHandle: "Zwiń tablicę",
+  outsideNote: (count: number) => `w tym poza ustawieniem: ${count}`,
+  excessNote: (detail: string) => `w tym ponad limit: ${detail}`,
   missing: (count: number, group: string) => `brakuje ${count} × ${group}`,
   excess: (count: number, group: string) =>
     `jest o ${count} × ${group} za dużo`,
