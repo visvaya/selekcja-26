@@ -1,9 +1,9 @@
 import { expect, test } from "@playwright/test";
 import type { Locator, Page } from "@playwright/test";
 import {
+  boardRegion,
   collectPageErrors,
   dialog,
-  dockToggle,
   expectCoherentReport,
   expectFocusVisible,
   finalizeButton,
@@ -226,10 +226,18 @@ test("desktop game is playable with the keyboard alone", async ({ page }) => {
   await expect(squadCount(page)).toHaveText("23/23");
   await expectFocusVisible(page, "event dialogs closed");
 
-  await activate(page, dockToggle(page));
-  await expect(dockToggle(page)).toHaveAttribute("aria-expanded", "true");
-  await page.keyboard.press("Enter");
-  await expect(dockToggle(page)).toHaveAttribute("aria-expanded", "false");
+  // The side board is one focusable region with a visible ring and no toggle; the stage
+  // button is the next Tab stop inside it.
+  const board = boardRegion(page);
+  await expect(board).toHaveAccessibleName(text.boardRegion.camp);
+  await expect(board.locator("button.dock-copy")).toHaveCount(0);
+  await finalizeButton(page).focus();
+  await page.keyboard.press("Shift+Tab");
+  await expectVisibleFocus(board);
+  await expectFocusVisible(page, "side board region");
+  await page.keyboard.press("Tab");
+  await expect(board.locator(".finalize")).toBeFocused();
+  await expectVisibleFocus(finalizeButton(page));
 
   await activate(page, finalizeButton(page));
   await expect(dialog(page)).toHaveAccessibleName(text.campReportTitle);

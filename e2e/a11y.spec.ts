@@ -1,13 +1,19 @@
 import { AxeBuilder } from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
+import { players } from "../src/data/catalog.ts";
 import { CHANGELOG } from "../src/data/changelog.ts";
+import type { GroupPosition } from "../src/data/types.ts";
 import {
+  boardRegion,
   CAMP_EVENT_CHOICES,
+  campSave,
   dialog,
   dockToggle,
   finalizeButton,
+  finalSave,
   finishedOtherRulesReportSave,
+  forceSaveErrorBanner,
   patchStorageFailures,
   saveAlert,
   seedStorage,
@@ -46,8 +52,19 @@ const EXPECTED_STATES = [
   "tournament report",
   "rules changed notice",
   "older rules report",
+  "side board camp",
+  "side board final with excess",
 ] as const;
 type ScreenState = (typeof EXPECTED_STATES)[number];
+
+// The side board states run in this phone project at desktop width.
+const DESKTOP_VIEWPORT = { width: 1280, height: 800 };
+
+const idsInGroup = (group: GroupPosition, count: number) =>
+  players
+    .filter((player) => player.pos === group)
+    .slice(0, count)
+    .map((player) => player.id);
 
 // The candidate list renders every card with the same PlayerCard component, so once its markup
 // is scanned in full on "camp list" and "final list" (the two required full-list scans; the
@@ -130,9 +147,7 @@ test.describe.serial("axe WCAG 2.2 AA scan", () => {
       text.visibleCount(61, 61),
     );
 
-    await setStorageFailureMode(page, "failed");
-    await page.locator(".select-btn").first().click();
-    await expect(saveAlert(page)).toHaveText(text.save.messages.failed);
+    await forceSaveErrorBanner(page);
     await scan(page, "save error banner", scanned);
     await setStorageFailureMode(page, "none");
     // Toggle the same player back off, restoring the earlier selection while forcing a
@@ -211,6 +226,39 @@ test.describe.serial("axe WCAG 2.2 AA scan", () => {
     await scan(page, "rules changed notice", scanned);
   });
 
+  test("side board camp at desktop width", async ({ page }) => {
+    await page.setViewportSize(DESKTOP_VIEWPORT);
+    await seedStorage(
+      page,
+      campSave({ selectedIds: idsInGroup("BR", 2), events: [] }),
+    );
+    await page.goto("/");
+    await expect(boardRegion(page)).toHaveAccessibleName(text.boardRegion.camp);
+    await scan(page, "side board camp", scanned);
+  });
+
+  test("side board final with excess at desktop width", async ({ page }) => {
+    await page.setViewportSize(DESKTOP_VIEWPORT);
+    // A fourth goalkeeper above the exact quota shows the red excess square and marker.
+    await seedStorage(
+      page,
+      finalSave({
+        selectedIds: [
+          ...idsInGroup("BR", 4),
+          ...idsInGroup("OBR", 6),
+          ...idsInGroup("POM", 6),
+          ...idsInGroup("ATA", 5),
+        ],
+      }),
+    );
+    await page.goto("/");
+    await expect(boardRegion(page)).toHaveAccessibleName(
+      text.boardRegion.final,
+    );
+    await expect(boardRegion(page)).toContainText(text.excessMarker(1));
+    await scan(page, "side board final with excess", scanned);
+  });
+
   test("older rules report from a finished save with other rules", async ({
     page,
   }) => {
@@ -222,7 +270,7 @@ test.describe.serial("axe WCAG 2.2 AA scan", () => {
     await expect(page.getByText(text.reportFromOlderRules)).toBeVisible();
     await scan(page, "older rules report", scanned);
 
-    // Every EXPECTED_STATES entry must have been scanned by one of the three tests above; this
+    // Every EXPECTED_STATES entry must have been scanned by one of the tests above; this
     // test runs last (describe.serial), so it is the only reliable place for the full check.
     expect([...scanned].sort()).toEqual([...EXPECTED_STATES].sort());
   });

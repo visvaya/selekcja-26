@@ -193,6 +193,29 @@ export function campSave({
   });
 }
 
+// An unfinished final-stage save for the running rules; the camp squad is the given selection.
+export function finalSave({
+  selectedIds,
+  system = "4231",
+}: {
+  selectedIds: string[];
+  system?: string;
+}): string {
+  return JSON.stringify({
+    schemaVersion: 4,
+    rulesRevision: RULES_REVISION,
+    state: {
+      ...v4State(),
+      stage: "final",
+      system,
+      selected: selectedIds,
+      campSquad: selectedIds,
+      events: ["doctor", "captain", "scout"],
+      seed: 12345,
+    },
+  });
+}
+
 export async function expectSavedSchemaVersion(
   page: Page,
   version: number,
@@ -405,4 +428,19 @@ export async function expectCoherentReport(page: Page): Promise<void> {
     expect(count(t.semifinalLossMarker)).toBe(0);
     expect(lines.at(-1)).toContain(t.eliminatedMarker);
   }
+}
+
+// The desktop side board (from 1024 px): a focusable region named after the stage.
+export function boardRegion(page: Page): Locator {
+  return page.getByRole("region", {
+    name: new RegExp(`^${text.boardRegion.camp.split(" – ")[0]}`),
+  });
+}
+
+// Shows the save error banner by failing the next save, a call-up of the first candidate. The
+// page must have been prepared with patchStorageFailures before it loaded.
+export async function forceSaveErrorBanner(page: Page): Promise<void> {
+  await setStorageFailureMode(page, "failed");
+  await page.locator(".select-btn").first().click();
+  await expect(saveAlert(page)).toHaveText(text.save.messages.failed);
 }
