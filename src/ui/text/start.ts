@@ -1,5 +1,6 @@
 import type { Stage, SystemId } from "../../data/types.ts";
 import type { ChangelogVersion } from "../../data/changelog.ts";
+import { plural } from "./polish-format.ts";
 
 // Formats an ISO "YYYY-MM-DD" changelog date as Polish "DD.MM.YYYY". No Intl dependency: the
 // format is fixed and locale-independent from the caller's point of view.
@@ -9,16 +10,20 @@ function formatChangelogDate(isoDate: string): string {
 }
 
 export const START_TEXT = {
-  introEyebrow: "Symulator selekcjonera • EURO 2028",
-  introTitle: "Jedna lista. Cały kraj ocenia.",
-  introLead:
-    "Wybierz 26 zawodników na mistrzostwa Europy. Nazwiska pomagają, ale turniej wygrywa kadra zbudowana pod plan – nie ranking popularności.",
-  briefTitle: "Notatka sztabu szkoleniowego",
-  candidateCount: "kandydatów",
-  campCount: "zgrupowania",
-  rosterTransition: "lista kontrolna i EURO",
-  groupMatches: "mecze w grupie",
+  ticket: {
+    title: "Bilet na EURO",
+    dates: "Turniej: 9 czerwca – 9 lipca 2028.",
+    candidates: (count: number) =>
+      `Wybierasz spośród ${count} ${plural(count, "kandydata", "kandydatów", "kandydatów")}.`,
+    stagesLabel: "Etapy selekcji",
+    nextStageLabel: "Najbliższy etap",
+    nextStage: "Zgrupowanie kontrolne",
+    campPlacesLabel: "Miejsca na 1. zgrupowaniu",
+    finalPlacesLabel: "Miejsca w kadrze turniejowej",
+    stub: "EURO·28",
+  },
   systemChoice: "Wybierz model gry",
+
   start: "Rozpocznij odprawę",
   undo: "Cofnij",
   disclaimer:

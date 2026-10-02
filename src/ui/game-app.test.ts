@@ -178,7 +178,7 @@ test("start, profile, comparison, event and position filter work together", asyn
         screen.getByRole("button", { name: "Zagraj od początku" }),
       );
       const introHeading = screen.getByRole("heading", {
-        name: "Jedna lista. Cały kraj ocenia.",
+        name: "Bilet na EURO",
       });
       assert.ok(screen.getByRole("button", { name: "Rozpocznij odprawę" }));
       assert.equal(isFocused(introHeading), true);

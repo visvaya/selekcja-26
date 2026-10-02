@@ -21,7 +21,7 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
   await page.goto("/");
 
   await expect(
-    page.getByRole("heading", { name: text.introTitle }),
+    page.getByRole("heading", { name: text.ticket.title }),
   ).toBeVisible();
   await expect(
     page.getByRole("button", {
@@ -141,14 +141,30 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
 
   await page.getByRole("button", { name: text.restart }).tap();
   await expect(
-    page.getByRole("heading", { name: text.introTitle }),
+    page.getByRole("heading", { name: text.ticket.title }),
   ).toBeVisible();
   await expect(page.getByRole("button", { name: text.undo })).toHaveCount(0);
   await expectFocusVisible(page, "restart");
   await page.reload();
   await expect(
-    page.getByRole("heading", { name: text.introTitle }),
+    page.getByRole("heading", { name: text.ticket.title }),
   ).toBeVisible();
 
   expect(errors).toEqual([]);
+});
+
+test("start ticket fits a 320 px phone with the stub under the content", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 640 });
+  await page.goto("/");
+  await expect(
+    page.getByRole("heading", { name: text.ticket.title }),
+  ).toBeVisible();
+  await expectNoHorizontalScroll(page);
+  const main = await page.locator(".hero-e-main").boundingBox();
+  const stub = await page.locator(".hero-e-stub").boundingBox();
+  expect(main).not.toBeNull();
+  expect(stub).not.toBeNull();
+  expect(stub!.y).toBeGreaterThanOrEqual(main!.y + main!.height - 1);
 });

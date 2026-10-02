@@ -47,7 +47,7 @@ test("desktop game is playable with the keyboard alone", async ({ page }) => {
   const errors = collectPageErrors(page);
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { name: text.introTitle }),
+    page.getByRole("heading", { name: text.ticket.title }),
   ).toBeVisible();
 
   // Tab order reaches every system choice before the start button.
@@ -168,7 +168,7 @@ test("desktop game is playable with the keyboard alone", async ({ page }) => {
 
   await activate(page, page.getByRole("button", { name: text.restart }));
   await expect(
-    page.getByRole("heading", { name: text.introTitle }),
+    page.getByRole("heading", { name: text.ticket.title }),
   ).toBeVisible();
   await expectFocusVisible(page, "restart");
 

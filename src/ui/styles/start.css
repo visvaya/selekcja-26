@@ -1,0 +1,242 @@
+/* Start screen: the EURO ticket header. */
+
+.start {
+  display: block;
+}
+
+.hero-sample-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-xl);
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+.hero-sample-lead {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-md);
+  color: var(--ink-soft);
+  max-width: 52ch;
+}
+
+.hero-e-fields dt {
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+/* The ticket uses the same frame as the other start screen cards: a 2 px soft border and the
+   medium radius, no offset shadow. */
+.hero-e-ticket {
+  display: flex;
+  max-width: 560px;
+  background: var(--surface-dialog);
+  border: 2px solid var(--frame-soft);
+  border-radius: var(--radius-md);
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.hero-e-main {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-4) var(--space-5);
+}
+
+.hero-e-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin: var(--space-3) 0 0;
+}
+
+.hero-e-fields dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-md);
+  color: var(--ink);
+}
+
+.hero-e-stub {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 96px;
+  padding: var(--space-3);
+  border-left: 2px dashed var(--frame);
+  background: var(--board-deep);
+}
+
+.hero-e-barcode {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  height: 32px;
+}
+
+.hero-e-barcode i {
+  width: 3px;
+  background: var(--ink);
+}
+
+.hero-e-barcode i:nth-child(3n) {
+  width: 5px;
+}
+
+.hero-e-num {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  writing-mode: vertical-rl;
+}
+
+.start-ticket {
+  max-width: 720px;
+  margin: var(--space-2) 0 var(--space-5);
+}
+
+.start-ticket h1.hero-sample-title {
+  font-size: var(--text-2xl);
+}
+
+/* Longer labels wrap inside their box. */
+.start-ticket .hero-e-fields dt {
+  max-width: 14ch;
+}
+
+/* One line per lead sentence. */
+.start-ticket-lead span {
+  display: block;
+}
+
+/* Values on one line even when the labels above them wrap differently. */
+.start-ticket .hero-e-fields > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+@media (max-width: 1023.98px) {
+  /* Below 1024 px the four fields are a 2 x 2 grid; each row keeps its values on one line. */
+  .start-ticket .hero-e-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3) var(--space-4);
+  }
+
+  .start-ticket .hero-e-fields dt {
+    max-width: 22ch;
+  }
+}
+
+@media (max-width: 379.98px) {
+  /* The stub moves under the content on the narrowest phones. */
+  .hero-e-ticket {
+    flex-direction: column;
+  }
+
+  .hero-e-stub {
+    flex-direction: row;
+    width: auto;
+    border-left: none;
+    border-top: 2px dashed var(--frame);
+  }
+
+  .hero-e-num {
+    writing-mode: horizontal-tb;
+  }
+}
+
+@media (min-width: 1024px) {
+  /* From 1024 px the ticket spans the full width; the extra width goes to its data, printed
+     in boxes like sector, row and seat on a real ticket. */
+  .start-ticket {
+    max-width: none;
+  }
+
+  .start-ticket .hero-e-main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: var(--space-6);
+    padding: var(--space-5) var(--space-6);
+  }
+
+  .start-ticket .hero-sample-title,
+  .start-ticket .hero-sample-lead {
+    grid-column: 1;
+  }
+
+  .start-ticket .hero-e-fields {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    display: grid;
+    grid-template-columns: repeat(4, auto);
+    gap: 0;
+    margin: 0;
+    border: 1px solid var(--frame-soft);
+  }
+
+  .start-ticket .hero-e-fields > div {
+    gap: var(--space-2);
+    min-width: 88px;
+    padding: var(--space-3) var(--space-4);
+    border-left: 1px solid var(--frame-soft);
+  }
+
+  .start-ticket .hero-e-fields > div:first-child {
+    border-left: none;
+  }
+
+  .start-ticket .hero-e-fields dd {
+    font-size: var(--text-2xl);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .start-ticket .hero-e-stub {
+    width: 112px;
+  }
+
+  /* Title and lead stay together, centred against the taller data boxes. */
+  .start-ticket .hero-sample-title {
+    align-self: end;
+  }
+
+  .start-ticket .hero-sample-lead {
+    align-self: start;
+  }
+
+  .start-ticket .hero-e-fields > div:first-child dd {
+    font-size: var(--text-2xl);
+    line-height: 1;
+    max-width: none;
+  }
+
+  .start-ticket .hero-e-fields > div:nth-child(2) dd {
+    font-size: var(--text-md);
+    line-height: 1.2;
+    max-width: 12ch;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1239.98px) {
+  /* Between 1024 and 1239 px the title column is too narrow beside the boxes: the boxes go
+     under the title and lead. */
+  .start-ticket .hero-e-main {
+    display: block;
+  }
+
+  .start-ticket .hero-e-fields {
+    width: fit-content;
+    margin-top: var(--space-4);
+  }
+}

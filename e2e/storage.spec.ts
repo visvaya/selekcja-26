@@ -164,7 +164,7 @@ test("an unfinished version 3 save from other rules is discarded with a notice",
   await page.getByRole("button", { name: text.understood }).click();
   await expect(dialog(page)).toBeHidden();
   await expect(
-    page.getByRole("heading", { name: text.introTitle }),
+    page.getByRole("heading", { name: text.ticket.title }),
   ).toBeVisible();
 
   await expect
@@ -214,7 +214,7 @@ test("a finished report from other rules is shown frozen with the older-rules no
 
   await page.getByRole("button", { name: text.restart }).click();
   await expect(
-    page.getByRole("heading", { name: text.introTitle }),
+    page.getByRole("heading", { name: text.ticket.title }),
   ).toBeVisible();
   expect(errors).toEqual([]);
 });
@@ -224,7 +224,7 @@ test("a corrupt save starts a fresh game", async ({ page }) => {
   await seedStorage(page, "{not json");
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { name: text.introTitle }),
+    page.getByRole("heading", { name: text.ticket.title }),
   ).toBeVisible();
   expect(errors).toEqual([]);
 });
@@ -239,12 +239,12 @@ test("?reset discards the saved game and removes the parameter", async ({
   await expect(page.getByRole("dialog")).toBeVisible();
   await page.goto("/?reset");
   await expect(
-    page.getByRole("heading", { name: text.introTitle }),
+    page.getByRole("heading", { name: text.ticket.title }),
   ).toBeVisible();
   await expect(page).toHaveURL(/\/$/);
   await page.reload();
   await expect(
-    page.getByRole("heading", { name: text.introTitle }),
+    page.getByRole("heading", { name: text.ticket.title }),
   ).toBeVisible();
   expect(errors).toEqual([]);
 });
@@ -256,7 +256,7 @@ test("a quota-exceeded save shows a retry banner and recovers", async ({
   await patchStorageFailures(page, STORAGE_KEY);
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { name: text.introTitle }),
+    page.getByRole("heading", { name: text.ticket.title }),
   ).toBeVisible();
 
   await setStorageFailureMode(page, "quota");
@@ -291,7 +291,7 @@ test("a generic save failure recovers after a later action without retry", async
   await patchStorageFailures(page, STORAGE_KEY);
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { name: text.introTitle }),
+    page.getByRole("heading", { name: text.ticket.title }),
   ).toBeVisible();
 
   await setStorageFailureMode(page, "failed");

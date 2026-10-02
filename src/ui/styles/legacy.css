@@ -88,10 +88,6 @@ button {
   margin: auto;
   padding: var(--legacy-space-10) var(--legacy-space-7) 108px;
 }
-.start {
-  max-width: 720px;
-  margin: 4vh auto 0;
-}
 .eyebrow {
   font-family: var(--font-display);
   font-size: var(--font-caption);
@@ -111,41 +107,6 @@ button {
   font-size: var(--font-large);
   color: var(--ink-soft);
   max-width: 650px;
-}
-.brief {
-  background: var(--ink);
-  color: var(--on-select);
-  padding: var(--legacy-space-11);
-  border-radius: 18px;
-  margin: 26px 0;
-  box-shadow: 3px 3px 0 var(--shadow);
-}
-.brief h2 {
-  font-size: 17px;
-  margin: 0 0 var(--legacy-space-6);
-  /* Light text on the --ink panel; base.css gives headings --ink. */
-  color: var(--on-select);
-}
-.brief-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--legacy-space-5);
-}
-.brief-stat {
-  border-left: 1px solid var(--on-ink-border);
-  padding-left: var(--legacy-space-6);
-}
-.brief-stat:first-child {
-  border-left: 0;
-  padding-left: 0;
-}
-.brief-stat b {
-  display: block;
-  font-size: 22px;
-}
-.brief-stat span {
-  font-size: var(--font-caption);
-  color: var(--on-ink-meta);
 }
 .choice-title {
   font-family: var(--font-display);
@@ -751,14 +712,6 @@ button {
   .game-head h1 {
     font-size: 36px;
   }
-}
-.brief-grid {
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--legacy-space-7) var(--legacy-space-5);
-}
-.brief-stat:nth-child(odd) {
-  border-left: 0;
-  padding-left: 0;
 }
 .player-actions {
   grid-template-columns: 1fr 1fr 1fr;
