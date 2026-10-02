@@ -586,6 +586,14 @@ test("clear-squad and new-game actions on the list", async () => {
       // screen, not into the previous game
       fireEvent.click(await view.findByRole("button", { name: "Cofnij" }));
       assert.ok(await view.findByRole("heading", { name: /Bilet na EURO/ }));
+      // nothing is left to undo: the saved game has an empty history
+      await waitFor(() => {
+        const saved = JSON.parse(
+          dom.window.localStorage.getItem(APP_CONFIG.storageKey) ?? "{}",
+        ) as { state?: { started?: boolean; history?: unknown[] } };
+        assert.equal(saved.state?.started, false);
+        assert.equal(saved.state?.history?.length, 0);
+      });
     } finally {
       cleanup();
       await vite.close();

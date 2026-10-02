@@ -253,3 +253,27 @@ test("a commit in one range keeps an uncommitted draft in another; clearing empt
     true,
   );
 });
+
+test("clearing the filters empties an unset field that shows a stepped scale end", async () => {
+  await withPanel(
+    campState(),
+    async ({ getByRole }) => {
+      const { fireEvent } = await import("@testing-library/react");
+      const ageFrom = getByRole("spinbutton", {
+        name: text.rangeFrom(text.ranges.age),
+        hidden: true,
+      }) as HTMLInputElement;
+      // a first clear stores the shared empty ranges, so only a fresh object can reset again
+      fireEvent.click(
+        getByRole("button", { name: text.clearFilters, hidden: true }),
+      );
+      fireEvent.keyDown(ageFrom, { key: "ArrowUp" });
+      assert.equal(ageFrom.value, "20");
+      fireEvent.click(
+        getByRole("button", { name: text.clearFilters, hidden: true }),
+      );
+      assert.equal(ageFrom.value, "");
+    },
+    true,
+  );
+});

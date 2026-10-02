@@ -97,9 +97,10 @@ export function RangeField({
   const minRef = useRef<HTMLInputElement>(null);
   const maxRef = useRef<HTMLInputElement>(null);
 
-  // `version` changes identity whenever this field's stored bounds change (or the filters are
-  // cleared). A change this field caused itself is skipped (it keeps showing a stepped scale end, stored as null); any other change
-  // (clearing the panel, a reload) replaces the drafts with the stored bounds.
+  // `version` changes identity whenever this field's stored bounds change (or the filters
+  // are cleared). A change this field caused itself is skipped (it keeps showing a stepped
+  // scale end, stored as null); any other change (clearing the panel, a reload) replaces the
+  // drafts with the stored bounds.
   const echo = useRef(false);
   useEffect(() => {
     if (echo.current) {

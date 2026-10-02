@@ -39,7 +39,7 @@ export function createInitialState(
     selected: new Set<string>(),
     campSquad: new Set<string>(),
     trial: {},
-    list: DEFAULT_LIST_FILTERS,
+    list: { ...DEFAULT_LIST_FILTERS, ranges: {} },
     events: new Set(),
     effects: { chem: 0, fit: 0, quality: 0 },
     compare: [],

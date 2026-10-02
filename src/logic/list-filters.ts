@@ -47,13 +47,14 @@ export function clearDetailFilters(): Pick<
   return {
     foot: DEFAULT_LIST_FILTERS.foot,
     traits: DEFAULT_LIST_FILTERS.traits,
-    ranges: DEFAULT_LIST_FILTERS.ranges,
+    // a fresh object on every clear, so range fields see a new version and reset
+    ranges: {},
   };
 }
 
 // Everything that narrows the list back to defaults; only the sort stays.
 export function clearAllFilters(sort: SortId): ListFilters {
-  return { ...DEFAULT_LIST_FILTERS, sort };
+  return { ...DEFAULT_LIST_FILTERS, sort, ranges: {} };
 }
 
 // Position chips in display order.
