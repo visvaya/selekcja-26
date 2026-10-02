@@ -93,7 +93,6 @@
   margin-bottom: var(--space-4);
 }
 
-.game-actions .action-button,
 .confirm-actions .action-button {
   margin-top: 0;
 }
@@ -106,7 +105,7 @@
   flex: 0 0 auto;
   margin-top: 0;
   padding: 0 var(--space-4);
-  border-width: 2px;
+  border-width: var(--control-border);
   border-radius: var(--radius-sm);
   font-weight: 700;
 }
@@ -142,7 +141,7 @@
 @media (min-width: 1024px) {
   .screen-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 360px;
+    grid-template-columns: minmax(0, 1fr) var(--side-column-width);
     gap: var(--space-6);
     align-items: start;
   }

@@ -15,16 +15,16 @@
 }
 
 .search {
-  min-height: 44px;
+  min-height: var(--control-height);
   padding: 0 var(--space-3);
   border-radius: var(--radius-sm);
-  border: 2px solid var(--frame);
+  border: var(--control-border) solid var(--frame);
   background: var(--surface);
   color: var(--ink);
   font-size: var(--text-base);
   width: 100%;
   min-width: 0;
-  flex: 1 1 200px;
+  flex: 1 1 var(--search-basis);
 }
 
 .filters-toggle {
@@ -32,10 +32,10 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  min-height: 44px;
+  min-height: var(--control-height);
   padding: 0 var(--space-4);
   border-radius: var(--radius-sm);
-  border: 2px solid var(--frame);
+  border: var(--control-border) solid var(--frame);
   background: var(--surface);
   color: var(--ink);
   font-weight: 700;
@@ -61,8 +61,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 20px;
-  height: 20px;
+  min-width: var(--count-badge-size);
+  height: var(--count-badge-size);
   padding: 0 var(--space-1);
   border-radius: var(--radius-sm);
   line-height: 1;
@@ -78,7 +78,7 @@
   gap: var(--space-4);
   padding: var(--space-4);
   border-radius: var(--radius-md);
-  border: 2px solid var(--frame-soft);
+  border: var(--control-border) solid var(--frame-soft);
   background: var(--surface);
 }
 
@@ -99,7 +99,7 @@
 
 .skip-link {
   align-self: flex-start;
-  min-height: 24px;
+  min-height: var(--check-target);
   color: var(--action);
   font-size: var(--text-sm);
   font-weight: 700;
@@ -156,14 +156,14 @@
   flex-wrap: wrap;
   gap: var(--space-3);
   padding-top: var(--space-3);
-  border-top: 1px solid var(--frame-soft);
+  border-top: var(--divider-border) solid var(--frame-soft);
 }
 
 /* the legacy .action-button stretches and adds a top margin; the panel button keeps its width */
 .filters-panel-actions .action-button {
   flex: 0 0 auto;
   margin-top: 0;
-  border-width: 2px;
+  border-width: var(--control-border);
   border-radius: var(--radius-sm);
   padding: 0 var(--space-4);
 }
@@ -173,7 +173,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  min-height: 24px;
+  min-height: var(--check-target);
   font-size: var(--text-sm);
   color: var(--ink);
   cursor: pointer;
@@ -181,8 +181,8 @@
 
 .checkbox-field input {
   appearance: none;
-  width: 24px;
-  height: 24px;
+  width: var(--check-target);
+  height: var(--check-target);
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
@@ -196,10 +196,10 @@
 
 .checkbox-field input::before {
   content: "";
-  width: 18px;
-  height: 18px;
+  width: var(--check-box-size);
+  height: var(--check-box-size);
   box-sizing: border-box;
-  border: 2px solid var(--frame);
+  border: var(--control-border) solid var(--frame);
   border-radius: var(--radius-sm);
   background: var(--surface);
 }
@@ -212,12 +212,12 @@
 .checkbox-field input:checked::after {
   content: "";
   position: absolute;
-  left: 9px;
-  top: 5px;
-  width: 5px;
-  height: 9px;
+  left: var(--check-mark-left);
+  top: var(--check-mark-top);
+  width: var(--check-mark-width);
+  height: var(--check-mark-height);
   border: solid var(--on-action);
-  border-width: 0 2px 2px 0;
+  border-width: 0 var(--control-border) var(--control-border) 0;
   transform: rotate(45deg);
 }
 
@@ -232,7 +232,7 @@
 }
 
 .checkbox-field:active input::before {
-  box-shadow: inset 0 0 0 2px var(--ink);
+  box-shadow: inset 0 0 0 var(--control-border) var(--ink);
 }
 
 .checkbox-field input:focus-visible {
@@ -254,7 +254,7 @@
 
 @media (max-width: 767.98px) {
   .search {
-    flex: 1 1 120px;
+    flex: 1 1 var(--search-basis-narrow);
   }
 
   .filters-toggle {

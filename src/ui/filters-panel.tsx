@@ -1,4 +1,4 @@
-import { useId, type ReactNode, type RefObject } from "react";
+import { useId, useState, type ReactNode, type RefObject } from "react";
 import type {
   GameState,
   ListFilters,
@@ -56,6 +56,9 @@ function withRange(
   id: RangeId,
   bounds: RangeBounds,
 ): ListFilters["ranges"] {
+  // clearing a range that is not stored keeps the object, so no field sees a new version
+  if (bounds.min === null && bounds.max === null && !(id in ranges))
+    return ranges;
   const rest = Object.fromEntries(
     Object.entries(ranges).filter(([key]) => key !== id),
   ) as ListFilters["ranges"];
@@ -84,6 +87,13 @@ export function FiltersPanel({
   const panelId = useId();
   const list = state.list;
   const count = appliedCriteriaCount(list, state.stage);
+  // Each field resets on its own stored entry, so a commit in one field keeps drafts in the
+  // others. Fields with no stored entry share the last empty ranges object as their version:
+  // it changes only when the ranges are emptied again (clearing the filters), not when another
+  // field commits.
+  const [emptyRanges, setEmptyRanges] = useState(list.ranges);
+  if (Object.keys(list.ranges).length === 0 && list.ranges !== emptyRanges)
+    setEmptyRanges(list.ranges);
   return (
     <div className="toolbar">
       <div className="search-row">
@@ -160,7 +170,7 @@ export function FiltersPanel({
                 scale={rangeScale(id, state)}
                 bounds={list.ranges[id] ?? EMPTY_BOUNDS}
                 signed={id === "campImpact"}
-                version={list.ranges}
+                version={list.ranges[id] ?? emptyRanges}
                 onCommit={(bounds) =>
                   onList({ ranges: withRange(list.ranges, id, bounds) })
                 }

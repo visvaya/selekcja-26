@@ -7,7 +7,8 @@ import { withJsdomWindow } from "./test-jsdom-window.ts";
 
 const scale = { min: 20, max: 40 };
 
-// Renders a stateful field: commits are recorded and fed back as the new bounds.
+// Renders a stateful field: commits are recorded and fed back as the new bounds. Like the
+// panel, an unset field that stays unset keeps its stored object (no new version).
 async function withField(
   options: { signed?: boolean; label?: string; bounds?: RangeBounds },
   body: (rendered: {
@@ -48,7 +49,11 @@ async function withField(
           version: bounds,
           onCommit: (next: RangeBounds) => {
             commits.push(next);
-            setBounds(next);
+            setBounds((prev) =>
+              [prev.min, prev.max, next.min, next.max].every((v) => v === null)
+                ? prev
+                : next,
+            );
           },
         });
       }

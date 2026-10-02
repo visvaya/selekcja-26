@@ -134,11 +134,13 @@
   --sheet-handle-height: 4px;
   --sheet-head-gap: var(--space-3);
 
-  /* Range filter: two 56 px number fields and a 16 px separator form the 136 px pair; the
+  /* Range filter: two 56 px number fields, a 16 px separator and two 4 px gaps form the 136 px pair; the
      handles are 24 px targets with a 2 px ring, inset 10 px so they meet the track ends. */
   --range-input-width: 56px;
   --range-sep-width: 16px;
-  --range-inputs-width: 136px;
+  --range-inputs-width: calc(
+    var(--range-input-width) * 2 + var(--range-sep-width) + var(--space-1) * 2
+  );
   --range-input-height: 36px;
   --range-input-border: 2px;
   --range-row-gap: 2px;
@@ -160,6 +162,21 @@
   --chevron-stroke: 2px;
   --chevron-inset: var(--space-3);
   --forced-outline-width: 3px;
+  /* Filters toolbar: 44 px search and toggle with a 200 px search basis (120 px on phones), a
+     20 px count badge, and checkboxes with a 24 px hit area around an 18 px box whose 5 x 9 px
+     check mark sits 9 px from the left and 5 px from the top. */
+  --control-height: 44px;
+  --search-basis: 200px;
+  --search-basis-narrow: 120px;
+  --count-badge-size: 20px;
+  --check-target: 24px;
+  --check-box-size: 18px;
+  --check-mark-left: 9px;
+  --check-mark-top: 5px;
+  --check-mark-width: 5px;
+  --check-mark-height: 9px;
+  /* Selection screen: a 360 px side column for the squad dock on desktop. */
+  --side-column-width: 360px;
   /* Player strip: a 46 x 42 px position magnet with a 4 px group bar, a 4 px strip bar that
      grows to 8 px when called up, 6 px meters, 44 px buttons (28 px in the desktop stack) and
      24 px name and popover targets. The desktop tracks leave the name column room for full

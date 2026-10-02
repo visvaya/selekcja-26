@@ -41,6 +41,9 @@ const draftBounds = (drafts: Drafts): RangeBounds => ({
   max: readDraft(drafts.max),
 });
 
+const isEmpty = (bounds: RangeBounds): boolean =>
+  bounds.min === null && bounds.max === null;
+
 const sameBounds = (left: RangeBounds, right: RangeBounds): boolean =>
   left.min === right.min && left.max === right.max;
 
@@ -94,8 +97,8 @@ export function RangeField({
   const minRef = useRef<HTMLInputElement>(null);
   const maxRef = useRef<HTMLInputElement>(null);
 
-  // `version` changes identity whenever the stored ranges change. A change this field caused
-  // itself is skipped (it keeps showing a stepped scale end, stored as null); any other change
+  // `version` changes identity whenever this field's stored bounds change (or the filters are
+  // cleared). A change this field caused itself is skipped (it keeps showing a stepped scale end, stored as null); any other change
   // (clearing the panel, a reload) replaces the drafts with the stored bounds.
   const echo = useRef(false);
   useEffect(() => {
@@ -117,8 +120,9 @@ export function RangeField({
     });
     const stored = commitRange(normal, edited, scale);
     if (!always && sameBounds(stored, committed.current)) return;
+    // an unset field that stays unset gets no new version, so no echo is expected
+    echo.current = !(isEmpty(stored) && isEmpty(committed.current));
     committed.current = stored;
-    echo.current = true;
     onCommit(stored);
   }
 

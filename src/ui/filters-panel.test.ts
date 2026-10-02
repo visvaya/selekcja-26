@@ -18,7 +18,7 @@ function campState(list: Partial<ListFilters> = {}): GameState {
 }
 
 // Renders a stateful harness: the toggle flips `open`, `onList` patches are recorded.
-async function renderPanel(state: GameState) {
+async function renderPanel(state: GameState, stateful = false) {
   const React = await import("react");
   const { render } = await import("@testing-library/react");
   const vite = await createServer({
@@ -31,11 +31,16 @@ async function renderPanel(state: GameState) {
   const patches: Partial<ListFilters>[] = [];
   function Harness() {
     const [open, setOpen] = React.useState(false);
+    const [current, setCurrent] = React.useState(state);
     return React.createElement(FiltersPanel, {
-      state,
+      state: current,
       open,
       onToggle: () => setOpen((value) => !value),
-      onList: (patch: Partial<ListFilters>) => patches.push(patch),
+      onList: (patch: Partial<ListFilters>) => {
+        patches.push(patch);
+        if (stateful)
+          setCurrent((prev) => ({ ...prev, list: { ...prev.list, ...patch } }));
+      },
     });
   }
   const result = render(React.createElement(Harness));
@@ -47,10 +52,11 @@ async function withPanel(
   body: (
     rendered: Awaited<ReturnType<typeof renderPanel>>,
   ) => Promise<void> | void,
+  stateful = false,
 ) {
   await withJsdomWindow(async () => {
     const { cleanup } = await import("@testing-library/react");
-    const rendered = await renderPanel(state);
+    const rendered = await renderPanel(state, stateful);
     try {
       await body(rendered);
     } finally {
@@ -216,5 +222,34 @@ test("a range with a set bound counts in the badge, an unset one does not", () =
       stage,
     ),
     0,
+  );
+});
+
+test("a commit in one range keeps an uncommitted draft in another; clearing empties both", async () => {
+  await withPanel(
+    campState(),
+    async ({ getByRole }) => {
+      const { fireEvent } = await import("@testing-library/react");
+      const ageFrom = getByRole("spinbutton", {
+        name: text.rangeFrom(text.ranges.age),
+        hidden: true,
+      }) as HTMLInputElement;
+      const qualityFrom = getByRole("spinbutton", {
+        name: text.rangeFrom(text.ranges.quality),
+        hidden: true,
+      }) as HTMLInputElement;
+      fireEvent.change(ageFrom, { target: { value: "25" } });
+      fireEvent.keyDown(qualityFrom, { key: "ArrowUp" });
+      fireEvent.keyDown(qualityFrom, { key: "ArrowUp" });
+      assert.equal(qualityFrom.value === "", false);
+      assert.equal(ageFrom.value, "25");
+      fireEvent.blur(ageFrom);
+      fireEvent.click(
+        getByRole("button", { name: text.clearFilters, hidden: true }),
+      );
+      assert.equal(ageFrom.value, "");
+      assert.equal(qualityFrom.value, "");
+    },
+    true,
   );
 });
