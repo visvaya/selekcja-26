@@ -59,12 +59,32 @@ test("the side board fits under the save error banner and its stage button is re
 
   // Scrolled down the list, so the side column is stuck under the bar and the banner.
   await page.evaluate(() => window.scrollTo(0, 1500));
-  const box = await page.locator(".dock-side").boundingBox();
-  const topbar = await page.locator(".topbar").boundingBox();
-  expect(box).not.toBeNull();
-  expect(topbar).not.toBeNull();
-  expect(box!.y).toBeGreaterThanOrEqual(topbar!.y + topbar!.height);
-  expect(box!.y + box!.height).toBeLessThanOrEqual(DESKTOP.height);
+  // Measured as one snapshot and polled: the banner's height (and so --save-banner-offset)
+  // can still settle after the fonts load, and both sticky elements must follow it.
+  await page.evaluate(() => document.fonts.ready);
+  const layout = () =>
+    page.evaluate(() => {
+      const rect = (selector: string) =>
+        document.querySelector(selector)!.getBoundingClientRect();
+      return {
+        boardTop: rect(".dock-side").top,
+        boardBottom: rect(".dock-side").bottom,
+        topbarBottom: rect(".topbar").bottom,
+        viewportHeight: window.innerHeight,
+      };
+    });
+  await expect
+    .poll(async () => {
+      const box = await layout();
+      return box.boardTop >= box.topbarBottom;
+    })
+    .toBe(true);
+  await expect
+    .poll(async () => {
+      const box = await layout();
+      return box.boardBottom <= box.viewportHeight;
+    })
+    .toBe(true);
 
   // The stage button sits at the top of the scrolling board; keyboard focus brings it back.
   await boardRegion(page).evaluate((element) => {
