@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import type { ReactNode } from "react";
+import type { ReactNode, RefObject } from "react";
 
 export function GameDialog({
   title,
@@ -8,6 +8,7 @@ export function GameDialog({
   onClose,
   blocking = false,
   restoreFocusFallback,
+  initialFocusRef,
 }: {
   title: string;
   eyebrow?: string;
@@ -18,6 +19,8 @@ export function GameDialog({
   // document (e.g. it belonged to a screen that was replaced while the dialog was
   // open), so focus does not fall back to the body.
   restoreFocusFallback?: () => void;
+  // The element focused on open; defaults to the dialog's first button.
+  initialFocusRef?: RefObject<HTMLElement | null>;
 }) {
   const dialogRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -30,7 +33,10 @@ export function GameDialog({
       document.activeElement !== document.body
         ? document.activeElement
         : null;
-    dialogRef.current?.querySelector<HTMLButtonElement>("button")?.focus();
+    (
+      initialFocusRef?.current ??
+      dialogRef.current?.querySelector<HTMLButtonElement>("button")
+    )?.focus();
     return () => {
       // The opener can still be in the document but no longer focusable (e.g. the finalize
       // button is disabled once the next screen starts empty), so a failed focus() call must
@@ -41,7 +47,7 @@ export function GameDialog({
       }
       restoreFocusFallback?.();
     };
-  }, [title, restoreFocusFallback]);
+  }, [title, restoreFocusFallback, initialFocusRef]);
   function onKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
     if (event.key === "Escape" && !blocking) {
       event.preventDefault();

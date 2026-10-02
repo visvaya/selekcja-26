@@ -500,3 +500,83 @@ for (const { outcome, points, marker, place } of MARKER_CASES) {
     }
   });
 }
+
+test("clear-squad and new-game actions on the list", async () => {
+  await withJsdomWindow(async (dom) => {
+    const { fireEvent, waitFor, cleanup, vite, view } =
+      await renderGameApp(dom);
+    try {
+      const doc = dom.window.document;
+      function focusedName(): string {
+        return doc.activeElement?.textContent ?? "";
+      }
+      fireEvent.click(
+        await view.findByRole("button", { name: "Rozpocznij odprawę" }),
+      );
+      await view.findByRole("heading", {
+        name: "Wybierz 23 zawodników na test",
+      });
+      const actions = [
+        ...view.container.querySelectorAll(".game-actions button"),
+      ];
+      assert.deepEqual(
+        actions.map((button) => button.textContent),
+        ["Cofnij", "Dobierz losowo", "Odwołaj wszystkich", "Nowa gra"],
+      );
+      assert.equal(actions[3]!.classList.contains("danger"), true);
+      const clear = view.getByRole("button", { name: "Odwołaj wszystkich" });
+      assert.equal((clear as HTMLButtonElement).disabled, true);
+
+      fireEvent.click(view.getByRole("button", { name: "Dobierz losowo" }));
+      await waitFor(() =>
+        assert.equal(
+          (
+            view.getByRole("button", {
+              name: "Odwołaj wszystkich",
+            }) as HTMLButtonElement
+          ).disabled,
+          false,
+        ),
+      );
+      fireEvent.click(view.getByRole("button", { name: "Odwołaj wszystkich" }));
+      await waitFor(() =>
+        assert.equal(
+          view.container.querySelector(".count-ring b")?.textContent,
+          "0/23",
+        ),
+      );
+      await waitFor(() =>
+        assert.equal(
+          view.container.querySelector('[aria-live="polite"]')?.textContent,
+          UI_TEXT.announcements.clearSquad,
+        ),
+      );
+      assert.equal(focusedName(), "Cofnij");
+
+      const newGame = view.getByRole("button", { name: "Nowa gra" });
+      newGame.focus();
+      fireEvent.click(newGame);
+      assert.ok(view.getByRole("dialog", { name: "Zacząć nową grę?" }));
+      assert.equal(focusedName(), "Wróć do gry");
+      fireEvent.click(view.getByRole("button", { name: "Wróć do gry" }));
+      assert.equal(view.queryByRole("dialog"), null);
+      assert.equal(focusedName(), "Nowa gra");
+      assert.ok(
+        view.getByRole("heading", { name: "Wybierz 23 zawodników na test" }),
+      );
+
+      fireEvent.click(view.getByRole("button", { name: "Nowa gra" }));
+      fireEvent.click(view.getByRole("button", { name: "Zacznij nową grę" }));
+      const startHeading = await view.findByRole("heading", {
+        name: /Bilet na EURO/,
+      });
+      await waitFor(() =>
+        assert.equal(doc.activeElement === startHeading, true),
+      );
+      assert.equal(view.queryByRole("button", { name: "Cofnij" }), null);
+    } finally {
+      cleanup();
+      await vite.close();
+    }
+  });
+});

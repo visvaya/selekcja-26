@@ -20,6 +20,7 @@ export type GameAction =
   | { type: "togglePlayer"; id: PlayerId; limit: number }
   | { type: "autoFill"; selected: Set<string>; seed: number }
   | { type: "undo" }
+  | { type: "clearSquad" }
   | { type: "toggleCompare"; id: PlayerId }
   | { type: "clearCompare" }
   | { type: "resolveEvent"; id: string; effects: Partial<Effects> }
@@ -156,6 +157,10 @@ export function reduceGameState(
         report: action.report,
         seed: action.seed,
       });
+    case "clearSquad":
+      return state.selected.size === 0
+        ? state
+        : remember(state, { ...state, selected: new Set<string>() });
     case "reset":
       return createInitialState(action.seed);
     default:

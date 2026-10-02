@@ -24,6 +24,7 @@
       "Losowo dobrano zawodników: Półfinał. Powołani: Półfinał z Półfinał.",
       "Losowo dobrano zawodników: 2026-10-01. Powołani: 2026-10-01 z 2026-10-01."
     ],
+    "clearSquad": "Odwołano wszystkich zawodników. Możesz to cofnąć przyciskiem „Cofnij”.",
     "eventResolved": [
       "Zdarzenie rozstrzygnięte: 0.",
       "Zdarzenie rozstrzygnięte: 1.",
@@ -136,10 +137,18 @@
     "Wersja 2026-10-01 · 01.10.2026"
   ],
   "clearComparison": "Wyczyść porównanie",
+  "clearSquad": "Odwołaj wszystkich",
   "compare": "Porównaj",
   "compared": "Wybrany",
   "comparisonEyebrow": "Analiza porównawcza",
   "comparisonTitle": "Dwóch kandydatów, jedno miejsce?",
+  "confirmNewGame": {
+    "cancel": "Wróć do gry",
+    "confirm": "Zacznij nową grę",
+    "description": "Obecna selekcja i historia decyzji przepadną. Tego nie da się cofnąć.",
+    "eyebrow": "Nowa gra",
+    "title": "Zacząć nową grę?"
+  },
   "continueToFinal": "Przejdź do powołań na EURO",
   "disclaimer": "Nieoficjalna gra fanowska. Nie jest rzeczywistym produktem PZPN/UEFA.",
   "dockCoverage": "Dotknij, aby zobaczyć obsadę",
@@ -286,6 +295,7 @@
     "Brakuje Półfinał",
     "Brakuje 2026-10-01"
   ],
+  "newGame": "Nowa gra",
   "noCandidates": "Brak zawodników spełniających kryteria.",
   "noStrengths": "Nie zbudowano wyraźnej przewagi strukturalnej.",
   "noWeaknesses": "Analiza nie wykryła krytycznej luki w konstrukcji kadry.",

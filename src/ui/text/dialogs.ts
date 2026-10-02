@@ -11,6 +11,14 @@ export const DIALOGS_TEXT = {
       "W finałowej kadrze mogą być dokładnie trzej bramkarze. Odwołaj nadliczbowego bramkarza i spróbuj ponownie.",
   },
   autoFillErrorTitle: "Nie udało się dobrać zawodników",
+  confirmNewGame: {
+    eyebrow: "Nowa gra",
+    title: "Zacząć nową grę?",
+    description:
+      "Obecna selekcja i historia decyzji przepadną. Tego nie da się cofnąć.",
+    confirm: "Zacznij nową grę",
+    cancel: "Wróć do gry",
+  },
   profileMetrics: [
     "Ocena selekcyjna",
     "Jakość",

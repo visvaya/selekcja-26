@@ -40,6 +40,9 @@ async function renderScreen(state: GameState) {
       headingRef: React.createRef<HTMLHeadingElement>(),
       onAutoFill: noop,
       onUndo: noop,
+      onClearSquad: noop,
+      onNewGame: noop,
+      undoRef: React.createRef<HTMLButtonElement>(),
       onQuery: noop,
       onFilter: noop,
       onSort: noop,
@@ -132,7 +135,7 @@ test("wide form moves the KPIs and actions into the side column", async () => {
         [...(actions?.querySelectorAll("button") ?? [])]
           .map((button) => button.textContent)
           .join("|"),
-        "Dobierz losowo|Cofnij",
+        "Cofnij|Dobierz losowo|Odwołaj wszystkich|Nowa gra",
       );
       assert.equal(container.querySelector(".kpis-inline") === null, true);
       assert.equal(container.querySelectorAll(".game-actions").length, 1);

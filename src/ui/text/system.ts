@@ -10,6 +10,8 @@ export const SYSTEM_TEXT = {
       `Cofnięto ostatnią decyzję. Powołani: ${count} z ${limit}.`,
     autoFill: (added: number, count: number, limit: number) =>
       `Losowo dobrano zawodników: ${added}. Powołani: ${count} z ${limit}.`,
+    clearSquad:
+      "Odwołano wszystkich zawodników. Możesz to cofnąć przyciskiem „Cofnij”.",
     eventResolved: (choiceTitle: string) =>
       `Zdarzenie rozstrzygnięte: ${choiceTitle}.`,
   },

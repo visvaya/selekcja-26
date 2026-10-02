@@ -121,11 +121,6 @@ button {
 .primary:hover {
   background: var(--action-strong);
 }
-.game-actions {
-  display: flex;
-  gap: var(--legacy-space-4);
-  margin: var(--legacy-space-7) 0;
-}
 .action-button {
   flex: 1;
   border: 1px solid var(--frame);

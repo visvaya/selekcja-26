@@ -13,6 +13,8 @@ function formatAge(years: number): string {
 
 export const LIST_TEXT = {
   autoFill: "Dobierz losowo",
+  clearSquad: "Odwołaj wszystkich",
+  newGame: "Nowa gra",
   roles: {
     aerial: "Powietrze",
     ballPlaying: "Gra nogami",

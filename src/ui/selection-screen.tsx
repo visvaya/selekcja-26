@@ -11,6 +11,7 @@ import {
   selectedPlayers,
   squadLimit,
 } from "../logic/selection.ts";
+import { GameActions } from "./game-actions.tsx";
 import { GAME_HEADING_ID, GameHead } from "./game-head.tsx";
 import { PlayerCard } from "./player-card.tsx";
 import { SideColumn } from "./side-column.tsx";
@@ -42,6 +43,9 @@ export function SelectionScreen({
   headingRef,
   onAutoFill,
   onUndo,
+  onClearSquad,
+  onNewGame,
+  undoRef,
   onQuery,
   onFilter,
   onSort,
@@ -53,6 +57,9 @@ export function SelectionScreen({
   headingRef: RefObject<HTMLHeadingElement | null>;
   onAutoFill: () => void;
   onUndo: () => void;
+  onClearSquad: () => void;
+  onNewGame: () => void;
+  undoRef: RefObject<HTMLButtonElement | null>;
   onQuery: (value: string) => void;
   onFilter: (value: "ALL" | DetailedPosition) => void;
   onSort: (value: SortId) => void;
@@ -72,22 +79,17 @@ export function SelectionScreen({
         ? positions[0]!
         : null;
   const actions = (
-    <div className={`game-actions${wide ? " side-actions" : ""}`}>
-      <button
-        className="action-button"
-        onClick={onAutoFill}
-        disabled={state.selected.size >= squadLimit(state)}
-      >
-        {text.autoFill}
-      </button>
-      <button
-        className="action-button"
-        onClick={onUndo}
-        disabled={!state.history.length}
-      >
-        {text.undo}
-      </button>
-    </div>
+    <GameActions
+      canUndo={state.history.length > 0}
+      canAutoFill={state.selected.size < squadLimit(state)}
+      canClear={state.selected.size > 0}
+      onUndo={onUndo}
+      onAutoFill={onAutoFill}
+      onClear={onClearSquad}
+      onNewGame={onNewGame}
+      undoRef={undoRef}
+      className={wide ? "side-actions" : undefined}
+    />
   );
   return (
     <div className="screen-layout">

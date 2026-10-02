@@ -68,3 +68,27 @@ test("list filters stay outside undo history", () => {
   assert.deepEqual(undone.list, filtered.list);
   assert.equal(undone.selected.has("robert-lewandowski"), false);
 });
+
+test("clearSquad empties the squad as one undo step and keeps the rest", () => {
+  let state = reduceGameState(createInitialState(7), { type: "start" });
+  for (const player of players.slice(0, 3))
+    state = reduceGameState(state, {
+      type: "togglePlayer",
+      id: player.id,
+      limit: 23,
+    });
+  const cleared = reduceGameState(state, { type: "clearSquad" });
+  assert.equal(cleared.selected.size, 0);
+  assert.equal(cleared.history.length, state.history.length + 1);
+  assert.equal(cleared.campSquad === state.campSquad, true);
+  assert.equal(cleared.trial === state.trial, true);
+  assert.equal(cleared.events === state.events, true);
+  assert.equal(cleared.effects === state.effects, true);
+  assert.equal(cleared.list === state.list, true);
+  assert.equal(cleared.compare === state.compare, true);
+  assert.equal(state.selected.size, 3);
+  const undone = reduceGameState(cleared, { type: "undo" });
+  assert.deepEqual([...undone.selected], [...state.selected]);
+  const empty = reduceGameState(createInitialState(7), { type: "start" });
+  assert.equal(reduceGameState(empty, { type: "clearSquad" }) === empty, true);
+});

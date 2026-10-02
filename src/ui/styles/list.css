@@ -85,7 +85,33 @@
   font-size: var(--text-lg);
 }
 
+/* List actions: undo, random fill, clear squad, new game */
+.game-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.game-actions .action-button,
+.confirm-actions .action-button {
+  margin-top: 0;
+}
+
+.confirm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
 @media (max-width: 767.98px) {
+  .game-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2) var(--space-3);
+  }
+
   .kpi span {
     font-size: var(--text-2xs);
   }
