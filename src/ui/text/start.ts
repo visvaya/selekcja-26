@@ -20,7 +20,7 @@ export const START_TEXT = {
     nextStage: "Zgrupowanie kontrolne",
     campPlacesLabel: "Miejsca na 1. zgrupowaniu",
     finalPlacesLabel: "Miejsca w kadrze turniejowej",
-    stub: "EURO·28",
+    stub: "EURO28",
   },
   systemChoice: "Wybierz formację",
   formationMap: (name: string) =>
