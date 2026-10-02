@@ -351,8 +351,10 @@
 }
 
 /* Start-screen map rules are scoped under .model-preview so the dock keeps its own look. */
+/* Panel and nodes grow with enlarged text (rem terms) and keep the design's px sizes at the
+   default text size. */
 .model-preview {
-  max-width: 220px;
+  max-width: max(220px, 13.75rem);
   margin: 0 auto;
   padding: var(--space-4);
   background: var(--board);
@@ -485,8 +487,8 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 28px;
-  height: 28px;
+  width: max(28px, 1.5rem);
+  height: max(28px, 1.5rem);
   border-radius: var(--radius-round);
   background: var(--surface);
   border: 2px solid var(--frame);
