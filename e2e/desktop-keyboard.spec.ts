@@ -169,10 +169,40 @@ test("desktop game is playable with the keyboard alone", async ({ page }) => {
   const skipLink = page.getByRole("link", { name: text.skipToList });
   await expect(skipLink).toBeFocused();
   await expectFocusVisible(page, "filters panel skip link");
-  await page.keyboard.press("Enter");
+
+  // Inside the panel Space ticks a trait and the visible count follows at once; Escape is
+  // harmless (no dialog to close, the tick and the focus stay).
+  const count = page.locator(".list-count");
+  await expect(count).toHaveText(text.visibleCount(61, 61));
+  const pace = page.getByRole("checkbox", { name: text.roles.pace });
+  await tabUntil(page, pace);
+  await expectVisibleFocus(pace);
+  await page.keyboard.press("Space");
+  await expect(pace).toBeChecked();
+  await expect(count).not.toHaveText(text.visibleCount(61, 61));
+  await page.keyboard.press("Escape");
+  await expect(pace).toBeChecked();
+  await expect(pace).toBeFocused();
+  await expect(filtersToggle).toHaveAttribute("aria-expanded", "true");
+  await page.keyboard.press("Space");
+  await expect(pace).not.toBeChecked();
+  await expect(count).toHaveText(text.visibleCount(61, 61));
+
+  // The skip link moves focus to the list heading.
+  await activate(page, skipLink);
   await expect(page.locator(".section-label h2")).toBeFocused();
+
+  // With the panel closed every position chip is a Tab stop with a visible focus ring.
   await activate(page, filtersToggle);
   await expect(filtersToggle).toHaveAttribute("aria-expanded", "false");
+  const chips = page.locator(".toolbar button[aria-pressed]");
+  const chipCount = await chips.count();
+  expect(chipCount).toBeGreaterThan(1);
+  await tabUntil(page, chips.first());
+  for (let index = 0; index < chipCount; index++) {
+    await expectVisibleFocus(chips.nth(index));
+    if (index < chipCount - 1) await page.keyboard.press("Tab");
+  }
 
   // Event dialogs are blocking: Escape does not dismiss them.
   await activate(page, page.getByRole("button", { name: text.autoFill }));

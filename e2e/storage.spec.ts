@@ -359,3 +359,79 @@ test("a version 4 save restores the list position filter and search", async ({
   );
   expect(errors).toEqual([]);
 });
+
+// Filters live outside the undo history and in the save: a filtered list survives a squad
+// change, its undo and a reload with the same criteria, players and panel badge.
+test("list filters survive a squad change, undo and reload", async ({
+  page,
+}) => {
+  const errors = collectPageErrors(page);
+  await page.goto("/");
+  await page.getByRole("button", { name: text.start }).click();
+  await expect(
+    page.getByRole("heading", { name: text.stages.camp.heading }),
+  ).toBeVisible();
+
+  await page.getByRole("button", { name: /^N \(/ }).click();
+  await page.getByRole("button", { name: /^LS \(/ }).click();
+  await page.getByLabel(text.searchLabel).fill("a");
+  const toggle = page.locator(".filters-toggle");
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  await page.getByRole("checkbox", { name: text.roles.pace }).check();
+  const ageFrom = page.getByRole("spinbutton", {
+    name: text.rangeFrom(text.ranges.age),
+  });
+  await ageFrom.fill("21");
+  await ageFrom.press("Enter");
+  await expect(ageFrom).toHaveValue("21");
+  await expect(toggle).toHaveAccessibleName(text.detailFiltersActive(2));
+
+  const profiles = page.locator(".player .profile-btn");
+  const callUp = page.locator(".player .select-btn");
+  await expect(profiles.nth(1)).toBeVisible();
+  await callUp.nth(0).click();
+  await callUp.nth(1).click();
+  await page.getByRole("checkbox", { name: text.onlySelected(2) }).check();
+  await expect(profiles).toHaveCount(2);
+
+  // A squad change and its undo leave the filters alone.
+  await callUp.nth(0).click();
+  await expect(profiles).toHaveCount(1);
+  await page.getByRole("button", { name: text.undo }).click();
+  await expect(profiles).toHaveCount(2);
+
+  const names = () =>
+    profiles.evaluateAll((buttons) =>
+      buttons.map((button) => button.getAttribute("aria-label")),
+    );
+  const count = page.locator(".list-count");
+  const before = { names: await names(), count: await count.innerText() };
+  expect(before.count).toBe(text.visibleCount(2, 61));
+
+  await page.reload();
+  await expect(count).toHaveText(before.count);
+  expect(await names()).toEqual(before.names);
+  await expect(page.getByLabel(text.searchLabel)).toHaveValue("a");
+  for (const code of ["N", "LS"])
+    await expect(
+      page.getByRole("button", { name: new RegExp(`^${code} \\(`) }),
+    ).toHaveAttribute("aria-pressed", "true");
+  await expect(
+    page.getByRole("checkbox", { name: text.onlySelected(2) }),
+  ).toBeChecked();
+  await expect(toggle).toHaveAccessibleName(text.detailFiltersActive(2));
+  if ((await toggle.getAttribute("aria-expanded")) !== "true")
+    await toggle.click();
+  await expect(
+    page.getByRole("checkbox", { name: text.roles.pace }),
+  ).toBeChecked();
+  await expect(
+    page.locator(".filters-panel input[type=checkbox]:checked"),
+  ).toHaveCount(1);
+  await expect(ageFrom).toHaveValue("21");
+  await expect(
+    page.getByRole("spinbutton", { name: text.rangeTo(text.ranges.age) }),
+  ).toHaveValue("");
+  expect(errors).toEqual([]);
+});

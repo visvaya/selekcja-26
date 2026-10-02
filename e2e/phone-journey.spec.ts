@@ -118,6 +118,23 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
     page.locator(".tag", { hasText: text.campResult }).first(),
   ).toBeVisible();
   await expectFocusVisible(page, "camp -> final");
+  await expect(
+    page.getByRole("checkbox", { name: text.onlyCamp(23) }),
+  ).toBeVisible();
+
+  // A lone "-" in the signed camp range is unparsable (validity.badInput) and is cleared on blur.
+  const filtersToggle = page.locator(".filters-toggle");
+  await filtersToggle.tap();
+  const campFrom = page.getByRole("spinbutton", {
+    name: text.rangeFrom(text.ranges.campImpact),
+  });
+  await campFrom.focus();
+  await campFrom.pressSequentially("-");
+  await campFrom.blur();
+  await expect(campFrom).toHaveValue("");
+  await expect(filtersToggle).toHaveAccessibleName(text.detailFilters);
+  await filtersToggle.tap();
+  await expect(filtersToggle).toHaveAttribute("aria-expanded", "false");
 
   await page.getByRole("button", { name: text.autoFill }).tap();
   await expect(squadCount(page)).toHaveText("26/26");
