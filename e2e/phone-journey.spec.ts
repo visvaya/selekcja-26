@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
-import { players } from "../src/data/catalog.ts";
+import { players, systems } from "../src/data/catalog.ts";
+import { detailedPositions } from "../src/logic/selection.ts";
 import { GAME_VERSION } from "../src/data/changelog.ts";
 import type { GroupPosition } from "../src/data/types.ts";
 import {
@@ -47,7 +48,7 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
   expect(labelBox?.width ?? 0).toBeLessThanOrEqual(1);
   expect(labelBox?.height ?? 0).toBeLessThanOrEqual(1);
 
-  // 3-4-2-1 has no wingers, so a random camp squad always leaves players outside the formation.
+  // 3-4-2-1 has no wingers, so a winger called up below stays outside the formation.
   await page
     .getByRole("radio", { name: new RegExp(`^${text.systems["3421"].name}`) })
     .tap();
@@ -68,6 +69,16 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
   await expect(dialog(page)).toBeHidden();
   await expect(squadCount(page)).toHaveText("0/23");
   await expectFocusVisible(page, "random fill dialog undo (closed)");
+
+  // A player with no 3-4-2-1 position keeps the outsiders strip on the pitch whatever the
+  // random fill adds; the fill keeps earlier call-ups.
+  const search = page.getByLabel(text.searchLabel);
+  await search.fill(OUTSIDER_3421.name);
+  await page.locator(".select-btn").first().tap();
+  await expect(squadCount(page)).toHaveText("1/23");
+  await search.fill("");
+  // Back to the top, as before the call-up: the journey's focus checks start from there.
+  await page.evaluate(() => window.scrollTo(0, 0));
 
   await page.getByRole("button", { name: text.autoFill }).tap();
   for (const choice of CAMP_EVENT_CHOICES) {
@@ -187,6 +198,14 @@ const idsInGroup = (group: GroupPosition, count: number) =>
     .filter((player) => player.pos === group)
     .slice(0, count)
     .map((player) => player.id);
+
+const SYSTEM_3421 = systems.find((system) => system.id === "3421")!;
+const OUTSIDER_3421 = players.find(
+  (player) =>
+    !detailedPositions(player).some((position) =>
+      SYSTEM_3421.fits.includes(position),
+    ),
+)!;
 
 // Focuses the last strip's compare button the way a keyboard user reaches it: programmatic focus
 // (WebKit has no Tab focus on buttons by default), then Tab away and back.
