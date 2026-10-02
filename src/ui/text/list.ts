@@ -51,7 +51,13 @@ export const LIST_TEXT = {
   emptyValue: "Brak",
   searchPlaceholder: "Szukaj zawodnika lub klubu…",
   searchLabel: "Szukaj zawodnika",
-  filterLabel: "Filtruj po pozycji",
+  positionChipsLabel: "Filtry pozycyjne (wybrani/dostępni):",
+  chip: (code: string, picked: number, total: number) =>
+    `${code} (${picked}/${total})`,
+  chipName: (code: string, picked: number, total: number, name: string) =>
+    `${code} (${picked}/${total}): ${name}, powołani ${picked} z ${total}`,
+  chipAllName: (picked: number, total: number) =>
+    `Wszyscy (${picked}/${total}): powołani ${picked} z ${total}`,
   detailFilters: "Filtry szczegółowe",
   detailFiltersActive: (count: number) =>
     `Filtry szczegółowe, aktywne: ${count}`,
@@ -77,15 +83,22 @@ export const LIST_TEXT = {
   rangeFrom: (label: string) => `${label} od`,
   rangeTo: (label: string) => `${label} do`,
   clearFilters: "Wyczyść filtry",
-  sortLabel: "Sortuj zawodników",
+  sortVisibleLabel: "Sortuj:",
+  visibleCount: (count: number, total: number) =>
+    `Widoczni: ${count} z ${total}`,
+  onlyGroupLabel: "Pokaż tylko",
+  onlySelected: (count: number) => `Tylko powołani (${count})`,
+  onlyCamp: (count: number) => `Tylko z marcowego zgrupowania (${count})`,
   allCandidates: "Wszyscy kandydaci",
   noCandidates: "Brak zawodników spełniających kryteria.",
+  noCandidatesHint:
+    "Wyczyść wyszukiwanie albo filtry, aby zobaczyć więcej kandydatów.",
   sort: {
     model: "Ocena selekcyjna",
     quality: "Jakość",
-    form: "Forma i rytm",
+    form: "Forma",
     fitness: "Zdrowie",
-    tactics: "Dopasowanie taktyczne",
+    tactics: "Taktyka",
     experience: "Doświadczenie",
     group: "Wpływ na grupę",
     young: "Wiek: najmłodsi",

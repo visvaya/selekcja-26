@@ -2,6 +2,7 @@
 import { players } from "../data/catalog.ts";
 import { GAME_RULES } from "../data/constants.ts";
 import type {
+  DetailedPosition,
   GameState,
   SortId,
   ListFilters,
@@ -48,6 +49,57 @@ export function clearDetailFilters(): Pick<
     traits: DEFAULT_LIST_FILTERS.traits,
     ranges: DEFAULT_LIST_FILTERS.ranges,
   };
+}
+
+// Everything that narrows the list back to defaults; only the sort stays.
+export function clearAllFilters(sort: SortId): ListFilters {
+  return { ...DEFAULT_LIST_FILTERS, sort };
+}
+
+// Position chips in display order.
+export const FILTER_POSITIONS: readonly DetailedPosition[] = Object.freeze([
+  "BR",
+  "LO",
+  "LŚO",
+  "ŚO",
+  "PŚO",
+  "PO",
+  "LWO",
+  "DP",
+  "ŚP",
+  "OP",
+  "PWO",
+  "LS",
+  "N",
+  "PS",
+]);
+
+let cachedCatalogueCounts: Readonly<Record<DetailedPosition, number>> | null =
+  null;
+
+// Catalogue players per detailed position (a player counts for each of his positions).
+export function catalogueCounts(): Readonly<Record<DetailedPosition, number>> {
+  cachedCatalogueCounts ??= Object.freeze(
+    Object.fromEntries(
+      FILTER_POSITIONS.map((position) => [
+        position,
+        players.filter((player) => detailedPositions(player).includes(position))
+          .length,
+      ]),
+    ) as Record<DetailedPosition, number>,
+  );
+  return cachedCatalogueCounts;
+}
+
+// Adds or removes one position; the result keeps the chip order.
+export function togglePosition(
+  positions: readonly DetailedPosition[],
+  position: DetailedPosition,
+): DetailedPosition[] {
+  const next = positions.includes(position)
+    ? positions.filter((item) => item !== position)
+    : [...positions, position];
+  return FILTER_POSITIONS.filter((item) => next.includes(item));
 }
 
 const rangeShown = (id: RangeId, stage: Stage): boolean =>

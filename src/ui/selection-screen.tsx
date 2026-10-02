@@ -1,45 +1,19 @@
-import { useState, type RefObject } from "react";
-import type {
-  DetailedPosition,
-  GameState,
-  ListFilters,
-  PlayerId,
-  SortId,
-} from "../data/types.ts";
-import { visiblePlayers } from "../logic/list-filters.ts";
-import {
-  detailedCounts,
-  selectedPlayers,
-  squadLimit,
-} from "../logic/selection.ts";
+import { useRef, useState, type RefObject } from "react";
+import type { GameState, ListFilters, PlayerId } from "../data/types.ts";
+import { clearAllFilters, visiblePlayers } from "../logic/list-filters.ts";
+import { squadLimit } from "../logic/selection.ts";
+import { EmptyList } from "./empty-list.tsx";
 import { FiltersPanel } from "./filters-panel.tsx";
 import { GameActions } from "./game-actions.tsx";
 import { GAME_HEADING_ID, GameHead } from "./game-head.tsx";
-import { LIST_HEADING_ID } from "./list-heading-id.ts";
+import { ListHeading } from "./list-heading.tsx";
 import { PlayerCard } from "./player-card.tsx";
+import { PositionChips } from "./position-chips.tsx";
 import { SideColumn } from "./side-column.tsx";
 import { UI_TEXT as text } from "./text.ts";
 import { useMediaQuery } from "./use-media-query.ts";
 
 const WIDE_LAYOUT_QUERY = "(min-width: 1024px)";
-
-const filterPositions: ("ALL" | DetailedPosition)[] = [
-  "ALL",
-  "BR",
-  "LO",
-  "LŚO",
-  "ŚO",
-  "PŚO",
-  "PO",
-  "LWO",
-  "DP",
-  "ŚP",
-  "OP",
-  "PWO",
-  "LS",
-  "N",
-  "PS",
-];
 
 export function SelectionScreen({
   state,
@@ -69,16 +43,12 @@ export function SelectionScreen({
   const wide = useMediaQuery(WIDE_LAYOUT_QUERY);
   // Screen state, not saved: the panel starts collapsed on every visit.
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const selected = selectedPlayers(state);
-  const detailed = detailedCounts(state);
-  // The chip row shows a single position at most; several positions press no chip.
+  const searchRef = useRef<HTMLInputElement>(null);
   const positions = state.list.positions;
-  const activeFilter: "ALL" | DetailedPosition | null =
-    positions.length === 0
-      ? "ALL"
-      : positions.length === 1
-        ? positions[0]!
-        : null;
+  // A single chosen position names the list; none or several keep the general heading.
+  const title =
+    positions.length === 1 ? text.positions[positions[0]!] : text.allCandidates;
+  const visible = visiblePlayers(state);
   const actions = (
     <GameActions
       canUndo={state.history.length > 0}
@@ -102,49 +72,18 @@ export function SelectionScreen({
           open={filtersOpen}
           onToggle={() => setFiltersOpen((open) => !open)}
           onList={onList}
+          searchRef={searchRef}
         >
-          <div className="filters" aria-label={text.filterLabel}>
-            {filterPositions.map((position) => (
-              <button
-                className={`chip ${activeFilter === position ? "active" : ""}`}
-                aria-pressed={activeFilter === position}
-                key={position}
-                title={
-                  position === "ALL"
-                    ? text.filtersAll
-                    : text.positions[position]
-                }
-                onClick={() =>
-                  onList({ positions: position === "ALL" ? [] : [position] })
-                }
-              >
-                {position === "ALL" ? text.filtersAll : position} (
-                {position === "ALL" ? selected.length : detailed[position]})
-              </button>
-            ))}
-          </div>
+          <PositionChips state={state} onList={onList} />
         </FiltersPanel>
-        <div className="section-label">
-          <h2 id={LIST_HEADING_ID} tabIndex={-1}>
-            {activeFilter === "ALL" || activeFilter === null
-              ? text.allCandidates
-              : text.positions[activeFilter]}
-          </h2>
-          <select
-            className="sort"
-            aria-label={text.sortLabel}
-            value={state.list.sort}
-            onChange={(event) => onList({ sort: event.target.value as SortId })}
-          >
-            {(Object.keys(text.sort) as SortId[]).map((sort) => (
-              <option key={sort} value={sort}>
-                {text.sort[sort]}
-              </option>
-            ))}
-          </select>
-        </div>
+        <ListHeading
+          state={state}
+          title={title}
+          visibleCount={visible.length}
+          onList={onList}
+        />
         <div className="players">
-          {visiblePlayers(state).map((player) => (
+          {visible.map((player) => (
             <PlayerCard
               key={player.id}
               player={player}
@@ -154,8 +93,11 @@ export function SelectionScreen({
               onCompare={onCompare}
             />
           ))}
-          {visiblePlayers(state).length === 0 && (
-            <div className="report">{text.noCandidates}</div>
+          {visible.length === 0 && (
+            <EmptyList
+              onClearAll={() => onList(clearAllFilters(state.list.sort))}
+              searchRef={searchRef}
+            />
           )}
         </div>
       </section>

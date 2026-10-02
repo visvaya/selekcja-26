@@ -1,4 +1,4 @@
-import { useId, type ReactNode } from "react";
+import { useId, type ReactNode, type RefObject } from "react";
 import type {
   GameState,
   ListFilters,
@@ -71,12 +71,14 @@ export function FiltersPanel({
   open,
   onToggle,
   onList,
+  searchRef,
   children,
 }: {
   state: GameState;
   open: boolean;
   onToggle: () => void;
   onList: (patch: Partial<ListFilters>) => void;
+  searchRef?: RefObject<HTMLInputElement | null>;
   children?: ReactNode;
 }) {
   const panelId = useId();
@@ -86,6 +88,7 @@ export function FiltersPanel({
     <div className="toolbar">
       <div className="search-row">
         <input
+          ref={searchRef}
           className="search"
           type="search"
           value={list.query}

@@ -140,13 +140,16 @@ test("desktop game is playable with the keyboard alone", async ({ page }) => {
   await expectFocusVisible(page, "comparison dialog close");
 
   // Position filter and search.
-  const leftBack = page.getByRole("button", { name: "LO (0)" });
+  const leftBack = page.getByRole("button", { name: /^LO \(0\// });
   await activate(page, leftBack, "Space");
   await expect(leftBack).toHaveAttribute("aria-pressed", "true");
   await expect(
     page.getByRole("heading", { name: text.positions.LO }),
   ).toBeVisible();
-  await activate(page, page.getByRole("button", { name: "Wszyscy (0)" }));
+  await activate(
+    page,
+    page.getByRole("button", { name: /^Wszyscy \(0\/61\)/ }),
+  );
   const search = page.getByRole("searchbox", { name: text.searchLabel });
   await search.focus();
   await page.keyboard.type("Kochalski");

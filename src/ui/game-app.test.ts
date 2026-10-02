@@ -54,9 +54,11 @@ test("start, profile, comparison, event and position filter work together", asyn
       );
       assert.equal(view.container.querySelectorAll(".compare-on").length, 0);
       assert.equal(isFocused(dom.window.document.body), false);
-      fireEvent.click(screen.getByRole("button", { name: "LO (0)" }));
+      fireEvent.click(screen.getByRole("button", { name: /^LO \(0\// }));
       assert.ok(screen.getByRole("heading", { name: "Lewy obrońca" }));
-      fireEvent.click(screen.getByRole("button", { name: "Wszyscy (0)" }));
+      fireEvent.click(
+        screen.getByRole("button", { name: /^Wszyscy \(0\/61\)/ }),
+      );
       fireEvent.click(screen.getByRole("button", { name: "Dobierz losowo" }));
       assert.ok(
         screen.getByRole("heading", { name: "Raport medyczny: przeciążenie" }),

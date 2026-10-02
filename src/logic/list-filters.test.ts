@@ -10,7 +10,11 @@ import type {
 } from "../data/types.ts";
 import {
   appliedCriteriaCount,
+  catalogueCounts,
+  clearAllFilters,
   clearDetailFilters,
+  FILTER_POSITIONS,
+  togglePosition,
   DEFAULT_LIST_FILTERS,
   matchesListFilters,
   rangeIdsForStage,
@@ -282,4 +286,33 @@ test("rangeIdsForStage lists nine ranges at camp and adds campImpact at the fina
     "groupImpact",
     "campImpact",
   ]);
+});
+
+test("catalogueCounts counts catalogue players per detailed position", () => {
+  const counts = catalogueCounts();
+  assert.deepEqual(Object.keys(counts), [...FILTER_POSITIONS]);
+  for (const position of FILTER_POSITIONS)
+    assert.equal(
+      counts[position],
+      players.filter((player) => detailedPositions(player).includes(position))
+        .length,
+    );
+  assert.equal(catalogueCounts() === counts, true);
+});
+
+test("togglePosition adds and removes a position in display order", () => {
+  assert.deepEqual(togglePosition([], "BR"), ["BR"]);
+  assert.deepEqual(togglePosition(["BR"], "BR"), []);
+  assert.deepEqual(togglePosition(["N"], "BR"), ["BR", "N"]);
+  assert.deepEqual(togglePosition(["BR", "N"], "LO"), ["BR", "LO", "N"]);
+  const input = Object.freeze(["N"]) as readonly ("N" | "BR")[];
+  togglePosition(input, "BR");
+  assert.deepEqual(input, ["N"]);
+});
+
+test("clearAllFilters resets every narrowing filter and keeps the sort", () => {
+  assert.deepEqual(clearAllFilters("name"), {
+    ...DEFAULT_LIST_FILTERS,
+    sort: "name",
+  });
 });

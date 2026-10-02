@@ -136,6 +136,39 @@
     "Wersja Półfinał · undefined.undefined.Półfinał",
     "Wersja 2026-10-01 · 01.10.2026"
   ],
+  "chip": [
+    "0 (0/0)",
+    "1 (1/1)",
+    "2 (2/2)",
+    "5 (5/5)",
+    "12 (12/12)",
+    "22 (22/22)",
+    "X (X/X)",
+    "Półfinał (Półfinał/Półfinał)",
+    "2026-10-01 (2026-10-01/2026-10-01)"
+  ],
+  "chipAllName": [
+    "Wszyscy (0/0): powołani 0 z 0",
+    "Wszyscy (1/1): powołani 1 z 1",
+    "Wszyscy (2/2): powołani 2 z 2",
+    "Wszyscy (5/5): powołani 5 z 5",
+    "Wszyscy (12/12): powołani 12 z 12",
+    "Wszyscy (22/22): powołani 22 z 22",
+    "Wszyscy (X/X): powołani X z X",
+    "Wszyscy (Półfinał/Półfinał): powołani Półfinał z Półfinał",
+    "Wszyscy (2026-10-01/2026-10-01): powołani 2026-10-01 z 2026-10-01"
+  ],
+  "chipName": [
+    "0 (0/0): 0, powołani 0 z 0",
+    "1 (1/1): 1, powołani 1 z 1",
+    "2 (2/2): 2, powołani 2 z 2",
+    "5 (5/5): 5, powołani 5 z 5",
+    "12 (12/12): 12, powołani 12 z 12",
+    "22 (22/22): 22, powołani 22 z 22",
+    "X (X/X): X, powołani X z X",
+    "Półfinał (Półfinał/Półfinał): Półfinał, powołani Półfinał z Półfinał",
+    "2026-10-01 (2026-10-01/2026-10-01): 2026-10-01, powołani 2026-10-01 z 2026-10-01"
+  ],
   "clearComparison": "Wyczyść porównanie",
   "clearFilters": "Wyczyść filtry",
   "clearSquad": "Odwołaj wszystkich",
@@ -245,7 +278,6 @@
     "formation": "Formacja",
     "term": "Termin"
   },
-  "filterLabel": "Filtruj po pozycji",
   "filtersAll": "Wszyscy",
   "foot": {
     "both": "Obunożny",
@@ -314,6 +346,7 @@
   ],
   "newGame": "Nowa gra",
   "noCandidates": "Brak zawodników spełniających kryteria.",
+  "noCandidatesHint": "Wyczyść wyszukiwanie albo filtry, aby zobaczyć więcej kandydatów.",
   "noStrengths": "Nie zbudowano wyraźnej przewagi strukturalnej.",
   "noWeaknesses": "Analiza nie wykryła krytycznej luki w konstrukcji kadry.",
   "notice": "Uwaga",
@@ -327,6 +360,29 @@
     "X: X powołanych",
     "Półfinał: Półfinał powołanych",
     "2026-10-01: 2026-10-01 powołanych"
+  ],
+  "onlyCamp": [
+    "Tylko z marcowego zgrupowania (0)",
+    "Tylko z marcowego zgrupowania (1)",
+    "Tylko z marcowego zgrupowania (2)",
+    "Tylko z marcowego zgrupowania (5)",
+    "Tylko z marcowego zgrupowania (12)",
+    "Tylko z marcowego zgrupowania (22)",
+    "Tylko z marcowego zgrupowania (X)",
+    "Tylko z marcowego zgrupowania (Półfinał)",
+    "Tylko z marcowego zgrupowania (2026-10-01)"
+  ],
+  "onlyGroupLabel": "Pokaż tylko",
+  "onlySelected": [
+    "Tylko powołani (0)",
+    "Tylko powołani (1)",
+    "Tylko powołani (2)",
+    "Tylko powołani (5)",
+    "Tylko powołani (12)",
+    "Tylko powołani (22)",
+    "Tylko powołani (X)",
+    "Tylko powołani (Półfinał)",
+    "Tylko powołani (2026-10-01)"
   ],
   "outOfFormation": "Poza ustawieniem",
   "outOfFormationCount": [
@@ -386,6 +442,7 @@
     "Zdobyliśmy Półfinał pkt w grupie.",
     "Zdobyliśmy 2026-10-01 pkt w grupie."
   ],
+  "positionChipsLabel": "Filtry pozycyjne (wybrani/dostępni):",
   "positions": {
     "BR": "Bramkarz",
     "DP": "Defensywny pomocnik",
@@ -568,16 +625,16 @@
   "sort": {
     "experience": "Doświadczenie",
     "fitness": "Zdrowie",
-    "form": "Forma i rytm",
+    "form": "Forma",
     "group": "Wpływ na grupę",
     "model": "Ocena selekcyjna",
     "name": "Nazwisko A–Z",
     "old": "Wiek: najstarsi",
     "quality": "Jakość",
-    "tactics": "Dopasowanie taktyczne",
+    "tactics": "Taktyka",
     "young": "Wiek: najmłodsi"
   },
-  "sortLabel": "Sortuj zawodników",
+  "sortVisibleLabel": "Sortuj:",
   "stages": {
     "camp": {
       "completed": "Lista kontrolna gotowa",
@@ -759,6 +816,17 @@
   },
   "understood": "Rozumiem",
   "undo": "Cofnij",
+  "visibleCount": [
+    "Widoczni: 0 z 0",
+    "Widoczni: 1 z 1",
+    "Widoczni: 2 z 2",
+    "Widoczni: 5 z 5",
+    "Widoczni: 12 z 12",
+    "Widoczni: 22 z 22",
+    "Widoczni: X z X",
+    "Widoczni: Półfinał z Półfinał",
+    "Widoczni: 2026-10-01 z 2026-10-01"
+  ],
   "weaknesses": "Ryzyka selekcji",
   "yourSquad": "Twoja kadra"
 }

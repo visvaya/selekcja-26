@@ -150,3 +150,233 @@
     margin: 0;
   }
 }
+
+/* Position chips: several can be pressed; on phones the row scrolls with edge fades */
+.toolbar > .filters-plain-label {
+  margin-bottom: calc(var(--space-2) * -1);
+}
+
+.filters-plain-label {
+  display: block;
+  margin-bottom: var(--space-1);
+  font-size: var(--text-sm);
+  color: var(--ink);
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.chip {
+  min-height: 32px;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--frame);
+  background: var(--board-deep);
+  color: var(--ink);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  white-space: nowrap;
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
+}
+
+.chip:hover {
+  border-color: var(--action);
+  color: var(--action);
+}
+
+.chip.active {
+  background: var(--action);
+  border-color: var(--action);
+  color: var(--on-action);
+}
+
+.chip.active:hover {
+  background: var(--action-strong);
+  border-color: var(--action-strong);
+  color: var(--on-action);
+}
+
+.chip:active {
+  transform: translateY(1px);
+}
+
+@media (max-width: 767.98px) {
+  .filters {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    padding-bottom: var(--space-1);
+    --fade-left: 0px;
+    --fade-right: 0px;
+    scroll-padding-inline: 32px;
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      black var(--fade-left),
+      black calc(100% - var(--fade-right)),
+      transparent 100%
+    );
+  }
+
+  .filters.fade-left {
+    --fade-left: 28px;
+  }
+
+  .filters.fade-right {
+    --fade-right: 28px;
+  }
+
+  .chip {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+  }
+}
+
+@media (max-width: 767.98px) and (pointer: fine) {
+  .filters {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  }
+}
+
+@media (max-width: 767.98px) and (pointer: coarse) {
+  .filters {
+    scrollbar-width: none;
+  }
+}
+
+/* List head: heading and count on one row, then the sort and the ticks, which wrap together */
+.section-label {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  margin-bottom: var(--space-3);
+}
+
+.section-label > .list-heading {
+  flex: 1 1 100%;
+}
+
+.section-label h2 {
+  font-size: var(--text-lg);
+  min-width: 0;
+}
+
+.list-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-3);
+}
+
+.list-count {
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}
+
+.sort-field {
+  display: flex;
+  align-items: center;
+  flex-shrink: 1;
+  min-width: 0;
+  gap: var(--space-2);
+}
+
+.sort-field label {
+  font-size: var(--text-sm);
+  color: var(--ink);
+}
+
+.select-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.sort {
+  appearance: none;
+  height: 40px;
+  min-width: 0;
+  max-width: 100%;
+  padding: 0 30px 0 var(--space-3);
+  border: 2px solid var(--frame);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: var(--text-sm);
+}
+
+.sort:hover {
+  border-color: var(--ink);
+}
+
+/* chevron drawn from two borders of a rotated square */
+.select-chevron {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  margin-top: -5px;
+  border: solid var(--ink-soft);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+.list-toggles {
+  display: flex;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  min-width: 0;
+  gap: var(--space-1) var(--space-4);
+}
+
+.list-toggle {
+  font-size: var(--text-sm);
+}
+
+/* Empty list */
+.noCandidates {
+  grid-column: 1 / -1;
+  padding: var(--space-4);
+  background: var(--board-deep);
+  border: 1px dashed var(--frame-soft);
+  border-radius: var(--radius-md);
+}
+
+.noCandidates p {
+  margin: 0;
+}
+
+.noCandidates .fineprint {
+  margin-top: var(--space-2);
+}
+
+@media (forced-colors: active) {
+  .chip.active {
+    outline: 3px solid Highlight;
+    outline-offset: -3px;
+  }
+
+  .select-chevron {
+    border-color: CanvasText;
+  }
+}
+
+/* The fixed squad dock covers the bottom of the viewport: focus and scroll-into-view keep
+   the focused control above it (stage 7 replaces the dock). */
+html:has(.dock) {
+  scroll-padding-bottom: calc(var(--space-8) * 2);
+}
