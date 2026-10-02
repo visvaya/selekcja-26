@@ -581,7 +581,11 @@ test("clear-squad and new-game actions on the list", async () => {
       await waitFor(() =>
         assert.equal(doc.activeElement === startHeading, true),
       );
-      assert.equal(view.queryByRole("button", { name: "Cofnij" }), null);
+      fireEvent.click(view.getByRole("button", { name: "Rozpocznij odprawę" }));
+      // the new game's history holds only its start step: one undo leads back to the start
+      // screen, not into the previous game
+      fireEvent.click(await view.findByRole("button", { name: "Cofnij" }));
+      assert.ok(await view.findByRole("heading", { name: /Bilet na EURO/ }));
     } finally {
       cleanup();
       await vite.close();
