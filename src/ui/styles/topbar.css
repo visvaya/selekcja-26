@@ -11,7 +11,17 @@
   display: flex;
   align-items: center;
   border-radius: var(--radius-sm);
-  margin-bottom: var(--space-5);
+  /* Inset, not full-bleed: the bar spans the same column as the page content below it, so
+     on wide screens its edges line up with the content. The gutters and the 1180 px column
+     follow the main content area. */
+  width: calc(min(100%, 1180px) - 2 * var(--legacy-space-7));
+  margin: 0 auto var(--space-5);
+}
+
+@media (min-width: 760px) {
+  .topbar {
+    width: calc(min(100%, 1180px) - 2 * var(--legacy-space-12));
+  }
 }
 
 .topbar-inner {

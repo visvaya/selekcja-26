@@ -133,7 +133,14 @@
   }
 
   .start-ticket .hero-e-fields dt {
-    max-width: 22ch;
+    max-width: min(22ch, 100%);
+  }
+
+  /* With enlarged text a long word breaks inside its column instead of running into the
+     next one. */
+  .start-ticket .hero-e-fields dt,
+  .start-ticket .hero-e-fields dd {
+    overflow-wrap: anywhere;
   }
 }
 
@@ -282,6 +289,8 @@
   border: 2px solid var(--frame-soft);
   background: var(--surface);
   cursor: pointer;
+  /* The design draws the cards as buttons, whose text keeps the font's normal line height. */
+  line-height: normal;
 }
 
 .choice:hover {
@@ -345,7 +354,7 @@
 .model-preview {
   max-width: 220px;
   margin: 0 auto;
-  padding: var(--space-2);
+  padding: var(--space-4);
   background: var(--board);
   border: 3px solid var(--board-line);
   border-radius: var(--radius-sm);
@@ -516,6 +525,52 @@
   font-size: var(--text-base);
 }
 
+/* The design's buttons, scoped to this row: the shared legacy button rules stay for the
+   screens that have not been restyled yet. */
+.start-actions-row .primary,
+.start-actions-row .action-button {
+  min-height: 44px;
+  margin: 0;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: var(--button-primary-size);
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
+}
+
+.start-actions-row .primary {
+  padding: 0 var(--space-5);
+  border: none;
+  font-family: var(--font-display);
+  box-shadow: 3px 3px 0 var(--shadow);
+}
+
+.start-actions-row .primary:active {
+  background: var(--action-strong);
+  transform: translateY(2px);
+  box-shadow: 1px 1px 0 var(--shadow);
+}
+
+.start-actions-row .action-button {
+  flex: none;
+  padding: 0 var(--space-4);
+  border: 2px solid var(--frame);
+  font-family: var(--font-body);
+}
+
+.start-actions-row .action-button:hover {
+  background: var(--board-deep);
+  border-color: var(--action);
+  color: var(--action);
+}
+
+.start-actions-row .action-button:active {
+  transform: translateY(1px);
+}
+
 .start .fineprint {
   margin-top: var(--space-5);
   font-size: var(--text-xs);
@@ -531,28 +586,31 @@
   margin-top: var(--space-6);
 }
 
+/* Both note cards use the card frame: surface, a 2 px soft border and the medium radius. */
 .start .changelog {
   margin: 0;
-  background: var(--board-deep);
-  border: 1px solid var(--frame-soft);
+  background: var(--surface);
+  border: 2px solid var(--frame-soft);
   border-radius: var(--radius-md);
   padding: var(--space-4);
 }
 
 .start .changelog h2 {
   margin: 0 0 var(--space-2);
-  font-size: var(--text-base);
+  font-size: var(--text-lg);
 }
 
 .start .changelog ul {
   margin: 0;
-  padding-left: 1.1em;
+  padding-left: 1.2em;
   font-size: var(--text-sm);
   color: var(--ink-soft);
 }
 
+/* Replaces the legacy list item margin with the design's spacing. */
 .start .changelog li {
   max-width: 72ch;
+  margin: 0 0 var(--space-1);
 }
 
 .start .changelog-version {
@@ -598,8 +656,10 @@
   height: 8px;
   margin: 0 0 0 4px;
   background: currentColor;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M1 2.5 4 5.5 7 2.5' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
-    center / contain no-repeat;
+  --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M1 2.5 4 5.5 7 2.5' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  /* WebKit versions without unprefixed mask support read the prefixed property. */
+  -webkit-mask: var(--chevron) center / contain no-repeat;
+  mask: var(--chevron) center / contain no-repeat;
   transition: transform var(--duration-fast) var(--ease-standard);
 }
 
