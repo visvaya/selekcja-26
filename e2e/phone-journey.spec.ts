@@ -24,10 +24,10 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
     page.getByRole("heading", { name: text.ticket.title }),
   ).toBeVisible();
   await expect(
-    page.getByRole("button", {
-      name: new RegExp(text.systems["4231"].name),
+    page.getByRole("radio", {
+      name: new RegExp(`^${text.systems["4231"].name}`),
     }),
-  ).toHaveAttribute("aria-pressed", "true");
+  ).toBeChecked();
   await expectNoHorizontalScroll(page);
 
   // Below 420 px the version and the stage label are hidden visually but stay in the
