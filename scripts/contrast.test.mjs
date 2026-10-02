@@ -303,18 +303,18 @@ const INTERIM_PAIRS = [
     required: LARGE_OR_UI_RATIO,
     note: ".compare-card and .profile-metric borders inside dialogs",
   },
-  // Dark --ink panels: .brief, .result-hero, .dock-breakdown, .score, .profile-score.
+  // Dark --ink panels: .result-hero, .dock-breakdown, .score, .profile-score.
   {
     fg: "on-select",
     bg: "ink",
     required: TEXT_RATIO,
-    note: "light text on --ink panels (.brief, .brief h2, .result-hero, .result-hero h1, .dock-breakdown b, .score, .profile-score)",
+    note: "light text on --ink panels (.result-hero, .result-hero h1, .dock-breakdown b, .score, .profile-score)",
   },
   {
     fg: "on-ink-border",
     bg: "ink",
     required: LARGE_OR_UI_RATIO,
-    note: ".brief-stat divider on the brief panel",
+    note: "divider on --ink panels; kept from the design palette, no current consumer",
   },
   {
     fg: "board-line",

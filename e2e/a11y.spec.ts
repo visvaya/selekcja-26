@@ -90,7 +90,7 @@ test.describe.serial("axe WCAG 2.2 AA scan", () => {
     await patchStorageFailures(page, STORAGE_KEY);
     await page.goto("/");
     await expect(
-      page.getByRole("heading", { name: text.introTitle }),
+      page.getByRole("heading", { name: text.ticket.title }),
     ).toBeVisible();
     await scan(page, "intro", scanned);
 

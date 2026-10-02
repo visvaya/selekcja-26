@@ -61,8 +61,6 @@
   },
   "availablePlayers": "liczba dostępnych",
   "brand": "SELEKCJA",
-  "briefTitle": "Notatka sztabu szkoleniowego",
-  "campCount": "zgrupowania",
   "campReportBody": [
     "Najlepiej wypadli 0. Najwięcej wątpliwości zostawili 0. Ocena selekcyjna uwzględnia teraz występ i znajomość automatyzmów.",
     "Najlepiej wypadli 1. Najwięcej wątpliwości zostawili 1. Ocena selekcyjna uwzględnia teraz występ i znajomość automatyzmów.",
@@ -77,7 +75,6 @@
   "campReportEyebrow": "Raport po zgrupowaniu",
   "campReportTitle": "Masz więcej danych. Nie wszystkie są wygodne.",
   "campResult": "Zgrupowanie",
-  "candidateCount": "kandydatów",
   "changelogHideOlder": "Ukryj wcześniejsze zmiany",
   "changelogNotes": {
     "0.1.0": [
@@ -230,20 +227,27 @@
     "left": "Lewa",
     "right": "Prawa"
   },
+  "formationMap": [
+    "0. Mapa pozycji dla wybranej formacji.",
+    "1. Mapa pozycji dla wybranej formacji.",
+    "2. Mapa pozycji dla wybranej formacji.",
+    "5. Mapa pozycji dla wybranej formacji.",
+    "12. Mapa pozycji dla wybranej formacji.",
+    "22. Mapa pozycji dla wybranej formacji.",
+    "X. Mapa pozycji dla wybranej formacji.",
+    "Półfinał. Mapa pozycji dla wybranej formacji.",
+    "2026-10-01. Mapa pozycji dla wybranej formacji."
+  ],
   "fulfilled": "✓ Spełnione",
   "fullSquadMessage": "Aby powołać kolejnego zawodnika, najpierw zwolnij jedno miejsce.",
   "fullSquadTitle": "Lista jest pełna",
-  "groupMatches": "mecze w grupie",
   "groups": {
     "ATA": "Napastnicy",
     "BR": "Bramkarze",
     "OBR": "Obrońcy",
     "POM": "Pomocnicy"
   },
-  "introEyebrow": "Symulator selekcjonera • EURO 2028",
-  "introLead": "Wybierz 26 zawodników na mistrzostwa Europy. Nazwiska pomagają, ale turniej wygrywa kadra zbudowana pod plan – nie ranking popularności.",
   "introPhase": "ODPRAWA",
-  "introTitle": "Jedna lista. Cały kraj ocenia.",
   "kpis": {
     "fit": "Dopasowanie",
     "quality": "Jakość",
@@ -326,7 +330,14 @@
     "runnerUp": "Wicemistrz Europy",
     "semifinal": "Półfinał"
   },
+  "phaseLabel": "Etap:",
   "pitchDescription": "Liczby pokazują, ilu powołanych może grać na danej pozycji.",
+  "plannedDisclaimer": "Plany mogą się zmienić.",
+  "plannedNotes": [
+    "Forma zawodników, która zmienia się w trakcie przygotowań.",
+    "Możliwość zmiany systemu gry po marcowym zgrupowaniu."
+  ],
+  "plannedTitle": "Co planujemy",
   "playerMetrics": {
     "fitness": "Zdrowie",
     "form": "Forma",
@@ -470,7 +481,6 @@
     "wingBack": "Wahadło",
     "winger": "Skrzydło"
   },
-  "rosterTransition": "lista kontrolna i EURO",
   "rulesChangedDiscarded": "Od twojej ostatniej wizyty zmieniły się zasady gry i nie ma możliwości wczytania niedokończonej selekcji. Zaczynasz od nowa.",
   "rulesChangedTitle": "Zmieniły się zasady gry",
   "save": {
@@ -523,7 +533,7 @@
   },
   "start": "Rozpocznij odprawę",
   "strengths": "Co zadziałało",
-  "systemChoice": "Wybierz model gry",
+  "systemChoice": "Wybierz formację",
   "systems": {
     "433": {
       "description": "Pressing, mobilna ósemka i szeroko ustawieni skrzydłowi.",
@@ -537,6 +547,27 @@
       "description": "Kontrola środka, skrzydła schodzące do półprzestrzeni.",
       "name": "4–2–3–1"
     }
+  },
+  "ticket": {
+    "campPlacesLabel": "Miejsca na 1. zgrupowaniu",
+    "candidates": [
+      "Wybierasz spośród 0 kandydatów.",
+      "Wybierasz spośród 1 kandydata.",
+      "Wybierasz spośród 2 kandydatów.",
+      "Wybierasz spośród 5 kandydatów.",
+      "Wybierasz spośród 12 kandydatów.",
+      "Wybierasz spośród 22 kandydatów.",
+      "Wybierasz spośród X kandydatów.",
+      "Wybierasz spośród Półfinał kandydatów.",
+      "Wybierasz spośród 2026-10-01 kandydatów."
+    ],
+    "dates": "Turniej: 9 czerwca – 9 lipca 2028.",
+    "finalPlacesLabel": "Miejsca w kadrze turniejowej",
+    "nextStage": "Zgrupowanie kontrolne",
+    "nextStageLabel": "Najbliższy etap",
+    "stagesLabel": "Etapy selekcji",
+    "stub": "EURO28",
+    "title": "Bilet na EURO"
   },
   "topBarVersion": [
     "v0",

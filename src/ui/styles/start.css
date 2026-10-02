@@ -1,0 +1,743 @@
+/* Start screen: the EURO ticket header. */
+
+.start {
+  display: block;
+}
+
+.hero-sample-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-xl);
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+.hero-sample-lead {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-md);
+  color: var(--ink-soft);
+  max-width: 52ch;
+}
+
+.hero-e-fields dt {
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+/* The ticket uses the same frame as the other start screen cards: a 2 px soft border and the
+   medium radius, no offset shadow. */
+.hero-e-ticket {
+  display: flex;
+  max-width: 560px;
+  background: var(--surface-dialog);
+  border: 2px solid var(--frame-soft);
+  border-radius: var(--radius-md);
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.hero-e-main {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-4) var(--space-5);
+}
+
+.hero-e-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin: var(--space-3) 0 0;
+}
+
+.hero-e-fields dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-md);
+  color: var(--ink);
+}
+
+.hero-e-stub {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 96px;
+  padding: var(--space-3);
+  border-left: 2px dashed var(--frame);
+  background: var(--board-deep);
+}
+
+.hero-e-barcode {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  height: 32px;
+}
+
+.hero-e-barcode i {
+  width: 3px;
+  background: var(--ink);
+}
+
+.hero-e-barcode i:nth-child(3n) {
+  width: 5px;
+}
+
+.hero-e-num {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  writing-mode: vertical-rl;
+}
+
+.start-ticket {
+  max-width: 720px;
+  margin: var(--space-2) 0 var(--space-5);
+}
+
+.start-ticket h1.hero-sample-title {
+  font-size: var(--text-2xl);
+}
+
+/* Longer labels wrap inside their box. */
+.start-ticket .hero-e-fields dt {
+  max-width: 14ch;
+}
+
+/* One line per lead sentence. */
+.start-ticket-lead span {
+  display: block;
+}
+
+/* Values on one line even when the labels above them wrap differently. */
+.start-ticket .hero-e-fields > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+@media (max-width: 1023.98px) {
+  /* Below 1024 px the four fields are a 2 x 2 grid; each row keeps its values on one line. */
+  .start-ticket .hero-e-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3) var(--space-4);
+  }
+
+  .start-ticket .hero-e-fields dt {
+    max-width: min(22ch, 100%);
+  }
+
+  /* With enlarged text a long word breaks inside its column instead of running into the
+     next one. */
+  .start-ticket .hero-e-fields dt,
+  .start-ticket .hero-e-fields dd {
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 379.98px) {
+  /* The stub moves under the content on the narrowest phones. */
+  .hero-e-ticket {
+    flex-direction: column;
+  }
+
+  .hero-e-stub {
+    flex-direction: row;
+    width: auto;
+    border-left: none;
+    border-top: 2px dashed var(--frame);
+  }
+
+  .hero-e-num {
+    writing-mode: horizontal-tb;
+  }
+}
+
+@media (min-width: 1024px) {
+  /* From 1024 px the ticket spans the full width; the extra width goes to its data, printed
+     in boxes like sector, row and seat on a real ticket. */
+  .start-ticket {
+    max-width: none;
+  }
+
+  .start-ticket .hero-e-main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: var(--space-6);
+    padding: var(--space-5) var(--space-6);
+  }
+
+  .start-ticket .hero-sample-title,
+  .start-ticket .hero-sample-lead {
+    grid-column: 1;
+  }
+
+  .start-ticket .hero-e-fields {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    display: grid;
+    grid-template-columns: repeat(4, auto);
+    gap: 0;
+    margin: 0;
+    border: 1px solid var(--frame-soft);
+  }
+
+  .start-ticket .hero-e-fields > div {
+    gap: var(--space-2);
+    min-width: 88px;
+    padding: var(--space-3) var(--space-4);
+    border-left: 1px solid var(--frame-soft);
+  }
+
+  .start-ticket .hero-e-fields > div:first-child {
+    border-left: none;
+  }
+
+  .start-ticket .hero-e-fields dd {
+    font-size: var(--text-2xl);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .start-ticket .hero-e-stub {
+    width: 112px;
+  }
+
+  /* Title and lead stay together, centred against the taller data boxes. */
+  .start-ticket .hero-sample-title {
+    align-self: end;
+  }
+
+  .start-ticket .hero-sample-lead {
+    align-self: start;
+  }
+
+  .start-ticket .hero-e-fields > div:first-child dd {
+    font-size: var(--text-2xl);
+    line-height: 1;
+    max-width: none;
+  }
+
+  .start-ticket .hero-e-fields > div:nth-child(2) dd {
+    font-size: var(--text-md);
+    line-height: 1.2;
+    max-width: 12ch;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1239.98px) {
+  /* Between 1024 and 1239 px the title column is too narrow beside the boxes: the boxes go
+     under the title and lead. */
+  .start-ticket .hero-e-main {
+    display: block;
+  }
+
+  .start-ticket .hero-e-fields {
+    width: fit-content;
+    margin-top: var(--space-4);
+  }
+}
+
+/* Formation choice: a native radio group of cards with a live position map. */
+
+.choice-fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-inline-size: 0;
+}
+
+.choice-title {
+  padding: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-base);
+  margin: var(--space-5) 0 var(--space-3);
+}
+
+.choice-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-3);
+}
+
+/* The position map sits under the three formation cards at every width. */
+.model-choice-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Outranks the dock's narrow-screen reorder of .pitch-panel, which also matches the map. */
+.model-choice-layout > .model-preview {
+  order: 0;
+}
+
+.choice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  text-align: left;
+  min-height: 44px;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: 2px solid var(--frame-soft);
+  background: var(--surface);
+  cursor: pointer;
+  /* The design draws the cards as buttons, whose text keeps the font's normal line height. */
+  line-height: normal;
+}
+
+.choice:hover {
+  border-color: var(--action);
+}
+
+.choice.selected:hover {
+  border-color: var(--select-strong);
+}
+
+.choice:active {
+  transform: translateY(1px);
+}
+
+/* The input itself is the visible dot; the focus ring is drawn on the card. */
+.choice .radio {
+  appearance: none;
+  margin: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-round);
+  border: 2px solid var(--frame);
+  flex-shrink: 0;
+}
+
+.choice .radio:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.choice .radio:checked {
+  border-color: var(--select);
+  background: var(--select);
+  box-shadow: inset 0 0 0 3px var(--surface);
+}
+
+.choice:has(input:focus-visible) {
+  outline: 3px solid var(--focus-core);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px var(--focus-halo);
+}
+
+.choice b {
+  display: block;
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+}
+
+.choice small {
+  display: block;
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}
+
+.choice.selected {
+  border-color: var(--select);
+  background: color-mix(in oklab, var(--select) 10%, var(--surface));
+}
+
+/* Start-screen map rules are scoped under .model-preview so the dock keeps its own look. */
+/* Panel and nodes grow with enlarged text (rem terms) and keep the design's px sizes at the
+   default text size. */
+.model-preview {
+  max-width: max(220px, 13.75rem);
+  margin: 0 auto;
+  padding: var(--space-4);
+  background: var(--board);
+  border: 3px solid var(--board-line);
+  border-radius: var(--radius-sm);
+}
+
+.model-preview .mini-pitch {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-2);
+  background: var(--board);
+  border: 2px solid var(--board-line);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.model-preview .pitch-markings {
+  position: absolute;
+  inset: var(--space-2);
+  pointer-events: none;
+}
+
+.model-preview .pitch-markings .halfway {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--board-line);
+}
+
+.model-preview .pitch-markings .centre-circle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 56px;
+  height: 56px;
+  margin: -28px 0 0 -28px;
+  border: 1px solid var(--board-line);
+  border-radius: var(--radius-round);
+}
+
+.model-preview .pitch-markings .box {
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  height: 16%;
+  border: 1px solid var(--board-line);
+}
+
+.model-preview .pitch-markings .box-top {
+  top: 0;
+  border-top: none;
+}
+
+.model-preview .pitch-markings .box-bottom {
+  bottom: 0;
+  border-bottom: none;
+}
+
+.model-preview .formation-label {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  color: var(--ink-soft);
+  background: var(--board);
+  align-self: flex-start;
+  padding: 2px var(--space-1);
+  max-width: 100%;
+}
+
+.model-preview .formation-label i {
+  flex-shrink: 0;
+  margin-top: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-round);
+  background: var(--select);
+  display: inline-block;
+}
+
+.model-preview .formation-label b {
+  display: block;
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+}
+
+.model-preview .pitch-field {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.model-preview .pitch-body {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 120px;
+  padding: var(--space-2) 0;
+  row-gap: var(--space-2);
+}
+
+.model-preview .pitch-row {
+  display: flex;
+  justify-content: space-evenly;
+  gap: var(--space-2);
+  flex-wrap: nowrap;
+}
+
+.model-preview .pitch-row.single {
+  justify-content: center;
+}
+
+.model-preview .pitch-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: max(28px, 1.5rem);
+  height: max(28px, 1.5rem);
+  border-radius: var(--radius-round);
+  background: var(--surface);
+  border: 2px solid var(--frame);
+  box-shadow: 2px 2px 0 var(--shadow);
+}
+
+.model-preview .pitch-node small {
+  font-size: var(--text-3xs);
+  font-weight: 700;
+  color: var(--ink-soft);
+  line-height: 1;
+}
+
+@media (min-width: 1024px) {
+  .choice-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Actions, disclaimer and notes. Rules are scoped under .start so they win over the legacy
+   .report and .start-button rules, which later screens still use. */
+
+/* Screen-level calls to action: stacked at full width on phones, primary first; from 768 px
+   natural width with a shared minimum, side by side. */
+.start-actions-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+}
+
+.start .start-button {
+  display: block;
+  width: 100%;
+  margin-top: 0;
+  font-size: var(--text-base);
+}
+
+/* The design's buttons, scoped to this row: the shared legacy button rules stay for the
+   screens that have not been restyled yet. */
+.start-actions-row .primary,
+.start-actions-row .action-button {
+  min-height: 44px;
+  margin: 0;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: var(--button-primary-size);
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
+}
+
+.start-actions-row .primary {
+  padding: 0 var(--space-5);
+  border: none;
+  font-family: var(--font-display);
+  box-shadow: 3px 3px 0 var(--shadow);
+}
+
+.start-actions-row .primary:active {
+  background: var(--action-strong);
+  transform: translateY(2px);
+  box-shadow: 1px 1px 0 var(--shadow);
+}
+
+.start-actions-row .action-button {
+  flex: none;
+  padding: 0 var(--space-4);
+  border: 2px solid var(--frame);
+  font-family: var(--font-body);
+}
+
+.start-actions-row .action-button:hover {
+  background: var(--board-deep);
+  border-color: var(--action);
+  color: var(--action);
+}
+
+.start-actions-row .action-button:active {
+  transform: translateY(1px);
+}
+
+.start .fineprint {
+  margin-top: var(--space-5);
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+}
+
+/* "Co nowego" and "Co planujemy": stacked on phones, side by side from 1024 px; the flex gap
+   is the only space between them. */
+.start-notes-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+/* Both note cards use the card frame: surface, a 2 px soft border and the medium radius. */
+.start .changelog {
+  margin: 0;
+  background: var(--surface);
+  border: 2px solid var(--frame-soft);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+}
+
+.start .changelog h2 {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-lg);
+}
+
+.start .changelog ul {
+  margin: 0;
+  padding-left: 1.2em;
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}
+
+/* Replaces the legacy list item margin with the design's spacing. */
+.start .changelog li {
+  max-width: 72ch;
+  margin: 0 0 var(--space-1);
+}
+
+.start .changelog-version {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+/* A quiet text link rather than a button competing with the entry above it, still a 24 px
+   target with the shared focus style. */
+.changelog-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: 24px;
+  margin-top: var(--space-1);
+  padding: 2px var(--space-1);
+  border: none;
+  background: none;
+  color: var(--ink-soft);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  text-decoration: none;
+}
+
+.changelog-toggle:hover {
+  color: var(--ink);
+}
+
+.changelog-toggle:active {
+  color: var(--ink);
+  background: var(--board-deep);
+  box-shadow: inset 0 0 0 1px var(--ink);
+}
+
+/* The chevron is drawn in CSS: a font glyph can render as a missing character. */
+.changelog-toggle::after {
+  display: inline-block;
+  content: "";
+  width: 8px;
+  height: 8px;
+  margin: 0 0 0 4px;
+  background: currentColor;
+  --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M1 2.5 4 5.5 7 2.5' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  /* WebKit versions without unprefixed mask support read the prefixed property. */
+  -webkit-mask: var(--chevron) center / contain no-repeat;
+  mask: var(--chevron) center / contain no-repeat;
+  transition: transform var(--duration-fast) var(--ease-standard);
+}
+
+.changelog-toggle[aria-expanded="true"]::after {
+  transform: rotate(180deg);
+}
+
+.changelog-older {
+  margin-top: var(--space-3);
+  transition: opacity var(--duration-base) var(--ease-standard);
+}
+
+.changelog-older.hidden {
+  display: none;
+}
+
+.changelog-entry {
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--frame-soft);
+}
+
+.start .changelog-entry .changelog-version {
+  margin-top: 0;
+}
+
+@media (min-width: 768px) {
+  .start-actions-row {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: var(--space-3);
+  }
+
+  .start-actions-row .primary,
+  .start-actions-row .action-button,
+  .start .start-button {
+    width: auto;
+    min-width: var(--cta-min-width);
+  }
+}
+
+@media (min-width: 1024px) {
+  .start-notes-layout {
+    flex-direction: row;
+    align-items: start;
+    gap: var(--space-4);
+  }
+
+  .start-notes-layout > .changelog {
+    flex: 1 1 0;
+  }
+}
+
+@media (forced-colors: active) {
+  /* The chosen formation stays visible in forced colours. */
+  .choice:has(input:checked) {
+    outline: 3px solid Highlight;
+    outline-offset: -3px;
+  }
+
+  .choice .radio:checked {
+    border-color: Highlight;
+    background: Highlight;
+    box-shadow: inset 0 0 0 3px Canvas;
+    forced-color-adjust: none;
+  }
+
+  /* Focus must differ from checked: a dashed ring outside the card in the text colour. */
+  .choice:has(input:focus-visible) {
+    outline: 3px dashed CanvasText;
+    outline-offset: 2px;
+  }
+}

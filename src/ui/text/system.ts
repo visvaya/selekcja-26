@@ -30,6 +30,7 @@ export const SYSTEM_TEXT = {
     "Od twojej ostatniej wizyty zmieniły się zasady gry i nie ma możliwości wczytania niedokończonej selekcji. Zaczynasz od nowa.",
   topBarVersion: (version: string) => `v${version}`,
   topBarVersionAccessible: (version: string) => `Wersja ${version}`,
+  phaseLabel: "Etap:",
   errorBoundary: {
     title: "Coś poszło nie tak",
     message:

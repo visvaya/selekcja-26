@@ -47,21 +47,55 @@ test("desktop game is playable with the keyboard alone", async ({ page }) => {
   const errors = collectPageErrors(page);
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { name: text.introTitle }),
+    page.getByRole("heading", { name: text.ticket.title }),
   ).toBeVisible();
 
-  // Tab order reaches every system choice before the start button.
-  const system433 = page.getByRole("button", {
-    name: new RegExp(text.systems["433"].name),
+  // The formation group is one Tab stop on the checked radio; arrows change the choice.
+  const radio4231 = page.getByRole("radio", {
+    name: new RegExp(`^${text.systems["4231"].name} `),
   });
-  const visitedToSystem = await tabUntil(page, system433);
-  await expectVisibleFocus(system433);
+  const radio433 = page.getByRole("radio", {
+    name: new RegExp(`^${text.systems["433"].name} `),
+  });
+  await tabUntil(page, radio4231);
+  await expect(radio4231).toBeFocused();
+  const cardOutline = await radio4231
+    .locator("xpath=..")
+    .evaluate((element) => getComputedStyle(element).outlineStyle);
+  expect(cardOutline, "the focused formation card shows the ring").not.toBe(
+    "none",
+  );
+  const checkedRadio = page.getByRole("radio", { checked: true });
+  let previousValue = "";
+  for (let step = 0; step < 3 && !(await radio433.isChecked()); step++) {
+    previousValue = await checkedRadio.inputValue();
+    await page.keyboard.press("ArrowRight");
+  }
+  await expect(radio433).toBeChecked();
+  await expect(page.getByRole("img", { name: /^4–3–3/ })).toBeVisible();
+
+  // Space on the checked formation changes nothing.
   await page.keyboard.press("Space");
-  await expect(system433).toHaveAttribute("aria-pressed", "true");
+  await expect(radio433).toBeChecked();
+  await expect(page.getByRole("img", { name: /^4–3–3/ })).toBeVisible();
+
+  // Undo from the keyboard restores the formation before the last change.
+  expect(previousValue, "arrows changed the formation").not.toBe("");
+  const previousName =
+    text.systems[previousValue as keyof typeof text.systems].name;
+  await activate(page, page.getByRole("button", { name: text.undo }));
+  await expect(page.locator(`input[value="${previousValue}"]`)).toBeChecked();
+  await expect(
+    page.getByRole("img", { name: new RegExp(`^${previousName}`) }),
+  ).toBeVisible();
+
+  // Back to 4–3–3 for the rest of the journey.
+  await radio433.focus();
+  await page.keyboard.press("Space");
+  await expect(radio433).toBeChecked();
   const start = page.getByRole("button", { name: text.start });
-  const visited = [...visitedToSystem, ...(await tabUntil(page, start))];
-  for (const system of Object.values(text.systems))
-    expect(visited.some((label) => label.includes(system.name))).toBe(true);
+  await page.keyboard.press("Tab");
+  await expect(start).toBeFocused();
   await expectVisibleFocus(start);
   await page.keyboard.press("Enter");
   await expect(
@@ -168,9 +202,64 @@ test("desktop game is playable with the keyboard alone", async ({ page }) => {
 
   await activate(page, page.getByRole("button", { name: text.restart }));
   await expect(
-    page.getByRole("heading", { name: text.introTitle }),
+    page.getByRole("heading", { name: text.ticket.title }),
   ).toBeVisible();
   await expectFocusVisible(page, "restart");
 
   expect(errors).toEqual([]);
+});
+
+test("checked formation keeps an outline in forced colours", async ({
+  page,
+  browserName,
+}) => {
+  test.skip(
+    browserName !== "chromium",
+    "forced colours emulation is Chromium-only",
+  );
+  await page.goto("/");
+  const checked = page.getByRole("radio", { checked: true });
+  // Without forced colours the dot keeps the --select token.
+  const normal = await checked.evaluate((element) => {
+    const probe = document.createElement("div");
+    probe.style.background = "var(--select)";
+    document.body.append(probe);
+    const select = getComputedStyle(probe).backgroundColor;
+    probe.remove();
+    return { dot: getComputedStyle(element).backgroundColor, select };
+  });
+  expect(normal.dot).toBe(normal.select);
+
+  await page.emulateMedia({ forcedColors: "active" });
+  const outline = await checked
+    .locator("xpath=..")
+    .evaluate((element) => getComputedStyle(element).outlineStyle);
+  expect(outline).not.toBe("none");
+
+  // The checked dot is filled with the system Highlight colour.
+  const fill = await checked.evaluate((element) => {
+    const probe = document.createElement("div");
+    probe.style.background = "Highlight";
+    document.body.append(probe);
+    const highlight = getComputedStyle(probe).backgroundColor;
+    probe.remove();
+    return {
+      dot: getComputedStyle(element).backgroundColor,
+      card: getComputedStyle(element.parentElement!).backgroundColor,
+      highlight,
+    };
+  });
+  expect(fill.dot).not.toBe("rgba(0, 0, 0, 0)");
+  expect(fill.dot).not.toBe(fill.card);
+  expect(fill.dot).toBe(fill.highlight);
+
+  // Keyboard focus on the checked card must look different from checked alone.
+  const ring = (element: Element) => {
+    const style = getComputedStyle(element);
+    return `${style.outlineStyle} ${style.outlineOffset}`;
+  };
+  const checkedOnly = await checked.locator("xpath=..").evaluate(ring);
+  await tabUntil(page, checked);
+  const focused = await checked.locator("xpath=..").evaluate(ring);
+  expect(focused).not.toBe(checkedOnly);
 });

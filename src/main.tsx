@@ -11,6 +11,8 @@ import "@fontsource-variable/commissioner/wght.css";
 import "./ui/styles/fonts.css";
 import "./ui/styles/tokens.css";
 import "./ui/styles/base.css";
+import "./ui/styles/topbar.css";
+import "./ui/styles/start.css";
 import "./ui/styles/legacy.css";
 
 createRoot(document.getElementById("root")!).render(

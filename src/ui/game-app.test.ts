@@ -2,6 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { players } from "../data/catalog.ts";
 import { APP_CONFIG, GAME_RULES, RULES_REVISION } from "../data/constants.ts";
+import { encodeSave } from "../logic/save-format.ts";
+import { createInitialState, reduceGameState } from "../logic/state.ts";
 import { tournamentStory } from "../logic/tournament.ts";
 import type { GroupPosition, OutcomeId, Player } from "../data/types.ts";
 import { withJsdomWindow } from "./test-jsdom-window.ts";
@@ -178,7 +180,7 @@ test("start, profile, comparison, event and position filter work together", asyn
         screen.getByRole("button", { name: "Zagraj od początku" }),
       );
       const introHeading = screen.getByRole("heading", {
-        name: "Jedna lista. Cały kraj ocenia.",
+        name: "Bilet na EURO",
       });
       assert.ok(screen.getByRole("button", { name: "Rozpocznij odprawę" }));
       assert.equal(isFocused(introHeading), true);
@@ -222,10 +224,16 @@ test("live region announces undo, random fill and event outcomes", async () => {
       // Two system swaps before the game starts (neither changes the selected squad) give
       // two undo steps to exercise: reverting either always lands on the same "0 z 23"
       // wording, which is exactly the repeated-announcement case the mechanism must handle.
-      const systemGrid = view.container.querySelectorAll(".choice-grid")[0]!;
-      const systemButtons = [...systemGrid.querySelectorAll("button")];
-      fireEvent.click(systemButtons[1]!);
-      fireEvent.click(systemButtons[2]!);
+      fireEvent.click(
+        view.getByRole("radio", {
+          name: new RegExp(`^${UI_TEXT.systems["3421"].name} `),
+        }),
+      );
+      fireEvent.click(
+        view.getByRole("radio", {
+          name: new RegExp(`^${UI_TEXT.systems["433"].name} `),
+        }),
+      );
 
       const expectedUndo = UI_TEXT.announcements.undo(
         0,
@@ -361,6 +369,42 @@ async function renderSavedReport(report: Record<string, unknown>) {
     }
   });
 }
+
+test("a saved formation change on the start screen can be undone after reload", async () => {
+  const saved = reduceGameState(createInitialState(5), {
+    type: "setSystem",
+    value: "433",
+  });
+  assert.equal(saved.history.length, 1);
+  await withJsdomWindow(async (dom) => {
+    dom.window.localStorage.setItem(APP_CONFIG.storageKey, encodeSave(saved));
+    const { act, cleanup, fireEvent, vite, view } = await renderGameApp(dom);
+    try {
+      const undo = await view.findByRole("button", { name: UI_TEXT.undo });
+      assert.equal(
+        (view.getByRole("radio", { name: /4–3–3/ }) as HTMLInputElement)
+          .checked,
+        true,
+      );
+      fireEvent.click(undo);
+      assert.equal(
+        (view.getByRole("radio", { name: /4–2–3–1/ }) as HTMLInputElement)
+          .checked,
+        true,
+      );
+      assert.equal(
+        view.queryByRole("button", { name: UI_TEXT.undo }) === null,
+        true,
+      );
+      await act(async () => {
+        await new Promise((resolve) => setImmediate(resolve));
+      });
+    } finally {
+      cleanup();
+      await vite.close();
+    }
+  });
+});
 
 test("a group-exit report nests three matches and marks the last one", async () => {
   const story = tournamentStory("group", 1, 77, UI_TEXT.tournament);

@@ -55,8 +55,9 @@ for (const size of SIZES) {
       await expect(changelog).toBeVisible();
       // Hidden through element.style rather than an injected <style> tag, which the production
       // Content-Security-Policy (style-src 'self', sent by vite preview) blocks.
-      await page
-        .locator(".changelog > :not(h2)")
+      // Scoped to this region: the plans section shares the class and stays in the shot.
+      await changelog
+        .locator(":scope > :not(h2)")
         .evaluateAll((elements) =>
           elements.forEach((element) =>
             (element as HTMLElement).style.setProperty(

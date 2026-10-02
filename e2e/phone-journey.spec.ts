@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { GAME_VERSION } from "../src/data/changelog.ts";
 import {
   CAMP_EVENT_CHOICES,
   collectPageErrors,
@@ -20,14 +21,26 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
   await page.goto("/");
 
   await expect(
-    page.getByRole("heading", { name: text.introTitle }),
+    page.getByRole("heading", { name: text.ticket.title }),
   ).toBeVisible();
   await expect(
-    page.getByRole("button", {
-      name: new RegExp(text.systems["4231"].name),
+    page.getByRole("radio", {
+      name: new RegExp(`^${text.systems["4231"].name}`),
     }),
-  ).toHaveAttribute("aria-pressed", "true");
+  ).toBeChecked();
   await expectNoHorizontalScroll(page);
+
+  // Below 420 px the version and the stage label are hidden visually but stay in the
+  // accessible text of the top bar.
+  await expect(page.locator(".phase-group")).toContainText(text.phaseLabel);
+  await expect(
+    page
+      .locator(".topbar")
+      .getByText(text.topBarVersionAccessible(GAME_VERSION)),
+  ).toBeAttached();
+  const labelBox = await page.locator(".phase-label").boundingBox();
+  expect(labelBox?.width ?? 0).toBeLessThanOrEqual(1);
+  expect(labelBox?.height ?? 0).toBeLessThanOrEqual(1);
 
   await page.getByRole("button", { name: text.start }).tap();
   await expect(
@@ -128,14 +141,43 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
 
   await page.getByRole("button", { name: text.restart }).tap();
   await expect(
-    page.getByRole("heading", { name: text.introTitle }),
+    page.getByRole("heading", { name: text.ticket.title }),
   ).toBeVisible();
   await expect(page.getByRole("button", { name: text.undo })).toHaveCount(0);
   await expectFocusVisible(page, "restart");
   await page.reload();
   await expect(
-    page.getByRole("heading", { name: text.introTitle }),
+    page.getByRole("heading", { name: text.ticket.title }),
   ).toBeVisible();
 
   expect(errors).toEqual([]);
+});
+
+test("start ticket fits a 320 px phone with the stub under the content", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 640 });
+  await page.goto("/");
+  await expect(
+    page.getByRole("heading", { name: text.ticket.title }),
+  ).toBeVisible();
+  await expectNoHorizontalScroll(page);
+  const main = await page.locator(".hero-e-main").boundingBox();
+  const stub = await page.locator(".hero-e-stub").boundingBox();
+  expect(main).not.toBeNull();
+  expect(stub).not.toBeNull();
+  expect(stub!.y).toBeGreaterThanOrEqual(main!.y + main!.height - 1);
+});
+
+test("start map sits under the formation cards on a phone", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const map = page.getByRole("img", { name: /Mapa pozycji/ });
+  await expect(map).toBeVisible();
+  const lastCard = await page.locator("label.choice").last().boundingBox();
+  const mapBox = await map.boundingBox();
+  expect(lastCard).not.toBeNull();
+  expect(mapBox).not.toBeNull();
+  expect(mapBox!.y).toBeGreaterThanOrEqual(lastCard!.y + lastCard!.height);
 });

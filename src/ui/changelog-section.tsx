@@ -23,7 +23,7 @@ export function ChangelogSection() {
         <>
           <button
             type="button"
-            className="action-button changelog-toggle"
+            className="changelog-toggle"
             aria-expanded={expanded}
             aria-controls="changelog-older"
             onClick={() => setExpanded((value) => !value)}
