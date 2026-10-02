@@ -219,6 +219,10 @@
     "O Półfinał za dużo",
     "O 2026-10-01 za dużo"
   ],
+  "facts": {
+    "formation": "Formacja",
+    "term": "Termin"
+  },
   "filterLabel": "Filtruj po pozycji",
   "filtersAll": "Wszyscy",
   "foot": {
@@ -251,7 +255,7 @@
   "kpis": {
     "fit": "Dopasowanie",
     "quality": "Jakość",
-    "risk": "Ryzyko"
+    "risk": "Ryzyko zdrowotne"
   },
   "loading": "Wczytywanie gry…",
   "luck": {
@@ -514,21 +518,19 @@
   "stages": {
     "camp": {
       "completed": "Lista kontrolna gotowa",
-      "eyebrow": "MARZEC 2028",
       "finalize": "Jedź na zgrupowanie",
       "heading": "Wybierz 23 zawodników na test",
       "hint": "To moment na sprawdzenie nowych twarzy. Występ na zgrupowaniu ujawni dodatkowe informacje przed EURO.",
       "phase": "ZGRUPOWANIE 1/2",
-      "suffix": "LISTA KONTROLNA"
+      "term": "marzec 2028"
     },
     "final": {
       "completed": "Kadra jest kompletna",
-      "eyebrow": "CZERWIEC 2028",
       "finalize": "Zatwierdź",
       "heading": "Wybierz finałową kadrę 26",
       "hint": "Masz raport z marcowego zgrupowania. Możesz zaufać obserwacji albo powołać nieprzetestowanego zawodnika.",
       "phase": "ZGRUPOWANIE 2/2",
-      "suffix": "EURO"
+      "term": "czerwiec 2028"
     }
   },
   "start": "Rozpocznij odprawę",

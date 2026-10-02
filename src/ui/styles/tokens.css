@@ -112,6 +112,10 @@
 
   /* Layout and safe areas */
   --topbar-height: 56px;
+  /* The page column: the top bar, the content and the dock share it. The gutter widens
+     from 760 px (below). */
+  --page-max-width: 1180px;
+  --page-gutter: 14px;
   --button-primary-size: var(--text-base);
   --cta-min-width: 240px;
   --scrollbar-thumb: var(--frame-soft);
@@ -127,4 +131,10 @@
   --sheet-handle-width: 44px;
   --sheet-handle-height: 4px;
   --sheet-head-gap: var(--space-3);
+}
+
+@media (min-width: 760px) {
+  :root {
+    --page-gutter: 24px;
+  }
 }

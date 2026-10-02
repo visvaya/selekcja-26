@@ -47,32 +47,29 @@ export const START_TEXT = {
   stages: {
     camp: {
       phase: "ZGRUPOWANIE 1/2",
-      eyebrow: "MARZEC 2028",
+      term: "marzec 2028",
       heading: "Wybierz 23 zawodników na test",
       hint: "To moment na sprawdzenie nowych twarzy. Występ na zgrupowaniu ujawni dodatkowe informacje przed EURO.",
       finalize: "Jedź na zgrupowanie",
       completed: "Lista kontrolna gotowa",
-      suffix: "LISTA KONTROLNA",
     },
     final: {
       phase: "ZGRUPOWANIE 2/2",
-      eyebrow: "CZERWIEC 2028",
+      term: "czerwiec 2028",
       heading: "Wybierz finałową kadrę 26",
       hint: "Masz raport z marcowego zgrupowania. Możesz zaufać obserwacji albo powołać nieprzetestowanego zawodnika.",
       finalize: "Zatwierdź",
       completed: "Kadra jest kompletna",
-      suffix: "EURO",
     },
   } satisfies Record<
     Stage,
     {
       phase: string;
-      eyebrow: string;
+      term: string;
       heading: string;
       hint: string;
       finalize: string;
       completed: string;
-      suffix: string;
     }
   >,
   changelogTitle: "Co nowego",

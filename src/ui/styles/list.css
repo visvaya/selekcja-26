@@ -1,0 +1,126 @@
+/* Candidate list screen: the game head with facts and squad indicators, and from 1024 px the
+   two-column layout with the side column. */
+
+.game-head {
+  margin-bottom: var(--space-4);
+}
+
+.game-head h1 {
+  font-size: var(--text-2xl);
+}
+
+/* labelled facts under the heading */
+.game-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-5);
+  margin: var(--space-2) 0 var(--space-3);
+}
+
+.game-facts div {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.game-facts dt {
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.game-facts dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-sm);
+  color: var(--ink);
+}
+
+/* KPI tiles: three in one row at every width, each a label segment over a value segment */
+.kpis {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: stretch;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.kpi {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 0;
+  overflow: hidden;
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--frame-soft);
+  border-radius: var(--radius-md);
+}
+
+.kpi span,
+.kpi b {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-1) var(--space-2);
+  margin: 0;
+  min-height: 0;
+  line-height: 1.15;
+}
+
+.kpi span {
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+  border-bottom: 1px solid var(--frame-soft);
+}
+
+.kpi b {
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-lg);
+}
+
+@media (max-width: 767.98px) {
+  .kpi span {
+    font-size: var(--text-2xs);
+  }
+
+  .kpi b {
+    font-size: var(--text-md);
+  }
+}
+
+@media (min-width: 1024px) {
+  .screen-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: var(--space-6);
+    align-items: start;
+  }
+
+  .game-head h1 {
+    font-size: var(--text-3xl);
+  }
+
+  .dock-side {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .kpis-side {
+    margin-top: 0;
+    margin-bottom: var(--space-4);
+  }
+
+  .dock-side .side-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
+    margin: 0;
+  }
+}

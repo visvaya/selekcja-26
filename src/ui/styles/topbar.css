@@ -12,16 +12,23 @@
   align-items: center;
   border-radius: var(--radius-sm);
   /* Inset, not full-bleed: the bar spans the same column as the page content below it, so
-     on wide screens its edges line up with the content. The gutters and the 1180 px column
-     follow the main content area. */
-  width: calc(min(100%, 1180px) - 2 * var(--legacy-space-7));
+     on wide screens its edges line up with the content. */
+  width: calc(min(100%, var(--page-max-width)) - 2 * var(--page-gutter));
   margin: 0 auto var(--space-5);
 }
 
-@media (min-width: 760px) {
-  .topbar {
-    width: calc(min(100%, 1180px) - 2 * var(--legacy-space-12));
-  }
+/* A page-coloured backdrop above and beside the bar, so content scrolling under the sticky
+   bar does not show through its rounded corners or the gutters next to it. It paints behind
+   the bar (the bar's z-index makes it a stacking context) and above the page. */
+.topbar::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: calc(-1 * var(--save-banner-offset, 0px));
+  bottom: 0;
+  left: calc(-1 * var(--page-gutter));
+  right: calc(-1 * var(--page-gutter));
+  background: var(--board);
 }
 
 .topbar-inner {
