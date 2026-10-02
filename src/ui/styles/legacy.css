@@ -593,24 +593,6 @@ button {
 .report li {
   margin: 7px 0;
 }
-.changelog-version {
-  font-size: var(--font-caption);
-  color: var(--ink-soft);
-  margin: 0 0 var(--legacy-space-5);
-}
-.changelog-toggle {
-  margin-top: var(--legacy-space-6);
-}
-.changelog-older {
-  margin-top: var(--legacy-space-7);
-  padding-top: var(--legacy-space-6);
-  border-top: 1px solid var(--board-line);
-}
-.changelog-entry + .changelog-entry {
-  margin-top: var(--legacy-space-7);
-  padding-top: var(--legacy-space-6);
-  border-top: 1px solid var(--board-line);
-}
 .squad-list {
   display: flex;
   flex-wrap: wrap;

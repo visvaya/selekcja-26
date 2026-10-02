@@ -332,6 +332,12 @@
   },
   "phaseLabel": "Etap:",
   "pitchDescription": "Liczby pokazują, ilu powołanych może grać na danej pozycji.",
+  "plannedDisclaimer": "Plany mogą się zmienić.",
+  "plannedNotes": [
+    "Forma zawodników, która zmienia się w trakcie przygotowań.",
+    "Możliwość zmiany systemu gry po marcowym zgrupowaniu."
+  ],
+  "plannedTitle": "Co planujemy",
   "playerMetrics": {
     "fitness": "Zdrowie",
     "form": "Forma",

@@ -44,6 +44,8 @@ test("changelog section on the start screen and in isolation", async () => {
         name: text.changelogShowOlder(CHANGELOG.length - 1),
       });
       assert.equal(toggle.getAttribute("aria-expanded"), "false");
+      assert.equal(toggle.classList.contains("changelog-toggle"), true);
+      assert.equal(toggle.classList.contains("action-button"), false);
 
       fireEvent.click(toggle);
       assert.equal(toggle.getAttribute("aria-expanded"), "true");

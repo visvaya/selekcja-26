@@ -200,4 +200,14 @@ test("checked formation keeps an outline in forced colours", async ({
     .locator("xpath=..")
     .evaluate((element) => getComputedStyle(element).outlineStyle);
   expect(outline).not.toBe("none");
+
+  // Keyboard focus on the checked card must look different from checked alone.
+  const ring = (element: Element) => {
+    const style = getComputedStyle(element);
+    return `${style.outlineStyle} ${style.outlineOffset}`;
+  };
+  const checkedOnly = await checked.locator("xpath=..").evaluate(ring);
+  await tabUntil(page, checked);
+  const focused = await checked.locator("xpath=..").evaluate(ring);
+  expect(focused).not.toBe(checkedOnly);
 });

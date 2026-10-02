@@ -4,6 +4,7 @@ import { GAME_RULES } from "../data/constants.ts";
 import type { SystemId } from "../data/types.ts";
 import { ChangelogSection } from "./changelog-section.tsx";
 import { FormationMap } from "./formation-map.tsx";
+import { PlannedSection } from "./planned-section.tsx";
 import { UI_TEXT as text } from "./text.ts";
 
 // Decorative bars in the ticket stub (not a game rule).
@@ -90,16 +91,21 @@ export function StartScreen({
           <FormationMap system={system} />
         </div>
       </fieldset>
-      <button className="primary start-button" onClick={onStart}>
-        {text.start}
-      </button>
-      {canUndo && (
-        <button className="action-button" onClick={onUndo}>
-          {text.undo}
+      <div className="start-actions-row">
+        <button className="primary start-button" onClick={onStart}>
+          {text.start}
         </button>
-      )}
+        {canUndo && (
+          <button className="action-button" onClick={onUndo}>
+            {text.undo}
+          </button>
+        )}
+      </div>
       <p className="fineprint">{text.disclaimer}</p>
-      <ChangelogSection />
+      <div className="start-notes-layout">
+        <ChangelogSection />
+        <PlannedSection />
+      </div>
     </section>
   );
 }

@@ -76,6 +76,12 @@ export const START_TEXT = {
     }
   >,
   changelogTitle: "Co nowego",
+  plannedTitle: "Co planujemy",
+  plannedNotes: [
+    "Forma zawodników, która zmienia się w trakcie przygotowań.",
+    "Możliwość zmiany systemu gry po marcowym zgrupowaniu.",
+  ],
+  plannedDisclaimer: "Plany mogą się zmienić.",
   changelogVersionLabel: (version: string, date: string) =>
     `Wersja ${version} · ${formatChangelogDate(date)}`,
   changelogShowOlder: (count: number) => `Wcześniejsze zmiany (${count})`,
