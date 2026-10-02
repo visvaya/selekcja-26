@@ -1,7 +1,8 @@
-import type { RefObject } from "react";
+import { useState, type RefObject } from "react";
 import type {
   DetailedPosition,
   GameState,
+  ListFilters,
   PlayerId,
   SortId,
 } from "../data/types.ts";
@@ -11,8 +12,10 @@ import {
   selectedPlayers,
   squadLimit,
 } from "../logic/selection.ts";
+import { FiltersPanel } from "./filters-panel.tsx";
 import { GameActions } from "./game-actions.tsx";
 import { GAME_HEADING_ID, GameHead } from "./game-head.tsx";
+import { LIST_HEADING_ID } from "./list-heading-id.ts";
 import { PlayerCard } from "./player-card.tsx";
 import { SideColumn } from "./side-column.tsx";
 import { UI_TEXT as text } from "./text.ts";
@@ -46,9 +49,7 @@ export function SelectionScreen({
   onClearSquad,
   onNewGame,
   undoRef,
-  onQuery,
-  onFilter,
-  onSort,
+  onList,
   onToggle,
   onProfile,
   onCompare,
@@ -60,14 +61,14 @@ export function SelectionScreen({
   onClearSquad: () => void;
   onNewGame: () => void;
   undoRef: RefObject<HTMLButtonElement | null>;
-  onQuery: (value: string) => void;
-  onFilter: (value: "ALL" | DetailedPosition) => void;
-  onSort: (value: SortId) => void;
+  onList: (patch: Partial<ListFilters>) => void;
   onToggle: (id: PlayerId) => void;
   onProfile: (id: PlayerId) => void;
   onCompare: (id: PlayerId) => void;
 }) {
   const wide = useMediaQuery(WIDE_LAYOUT_QUERY);
+  // Screen state, not saved: the panel starts collapsed on every visit.
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const selected = selectedPlayers(state);
   const detailed = detailedCounts(state);
   // The chip row shows a single position at most; several positions press no chip.
@@ -96,15 +97,12 @@ export function SelectionScreen({
       <section aria-labelledby={GAME_HEADING_ID}>
         <GameHead state={state} headingRef={headingRef} showKpis={!wide} />
         {!wide && actions}
-        <div className="toolbar">
-          <input
-            className="search"
-            type="search"
-            value={state.list.query}
-            onChange={(event) => onQuery(event.target.value)}
-            placeholder={text.searchPlaceholder}
-            aria-label={text.searchLabel}
-          />
+        <FiltersPanel
+          state={state}
+          open={filtersOpen}
+          onToggle={() => setFiltersOpen((open) => !open)}
+          onList={onList}
+        >
           <div className="filters" aria-label={text.filterLabel}>
             {filterPositions.map((position) => (
               <button
@@ -116,16 +114,18 @@ export function SelectionScreen({
                     ? text.filtersAll
                     : text.positions[position]
                 }
-                onClick={() => onFilter(position)}
+                onClick={() =>
+                  onList({ positions: position === "ALL" ? [] : [position] })
+                }
               >
                 {position === "ALL" ? text.filtersAll : position} (
                 {position === "ALL" ? selected.length : detailed[position]})
               </button>
             ))}
           </div>
-        </div>
+        </FiltersPanel>
         <div className="section-label">
-          <h2>
+          <h2 id={LIST_HEADING_ID} tabIndex={-1}>
             {activeFilter === "ALL" || activeFilter === null
               ? text.allCandidates
               : text.positions[activeFilter]}
@@ -134,7 +134,7 @@ export function SelectionScreen({
             className="sort"
             aria-label={text.sortLabel}
             value={state.list.sort}
-            onChange={(event) => onSort(event.target.value as SortId)}
+            onChange={(event) => onList({ sort: event.target.value as SortId })}
           >
             {(Object.keys(text.sort) as SortId[]).map((sort) => (
               <option key={sort} value={sort}>

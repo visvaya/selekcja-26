@@ -3,6 +3,7 @@
 import { players, positionOrder, systems } from "../data/catalog.ts";
 import { APP_CONFIG, GAME_RULES, RULES_REVISION } from "../data/constants.ts";
 import { EVENTS } from "../data/events.ts";
+import { ROLE_IDS } from "../data/roles.ts";
 import type {
   GameSnapshot,
   GameState,
@@ -25,7 +26,7 @@ const PLAYER_IDS = new Set(players.map((player) => player.id));
 const SYSTEM_IDS = new Set<unknown>(systems.map((system) => system.id));
 const EVENT_IDS = new Set<unknown>(EVENTS.map((event) => event.id));
 const POSITIONS = new Set<unknown>(Object.keys(positionOrder));
-const ROLE_IDS = new Set<unknown>(players.flatMap((player) => player.roles));
+const ROLE_ID_SET = new Set<unknown>(ROLE_IDS);
 const RANGE_IDS = new Set<string>(
   Object.keys({
     age: 0,
@@ -201,7 +202,7 @@ function isListFilters(value: unknown): value is ListFilters {
     typeof foot.left === "boolean" &&
     typeof foot.right === "boolean" &&
     Array.isArray(value.traits) &&
-    value.traits.every((trait) => ROLE_IDS.has(trait)) &&
+    value.traits.every((trait) => ROLE_ID_SET.has(trait)) &&
     isRanges(value.ranges) &&
     typeof value.onlySelected === "boolean" &&
     typeof value.onlyCamp === "boolean"

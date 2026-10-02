@@ -7,7 +7,8 @@ import { decodeSave, encodeSave } from "./save-format.ts";
 import { migrateLegacyState, migrateV3State } from "./save-migration.ts";
 import { clearGame, loadGame, saveGame } from "./storage.ts";
 import { tournamentStory } from "./tournament.ts";
-import type { TournamentStory } from "../data/types.ts";
+import type { RoleId, TournamentStory } from "../data/types.ts";
+import { ROLE_IDS } from "../data/roles.ts";
 import { UI_TEXT } from "../ui/text.ts";
 
 const KEY = "selekcja-26-game";
@@ -760,4 +761,15 @@ test("a literal version 3 rules-1 save of an unfinished game is discarded", () =
     state: null,
     discardedForRulesChange: true,
   });
+});
+
+test("a v4 save loads a trait filter for any role, used by the catalogue or not", () => {
+  assert.equal(ROLE_IDS.length, 23);
+  const used = new Set<RoleId>(players.flatMap((player) => player.roles));
+  const unused = ROLE_IDS.filter((role) => !used.has(role));
+  for (const role of unused.length > 0 ? unused : ROLE_IDS) {
+    const base = reduceGameState(createInitialState(9), { type: "start" });
+    const state = { ...base, list: { ...base.list, traits: [role] } };
+    assert.deepEqual(decodeSave(encodeSave(state)).state?.list.traits, [role]);
+  }
 });

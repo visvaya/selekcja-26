@@ -9,6 +9,8 @@ import type {
   SortId,
 } from "../data/types.ts";
 import {
+  appliedCriteriaCount,
+  clearDetailFilters,
   DEFAULT_LIST_FILTERS,
   matchesListFilters,
   rangeValue,
@@ -210,4 +212,36 @@ test("visiblePlayers orders by every sort without dropping players", () => {
     query.map((player) => player.id),
     ["robert-lewandowski"],
   );
+});
+
+test("appliedCriteriaCount is 0 for the defaults", () => {
+  assert.equal(appliedCriteriaCount(DEFAULT_LIST_FILTERS, "camp"), 0);
+});
+
+test("appliedCriteriaCount counts foot boxes, traits and set ranges only", () => {
+  const list: ListFilters = {
+    ...DEFAULT_LIST_FILTERS,
+    positions: ["BR", "LO"],
+    query: "ki",
+    onlySelected: true,
+    onlyCamp: true,
+    foot: { left: true, right: true },
+    traits: ["pace", "leader", "aerial"],
+    ranges: {
+      age: { min: 20, max: null },
+      form: { min: null, max: 90 },
+      quality: { min: null, max: null },
+      campImpact: { min: -2, max: null },
+    },
+  };
+  assert.equal(appliedCriteriaCount(list, "final"), 8);
+  assert.equal(appliedCriteriaCount(list, "camp"), 7);
+});
+
+test("clearDetailFilters resets foot, traits and ranges to the defaults", () => {
+  assert.deepEqual(clearDetailFilters(), {
+    foot: DEFAULT_LIST_FILTERS.foot,
+    traits: DEFAULT_LIST_FILTERS.traits,
+    ranges: DEFAULT_LIST_FILTERS.ranges,
+  });
 });

@@ -1,0 +1,282 @@
+/* Candidate list toolbar: search, the "Filtry szczegółowe" disclosure with its count badge,
+   and the detailed filters panel (lead foot, traits, ranges). Not sticky. */
+
+.toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.search-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+}
+
+.search {
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--frame);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: var(--text-base);
+  width: 100%;
+  min-width: 0;
+  flex: 1 1 200px;
+}
+
+.filters-toggle {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--frame);
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 700;
+  font-size: var(--text-sm);
+}
+
+.filters-toggle:hover {
+  border-color: var(--action);
+}
+
+.filters-toggle:active {
+  background: var(--board-deep);
+  border-color: var(--action);
+  color: var(--action);
+}
+
+.filters-toggle[aria-expanded="true"] {
+  border-color: var(--action);
+  color: var(--action);
+}
+
+.filters-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-sm);
+  line-height: 1;
+  background: var(--select);
+  color: var(--on-select);
+  font-size: var(--text-2xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.filters-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  border: 2px solid var(--frame-soft);
+  background: var(--surface);
+}
+
+.filters-panel[hidden] {
+  display: none;
+}
+
+/* visually hidden until focused, then shown in place at the top of the panel */
+.skip-link:not(:focus) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.skip-link {
+  align-self: flex-start;
+  min-height: 24px;
+  color: var(--action);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.filters-panel-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+.filter-group {
+  margin: 0;
+  padding: 0;
+  border: none;
+  min-width: 0;
+}
+
+.filter-group legend {
+  padding: 0 0 var(--space-2);
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.filter-hint {
+  margin: 0 0 var(--space-1);
+  font-size: var(--text-2xs);
+  color: var(--ink-soft);
+}
+
+.filter-traits-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+}
+
+.filters-panel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--frame-soft);
+}
+
+/* the legacy .action-button stretches and adds a top margin; the panel button keeps its width */
+.filters-panel-actions .action-button {
+  flex: 0 0 auto;
+  margin-top: 0;
+  border-width: 2px;
+  border-radius: var(--radius-sm);
+  padding: 0 var(--space-4);
+}
+
+/* checkbox: a 24 px hit area with an 18 px box drawn inside it, the check mark only when checked */
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 24px;
+  font-size: var(--text-sm);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.checkbox-field input {
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  position: relative;
+}
+
+.checkbox-field input::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  box-sizing: border-box;
+  border: 2px solid var(--frame);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+
+.checkbox-field input:checked::before {
+  background: var(--action);
+  border-color: var(--action);
+}
+
+.checkbox-field input:checked::after {
+  content: "";
+  position: absolute;
+  left: 9px;
+  top: 5px;
+  width: 5px;
+  height: 9px;
+  border: solid var(--on-action);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.checkbox-field:hover input::before {
+  border-color: var(--ink);
+  background: var(--board-deep);
+}
+
+.checkbox-field:hover input:checked::before {
+  background: var(--action-strong);
+  border-color: var(--action-strong);
+}
+
+.checkbox-field:active input::before {
+  box-shadow: inset 0 0 0 2px var(--ink);
+}
+
+.checkbox-field input:focus-visible {
+  outline: 3px solid var(--focus-core);
+  outline-offset: 0;
+  box-shadow: none;
+}
+
+@media (forced-colors: active) {
+  .checkbox-field input::before {
+    border-color: CanvasText;
+  }
+
+  .checkbox-field input:checked::before {
+    background: Highlight;
+    border-color: Highlight;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .search {
+    flex: 1 1 120px;
+  }
+
+  .filters-toggle {
+    padding: 0 var(--space-2);
+    gap: var(--space-1);
+    font-size: var(--text-xs);
+  }
+}
+
+/* below 420 px search and the toggle stack; the toggle keeps its natural width */
+@media (max-width: 419.98px) {
+  .search-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search {
+    width: 100%;
+    flex: 1 1 auto;
+  }
+
+  .filters-toggle {
+    align-self: flex-start;
+  }
+}
+
+@media (min-width: 1024px) {
+  .filters-panel-grid {
+    grid-template-columns: 1fr 2fr 2fr;
+  }
+}
+
+/* text in form fields on touch screens: 16 px, so iOS does not zoom in on focus */
+@media (pointer: coarse) {
+  .search {
+    font-size: var(--text-control);
+  }
+}

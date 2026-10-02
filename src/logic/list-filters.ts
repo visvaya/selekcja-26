@@ -7,6 +7,7 @@ import type {
   Player,
   RangeBounds,
   RangeId,
+  Stage,
 } from "../data/types.ts";
 import {
   experienceScore,
@@ -26,6 +27,30 @@ export const DEFAULT_LIST_FILTERS: ListFilters = Object.freeze({
   onlySelected: false,
   onlyCamp: false,
 });
+
+// Applied criteria of the detailed filters panel: each foot box, each trait and each range
+// with a set bound. Ranges hidden at the current stage do not count.
+export function appliedCriteriaCount(list: ListFilters, stage: Stage): number {
+  const feet = Number(list.foot.left) + Number(list.foot.right);
+  const ranges = (
+    Object.entries(list.ranges) as [RangeId, RangeBounds][]
+  ).filter(([id, bounds]) => isSet(bounds) && rangeShown(id, stage)).length;
+  return feet + list.traits.length + ranges;
+}
+
+export function clearDetailFilters(): Pick<
+  ListFilters,
+  "foot" | "traits" | "ranges"
+> {
+  return {
+    foot: DEFAULT_LIST_FILTERS.foot,
+    traits: DEFAULT_LIST_FILTERS.traits,
+    ranges: DEFAULT_LIST_FILTERS.ranges,
+  };
+}
+
+const rangeShown = (id: RangeId, stage: Stage): boolean =>
+  !(id === "campImpact" && stage === "camp");
 
 export function rangeValue(
   id: RangeId,
@@ -63,10 +88,7 @@ const isSet = (bounds: RangeBounds | undefined): bounds is RangeBounds =>
 
 function withinRanges(player: Player, state: GameState): boolean {
   return (Object.entries(state.list.ranges) as [RangeId, RangeBounds][])
-    .filter(
-      ([id, bounds]) =>
-        isSet(bounds) && !(id === "campImpact" && state.stage === "camp"),
-    )
+    .filter(([id, bounds]) => isSet(bounds) && rangeShown(id, state.stage))
     .every(([id, bounds]) => {
       const value = rangeValue(id, player, state);
       return (

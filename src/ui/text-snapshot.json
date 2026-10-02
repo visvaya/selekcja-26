@@ -137,6 +137,7 @@
     "Wersja 2026-10-01 · 01.10.2026"
   ],
   "clearComparison": "Wyczyść porównanie",
+  "clearFilters": "Wyczyść filtry",
   "clearSquad": "Odwołaj wszystkich",
   "compare": "Porównaj",
   "compared": "Wybrany",
@@ -150,6 +151,18 @@
     "title": "Zacząć nową grę?"
   },
   "continueToFinal": "Przejdź do powołań na EURO",
+  "detailFilters": "Filtry szczegółowe",
+  "detailFiltersActive": [
+    "Filtry szczegółowe, aktywne: 0",
+    "Filtry szczegółowe, aktywne: 1",
+    "Filtry szczegółowe, aktywne: 2",
+    "Filtry szczegółowe, aktywne: 5",
+    "Filtry szczegółowe, aktywne: 12",
+    "Filtry szczegółowe, aktywne: 22",
+    "Filtry szczegółowe, aktywne: X",
+    "Filtry szczegółowe, aktywne: Półfinał",
+    "Filtry szczegółowe, aktywne: 2026-10-01"
+  ],
   "disclaimer": "Nieoficjalna gra fanowska. Nie jest rzeczywistym produktem PZPN/UEFA.",
   "dockCoverage": "Dotknij, aby zobaczyć obsadę",
   "dockOpen": "Dotknij, aby zobaczyć podział miejsc",
@@ -240,6 +253,10 @@
     "left": "Lewa",
     "right": "Prawa"
   },
+  "footHint": "Zaznacz obie, aby pokazać obunożnych.",
+  "footLeft": "Lewa noga",
+  "footLegend": "Noga wiodąca",
+  "footRight": "Prawa noga",
   "formationMap": [
     "0. Mapa pozycji dla wybranej formacji.",
     "1. Mapa pozycji dla wybranej formacji.",
@@ -396,6 +413,7 @@
     "Zgranie kadrowe",
     "Wpływ na grupę"
   ],
+  "rangesLegend": "Zakresy",
   "remaining": [
     "Zostało 0 miejsc",
     "Zostało 1 miejsc",
@@ -512,6 +530,7 @@
   "selected": "Powołany ✓",
   "selectionScore": "Ocena selekcyjna",
   "simulationDisclaimer": "Symulacja ocenia strukturę decyzji i zawiera kontrolowaną losowość. Nie jest prognozą rzeczywistego wyniku sportowego.",
+  "skipToList": "Przejdź do listy kandydatów",
   "sort": {
     "experience": "Doświadczenie",
     "fitness": "Zdrowie",
@@ -697,6 +716,7 @@
     "semifinalLossMarker": "Przegraliśmy"
   },
   "tournamentProgress": "Przebieg turnieju",
+  "traitsLegend": "Cechy",
   "trialNotes": {
     "disappointed": "rozczarował",
     "impressed": "przekonał",

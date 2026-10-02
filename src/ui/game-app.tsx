@@ -373,14 +373,7 @@ export function GameApp() {
             onClearSquad={clearSquad}
             onNewGame={() => setModal({ kind: "confirmNewGame" })}
             undoRef={undoRef}
-            onQuery={(query) => dispatch({ type: "setList", patch: { query } })}
-            onFilter={(value) =>
-              dispatch({
-                type: "setList",
-                patch: { positions: value === "ALL" ? [] : [value] },
-              })
-            }
-            onSort={(sort) => dispatch({ type: "setList", patch: { sort } })}
+            onList={(patch) => dispatch({ type: "setList", patch })}
             onToggle={togglePlayer}
             onProfile={(id) => setModal({ kind: "profile", id })}
             onCompare={comparePlayer}

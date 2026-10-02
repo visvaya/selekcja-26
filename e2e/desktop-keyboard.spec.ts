@@ -154,6 +154,21 @@ test("desktop game is playable with the keyboard alone", async ({ page }) => {
   await page.keyboard.press("Control+A");
   await page.keyboard.press("Backspace");
 
+  // Detailed filters: the disclosure follows the search field; its skip link leads to the list.
+  await page.keyboard.press("Tab");
+  const filtersToggle = page.getByRole("button", { name: text.detailFilters });
+  await expect(filtersToggle).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(filtersToggle).toHaveAttribute("aria-expanded", "true");
+  await page.keyboard.press("Tab");
+  const skipLink = page.getByRole("link", { name: text.skipToList });
+  await expect(skipLink).toBeFocused();
+  await expectFocusVisible(page, "filters panel skip link");
+  await page.keyboard.press("Enter");
+  await expect(page.locator(".section-label h2")).toBeFocused();
+  await activate(page, filtersToggle);
+  await expect(filtersToggle).toHaveAttribute("aria-expanded", "false");
+
   // Event dialogs are blocking: Escape does not dismiss them.
   await activate(page, page.getByRole("button", { name: text.autoFill }));
   await expect(dialog(page)).toBeVisible();
