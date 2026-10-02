@@ -108,49 +108,6 @@ button {
   color: var(--ink-soft);
   max-width: 650px;
 }
-.choice-title {
-  font-family: var(--font-display);
-  font-weight: 850;
-  margin: var(--legacy-space-12) 0 var(--legacy-space-5);
-}
-.choice-grid {
-  display: grid;
-  gap: 9px;
-}
-.choice {
-  background: var(--surface);
-  border: 1px solid var(--frame);
-  border-radius: 14px;
-  padding: var(--legacy-space-7);
-  text-align: left;
-  display: flex;
-  gap: var(--legacy-space-6);
-  align-items: flex-start;
-}
-.choice.selected {
-  border-color: var(--select);
-  box-shadow: inset 0 0 0 1px var(--select);
-  background: var(--surface-selected);
-}
-.choice b {
-  display: block;
-}
-.choice small {
-  color: var(--ink-soft);
-  display: block;
-  margin-top: 3px;
-}
-.radio {
-  width: 18px;
-  height: 18px;
-  border: 2px solid var(--frame);
-  border-radius: 50%;
-  margin-top: var(--legacy-space-1);
-  flex: 0 0 auto;
-}
-.selected .radio {
-  border: 5px solid var(--select);
-}
 .primary {
   font-family: var(--font-display);
   border: 0;
@@ -675,9 +632,6 @@ button {
 @media (min-width: 760px) {
   .main {
     padding: var(--legacy-space-13) var(--legacy-space-12) 110px;
-  }
-  .choice-grid {
-    grid-template-columns: repeat(3, 1fr);
   }
   .game-head {
     flex-direction: row;

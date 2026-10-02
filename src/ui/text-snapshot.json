@@ -227,6 +227,17 @@
     "left": "Lewa",
     "right": "Prawa"
   },
+  "formationMap": [
+    "0. Mapa pozycji dla wybranej formacji.",
+    "1. Mapa pozycji dla wybranej formacji.",
+    "2. Mapa pozycji dla wybranej formacji.",
+    "5. Mapa pozycji dla wybranej formacji.",
+    "12. Mapa pozycji dla wybranej formacji.",
+    "22. Mapa pozycji dla wybranej formacji.",
+    "X. Mapa pozycji dla wybranej formacji.",
+    "Półfinał. Mapa pozycji dla wybranej formacji.",
+    "2026-10-01. Mapa pozycji dla wybranej formacji."
+  ],
   "fulfilled": "✓ Spełnione",
   "fullSquadMessage": "Aby powołać kolejnego zawodnika, najpierw zwolnij jedno miejsce.",
   "fullSquadTitle": "Lista jest pełna",
@@ -516,7 +527,7 @@
   },
   "start": "Rozpocznij odprawę",
   "strengths": "Co zadziałało",
-  "systemChoice": "Wybierz model gry",
+  "systemChoice": "Wybierz formację",
   "systems": {
     "433": {
       "description": "Pressing, mobilna ósemka i szeroko ustawieni skrzydłowi.",

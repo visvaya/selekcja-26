@@ -3,36 +3,11 @@ import { players, systems } from "../data/catalog.ts";
 import { GAME_RULES } from "../data/constants.ts";
 import type { SystemId } from "../data/types.ts";
 import { ChangelogSection } from "./changelog-section.tsx";
+import { FormationMap } from "./formation-map.tsx";
 import { UI_TEXT as text } from "./text.ts";
 
 // Decorative bars in the ticket stub (not a game rule).
 const TICKET_BARCODE_BARS = 7;
-
-function ChoiceButton({
-  selected,
-  name,
-  description,
-  onClick,
-}: {
-  selected: boolean;
-  name: string;
-  description: string;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      className={`choice ${selected ? "selected" : ""}`}
-      aria-pressed={selected}
-      onClick={onClick}
-    >
-      <span className="radio" aria-hidden="true" />
-      <span>
-        <b>{name}</b>
-        <small>{description}</small>
-      </span>
-    </button>
-  );
-}
 
 export function StartScreen({
   system,
@@ -88,18 +63,33 @@ export function StartScreen({
           <span className="hero-e-num">{text.ticket.stub}</span>
         </div>
       </div>
-      <div className="choice-title">{text.systemChoice}</div>
-      <div className="choice-grid">
-        {systems.map((candidate) => (
-          <ChoiceButton
-            key={candidate.id}
-            selected={system === candidate.id}
-            name={text.systems[candidate.id].name}
-            description={text.systems[candidate.id].description}
-            onClick={() => onSystem(candidate.id)}
-          />
-        ))}
-      </div>
+      <fieldset className="choice-fieldset">
+        <legend className="choice-title">{text.systemChoice}</legend>
+        <div className="model-choice-layout">
+          <div className="choice-grid">
+            {systems.map((candidate) => (
+              <label
+                key={candidate.id}
+                className={`choice ${system === candidate.id ? "selected" : ""}`}
+              >
+                <input
+                  type="radio"
+                  name="system"
+                  className="radio"
+                  value={candidate.id}
+                  checked={system === candidate.id}
+                  onChange={() => onSystem(candidate.id)}
+                />
+                <span>
+                  <b>{text.systems[candidate.id].name}</b>{" "}
+                  <small>{text.systems[candidate.id].description}</small>
+                </span>
+              </label>
+            ))}
+          </div>
+          <FormationMap system={system} />
+        </div>
+      </fieldset>
       <button className="primary start-button" onClick={onStart}>
         {text.start}
       </button>

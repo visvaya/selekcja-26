@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createServer } from "vite";
-import { players } from "../data/catalog.ts";
+import { players, systems } from "../data/catalog.ts";
 import { GAME_RULES } from "../data/constants.ts";
 import { UI_TEXT } from "./text.ts";
 import { withJsdomWindow } from "./test-jsdom-window.ts";
@@ -57,6 +57,75 @@ test("StartScreen shows the EURO ticket built from game data", async () => {
         "true",
       );
       assert.equal(queryByText("Notatka sztabu szkoleniowego") === null, true);
+      cleanup();
+    } finally {
+      await vite.close();
+    }
+  });
+});
+
+test("StartScreen offers the formations as a radio group with a live map", async () => {
+  await withJsdomWindow(async () => {
+    const React = await import("react");
+    const { render, cleanup, fireEvent } =
+      await import("@testing-library/react");
+    const vite = await createServer({
+      server: { middlewareMode: true, hmr: false, watch: null },
+      appType: "custom",
+    });
+    try {
+      const { StartScreen } = (await vite.ssrLoadModule(
+        "/src/ui/start-screen.tsx",
+      )) as typeof import("./start-screen.tsx");
+      const calls: string[] = [];
+      const props = {
+        canUndo: false,
+        headingRef: React.createRef<HTMLHeadingElement>(),
+        onSystem: (value: string) => calls.push(value),
+        onStart: () => {},
+        onUndo: () => {},
+      };
+      const view = render(
+        React.createElement(StartScreen, { ...props, system: "4231" }),
+      );
+      const group = view.getByRole("group", { name: "Wybierz formację" });
+      const radios = [...group.querySelectorAll('input[type="radio"]')];
+      assert.equal(radios.length, 3);
+      const names = ["4–2–3–1", "3–4–2–1", "4–3–3"];
+      for (const name of names) {
+        const radio = view.getByRole("radio", {
+          name: new RegExp(`^${name} `),
+        }) as HTMLInputElement;
+        assert.equal(radio.checked, name === "4–2–3–1");
+      }
+      fireEvent.click(view.getByRole("radio", { name: /^4–3–3 / }));
+      assert.deepEqual(calls, ["433"]);
+      fireEvent.click(view.getByRole("radio", { name: /^4–2–3–1 / }));
+      assert.deepEqual(calls, ["433"]);
+
+      const nodeTexts = () =>
+        [...view.container.querySelectorAll(".model-preview .pitch-node")].map(
+          (node) => node.textContent,
+        );
+      const shape = (id: string) =>
+        systems.find((candidate) => candidate.id === id)!.shape.flat();
+      const map = view.getByRole("img", {
+        name: "4–2–3–1. Mapa pozycji dla wybranej formacji.",
+      });
+      assert.deepEqual(nodeTexts(), shape("4231"));
+      assert.equal(
+        map.querySelector(".pitch-markings")?.getAttribute("aria-hidden"),
+        "true",
+      );
+      view.rerender(
+        React.createElement(StartScreen, { ...props, system: "3421" }),
+      );
+      assert.ok(
+        view.getByRole("img", {
+          name: "3–4–2–1. Mapa pozycji dla wybranej formacji.",
+        }),
+      );
+      assert.deepEqual(nodeTexts(), shape("3421"));
       cleanup();
     } finally {
       await vite.close();

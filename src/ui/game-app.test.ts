@@ -222,10 +222,16 @@ test("live region announces undo, random fill and event outcomes", async () => {
       // Two system swaps before the game starts (neither changes the selected squad) give
       // two undo steps to exercise: reverting either always lands on the same "0 z 23"
       // wording, which is exactly the repeated-announcement case the mechanism must handle.
-      const systemGrid = view.container.querySelectorAll(".choice-grid")[0]!;
-      const systemButtons = [...systemGrid.querySelectorAll("button")];
-      fireEvent.click(systemButtons[1]!);
-      fireEvent.click(systemButtons[2]!);
+      fireEvent.click(
+        view.getByRole("radio", {
+          name: new RegExp(`^${UI_TEXT.systems["3421"].name} `),
+        }),
+      );
+      fireEvent.click(
+        view.getByRole("radio", {
+          name: new RegExp(`^${UI_TEXT.systems["433"].name} `),
+        }),
+      );
 
       const expectedUndo = UI_TEXT.announcements.undo(
         0,

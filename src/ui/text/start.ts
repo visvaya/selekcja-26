@@ -22,7 +22,9 @@ export const START_TEXT = {
     finalPlacesLabel: "Miejsca w kadrze turniejowej",
     stub: "EURO·28",
   },
-  systemChoice: "Wybierz model gry",
+  systemChoice: "Wybierz formację",
+  formationMap: (name: string) =>
+    `${name}. Mapa pozycji dla wybranej formacji.`,
 
   start: "Rozpocznij odprawę",
   undo: "Cofnij",

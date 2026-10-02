@@ -50,18 +50,28 @@ test("desktop game is playable with the keyboard alone", async ({ page }) => {
     page.getByRole("heading", { name: text.ticket.title }),
   ).toBeVisible();
 
-  // Tab order reaches every system choice before the start button.
-  const system433 = page.getByRole("button", {
-    name: new RegExp(text.systems["433"].name),
+  // The formation group is one Tab stop on the checked radio; arrows change the choice.
+  const radio4231 = page.getByRole("radio", {
+    name: new RegExp(`^${text.systems["4231"].name} `),
   });
-  const visitedToSystem = await tabUntil(page, system433);
-  await expectVisibleFocus(system433);
-  await page.keyboard.press("Space");
-  await expect(system433).toHaveAttribute("aria-pressed", "true");
+  const radio433 = page.getByRole("radio", {
+    name: new RegExp(`^${text.systems["433"].name} `),
+  });
+  await tabUntil(page, radio4231);
+  await expect(radio4231).toBeFocused();
+  const cardOutline = await radio4231
+    .locator("xpath=..")
+    .evaluate((element) => getComputedStyle(element).outlineStyle);
+  expect(cardOutline, "the focused formation card shows the ring").not.toBe(
+    "none",
+  );
+  for (let step = 0; step < 3 && !(await radio433.isChecked()); step++)
+    await page.keyboard.press("ArrowRight");
+  await expect(radio433).toBeChecked();
+  await expect(page.getByRole("img", { name: /^4–3–3/ })).toBeVisible();
   const start = page.getByRole("button", { name: text.start });
-  const visited = [...visitedToSystem, ...(await tabUntil(page, start))];
-  for (const system of Object.values(text.systems))
-    expect(visited.some((label) => label.includes(system.name))).toBe(true);
+  await page.keyboard.press("Tab");
+  await expect(start).toBeFocused();
   await expectVisibleFocus(start);
   await page.keyboard.press("Enter");
   await expect(
@@ -173,4 +183,21 @@ test("desktop game is playable with the keyboard alone", async ({ page }) => {
   await expectFocusVisible(page, "restart");
 
   expect(errors).toEqual([]);
+});
+
+test("checked formation keeps an outline in forced colours", async ({
+  page,
+  browserName,
+}) => {
+  test.skip(
+    browserName !== "chromium",
+    "forced colours emulation is Chromium-only",
+  );
+  await page.emulateMedia({ forcedColors: "active" });
+  await page.goto("/");
+  const checked = page.getByRole("radio", { checked: true });
+  const outline = await checked
+    .locator("xpath=..")
+    .evaluate((element) => getComputedStyle(element).outlineStyle);
+  expect(outline).not.toBe("none");
 });
