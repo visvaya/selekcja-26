@@ -41,7 +41,12 @@ export function PitchOutsiders({
       type="button"
       className="pitch-outsiders"
       aria-label={text.outOfFormationTitle(players.length)}
-      onClick={onOpen}
+      onClick={(event) => {
+        // Safari does not focus a tapped button, so the dialog would return focus to the
+        // heading under the open board instead of to this button.
+        event.currentTarget.focus();
+        onOpen();
+      }}
     >
       <span className="pitch-outsiders-label">{text.outOfFormation}</span>
       <span className="pitch-outsiders-strip">
