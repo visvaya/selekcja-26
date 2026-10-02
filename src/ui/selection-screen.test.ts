@@ -95,7 +95,7 @@ test("camp list head shows the heading, facts, hint and inline KPIs", async () =
       const labels = [
         ...container.querySelectorAll(".kpis.kpis-inline .kpi span"),
       ].map((span) => span.textContent);
-      assert.deepEqual(labels, ["Jakość", "Dopasowanie", "Ryzyko zdrowotne"]);
+      assert.deepEqual(labels, ["Jakość", "Dopasowanie", "Ryzyko urazu"]);
       // phone form in jsdom: no side column
       assert.equal(container.querySelector("aside.dock-side") === null, true);
       const text = container.textContent ?? "";

@@ -45,7 +45,7 @@ export const LIST_TEXT = {
     injuryRisk: "Ryzyko urazu",
     minutesLimit: "Limit minut",
   } satisfies Record<AvailabilityFlagId, string>,
-  kpis: { quality: "Jakość", fit: "Dopasowanie", risk: "Ryzyko zdrowotne" },
+  kpis: { quality: "Jakość", fit: "Dopasowanie", risk: "Ryzyko urazu" },
   facts: { term: "Termin", formation: "Formacja" },
   risk: { none: "Brak", low: "Niskie", medium: "Średnie", high: "Wysokie" },
   emptyValue: "Brak",
