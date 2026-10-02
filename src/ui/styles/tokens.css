@@ -133,6 +133,19 @@
   --sheet-handle-width: 44px;
   --sheet-handle-height: 4px;
   --sheet-head-gap: var(--space-3);
+
+  /* Range filter: two 56 px number fields and a 16 px separator form the 136 px pair; the
+     handles are 24 px targets with a 2 px ring, inset 10 px so they meet the track ends. */
+  --range-input-width: 56px;
+  --range-sep-width: 16px;
+  --range-inputs-width: 136px;
+  --range-input-height: 36px;
+  --range-input-border: 2px;
+  --range-row-gap: 2px;
+  --range-track-height: 6px;
+  --range-handle-size: 24px;
+  --range-handle-ring: 2px;
+  --range-slider-inset: 10px;
 }
 
 @media (min-width: 760px) {

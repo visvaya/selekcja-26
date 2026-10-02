@@ -24,8 +24,12 @@ interface Drafts {
   max: string;
 }
 
-const show = (value: number | null, scale: RangeScale): string =>
-  value === null ? "" : String(Math.min(scale.max, Math.max(scale.min, value)));
+// Stored bounds are shown as stored, even outside the current scale, so the fields always show
+// what the filter applies; only the track fill clamps.
+const show = (bounds: RangeBounds): Drafts => ({
+  min: bounds.min === null ? "" : String(bounds.min),
+  max: bounds.max === null ? "" : String(bounds.max),
+});
 
 const readDraft = (draft: string): number | null => {
   const value = parseRangeInput(draft);
@@ -73,6 +77,7 @@ export function RangeField({
   scale,
   bounds,
   signed,
+  version,
   onCommit,
 }: {
   id: RangeId;
@@ -80,23 +85,28 @@ export function RangeField({
   scale: RangeScale;
   bounds: RangeBounds;
   signed: boolean;
+  version: object;
   onCommit: (bounds: RangeBounds) => void;
 }) {
-  const [drafts, setDrafts] = useState<Drafts>(() => ({
-    min: show(bounds.min, scale),
-    max: show(bounds.max, scale),
-  }));
+  const [drafts, setDrafts] = useState<Drafts>(() => show(bounds));
   const [dragging, setDragging] = useState(false);
   const committed = useRef<RangeBounds>(bounds);
   const minRef = useRef<HTMLInputElement>(null);
   const maxRef = useRef<HTMLInputElement>(null);
 
-  // Bounds changed from outside (clear, undo of the panel, reload): show them.
+  // `version` changes identity whenever the stored ranges change. A change this field caused
+  // itself is skipped (it keeps showing a stepped scale end, stored as null); any other change
+  // (clearing the panel, a reload) replaces the drafts with the stored bounds.
+  const echo = useRef(false);
   useEffect(() => {
-    if (sameBounds(committed.current, bounds)) return;
+    if (echo.current) {
+      echo.current = false;
+      return;
+    }
     committed.current = bounds;
-    setDrafts({ min: show(bounds.min, scale), max: show(bounds.max, scale) });
-  }, [bounds, scale]);
+    setDrafts(show(bounds));
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- reset only on a new version
+  }, [version]);
 
   // Steps always report; a blur or Enter that changes nothing stays quiet.
   function commit(next: Drafts, edited: Side, always = false) {
@@ -108,6 +118,7 @@ export function RangeField({
     const stored = commitRange(normal, edited, scale);
     if (!always && sameBounds(stored, committed.current)) return;
     committed.current = stored;
+    echo.current = true;
     onCommit(stored);
   }
 
@@ -129,7 +140,9 @@ export function RangeField({
   }
 
   function onBlur(side: Side, input: HTMLInputElement) {
-    // text the field cannot read as a number (a lone "-") would linger as an ignored value
+    // Text a number field cannot read (a lone "-") reports value "" with badInput, so the draft
+    // is already "" and React sees no change to render; the visible text has to be cleared on
+    // the element itself.
     if (input.validity.badInput) input.value = "";
     commit(drafts, side);
   }
@@ -156,6 +169,27 @@ export function RangeField({
     setDragging(false);
     commit(drafts, side, true);
   }
+
+  // A drag can end away from the handle (pointer released outside, no pointerup on it); the
+  // native change event of the range input still marks the end, so it commits too.
+  const minHandle = useRef<HTMLInputElement>(null);
+  const maxHandle = useRef<HTMLInputElement>(null);
+  const latestRelease = useRef(release);
+  useEffect(() => {
+    latestRelease.current = release;
+  });
+  useEffect(() => {
+    const pairs = [
+      [minHandle.current, "min"],
+      [maxHandle.current, "max"],
+    ] as const;
+    const listeners = pairs.map(([handle, side]) => {
+      const listener = () => latestRelease.current(side);
+      handle?.addEventListener("change", listener);
+      return () => handle?.removeEventListener("change", listener);
+    });
+    return () => listeners.forEach((remove) => remove());
+  }, []);
 
   const fieldClass = [
     "range-field",
@@ -200,7 +234,11 @@ export function RangeField({
       max={scale.max}
       step={1}
       value={side === "min" ? handleFrom : handleTo}
-      onPointerDown={() => setDragging(true)}
+      ref={side === "min" ? minHandle : maxHandle}
+      onPointerDown={(event) => {
+        event.currentTarget.setPointerCapture?.(event.pointerId);
+        setDragging(true);
+      }}
       onChange={(event) => drag(side, event.target.value)}
       onPointerUp={() => release(side)}
       onPointerCancel={() => release(side)}

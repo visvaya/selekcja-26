@@ -15,11 +15,12 @@ async function withField(
     from: HTMLInputElement;
     to: HTMLInputElement;
     container: HTMLElement;
+    setStored: (bounds: RangeBounds) => void;
   }) => Promise<void> | void,
 ) {
   await withJsdomWindow(async () => {
     const React = await import("react");
-    const { render, cleanup } = await import("@testing-library/react");
+    const { render, cleanup, act } = await import("@testing-library/react");
     const vite = await createServer({
       server: { middlewareMode: true, hmr: false, watch: null },
       appType: "custom",
@@ -29,17 +30,22 @@ async function withField(
         "/src/ui/range-field.tsx",
       )) as typeof import("./range-field.tsx");
       const commits: RangeBounds[] = [];
+      let setStored: (bounds: RangeBounds) => void = () => undefined;
       const label = options.label ?? text.ranges.age;
       function Harness() {
         const [bounds, setBounds] = React.useState<RangeBounds>(
           options.bounds ?? { min: null, max: null },
         );
+        React.useEffect(() => {
+          setStored = setBounds;
+        }, []);
         return React.createElement(RangeField, {
           id: "age",
           label,
           scale,
           bounds,
           signed: options.signed ?? false,
+          version: bounds,
           onCommit: (next: RangeBounds) => {
             commits.push(next);
             setBounds(next);
@@ -53,7 +59,13 @@ async function withField(
       const to = getByRole("spinbutton", {
         name: text.rangeTo(label),
       }) as HTMLInputElement;
-      await body({ commits, from, to, container });
+      await body({
+        commits,
+        from,
+        to,
+        container,
+        setStored: (bounds) => act(() => setStored(bounds)),
+      });
     } finally {
       cleanup();
       await vite.close();
@@ -147,12 +159,12 @@ test("a lone minus in the signed field is cleared on blur", async () => {
   });
 });
 
-test("a stored bound outside the scale is shown clamped", async () => {
+test("a stored bound outside the scale is shown as stored, the fill clamps", async () => {
   await withField(
     { bounds: { min: 5, max: 90 } },
     ({ from, to, container }) => {
-      assert.equal(from.value, "20");
-      assert.equal(to.value, "40");
+      assert.equal(from.value, "5");
+      assert.equal(to.value, "90");
       const fill = container.querySelector(".range-track-fill");
       assert.equal(fill?.classList.contains("is-set"), false);
     },
@@ -181,11 +193,41 @@ test("the drag handles are hidden from assistive tech and the tab order", async 
       assert.equal(fill?.style.getPropertyValue("--from"), "25%");
       assert.equal(fill?.style.getPropertyValue("--to"), "50%");
       fireEvent.pointerDown(handles[0]!);
-      fireEvent.change(handles[0]!, { target: { value: "35" } });
+      fireEvent.input(handles[0]!, { target: { value: "35" } });
       assert.equal(from.value, "30");
       assert.equal(commits.length, 0);
       fireEvent.pointerUp(handles[0]!);
       assert.deepEqual(commits, [{ min: 30, max: 30 }]);
     },
   );
+});
+
+test("a drag that ends with a native change commits once and stops dragging", async () => {
+  await withField(
+    { bounds: { min: 25, max: 30 } },
+    async ({ commits, container, from }) => {
+      const { fireEvent } = await import("@testing-library/react");
+      const handle = container.querySelector<HTMLInputElement>(
+        'input[type="range"]',
+      )!;
+      const field = container.querySelector(".range-field")!;
+      fireEvent.pointerDown(handle);
+      assert.equal(field.classList.contains("is-dragging"), true);
+      fireEvent.input(handle, { target: { value: "22" } });
+      fireEvent(handle, new window.Event("change", { bubbles: true }));
+      assert.deepEqual(commits, [{ min: 22, max: 30 }]);
+      assert.equal(from.value, "22");
+      assert.equal(field.classList.contains("is-dragging"), false);
+    },
+  );
+});
+
+test("clearing the stored bounds empties a field that showed a stepped scale end", async () => {
+  await withField({}, async ({ from, setStored }) => {
+    const { fireEvent } = await import("@testing-library/react");
+    fireEvent.keyDown(from, { key: "ArrowUp" });
+    assert.equal(from.value, "20");
+    setStored({ min: null, max: null });
+    assert.equal(from.value, "");
+  });
 });

@@ -157,6 +157,7 @@ export function FiltersPanel({
                 scale={rangeScale(id, state)}
                 bounds={list.ranges[id] ?? EMPTY_BOUNDS}
                 signed={id === "campImpact"}
+                version={list.ranges}
                 onCommit={(bounds) =>
                   onList({ ranges: withRange(list.ranges, id, bounds) })
                 }
