@@ -41,6 +41,7 @@ function withList(state: GameState, list: Partial<ListFilters>): GameState {
 async function renderScreen(
   state: GameState,
   onList: (patch: Partial<ListFilters>) => void = () => {},
+  wide = false,
 ) {
   const React = await import("react");
   const { render } = await import("@testing-library/react");
@@ -59,6 +60,9 @@ async function renderScreen(
       onToggle: noop,
       onProfile: noop,
       onCompare: noop,
+      wide,
+      onOutsiders: noop,
+      onFinalize: noop,
     }),
   );
   return { vite, ...result };
@@ -97,7 +101,8 @@ test("camp list head shows the heading, facts, hint and inline KPIs", async () =
       ].map((span) => span.textContent);
       assert.deepEqual(labels, ["Jakość", "Dopasowanie", "Ryzyko urazu"]);
       // phone form in jsdom: no side column
-      assert.equal(container.querySelector("aside.dock-side") === null, true);
+      assert.equal(container.querySelector(".dock-side") === null, true);
+      assert.ok(container.querySelector("section .game-actions"));
       const text = container.textContent ?? "";
       assert.equal(text.includes("LISTA KONTROLNA"), false);
       assert.equal(text.includes("MARZEC 2028"), false);
@@ -121,32 +126,33 @@ test("final list head shows the June term", async () => {
   });
 });
 
-test("wide form moves the KPIs and actions into the side column", async () => {
+test("wide form moves the KPIs, the board and actions into the side column", async () => {
   await withJsdomWindow(async () => {
     const { cleanup } = await import("@testing-library/react");
-    const stub = (query: string) =>
-      ({
-        matches: query === "(min-width: 1024px)",
-        media: query,
-        addEventListener: () => {},
-        removeEventListener: () => {},
-      }) as unknown as MediaQueryList;
-    Object.defineProperty(window, "matchMedia", {
-      configurable: true,
-      value: stub,
-    });
-    const { vite, container } = await renderScreen(campState());
+    const { vite, container } = await renderScreen(campState(), () => {}, true);
     try {
-      const aside = container.querySelector(".screen-layout > aside.dock-side");
-      assert.equal(aside !== null, true);
-      assert.equal(aside?.querySelector(".kpis.kpis-side") !== null, true);
-      const actions = aside?.querySelector(".game-actions.side-actions");
+      const side = container.querySelector(".screen-layout > div.dock-side");
+      assert.equal(side !== null, true);
+      assert.deepEqual(
+        [...(side?.children ?? [])].map((child) =>
+          child.getAttribute("role") === "region"
+            ? `region:${child.getAttribute("aria-label")}`
+            : child.className,
+        ),
+        [
+          "kpis kpis-side",
+          "region:Tablica kadry – zgrupowanie",
+          "game-actions side-actions",
+        ],
+      );
+      const actions = side?.querySelector(".game-actions.side-actions");
       assert.equal(
         [...(actions?.querySelectorAll("button") ?? [])]
           .map((button) => button.textContent)
           .join("|"),
         "Cofnij|Dobierz losowo|Odwołaj wszystkich|Nowa gra",
       );
+      assert.equal(container.querySelector("aside") === null, true);
       assert.equal(container.querySelector(".kpis-inline") === null, true);
       assert.equal(container.querySelectorAll(".game-actions").length, 1);
     } finally {
@@ -337,6 +343,9 @@ test("a narrowed list announces the visible count once after the pause", async (
           onToggle: noop,
           onProfile: noop,
           onCompare: noop,
+          wide: false,
+          onOutsiders: noop,
+          onFinalize: noop,
         }),
       );
       const expected = `Widoczni: ${visiblePlayers(narrowed).length} z 61`;

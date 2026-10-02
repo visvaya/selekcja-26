@@ -71,6 +71,8 @@
   margin: 0;
   min-height: 0;
   line-height: 1.15;
+  /* With enlarged text a long word breaks inside the tile instead of being cut off. */
+  overflow-wrap: anywhere;
 }
 
 .kpi span {
@@ -150,21 +152,9 @@
     font-size: var(--text-3xl);
   }
 
-  .dock-side {
-    display: flex;
-    flex-direction: column;
-  }
-
   .kpis-side {
     margin-top: 0;
     margin-bottom: var(--space-4);
-  }
-
-  .dock-side .side-actions {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-2);
-    margin: 0;
   }
 }
 
@@ -392,8 +382,8 @@
   }
 }
 
-/* The fixed squad dock covers the bottom of the viewport: focus and scroll-into-view keep
-   the focused control above it (stage 7 replaces the dock). */
+/* The fixed squad bar covers the bottom of the viewport: focus and scroll-into-view keep
+   the focused control above its measured height. */
 html:has(.dock) {
-  scroll-padding-bottom: var(--dock-scroll-padding);
+  scroll-padding-bottom: calc(var(--dock-height, 0px) + var(--space-2));
 }

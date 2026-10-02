@@ -1,0 +1,469 @@
+/* Squad board anatomy: count ring, slot squares, markers and the stage button, shared by
+   the phone bar and the desktop board. */
+
+/* The phone bar: fixed to the bottom, its content in the page column. */
+.dock {
+  position: fixed;
+  z-index: 30;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.dock-inner {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas: "ring copy" "go go";
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-3)
+    max(
+      var(--page-gutter),
+      calc((100% - var(--page-max-width)) / 2 + var(--page-gutter))
+    )
+    calc(var(--space-3) + env(safe-area-inset-bottom));
+  background: var(--board-deep);
+  border-top: var(--board-frame-width) solid var(--frame);
+}
+
+.dock-inner .count-ring {
+  grid-area: ring;
+}
+
+.dock-inner .dock-copy {
+  grid-area: copy;
+}
+
+.dock-inner .finalize {
+  grid-area: go;
+}
+
+/* The breakdown opens above the bar, in the page column, and scrolls inside itself. */
+.dock-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  /* Clears the sticky top bar (and the save banner above it) and the bar below. */
+  max-height: calc(
+    100dvh - var(--dock-height, 0px) - var(--topbar-height) -
+      var(--save-banner-offset, 0px) - var(--space-4)
+  );
+  overflow: auto;
+  margin: 0
+    max(
+      var(--page-gutter),
+      calc((100% - var(--page-max-width)) / 2 + var(--page-gutter))
+    )
+    var(--space-2);
+  padding: var(--space-4);
+  background: var(--board-deep);
+  border: var(--board-frame-width) solid var(--frame);
+  border-radius: var(--radius-md);
+  transition: opacity var(--duration-base) var(--ease-standard);
+}
+
+.dock-breakdown[hidden] {
+  display: none;
+}
+
+.dock-breakdown .dock-slots {
+  max-width: none;
+  padding-inline: var(--space-2);
+}
+
+/* Count ring: the progress arc around a surface disc. */
+.count-ring {
+  flex-shrink: 0;
+  width: var(--ring-size);
+  height: var(--ring-size);
+  border-radius: var(--radius-round);
+  background: conic-gradient(
+    var(--select) calc(var(--progress) * 1%),
+    var(--surface) 0
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: var(--ring-border) solid var(--frame);
+}
+
+.count-ring b {
+  width: var(--ring-inner-size);
+  height: var(--ring-inner-size);
+  border-radius: var(--radius-round);
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: var(--ring-count-size);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The toggle: headline with the chevron, hint below. The fill stays inside its padding. */
+.dock-copy {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  min-height: var(--finalize-min-height);
+  text-align: left;
+  color: inherit;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  padding: var(--space-1) var(--space-3);
+  margin: 0;
+  cursor: pointer;
+}
+
+button.dock-copy:hover {
+  background: color-mix(in oklab, var(--action) 14%, transparent);
+  border-color: color-mix(in oklab, var(--action) 35%, transparent);
+}
+
+button.dock-copy:active {
+  background: color-mix(in oklab, var(--action) 22%, transparent);
+  transform: translateY(1px);
+}
+
+.dock-copy b {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+}
+
+.dock-copy small {
+  display: block;
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+}
+
+/* The bar sits at the bottom and the breakdown opens upward: collapsed points up. */
+.dock-copy-chevron {
+  flex-shrink: 0;
+  width: 1em;
+  height: 1em;
+  color: var(--ink-soft);
+  transform: rotate(180deg);
+  transition: transform var(--duration-fast) var(--ease-standard);
+}
+
+.dock-copy[aria-expanded="true"] .dock-copy-chevron {
+  transform: rotate(0deg);
+}
+
+/* Stage button: never disabled, aria-disabled while the squad is not ready. */
+.finalize {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--finalize-min-height);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--good);
+  color: var(--on-good);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-sm);
+  text-align: center;
+  cursor: pointer;
+}
+
+.finalize[aria-disabled="true"] {
+  background: var(--disabled-fill);
+  color: var(--ink-soft);
+  cursor: not-allowed;
+}
+
+/* Slot squares grouped by position group plus the free pool. */
+.dock-slots {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-2) var(--space-3);
+  max-width: var(--slots-max-width);
+}
+
+.dock-slot-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--slot-label-gap);
+}
+
+.dock-slot-group-label {
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.dock-slot-group-squares {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--slot-square-gap);
+  max-width: var(--slot-group-max-width);
+}
+
+.dock-slot-group-squares span {
+  width: var(--slot-square-size);
+  height: var(--slot-square-size);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--frame);
+  flex: 0 0 auto;
+}
+
+.dock-slot-group-squares span.empty {
+  background: transparent;
+  border-style: dashed;
+}
+
+.dock-slot-group-gk .filled,
+.dock-slot-group-gk .empty,
+.dock-slot-group-free .filled.fill-gk {
+  border-color: var(--hue-gk);
+}
+
+.dock-slot-group-gk .filled,
+.dock-slot-group-free .filled.fill-gk {
+  background-color: var(--hue-gk);
+}
+
+.dock-slot-group-def .filled,
+.dock-slot-group-def .empty,
+.dock-slot-group-free .filled.fill-def {
+  border-color: var(--hue-def);
+}
+
+.dock-slot-group-def .filled,
+.dock-slot-group-free .filled.fill-def {
+  background-color: var(--hue-def);
+}
+
+.dock-slot-group-mid .filled,
+.dock-slot-group-mid .empty,
+.dock-slot-group-free .filled.fill-mid {
+  border-color: var(--hue-mid);
+}
+
+.dock-slot-group-mid .filled,
+.dock-slot-group-free .filled.fill-mid {
+  background-color: var(--hue-mid);
+}
+
+.dock-slot-group-fwd .filled,
+.dock-slot-group-fwd .empty,
+.dock-slot-group-free .filled.fill-fwd {
+  border-color: var(--hue-fwd);
+}
+
+.dock-slot-group-fwd .filled,
+.dock-slot-group-free .filled.fill-fwd {
+  background-color: var(--hue-fwd);
+}
+
+.dock-slot-group-free .empty {
+  border-color: var(--ink-soft);
+}
+
+/* Players outside the formation: hatched squares. */
+.dock-slot-group-squares span.outside {
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent 0 var(--hatch-gap),
+    var(--surface) var(--hatch-gap) var(--hatch-stripe)
+  );
+}
+
+/* Over the limit: the alert colour instead of the group's hue. */
+.dock-slot-group-squares span.excess {
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
+/* Markers: each in its own row under the groups, behind a divider. */
+.dock-outside-marker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--slot-label-gap);
+  flex-basis: 100%;
+  margin-top: var(--space-1);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--frame-soft);
+}
+
+.dock-outside-marker .dock-slot-group-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--warn-ink);
+  white-space: normal;
+}
+
+.dock-excess-marker .dock-slot-group-label {
+  color: var(--ink);
+}
+
+.dock-outside-icon,
+.dock-excess-icon {
+  flex: 0 0 auto;
+  width: var(--marker-icon-size);
+  height: var(--marker-icon-size);
+  border-radius: var(--radius-sm);
+}
+
+.dock-outside-icon {
+  border: 1px solid var(--ink-soft);
+  background: var(--ink-soft)
+    repeating-linear-gradient(
+      45deg,
+      transparent 0 var(--hatch-gap),
+      var(--surface) var(--hatch-gap) var(--hatch-stripe)
+    );
+}
+
+.dock-excess-icon {
+  border: 1px solid var(--danger);
+  background: var(--danger);
+}
+
+.dock-outside-detail {
+  font-size: var(--text-2xs);
+  color: var(--ink-soft);
+}
+
+@media (max-width: 767.98px) {
+  .count-ring {
+    width: var(--ring-size-narrow);
+    height: var(--ring-size-narrow);
+  }
+
+  .count-ring b {
+    width: var(--ring-inner-size-narrow);
+    height: var(--ring-inner-size-narrow);
+  }
+}
+
+@media (forced-colors: active) {
+  /* The square over the limit and its marker icon stay distinct from ordinary squares. */
+  .dock-slot-group-squares span.excess,
+  .dock-excess-icon {
+    forced-color-adjust: none;
+    background: Highlight;
+    border-color: Highlight;
+    outline: 1px solid CanvasText;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dock-breakdown,
+  .dock-copy-chevron {
+    transition: none;
+  }
+}
+
+/* The desktop side column (from 1024 px): sticky beside the list, the KPIs and actions at
+   their own height and the board taking the rest, scrolling inside itself. */
+@media (min-width: 1024px) {
+  .dock-side {
+    position: sticky;
+    top: calc(
+      var(--topbar-height) + var(--space-4) + var(--save-banner-offset, 0px)
+    );
+    display: flex;
+    flex-direction: column;
+    /* dvh as for the phone breakdown: on a tablet wide enough for this column the browser
+       toolbar can still collapse, and 100vh would then hide the board's last rows. */
+    max-height: calc(
+      100dvh - var(--topbar-height) - var(--space-4) * 2 -
+        var(--save-banner-offset, 0px)
+    );
+  }
+
+  .dock-side > .kpis-side,
+  .dock-side > .side-actions {
+    flex: none;
+  }
+
+  .dock-side > .dock {
+    position: static;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    background: var(--board-deep);
+    border: var(--board-frame-width) solid var(--frame);
+    border-radius: var(--radius-md);
+  }
+
+  .dock-side .dock-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-5) var(--space-4);
+    background: none;
+    border: none;
+  }
+
+  /* More room between the ring and the slot squares than the row gap. */
+  .dock-side .count-ring {
+    margin-right: var(--space-3);
+  }
+
+  .dock-side .dock-slots {
+    flex: 1 1 0;
+    max-width: none;
+  }
+
+  /* The copy and the stage button take full rows under the ring and the squares. */
+  .dock-side .dock-copy,
+  .dock-side .finalize {
+    flex: 1 1 100%;
+    margin: 0;
+  }
+
+  /* Plain text here: no hover frame, but the toggle's height and inset as in the bar. */
+  .dock-side .dock-copy {
+    border: none;
+    cursor: default;
+  }
+
+  .dock-side .dock-breakdown {
+    max-height: none;
+    overflow: visible;
+    margin: 0;
+    padding: var(--space-4);
+    background: none;
+    border: none;
+    border-top: var(--board-frame-width) solid var(--frame);
+    border-radius: 0;
+  }
+
+  .dock-side .side-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
+    margin: var(--space-3) 0 0;
+  }
+
+  .dock-side .side-actions .action-button {
+    min-height: var(--side-action-height);
+    margin: 0;
+    padding: 0 var(--space-2);
+    font-size: var(--text-sm);
+  }
+}
+
+@media (min-width: 1024px) and (pointer: fine) {
+  .dock-side > .dock {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  }
+}

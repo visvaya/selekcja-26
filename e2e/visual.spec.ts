@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 import type { Locator, Page } from "@playwright/test";
 import { players } from "../src/data/catalog.ts";
 import { RULES_REVISION } from "../src/data/constants.ts";
+import { UI_CONFIG } from "../src/ui/ui-config.ts";
 import {
   campSave,
   dialog,
@@ -91,8 +92,15 @@ for (const size of SIZES) {
         campSave({ selectedIds: firstIds(10), events: ["doctor"] }),
       );
       await page.goto("/");
-      await dockToggle(page).click();
-      await expect(dockToggle(page)).toHaveAttribute("aria-expanded", "true");
+      // Only the phone bottom dock collapses; the desktop side board is always expanded.
+      const wide = await page.evaluate(
+        (query) => window.matchMedia(query).matches,
+        UI_CONFIG.wideLayoutQuery,
+      );
+      if (!wide) {
+        await dockToggle(page).click();
+        await expect(dockToggle(page)).toHaveAttribute("aria-expanded", "true");
+      }
       await shot(page, `${size.name}-board`);
     });
 

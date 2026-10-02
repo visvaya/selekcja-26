@@ -276,14 +276,6 @@ for (const pair of PALETTE_PAIRS) {
 
 // Combinations the re-pointed legacy.css rules produce that PALETTE_PAIRS does not contain.
 // They cover legacy.css until the screen stages delete its rules; stage 11 removes this list.
-// The dock summary's warning row mixes two palette tokens, so it gets a local token here.
-const interimTokens = new Map([
-  ...paletteTokens,
-  [
-    "--interim-warn-overlay",
-    "color-mix(in oklab, var(--warn-fill) 25%, var(--surface))",
-  ],
-]);
 const INTERIM_PAIRS = [
   {
     fg: "frame",
@@ -292,23 +284,17 @@ const INTERIM_PAIRS = [
     note: "control borders on the board background: .search, .chip, .sort in .toolbar; .choice and .action-button on the start screen",
   },
   {
-    fg: "warn-ink",
-    bg: "interim-warn-overlay",
-    required: TEXT_RATIO,
-    note: ".dock-summary div.need, div.over and their span: text and border on the warning row",
-  },
-  {
     fg: "board-line",
     bg: "surface-dialog",
     required: LARGE_OR_UI_RATIO,
     note: ".compare-card and .profile-metric borders inside dialogs",
   },
-  // Dark --ink panels: .result-hero, .dock-breakdown, .score, .profile-score.
+  // Dark --ink panels: .result-hero, .score, .profile-score.
   {
     fg: "on-select",
     bg: "ink",
     required: TEXT_RATIO,
-    note: "light text on --ink panels (.result-hero, .result-hero h1, .dock-breakdown b, .score, .profile-score)",
+    note: "light text on --ink panels (.result-hero, .result-hero h1, .score, .profile-score)",
   },
   {
     fg: "on-ink-border",
@@ -317,61 +303,30 @@ const INTERIM_PAIRS = [
     note: "divider on --ink panels; kept from the design palette, no current consumer",
   },
   {
-    fg: "board-line",
-    bg: "ink",
-    required: LARGE_OR_UI_RATIO,
-    note: ".mini-pitch border inside .dock-breakdown",
-  },
-  {
-    fg: "interim-warn-overlay",
-    bg: "ink",
-    required: LARGE_OR_UI_RATIO,
-    note: "the dock summary warning row against .dock-breakdown: its light fill marks the row edge (its --warn-ink border is 1.45:1 on --ink and only decorates)",
-  },
-  {
-    fg: "on-select",
-    bg: "ink-tile",
-    required: TEXT_RATIO,
-    note: ".dock-summary div b on its tile",
-  },
-  {
-    fg: "on-ink-lead",
-    bg: "ink-tile",
-    required: TEXT_RATIO,
-    note: ".dock-summary span on its tile",
-  },
-  {
-    fg: "on-ink-dim",
-    bg: "ink-tile",
-    required: TEXT_RATIO,
-    note: ".dock-breakdown small on a .dock-summary tile",
-  },
-  {
-    fg: "warn-fill",
-    bg: "ink",
-    required: LARGE_OR_UI_RATIO,
-    note: ".formation-outsiders fill inside .dock-breakdown",
-  },
-  {
     fg: "focus-halo",
     bg: "ink",
     required: LARGE_OR_UI_RATIO,
     note: "the focus indicator on dark panels is carried by the white halo band; focus-core on ink is 1.21:1 and does not carry it there",
   },
+];
+
+// Squad board pairs the palette fixture does not contain.
+const BOARD_PAIRS = [
   {
-    fg: "select",
+    fg: "warn-ink",
     bg: "board-deep",
-    required: LARGE_OR_UI_RATIO,
-    note: ".count-ring progress arc against its track",
+    required: TEXT_RATIO,
+    note: ".dock-outside-marker label text on the board",
   },
 ];
 
-for (const pair of INTERIM_PAIRS) {
-  test(`interim pair ${pair.fg} on ${pair.bg} meets ${pair.required}:1`, () => {
+for (const pair of [...INTERIM_PAIRS, ...BOARD_PAIRS]) {
+  const kind = INTERIM_PAIRS.includes(pair) ? "interim" : "board";
+  test(`${kind} pair ${pair.fg} on ${pair.bg} meets ${pair.required}:1`, () => {
     const ratio = tokenContrastRatio(
       `--${pair.fg}`,
       `--${pair.bg}`,
-      interimTokens,
+      paletteTokens,
     );
     assert.ok(
       ratio >= pair.required,

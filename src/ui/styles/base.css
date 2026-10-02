@@ -67,6 +67,10 @@ button {
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  /* Focus and in-page jumps stop below the sticky top bar and the save banner above it. */
+  scroll-padding-top: calc(
+    var(--topbar-height) + var(--save-banner-offset, 0px) + var(--space-2)
+  );
 }
 
 @media (prefers-reduced-motion: reduce) {

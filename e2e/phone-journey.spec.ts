@@ -1,7 +1,12 @@
 import { expect, test } from "@playwright/test";
+import type { Page } from "@playwright/test";
+import { players, systems } from "../src/data/catalog.ts";
+import { detailedPositions } from "../src/logic/selection.ts";
 import { GAME_VERSION } from "../src/data/changelog.ts";
+import type { GroupPosition } from "../src/data/types.ts";
 import {
   CAMP_EVENT_CHOICES,
+  campSave,
   collectPageErrors,
   dialog,
   dockToggle,
@@ -10,6 +15,7 @@ import {
   expectNoHorizontalScroll,
   finalizeButton,
   readReport,
+  seedStorage,
   squadCount,
   text,
 } from "./helpers.ts";
@@ -42,6 +48,10 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
   expect(labelBox?.width ?? 0).toBeLessThanOrEqual(1);
   expect(labelBox?.height ?? 0).toBeLessThanOrEqual(1);
 
+  // 3-4-2-1 has no wingers, so a winger called up below stays outside the formation.
+  await page
+    .getByRole("radio", { name: new RegExp(`^${text.systems["3421"].name}`) })
+    .tap();
   await page.getByRole("button", { name: text.start }).tap();
   await expect(
     page.getByRole("heading", { name: text.stages.camp.heading }),
@@ -59,6 +69,17 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
   await expect(dialog(page)).toBeHidden();
   await expect(squadCount(page)).toHaveText("0/23");
   await expectFocusVisible(page, "random fill dialog undo (closed)");
+
+  // A player with no 3-4-2-1 position keeps the outsiders strip on the pitch whatever the
+  // random fill adds; the fill keeps earlier call-ups.
+  const search = page.getByLabel(text.searchLabel);
+  await search.fill(OUTSIDER_3421.name);
+  await page.locator(".select-btn").first().tap();
+  await expect(squadCount(page)).toHaveText("1/23");
+  await search.fill("");
+  // Scrolled down the list: when the event dialogs close, focus falls back to the heading,
+  // which must come out from under the sticky top bar.
+  await page.evaluate(() => window.scrollTo(0, 600));
 
   await page.getByRole("button", { name: text.autoFill }).tap();
   for (const choice of CAMP_EVENT_CHOICES) {
@@ -82,17 +103,16 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
   await dockToggle(page).tap();
   await expect(dockToggle(page)).toHaveAttribute("aria-expanded", "true");
   await expect(
-    page.getByRole("img", { name: new RegExp(text.systems["4231"].name) }),
+    page.getByRole("img", { name: new RegExp(text.systems["3421"].name) }),
   ).toBeVisible();
-  const outsiders = page.locator(".formation-outsiders");
-  if (await outsiders.isVisible()) {
-    await outsiders.tap();
-    await expect(dialog(page)).toBeVisible();
-    await expectFocusVisible(page, "outsiders dialog open");
-    await dialog(page).getByRole("button", { name: text.returnToPitch }).tap();
-    await expect(dialog(page)).toBeHidden();
-    await expectFocusVisible(page, "outsiders dialog close");
-  }
+  const outsiders = page.getByRole("button", { name: /^Poza ustawieniem: / });
+  await expect(outsiders).toBeVisible();
+  await outsiders.tap();
+  await expect(dialog(page)).toBeVisible();
+  await expectFocusVisible(page, "outsiders dialog open");
+  await dialog(page).getByRole("button", { name: text.returnToPitch }).tap();
+  await expect(dialog(page)).toBeHidden();
+  await expectFocusVisible(page, "outsiders dialog close");
   await dockToggle(page).tap();
   await expect(dockToggle(page)).toHaveAttribute("aria-expanded", "false");
   await expectNoHorizontalScroll(page);
@@ -173,6 +193,68 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
 
   expect(errors).toEqual([]);
 });
+
+const idsInGroup = (group: GroupPosition, count: number) =>
+  players
+    .filter((player) => player.pos === group)
+    .slice(0, count)
+    .map((player) => player.id);
+
+const SYSTEM_3421 = systems.find((system) => system.id === "3421")!;
+const OUTSIDER_3421 = players.find(
+  (player) =>
+    !detailedPositions(player).some((position) =>
+      SYSTEM_3421.fits.includes(position),
+    ),
+)!;
+
+// Focuses the last strip's compare button the way a keyboard user reaches it: programmatic focus
+// (WebKit has no Tab focus on buttons by default), then Tab away and back.
+async function focusLastCompare(page: Page): Promise<void> {
+  const last = page.locator(".compare-btn").last();
+  await last.focus();
+  await page.keyboard.press("Shift+Tab");
+  await page.keyboard.press("Tab");
+  if (!(await last.evaluate((element) => element === document.activeElement)))
+    await last.focus();
+  await expect(last).toBeFocused();
+}
+
+for (const blocked of [false, true])
+  test(`the last strip's compare button stays above the bottom dock${blocked ? " when a full squad is blocked" : ""}`, async ({
+    page,
+  }) => {
+    const errors = collectPageErrors(page);
+    // A full camp squad without goalkeepers is blocked, so the dock headline takes two lines
+    // and the bar grows.
+    const selectedIds = blocked
+      ? [
+          ...idsInGroup("OBR", 8),
+          ...idsInGroup("POM", 8),
+          ...idsInGroup("ATA", 7),
+        ]
+      : [];
+    await seedStorage(
+      page,
+      campSave({
+        selectedIds,
+        events: blocked ? ["doctor", "captain", "scout"] : [],
+      }),
+    );
+    await page.goto("/");
+    await expect(squadCount(page)).toHaveText(`${selectedIds.length}/23`);
+    if (blocked)
+      await expect(finalizeButton(page)).toHaveAttribute(
+        "aria-disabled",
+        "true",
+      );
+    await focusLastCompare(page);
+    await expectFocusVisible(
+      page,
+      blocked ? "last compare button, blocked squad" : "last compare button",
+    );
+    expect(errors).toEqual([]);
+  });
 
 test("start ticket fits a 320 px phone with the stub under the content", async ({
   page,

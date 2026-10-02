@@ -5,4 +5,6 @@ export const UI_CONFIG = Object.freeze({
   popoverEdgePx: 8,
   liveCountDebounceMs: 500,
   hintDelayMs: 300,
+  // The desktop layout: side column with the board, no bottom dock.
+  wideLayoutQuery: "(min-width: 1024px)",
 });

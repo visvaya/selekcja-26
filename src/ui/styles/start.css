@@ -278,11 +278,6 @@
   gap: var(--space-4);
 }
 
-/* Outranks the dock's narrow-screen reorder of .pitch-panel, which also matches the map. */
-.model-choice-layout > .model-preview {
-  order: 0;
-}
-
 .choice {
   display: flex;
   align-items: center;
@@ -355,156 +350,46 @@
   background: color-mix(in oklab, var(--select) 10%, var(--surface));
 }
 
-/* Start-screen map rules are scoped under .model-preview so the dock keeps its own look. */
-/* Panel and nodes grow with enlarged text (rem terms) and keep the design's px sizes at the
-   default text size. */
+/* The start screen map overrides the shared pitch (pitch.css): a narrower panel, a shorter
+   body and smaller nodes at every width. Panel and nodes grow with enlarged text (rem terms)
+   and keep the design's px sizes at the default text size. */
 .model-preview {
   max-width: max(220px, 13.75rem);
   margin: 0 auto;
-  padding: var(--space-4);
-  background: var(--board);
-  border: 3px solid var(--board-line);
-  border-radius: var(--radius-sm);
 }
 
-.model-preview .mini-pitch {
-  position: relative;
-  display: flex;
-  flex-direction: column;
+.model-preview .pitch-row {
   gap: var(--space-2);
-  padding: var(--space-4) var(--space-2);
-  background: var(--board);
-  border: 2px solid var(--board-line);
-  border-radius: var(--radius-sm);
-  overflow: hidden;
 }
 
-.model-preview .pitch-markings {
-  position: absolute;
-  inset: var(--space-2);
-  pointer-events: none;
-}
-
-.model-preview .pitch-markings .halfway {
+/* The start map keeps its earlier look: a halfway line across the whole pitch and a ringed
+   legend dot set 4 px off the name. */
+.model-preview .mini-pitch::before {
+  content: "";
   position: absolute;
   left: 0;
   right: 0;
   top: 50%;
-  height: 1px;
-  background: var(--board-line);
-}
-
-.model-preview .pitch-markings .centre-circle {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 56px;
-  height: 56px;
-  margin: -28px 0 0 -28px;
-  border: 1px solid var(--board-line);
-  border-radius: var(--radius-round);
-}
-
-.model-preview .pitch-markings .box {
-  position: absolute;
-  left: 18%;
-  right: 18%;
-  height: 16%;
-  border: 1px solid var(--board-line);
-}
-
-.model-preview .pitch-markings .box-top {
-  top: 0;
-  border-top: none;
-}
-
-.model-preview .pitch-markings .box-bottom {
-  bottom: 0;
-  border-bottom: none;
+  border-top: 1px solid var(--board-line);
 }
 
 .model-preview .formation-label {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-2);
-  color: var(--ink-soft);
-  background: var(--board);
-  align-self: flex-start;
-  padding: 2px var(--space-1);
-  max-width: 100%;
+  top: var(--start-map-label-top);
+  left: var(--space-2);
 }
 
 .model-preview .formation-label i {
-  flex-shrink: 0;
-  margin-top: 4px;
-  width: 10px;
-  height: 10px;
-  border-radius: var(--radius-round);
-  background: var(--select);
-  display: inline-block;
-}
-
-.model-preview .formation-label b {
-  display: block;
-  font-family: var(--font-display);
-  font-size: var(--text-xs);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--ink-soft);
-}
-
-.model-preview .pitch-field {
-  position: relative;
-  width: 100%;
-  max-width: 520px;
-  margin: 0 auto;
+  border: 2px solid var(--select);
+  margin-right: var(--space-1);
 }
 
 .model-preview .pitch-body {
-  position: relative;
-  z-index: 1;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
   min-height: 120px;
-  padding: var(--space-2) 0;
-  row-gap: var(--space-2);
-}
-
-.model-preview .pitch-row {
-  display: flex;
-  justify-content: space-evenly;
-  gap: var(--space-2);
-  flex-wrap: nowrap;
-}
-
-.model-preview .pitch-row.single {
-  justify-content: center;
 }
 
 .model-preview .pitch-node {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
   width: max(28px, 1.5rem);
   height: max(28px, 1.5rem);
-  border-radius: var(--radius-round);
-  background: var(--surface);
-  border: 2px solid var(--frame);
-  box-shadow: 2px 2px 0 var(--shadow);
-}
-
-.model-preview .pitch-node small {
-  font-size: var(--text-3xs);
-  font-weight: 700;
-  color: var(--ink-soft);
-  line-height: 1;
 }
 
 @media (min-width: 1024px) {
