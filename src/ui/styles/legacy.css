@@ -86,7 +86,7 @@ button {
 .main {
   max-width: var(--page-max-width);
   margin: auto;
-  padding: var(--legacy-space-10) var(--page-gutter) 108px;
+  padding: 0 var(--page-gutter) 108px;
 }
 .eyebrow {
   font-family: var(--font-display);
@@ -574,7 +574,7 @@ button {
 }
 @media (min-width: 760px) {
   .main {
-    padding: var(--legacy-space-13) var(--page-gutter) 110px;
+    padding: 0 var(--page-gutter) 110px;
   }
   .toolbar {
     grid-template-columns: 1fr auto;

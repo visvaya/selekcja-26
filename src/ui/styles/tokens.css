@@ -116,6 +116,8 @@
      from 760 px (below). */
   --page-max-width: 1180px;
   --page-gutter: 14px;
+  /* space between the top bar and the first content of every screen */
+  --topbar-gap: var(--space-5);
   --button-primary-size: var(--text-base);
   --cta-min-width: 240px;
   --scrollbar-thumb: var(--frame-soft);

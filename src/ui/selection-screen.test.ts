@@ -107,3 +107,38 @@ test("final list head shows the June term", async () => {
     }
   });
 });
+
+test("wide form moves the KPIs and actions into the side column", async () => {
+  await withJsdomWindow(async () => {
+    const { cleanup } = await import("@testing-library/react");
+    const stub = (query: string) =>
+      ({
+        matches: query === "(min-width: 1024px)",
+        media: query,
+        addEventListener: () => {},
+        removeEventListener: () => {},
+      }) as unknown as MediaQueryList;
+    Object.defineProperty(window, "matchMedia", {
+      configurable: true,
+      value: stub,
+    });
+    const { vite, container } = await renderScreen(campState());
+    try {
+      const aside = container.querySelector(".screen-layout > aside.dock-side");
+      assert.equal(aside !== null, true);
+      assert.equal(aside?.querySelector(".kpis.kpis-side") !== null, true);
+      const actions = aside?.querySelector(".game-actions.side-actions");
+      assert.equal(
+        [...(actions?.querySelectorAll("button") ?? [])]
+          .map((button) => button.textContent)
+          .join("|"),
+        "Dobierz losowo|Cofnij",
+      );
+      assert.equal(container.querySelector(".kpis-inline") === null, true);
+      assert.equal(container.querySelectorAll(".game-actions").length, 1);
+    } finally {
+      cleanup();
+      await vite.close();
+    }
+  });
+});
