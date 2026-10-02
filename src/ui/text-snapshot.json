@@ -172,6 +172,8 @@
   "clearComparison": "Wyczyść porównanie",
   "clearFilters": "Wyczyść filtry",
   "clearSquad": "Odwołaj wszystkich",
+  "collapseTraits": "Zwiń",
+  "collapseTraitsName": "Zwiń cechy",
   "compare": "Porównaj",
   "compared": "Wybrany",
   "comparisonEyebrow": "Analiza porównawcza",
@@ -343,6 +345,17 @@
     "Brakuje X",
     "Brakuje Półfinał",
     "Brakuje 2026-10-01"
+  ],
+  "moreTraits": [
+    "+0: pokaż jeszcze 0 cech",
+    "+1: pokaż jeszcze 1 cechę, w tym ostrzeżenie",
+    "+2: pokaż jeszcze 2 cechy, w tym 2 ostrzeżenia",
+    "+5: pokaż jeszcze 5 cech, w tym 5 ostrzeżeń",
+    "+12: pokaż jeszcze 12 cech, w tym 12 ostrzeżeń",
+    "+22: pokaż jeszcze 22 cechy, w tym 22 ostrzeżenia",
+    "+X: pokaż jeszcze X cech, w tym X ostrzeżeń",
+    "+Półfinał: pokaż jeszcze Półfinał cech, w tym Półfinał ostrzeżeń",
+    "+2026-10-01: pokaż jeszcze 2026-10-01 cech, w tym 2026-10-01 ostrzeżeń"
   ],
   "newGame": "Nowa gra",
   "noCandidates": "Brak zawodników spełniających kryteria.",
@@ -655,6 +668,17 @@
   "selected": "Powołany ✓",
   "selectedName": "Powołany",
   "selectionScore": "Ocena selekcyjna",
+  "shortName": [
+    "0 (0)",
+    "1 (1)",
+    "2 (2)",
+    "5 (5)",
+    "12 (12)",
+    "22 (22)",
+    "X (X)",
+    "Półfinał (Półfinał)",
+    "2026-10-01 (2026-10-01)"
+  ],
   "simulationDisclaimer": "Symulacja ocenia strukturę decyzji i zawiera kontrolowaną losowość. Nie jest prognozą rzeczywistego wyniku sportowego.",
   "skipToList": "Przejdź do listy kandydatów",
   "sort": {

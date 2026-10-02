@@ -134,6 +134,18 @@ export const LIST_TEXT = {
     `${codes}: ${`${names}`.toLocaleLowerCase("pl")}`,
   positionPopoverSeparator: " · ",
   positionMore: (count: number) => `+${count}`,
+  // shortened strip name: the visible form first, the full name in brackets
+  shortName: (shown: string, full: string) => `${shown} (${full})`,
+  moreTraits: (count: number, flags: number) =>
+    `+${count}: pokaż jeszcze ${count} ${plural(count, "cechę", "cechy", "cech")}${
+      flags === 0
+        ? ""
+        : flags === 1
+          ? ", w tym ostrzeżenie"
+          : `, w tym ${flags} ${plural(flags, "ostrzeżenie", "ostrzeżenia", "ostrzeżeń")}`
+    }`,
+  collapseTraits: "Zwiń",
+  collapseTraitsName: "Zwiń cechy",
   playerMetrics: {
     quality: "Jakość",
     form: "Forma",

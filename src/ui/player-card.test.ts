@@ -1,12 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createServer } from "vite";
-import { players } from "../data/catalog.ts";
 import type { GameState, Player } from "../data/types.ts";
 import { modelScore } from "../logic/scoring.ts";
-import { createInitialState, reduceGameState } from "../logic/state.ts";
 import { scoreBand } from "./score-band.ts";
 import { withJsdomWindow } from "./test-jsdom-window.ts";
+import { campState, finalState, player } from "./test-strip-states.ts";
 
 // `hmr: false` keeps this server off the default HMR port other test files may use.
 async function loadModules() {
@@ -21,24 +20,6 @@ async function loadModules() {
     "/src/ui/use-popover-anchoring.ts",
   )) as typeof import("./use-popover-anchoring.ts");
   return { vite, card, anchoring };
-}
-
-function player(id: string): Player {
-  const found = players.find((candidate) => candidate.id === id);
-  assert.ok(found, id);
-  return found;
-}
-
-function campState(): GameState {
-  return reduceGameState(createInitialState(7), { type: "start" });
-}
-
-function finalState(trial: GameState["trial"]): GameState {
-  const state = reduceGameState(campState(), {
-    type: "completeCamp",
-    squad: players.slice(0, 23),
-  });
-  return { ...state, trial };
 }
 
 async function renderCard(target: Player, state: GameState) {
@@ -59,7 +40,7 @@ async function renderCard(target: Player, state: GameState) {
 }
 
 function tagTexts(container: HTMLElement): string[] {
-  return [...container.querySelectorAll(".tags .tag")].map(
+  return [...container.querySelectorAll(".tags .tag:not(.tag-more)")].map(
     (tag) => tag.textContent ?? "",
   );
 }

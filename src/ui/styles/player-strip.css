@@ -564,6 +564,112 @@ button.pos:active {
   }
 }
 
+/* ================= Fitted names, clubs and trait rows ================= */
+
+/* the invisible probe that measures a name's natural width; it outranks the name's own cap */
+.player h3 .fit-probe {
+  position: absolute;
+  visibility: hidden;
+  width: auto;
+  max-width: none;
+  white-space: nowrap;
+}
+
+/* a shortened name opens the full one; it keeps the heading's look */
+button.name-trunc {
+  appearance: none;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+button.name-trunc:hover {
+  background: var(--board-deep);
+}
+
+button.name-trunc:active {
+  background: var(--board-deep);
+  box-shadow: inset 0 0 0 var(--divider-border) var(--action);
+}
+
+.name-popover {
+  max-width: var(--popover-max-width);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: var(--popover-border) solid var(--frame);
+  background: var(--surface-dialog);
+  color: var(--ink);
+  box-shadow: var(--popover-shadow-offset) var(--popover-shadow-offset) 0
+    var(--shadow);
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+/* club as a button: a 24 px line, the text as before */
+button.meta-club {
+  appearance: none;
+  min-height: var(--name-target);
+  padding: 0 var(--club-nudge);
+  margin: 0 0 0 calc(var(--club-nudge) * -1);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+button.meta-club:hover {
+  background: var(--board-deep);
+}
+
+button.meta-club:active {
+  box-shadow: inset 0 0 0 var(--divider-border) var(--action);
+}
+
+/* "+N" and "Zwiń": a quiet text button in the size of the traits */
+.tag.tag-more {
+  min-height: var(--name-target);
+  min-width: var(--name-target);
+  padding: 0 var(--space-1);
+  border: none;
+  background: transparent;
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tag.tag-more:hover {
+  color: var(--ink);
+  background: var(--board-deep);
+}
+
+/* "+N" that hides a flag takes the flag's colours, so the warning never disappears */
+.tag.tag-more.tag-more-alert {
+  background: var(--warn-fill);
+  color: var(--warn-ink);
+  border: var(--divider-border) solid var(--warn-ink);
+}
+
+.tag.tag-more.tag-more-alert:hover {
+  box-shadow: inset 0 0 0 var(--divider-border) var(--warn-ink);
+}
+
+.tags > [hidden] {
+  display: none;
+}
+
 @media (forced-colors: active) {
   .player-actions .select-btn[aria-pressed="true"],
   .player-actions .compare-btn[aria-pressed="true"] {
