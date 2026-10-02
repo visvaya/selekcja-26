@@ -389,9 +389,23 @@ test("list filters survive a squad change, undo and reload", async ({
 
   const profiles = page.locator(".player .profile-btn");
   const callUp = page.locator(".player .select-btn");
-  await expect(profiles.nth(1)).toBeVisible();
+  await expect(profiles.nth(2)).toBeVisible();
   await callUp.nth(0).click();
   await callUp.nth(1).click();
+  const count = page.locator(".list-count");
+  const filteredCount = await count.innerText();
+  // A call-up and its undo leave the filters and the visible list alone.
+  await callUp.nth(2).click();
+  await expect(
+    page.getByRole("checkbox", { name: text.onlySelected(3) }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: text.undo }).click();
+  await expect(
+    page.getByRole("checkbox", { name: text.onlySelected(2) }),
+  ).toBeVisible();
+  await expect(count).toHaveText(filteredCount);
+  await expect(page.getByLabel(text.searchLabel)).toHaveValue("a");
+  await expect(toggle).toHaveAccessibleName(text.detailFiltersActive(2));
   await page.getByRole("checkbox", { name: text.onlySelected(2) }).check();
   await expect(profiles).toHaveCount(2);
 
@@ -405,7 +419,6 @@ test("list filters survive a squad change, undo and reload", async ({
     profiles.evaluateAll((buttons) =>
       buttons.map((button) => button.getAttribute("aria-label")),
     );
-  const count = page.locator(".list-count");
   const before = { names: await names(), count: await count.innerText() };
   expect(before.count).toBe(text.visibleCount(2, 61));
 
@@ -421,8 +434,8 @@ test("list filters survive a squad change, undo and reload", async ({
     page.getByRole("checkbox", { name: text.onlySelected(2) }),
   ).toBeChecked();
   await expect(toggle).toHaveAccessibleName(text.detailFiltersActive(2));
-  if ((await toggle.getAttribute("aria-expanded")) !== "true")
-    await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await toggle.click();
   await expect(
     page.getByRole("checkbox", { name: text.roles.pace }),
   ).toBeChecked();

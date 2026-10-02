@@ -129,8 +129,12 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
     name: text.rangeFrom(text.ranges.campImpact),
   });
   await campFrom.focus();
+  const badInput = () =>
+    campFrom.evaluate((input) => (input as HTMLInputElement).validity.badInput);
   await campFrom.pressSequentially("-");
+  expect(await badInput(), "the lone minus was typed").toBe(true);
   await campFrom.blur();
+  expect(await badInput(), "blur clears the unreadable text").toBe(false);
   await expect(campFrom).toHaveValue("");
   await expect(filtersToggle).toHaveAccessibleName(text.detailFilters);
   await filtersToggle.tap();

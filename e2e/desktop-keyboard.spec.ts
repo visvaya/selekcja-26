@@ -195,7 +195,9 @@ test("desktop game is playable with the keyboard alone", async ({ page }) => {
   // With the panel closed every position chip is a Tab stop with a visible focus ring.
   await activate(page, filtersToggle);
   await expect(filtersToggle).toHaveAttribute("aria-expanded", "false");
-  const chips = page.locator(".toolbar button[aria-pressed]");
+  const chips = page
+    .getByRole("group", { name: text.positionChipsLabel })
+    .getByRole("button");
   const chipCount = await chips.count();
   expect(chipCount).toBeGreaterThan(1);
   await tabUntil(page, chips.first());
