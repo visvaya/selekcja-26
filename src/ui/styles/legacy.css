@@ -26,13 +26,6 @@ button {
 .app {
   min-height: 100vh;
 }
-.topbar {
-  position: sticky;
-  top: var(--save-banner-offset, 0px);
-  z-index: 20;
-  background: var(--surface);
-  border-bottom: 1px solid var(--board-line);
-}
 .save-status {
   position: sticky;
   top: 0;
@@ -89,55 +82,6 @@ button {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
-}
-.topbar-inner {
-  max-width: 1180px;
-  margin: auto;
-  height: var(--topbar-height);
-  padding: 0 var(--legacy-space-8);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--legacy-space-7);
-}
-.brand-group {
-  display: flex;
-  align-items: baseline;
-  gap: var(--legacy-space-5);
-  min-width: 0;
-}
-.brand {
-  font-family: var(--font-display);
-  display: flex;
-  align-items: center;
-  gap: var(--legacy-space-5);
-  font-weight: 900;
-  letter-spacing: -0.04em;
-}
-.topbar-version {
-  flex: none;
-  font-size: var(--font-caption);
-  color: var(--ink-soft);
-  font-weight: 700;
-  white-space: nowrap;
-}
-.brand-mark {
-  font-family: var(--font-display);
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  background: var(--action);
-  color: var(--on-action);
-  display: grid;
-  place-items: center;
-  font-size: var(--font-caption);
-}
-.phase {
-  font-family: var(--font-display);
-  flex: none;
-  font-size: var(--font-small);
-  color: var(--ink-soft);
-  font-weight: 700;
 }
 .main {
   max-width: 1180px;
@@ -795,9 +739,6 @@ button {
   }
   .modal {
     border-radius: 22px;
-  }
-  .topbar-inner {
-    padding: 0 var(--legacy-space-12);
   }
 }
 @media (min-width: 1050px) {

@@ -326,6 +326,7 @@
     "runnerUp": "Wicemistrz Europy",
     "semifinal": "Półfinał"
   },
+  "phaseLabel": "Etap:",
   "pitchDescription": "Liczby pokazują, ilu powołanych może grać na danej pozycji.",
   "playerMetrics": {
     "fitness": "Zdrowie",

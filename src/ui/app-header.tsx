@@ -16,7 +16,10 @@ export function AppHeader({ phase }: { phase: string }) {
             </span>
           </span>
         </div>
-        <div className="phase">{phase}</div>
+        <div className="phase-group">
+          <span className="phase-label">{text.phaseLabel}</span>
+          <div className="phase">{phase}</div>
+        </div>
       </div>
     </header>
   );

@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { GAME_VERSION } from "../src/data/changelog.ts";
 import {
   CAMP_EVENT_CHOICES,
   collectPageErrors,
@@ -28,6 +29,18 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
     }),
   ).toHaveAttribute("aria-pressed", "true");
   await expectNoHorizontalScroll(page);
+
+  // Below 420 px the version and the stage label are hidden visually but stay in the
+  // accessible text of the top bar.
+  await expect(page.locator(".phase-group")).toContainText(text.phaseLabel);
+  await expect(
+    page
+      .locator(".topbar")
+      .getByText(text.topBarVersionAccessible(GAME_VERSION)),
+  ).toBeAttached();
+  const labelBox = await page.locator(".phase-label").boundingBox();
+  expect(labelBox?.width ?? 0).toBeLessThanOrEqual(1);
+  expect(labelBox?.height ?? 0).toBeLessThanOrEqual(1);
 
   await page.getByRole("button", { name: text.start }).tap();
   await expect(
