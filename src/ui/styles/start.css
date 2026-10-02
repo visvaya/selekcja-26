@@ -392,10 +392,6 @@
   height: max(28px, 1.5rem);
 }
 
-.model-preview .pitch-node small {
-  font-size: var(--text-3xs);
-}
-
 @media (min-width: 1024px) {
   .choice-grid {
     grid-template-columns: repeat(3, 1fr);

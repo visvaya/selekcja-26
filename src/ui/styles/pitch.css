@@ -159,6 +159,7 @@
 }
 
 .pitch-node small {
+  font-size: var(--text-3xs);
   font-weight: 700;
   color: var(--ink-soft);
   line-height: 1;

@@ -233,11 +233,12 @@
   /* Squad board anatomy: the count ring (66 px, 60 px below 768 px) with its inner disc
      (52/46 px), 10 px slot squares 3 px apart in groups at most 56 px wide (five per row),
      the slot block at most 260 px, 2 px between a group label and its squares, the 10 px
-     marker icon and the 2 px gaps and 3.5 px stripes of the outsider hatching. */
-  --ring-size: 66px;
-  --ring-size-narrow: 60px;
-  --ring-inner-size: 52px;
-  --ring-inner-size-narrow: 46px;
+     marker icon and the 2 px gaps and 3.5 px stripes of the outsider hatching. The ring
+     grows with enlarged text (rem terms) so the count stays inside its disc. */
+  --ring-size: max(66px, 4.125rem);
+  --ring-size-narrow: max(60px, 3.75rem);
+  --ring-inner-size: max(52px, 3.25rem);
+  --ring-inner-size-narrow: max(46px, 2.875rem);
   --ring-border: 2px;
   --slot-square-size: 10px;
   --slot-square-gap: 3px;
