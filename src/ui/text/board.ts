@@ -39,7 +39,6 @@ export const BOARD_TEXT = {
       `${count} ${plural(count, "napastnik", "napastników", "napastników")}`,
   } satisfies Record<GroupPosition, (count: number) => string>,
   outOfFormation: "Poza ustawieniem",
-  availablePlayers: "liczba dostępnych",
   pitchDescription:
     "Liczby pokazują, ilu powołanych może grać na danej pozycji.",
   dockOpen: "Dotknij, aby zobaczyć podział miejsc",

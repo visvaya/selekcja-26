@@ -1,10 +1,13 @@
 import { systems } from "../data/catalog.ts";
 import type { GameState } from "../data/types.ts";
 import { slotCount } from "../logic/selection.ts";
+import { PitchField } from "./pitch-field.tsx";
 import { UI_TEXT as text } from "./text.ts";
 
+// The squad board's formation: how many called-up players can play each slot.
 export function Pitch({ state }: { state: GameState }) {
   const system = systems.find((candidate) => candidate.id === state.system)!;
+  const name = text.systems[state.system].name;
   const accessibleSlots = system.shape
     .flat()
     .map((position) =>
@@ -15,29 +18,31 @@ export function Pitch({ state }: { state: GameState }) {
     <div
       className="mini-pitch"
       role="img"
-      aria-label={`${text.systems[state.system].name}. ${text.pitchDescription} ${accessibleSlots}`}
+      aria-label={`${name}. ${text.pitchDescription} ${accessibleSlots}`}
     >
       <div className="formation-label">
         <i aria-hidden="true" />
-        {text.systems[state.system].name} • {text.availablePlayers}
+        <span>
+          <b>{name}</b>
+          <small>{text.pitchDescription}</small>
+        </span>
       </div>
-      {system.shape.map((row, index) => (
-        <div className="pitch-row" key={index}>
-          {row.map((position, slot) => (
+      <PitchField
+        shape={system.shape}
+        renderNode={(code, key) => {
+          const count = slotCount(state, code);
+          return (
             <span
               className="pitch-node"
-              key={`${position}-${slot}`}
-              title={text.occupied(
-                slotCount(state, position),
-                text.positions[position],
-              )}
+              key={key}
+              title={text.occupied(count, text.positions[code])}
             >
-              <small>{position}</small>
-              <b>{slotCount(state, position)}</b>
+              <small>{code}</small>
+              <b>{count}</b>
             </span>
-          ))}
-        </div>
-      ))}
+          );
+        }}
+      />
     </div>
   );
 }

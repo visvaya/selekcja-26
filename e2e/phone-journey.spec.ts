@@ -84,7 +84,7 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
   await expect(
     page.getByRole("img", { name: new RegExp(text.systems["4231"].name) }),
   ).toBeVisible();
-  const outsiders = page.locator(".formation-outsiders");
+  const outsiders = page.getByRole("button", { name: /^Poza ustawieniem: / });
   if (await outsiders.isVisible()) {
     await outsiders.tap();
     await expect(dialog(page)).toBeVisible();

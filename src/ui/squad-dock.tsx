@@ -5,12 +5,12 @@ import {
   canFinalize,
   formationOutsiders,
   groupCounts,
-  positionShort,
   squadLimit,
   squadProblems,
 } from "../logic/selection.ts";
 import { groupPositions } from "./group-order.ts";
 import { Pitch } from "./pitch.tsx";
+import { PitchOutsiders } from "./pitch-outsiders.tsx";
 import { UI_TEXT as text } from "./text.ts";
 
 export function SquadDock({
@@ -30,14 +30,6 @@ export function SquadDock({
     requirements = GAME_RULES[state.stage].minimumPlayersByGroup;
   const issues = squadProblems(state),
     outsiders = formationOutsiders(state);
-  const groups = Object.entries(
-    outsiders.reduce<Record<string, number>>((result, player) => {
-      const key = positionShort(player);
-      return { ...result, [key]: (result[key] ?? 0) + 1 };
-    }, {}),
-  )
-    .map(([position, count]) => `${position} ×${count}`)
-    .join(" · ");
   const progress = Math.min(
     GAME_RULES.ratingMaximumPoints,
     (state.selected.size / squadLimit(state)) * GAME_RULES.ratingMaximumPoints,
@@ -88,21 +80,7 @@ export function SquadDock({
         </div>
         <div className="pitch-panel">
           <Pitch state={state} />
-          {outsiders.length > 0 && (
-            <button
-              className="formation-outsiders"
-              onClick={onOutsiders}
-              aria-label={text.outOfFormationTitle(outsiders.length)}
-            >
-              <div>
-                <strong>{text.outOfFormationTitle(outsiders.length)}</strong>
-                <small>{groups}</small>
-              </div>
-              <span className="outside-arrow" aria-hidden="true">
-                ›
-              </span>
-            </button>
-          )}
+          <PitchOutsiders players={outsiders} onOpen={onOutsiders} />
         </div>
       </div>
       <div className="dock-inner">

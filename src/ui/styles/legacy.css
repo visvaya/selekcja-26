@@ -497,113 +497,6 @@ span.pos {
 .dock-breakdown.hidden {
   display: none !important;
 }
-.pitch-panel {
-  min-width: 0;
-  display: grid;
-  gap: var(--legacy-space-3);
-}
-.mini-pitch {
-  position: relative;
-  min-height: 240px;
-  border: 2px solid var(--board-line);
-  border-radius: 9px;
-  background: var(--board);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  padding: 25px 5px var(--legacy-space-3);
-  overflow: hidden;
-}
-.mini-pitch:before {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  border-top: 1px solid var(--board-line);
-}
-.formation-label {
-  position: absolute;
-  z-index: 2;
-  top: 6px;
-  left: 8px;
-  font-size: var(--font-caption);
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  color: var(--ink);
-}
-.formation-label i {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  border: 2px solid var(--select);
-  border-radius: 50%;
-  vertical-align: -2px;
-  margin-right: var(--legacy-space-2);
-}
-.pitch-row {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  justify-content: center;
-  gap: 9px;
-}
-.pitch-node {
-  width: 38px;
-  height: 38px;
-  border: 3px solid var(--select);
-  border-radius: 50%;
-  background: var(--surface);
-  color: var(--ink);
-  display: grid;
-  place-items: center;
-  font-weight: 950;
-  box-shadow:
-    0 0 0 2px var(--frame),
-    2px 2px 0 var(--shadow);
-}
-.pitch-node small {
-  color: var(--ink-soft);
-  font-size: 9px;
-  line-height: 1;
-}
-.pitch-node b {
-  font-family: var(--font-display);
-  font-size: 15px;
-  line-height: 1;
-}
-.formation-outsiders {
-  width: 100%;
-  border: 1px solid var(--warn-ink);
-  border-radius: 8px;
-  background: var(--warn-fill);
-  color: var(--warn-ink);
-  padding: 7px var(--legacy-space-4);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--legacy-space-3);
-  text-align: left;
-  cursor: pointer;
-}
-.formation-outsiders div {
-  min-width: 0;
-}
-.formation-outsiders strong {
-  display: block;
-  font-size: var(--font-caption);
-}
-.formation-outsiders small {
-  color: var(--warn-ink);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.formation-outsiders .outside-arrow {
-  font-size: 20px;
-  color: var(--warn-ink);
-  flex: 0 0 auto;
-}
 .profile-head {
   display: flex;
   align-items: center;
@@ -656,22 +549,6 @@ span.pos {
   letter-spacing: 0.07em;
   margin: 0 0 7px;
   color: var(--ink-soft);
-}
-.mini-pitch {
-  min-height: 250px;
-}
-.pitch-row {
-  gap: 3px;
-}
-.pitch-node {
-  width: 32px;
-  height: 32px;
-}
-.pitch-node small {
-  font-size: 8px;
-}
-.pitch-node b {
-  font-size: var(--font-small);
 }
 .dock-warning {
   grid-column: 1/-1;
@@ -726,18 +603,9 @@ body {
 .modal .profile-head p {
   margin: 0;
 }
-.dock-breakdown .pitch-node small {
-  font-size: 0.6875rem;
-}
 @media (max-width: 420px) {
   .dock-breakdown {
     grid-template-columns: 1fr;
-  }
-  .pitch-panel {
-    order: -1;
-  }
-  .mini-pitch {
-    min-height: 220px;
   }
 }
 @media (prefers-reduced-motion: reduce) {

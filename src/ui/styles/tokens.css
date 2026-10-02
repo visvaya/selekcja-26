@@ -214,6 +214,22 @@
   --popover-max-width: 260px;
   --popover-border: 2px;
   --popover-shadow-offset: 3px;
+  /* Squad board: the pitch (42 px nodes, 48 px from 1024 px; a 56 px centre circle; a field
+     capped at 520 px whose body is 220 px tall, 380 px from 1024 px; a 10 px legend dot) and
+     the outsiders strip (40 px magnets in 110 px cells, 22 px of room for the chevron). */
+  --pitch-node-size: 42px;
+  --pitch-node-size-wide: 48px;
+  --pitch-centre-circle: 56px;
+  --pitch-field-max-width: 520px;
+  --pitch-body-height: 220px;
+  --pitch-body-height-wide: 380px;
+  --pitch-label-dot: 10px;
+  --pitch-label-pad: 2px;
+  --outsider-magnet-size: 40px;
+  --outsider-cell-min: 110px;
+  --outside-arrow-room: 22px;
+  /* The start map legend sits 6 px lower than the shared pitch legend, as before. */
+  --start-map-label-top: 6px;
   /* Estimate of the fixed squad dock height (not measured), so focus scrolling keeps the
      focused control above it; replaced by a measured height when the dock is rebuilt. */
   --dock-scroll-padding: calc(var(--space-8) * 2);
