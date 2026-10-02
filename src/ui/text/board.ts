@@ -52,9 +52,4 @@ export const BOARD_TEXT = {
   outOfFormationTitle: (count: number) => `Poza ustawieniem: ${count}`,
   occupied: (count: number, position: string) =>
     `${position}: ${count} ${plural(count, "powołany", "powołanych", "powołanych")}`,
-  exact: "dokładnie",
-  minimum: "min.",
-  missingShort: (count: number) => `Brakuje ${count}`,
-  excessShort: (count: number) => `O ${count} za dużo`,
-  fulfilled: "✓ Spełnione",
 } as const;

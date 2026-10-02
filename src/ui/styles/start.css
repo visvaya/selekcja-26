@@ -278,11 +278,6 @@
   gap: var(--space-4);
 }
 
-/* Outranks the dock's narrow-screen reorder of .pitch-panel, which also matches the map. */
-.model-choice-layout > .model-preview {
-  order: 0;
-}
-
 .choice {
   display: flex;
   align-items: center;

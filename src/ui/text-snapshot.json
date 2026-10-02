@@ -256,7 +256,6 @@
       "title": "Ostatni raport obserwacyjny"
     }
   },
-  "exact": "dokładnie",
   "exactGoalkeepers": [
     "Turniej wymaga dokładnie 0 bramkarzy.",
     "Turniej wymaga dokładnie 1 bramkarzy.",
@@ -301,17 +300,6 @@
     "W tym ponad limit: Półfinał.",
     "W tym ponad limit: 2026-10-01."
   ],
-  "excessShort": [
-    "O 0 za dużo",
-    "O 1 za dużo",
-    "O 2 za dużo",
-    "O 5 za dużo",
-    "O 12 za dużo",
-    "O 22 za dużo",
-    "O X za dużo",
-    "O Półfinał za dużo",
-    "O 2026-10-01 za dużo"
-  ],
   "facts": {
     "formation": "Formacja",
     "term": "Termin"
@@ -349,7 +337,6 @@
     "Dowolne Półfinał/Półfinał",
     "Dowolne 2026-10-01/2026-10-01"
   ],
-  "fulfilled": "✓ Spełnione",
   "fullSquadMessage": "Aby powołać kolejnego zawodnika, najpierw zwolnij jedno miejsce.",
   "fullSquadTitle": "Lista jest pełna",
   "groupPlayers": {
@@ -422,7 +409,6 @@
     "neutral": "Zespół uzyskał wynik odpowiadający jakości i przygotowaniu kadry.",
     "positive": "Kilka kluczowych momentów ułożyło się po twojej myśli."
   },
-  "minimum": "min.",
   "missing": [
     "brakuje 0 × 0",
     "brakuje 1 × 1",
@@ -433,17 +419,6 @@
     "brakuje X × X",
     "brakuje Półfinał × Półfinał",
     "brakuje 2026-10-01 × 2026-10-01"
-  ],
-  "missingShort": [
-    "Brakuje 0",
-    "Brakuje 1",
-    "Brakuje 2",
-    "Brakuje 5",
-    "Brakuje 12",
-    "Brakuje 22",
-    "Brakuje X",
-    "Brakuje Półfinał",
-    "Brakuje 2026-10-01"
   ],
   "moreTraits": [
     "+0: pokaż jeszcze 0 cech",

@@ -230,9 +230,25 @@
   --outside-arrow-room: 22px;
   /* The start map legend sits 6 px lower than the shared pitch legend, as before. */
   --start-map-label-top: 6px;
-  /* Estimate of the fixed squad dock height (not measured), so focus scrolling keeps the
-     focused control above it; replaced by a measured height when the dock is rebuilt. */
-  --dock-scroll-padding: calc(var(--space-8) * 2);
+  /* Squad board anatomy: the count ring (66 px, 60 px below 768 px) with its inner disc
+     (52/46 px), 10 px slot squares 3 px apart in groups at most 56 px wide (five per row),
+     the slot block at most 260 px, 2 px between a group label and its squares, the 10 px
+     marker icon and the 2 px gaps and 3.5 px stripes of the outsider hatching. */
+  --ring-size: 66px;
+  --ring-size-narrow: 60px;
+  --ring-inner-size: 52px;
+  --ring-inner-size-narrow: 46px;
+  --ring-border: 2px;
+  --slot-square-size: 10px;
+  --slot-square-gap: 3px;
+  --slot-group-max-width: 56px;
+  --slots-max-width: 260px;
+  --slot-label-gap: 2px;
+  --marker-icon-size: 10px;
+  --hatch-gap: 2px;
+  --hatch-stripe: 3.5px;
+  --board-frame-width: 3px;
+  --finalize-min-height: 44px;
 }
 
 @media (min-width: 1024px) {
