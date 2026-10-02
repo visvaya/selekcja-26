@@ -168,3 +168,16 @@ test("start ticket fits a 320 px phone with the stub under the content", async (
   expect(stub).not.toBeNull();
   expect(stub!.y).toBeGreaterThanOrEqual(main!.y + main!.height - 1);
 });
+
+test("start map sits under the formation cards on a phone", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const map = page.getByRole("img", { name: /Mapa pozycji/ });
+  await expect(map).toBeVisible();
+  const lastCard = await page.locator("label.choice").last().boundingBox();
+  const mapBox = await map.boundingBox();
+  expect(lastCard).not.toBeNull();
+  expect(mapBox).not.toBeNull();
+  expect(mapBox!.y).toBeGreaterThanOrEqual(lastCard!.y + lastCard!.height);
+});
