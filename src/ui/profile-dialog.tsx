@@ -63,9 +63,7 @@ export function ProfileDialog({
       <div className="tags">
         <RoleTags roles={player.roles} />
         <FlagTag flag={player.flag} />
-        {trial && (
-          <TrialTag note={trial.note} impact={impact} format="profile" />
-        )}
+        {trial && <TrialTag note={trial.note} impact={impact} />}
       </div>
       <div className="profile-metrics">
         {text.profileMetrics.map((label, index) => (

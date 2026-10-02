@@ -15,3 +15,6 @@ test("scoreBand splits values at 85 and 75", () => {
     "low",
   ]);
 });
+test("scoreBand(NaN) is low", () => {
+  assert.equal(scoreBand(Number.NaN), "low");
+});

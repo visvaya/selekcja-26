@@ -122,7 +122,10 @@ test.describe.serial("axe WCAG 2.2 AA scan", () => {
     await page.locator(".select-btn").first().click();
     await expect(saveAlert(page)).toHaveText("");
 
-    await page.getByRole("button", { name: text.profile }).first().click();
+    await page
+      .getByRole("button", { name: new RegExp(`^${text.profile}: `) })
+      .first()
+      .click();
     await expect(dialog(page)).toBeVisible();
     await scan(page, "profile dialog", scanned);
     await dialog(page).getByRole("button", { name: text.returnToList }).click();

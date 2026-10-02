@@ -105,7 +105,9 @@ test("desktop game is playable with the keyboard alone", async ({ page }) => {
   await expectFocusVisible(page, "start -> camp");
 
   // Profile dialog: focus moves in, Tab is trapped, Escape closes and restores focus.
-  const profile = page.getByRole("button", { name: text.profile }).first();
+  const profile = page
+    .getByRole("button", { name: new RegExp(`^${text.profile}: `) })
+    .first();
   await activate(page, profile);
   await expect(dialog(page)).toBeVisible();
   const dialogButtons = dialog(page).getByRole("button");

@@ -10,6 +10,7 @@ import type { LoadedSave } from "../logic/save-format.ts";
 import { createLatestRequestTracker } from "../logic/latest-request.ts";
 import { initialSaveStatus, reduceSaveStatus } from "../logic/save-status.ts";
 import { SaveStatusBanner } from "./save-status-banner.tsx";
+import { usePopoverAnchoring } from "./use-popover-anchoring.ts";
 import { LiveAnnouncer } from "./live-announcer.tsx";
 import { AppHeader } from "./app-header.tsx";
 import { StartScreen } from "./start-screen.tsx";
@@ -60,6 +61,7 @@ function randomSeed(): number {
 }
 
 export function GameApp() {
+  usePopoverAnchoring();
   const [state, dispatch] = useReducer(reduceGameState, 0, () =>
     createInitialState(randomSeed()),
   );

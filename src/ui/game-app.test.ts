@@ -31,7 +31,7 @@ test("start, profile, comparison, event and position filter work together", asyn
       // (the start screen unmounted), so focus must move to the new screen's own heading
       // rather than falling back to the body.
       assert.equal(isFocused(campHeading), true);
-      fireEvent.click(screen.getAllByRole("button", { name: "Profil" })[0]!);
+      fireEvent.click(screen.getAllByRole("button", { name: /^Profil: / })[0]!);
       assert.ok(screen.getByRole("dialog"));
       assert.equal(
         dom.window.document.activeElement?.tagName,
@@ -42,8 +42,12 @@ test("start, profile, comparison, event and position filter work together", asyn
       // Closing the dialog must not drop focus to the body, whether or not the button that
       // opened it was itself focused beforehand.
       assert.equal(isFocused(dom.window.document.body), false);
-      fireEvent.click(screen.getAllByRole("button", { name: "Porównaj" })[0]!);
-      fireEvent.click(screen.getAllByRole("button", { name: "Porównaj" })[0]!);
+      fireEvent.click(
+        screen.getAllByRole("button", { name: /^Porównaj: / })[0]!,
+      );
+      fireEvent.click(
+        screen.getAllByRole("button", { name: /^Porównaj: / })[0]!,
+      );
       assert.ok(
         screen.getByRole("heading", {
           name: "Dwóch kandydatów, jedno miejsce?",
@@ -73,7 +77,9 @@ test("start, profile, comparison, event and position filter work together", asyn
         0,
       );
       for (let count = 0; count < 9; count++)
-        fireEvent.click(screen.getAllByRole("button", { name: "Powołaj" })[0]!);
+        fireEvent.click(
+          screen.getAllByRole("button", { name: /^Powołaj: / })[0]!,
+        );
       assert.ok(
         screen.getByRole("heading", { name: "Raport medyczny: przeciążenie" }),
       );

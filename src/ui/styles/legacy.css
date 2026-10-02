@@ -145,34 +145,7 @@ button {
   color: var(--ink-soft);
   margin-top: var(--legacy-space-7);
 }
-.players {
-  display: grid;
-  gap: var(--legacy-space-4);
-}
-.player {
-  background: var(--surface);
-  border: 1px solid var(--board-line);
-  border-radius: 15px;
-  padding: 13px;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: var(--legacy-space-5);
-  transition: 0.18s;
-}
-.player.selected {
-  border-color: var(--select);
-  box-shadow: inset 4px 0 var(--select);
-  background: var(--surface-selected);
-}
-.player.compare-on {
-  outline: 2px solid var(--ink);
-}
-.player-top {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--legacy-space-5);
-}
-.pos {
+span.pos {
   background: var(--board-deep);
   color: var(--ink-soft);
   border-radius: 8px;
@@ -181,58 +154,6 @@ button {
   font-weight: 900;
   min-width: 38px;
   text-align: center;
-}
-.player h3 {
-  font-family: var(--font-display);
-  font-size: var(--font-body-size);
-  margin: 0;
-  letter-spacing: -0.02em;
-}
-.meta {
-  font-size: var(--font-caption);
-  color: var(--ink-soft);
-  margin-top: var(--legacy-space-1);
-}
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  margin-top: 9px;
-}
-.tag {
-  font-size: var(--font-caption);
-  padding: 3px 7px;
-  border-radius: 999px;
-  background: var(--board-deep);
-  color: var(--ink-soft);
-}
-.tag.alert {
-  background: var(--warn-fill);
-  color: var(--warn-ink);
-}
-.score {
-  font-family: var(--font-display);
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: var(--ink);
-  color: var(--on-select);
-  font-weight: 900;
-  font-size: 17px;
-}
-.metrics {
-  grid-column: 1/-1;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 7px;
-}
-.metric span {
-  font-size: var(--font-caption);
-  color: var(--ink-soft);
-  display: flex;
-  justify-content: space-between;
 }
 .bar {
   height: 4px;
@@ -246,12 +167,6 @@ button {
   height: 100%;
   background: var(--good);
 }
-.player-actions {
-  grid-column: 1/-1;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 7px;
-}
 .select-btn,
 .compare-btn {
   border: 1px solid var(--frame);
@@ -260,11 +175,6 @@ button {
   padding: 9px var(--legacy-space-5);
   font-size: var(--font-small);
   font-weight: 800;
-}
-.selected .select-btn {
-  background: var(--select);
-  color: var(--on-select);
-  border-color: var(--select);
 }
 .compare-btn {
   color: var(--ink-soft);
@@ -508,9 +418,6 @@ button {
   .main {
     padding: 0 var(--page-gutter) 110px;
   }
-  .players {
-    grid-template-columns: repeat(2, 1fr);
-  }
   .modal-wrap {
     place-items: center;
     padding: var(--legacy-space-10);
@@ -518,26 +425,6 @@ button {
   .modal {
     border-radius: 22px;
   }
-}
-@media (min-width: 1050px) {
-  .players {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  .player {
-    min-height: 258px;
-  }
-}
-.player-actions {
-  grid-template-columns: 1fr 1fr 1fr;
-}
-.profile-btn {
-  border: 1px solid var(--frame);
-  background: var(--board-deep);
-  border-radius: 10px;
-  padding: 9px var(--legacy-space-5);
-  font-size: var(--font-small);
-  font-weight: 800;
-  color: var(--ink);
 }
 .dock-copy {
   border: 0;
@@ -821,37 +708,10 @@ button {
 body {
   font-family: var(--font-body);
 }
-.player-actions button,
-.profile-btn,
 .select-btn,
 .compare-btn,
 .finalize {
   font-size: var(--font-small);
-}
-.metric span {
-  font-size: var(--font-caption);
-}
-.metric b {
-  font-variant-numeric: tabular-nums;
-}
-.metric progress {
-  display: block;
-  width: 100%;
-  height: var(--spacing-unit);
-  margin-top: var(--spacing-unit);
-  border: 0;
-  border-radius: var(--spacing-unit);
-  overflow: hidden;
-  background: var(--board-deep);
-}
-.metric progress::-webkit-progress-bar {
-  background: var(--board-deep);
-}
-.metric progress::-webkit-progress-value {
-  background: var(--good);
-}
-.metric progress::-moz-progress-bar {
-  background: var(--good);
 }
 .result-eyebrow {
   color: var(--on-ink-eyebrow);
@@ -859,9 +719,6 @@ body {
 .compare-select {
   width: 100%;
   margin-top: var(--space-medium);
-}
-.profile-btn {
-  background: var(--board-deep);
 }
 .modal .eyebrow {
   margin-bottom: var(--space-small);
@@ -886,8 +743,5 @@ body {
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
-  }
-  .player {
-    transition: none;
   }
 }

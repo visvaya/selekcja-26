@@ -425,6 +425,17 @@
     "Możliwość zmiany systemu gry po marcowym zgrupowaniu."
   ],
   "plannedTitle": "Co planujemy",
+  "playerAction": [
+    "0: 0",
+    "1: 1",
+    "2: 2",
+    "5: 5",
+    "12: 12",
+    "22: 22",
+    "X: X",
+    "Półfinał: Półfinał",
+    "2026-10-01: 2026-10-01"
+  ],
   "playerMetrics": {
     "fitness": "Zdrowie",
     "form": "Forma",
@@ -442,7 +453,30 @@
     "Zdobyliśmy Półfinał pkt w grupie.",
     "Zdobyliśmy 2026-10-01 pkt w grupie."
   ],
+  "positionBadgeName": [
+    "0: 0",
+    "1: 1",
+    "2: 2",
+    "5: 5",
+    "12: 12",
+    "22: 22",
+    "X: x",
+    "Półfinał: półfinał",
+    "2026-10-01: 2026-10-01"
+  ],
   "positionChipsLabel": "Filtry pozycyjne (wybrani/dostępni):",
+  "positionMore": [
+    "+0",
+    "+1",
+    "+2",
+    "+5",
+    "+12",
+    "+22",
+    "+X",
+    "+Półfinał",
+    "+2026-10-01"
+  ],
+  "positionPopoverSeparator": " · ",
   "positions": {
     "BR": "Bramkarz",
     "DP": "Defensywny pomocnik",
@@ -587,7 +621,7 @@
     "buildUp": "Wyprowadzenie",
     "centreBack": "Stoper",
     "dribbling": "Drybling",
-    "experience": "Doświadczenie",
+    "experience": "Weteran",
     "leader": "Lider",
     "leftFoot": "Lewa noga",
     "linkUp": "Łączenie gry",
@@ -598,9 +632,9 @@
     "pressing": "Pressing",
     "reach": "Zasięg",
     "reflexes": "Refleks",
-    "rightBack": "Prawy obrońca",
+    "rightBack": "Gra na boku",
     "setPieces": "Stałe fragmenty",
-    "striker": "Napastnik",
+    "striker": "Wykończenie",
     "wingBack": "Wahadło",
     "winger": "Skrzydło"
   },
@@ -619,6 +653,7 @@
   "searchPlaceholder": "Szukaj zawodnika lub klubu…",
   "select": "Powołaj",
   "selected": "Powołany ✓",
+  "selectedName": "Powołany",
   "selectionScore": "Ocena selekcyjna",
   "simulationDisclaimer": "Symulacja ocenia strukturę decyzji i zawiera kontrolowaną losowość. Nie jest prognozą rzeczywistego wyniku sportowego.",
   "skipToList": "Przejdź do listy kandydatów",

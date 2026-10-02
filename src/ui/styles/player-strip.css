@@ -1,0 +1,585 @@
+/* Candidate strip: position magnet with its popover, name block, traits, selection score,
+   four meters and three actions. Phone first; from 1024 px a two-row strip, from 1240 px one row.
+   Shared .tag rules also serve the profile dialog. */
+
+/* ================= Popovers ================= */
+
+/* usePopoverAnchoring places every popover against its trigger; until then it stays hidden,
+   so the browser's centred default position never flashes */
+[popover]:popover-open:not([data-placed]) {
+  visibility: hidden;
+}
+
+[popover][data-placed] {
+  position: fixed;
+  inset: auto;
+  top: var(--popover-top);
+  left: var(--popover-left);
+  margin: 0;
+}
+
+.pos-popover {
+  max-width: var(--popover-max-width);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: var(--popover-border) solid var(--frame);
+  background: var(--surface-dialog);
+  color: var(--ink);
+  box-shadow: var(--popover-shadow-offset) var(--popover-shadow-offset) 0
+    var(--shadow);
+  font-family: var(--font-body);
+  line-height: 1.3;
+}
+
+.pos-popover ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.pos-popover li {
+  font-size: var(--text-sm);
+}
+
+.pos-popover b {
+  font-family: var(--font-display);
+}
+
+/* ================= Tags ================= */
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  align-items: center;
+}
+
+.tag {
+  display: inline-block;
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: var(--tag-pad-block) var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--board-deep);
+  color: var(--ink-soft);
+  border: var(--divider-border) solid var(--frame-soft);
+  white-space: nowrap;
+}
+
+/* the camp result is never hidden, so with enlarged text it wraps inside its own tag */
+.tag.tag-camp {
+  max-width: 100%;
+  white-space: normal;
+}
+
+.tag.alert {
+  background: var(--warn-fill);
+  color: var(--warn-ink);
+  border-color: var(--warn-ink);
+}
+
+.tag.camp-plus {
+  background: var(--good);
+  border-color: var(--good);
+  color: var(--on-good);
+}
+
+.tag.camp-minus {
+  background: var(--warn-fill);
+  border-color: var(--warn-ink);
+  color: var(--warn-ink);
+}
+
+/* ================= Strip ================= */
+
+/* one column of long strips, not a card grid */
+.players {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.player {
+  transition:
+    background-color var(--duration-base) var(--ease-emphasized),
+    border-color var(--duration-base) var(--ease-emphasized);
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--space-2) var(--space-3);
+  background: var(--surface);
+  border: none;
+  border-left: var(--strip-bar) solid var(--frame);
+  border-bottom: var(--strip-edge) solid var(--frame-soft);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+}
+
+.player-top {
+  display: flex;
+  align-items: center;
+  grid-column: 1;
+  grid-row: 1;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.player .tags,
+.player .metrics,
+.player .player-actions {
+  grid-column: 1 / -1;
+}
+
+.player-top > div:not([popover]) {
+  min-width: 0;
+  flex: 1 1 0;
+  padding-top: var(--strip-name-offset);
+}
+
+/* the position magnet: primary code large, the first secondary code under a thin divider */
+.pos {
+  appearance: none;
+  flex-shrink: 0;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: var(--badge-width);
+  height: var(--badge-height);
+  margin: 0;
+  padding: var(--badge-pad) var(--space-1) var(--space-1);
+  border-radius: var(--radius-sm);
+  border: var(--control-border) solid var(--frame);
+  border-left-width: var(--strip-bar);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.pos.pos-gk {
+  border-color: var(--hue-gk);
+}
+
+.pos.pos-def {
+  border-color: var(--hue-def);
+}
+
+.pos.pos-mid {
+  border-color: var(--hue-mid);
+}
+
+.pos.pos-fwd {
+  border-color: var(--hue-fwd);
+}
+
+button.pos:hover {
+  background: var(--board-deep);
+}
+
+button.pos:active {
+  background: var(--board-deep);
+  box-shadow: inset 0 0 0 var(--divider-border) var(--ink);
+  transform: translateY(var(--divider-border));
+}
+
+.pos b {
+  font-size: var(--text-sm);
+}
+
+/* secondary codes: an abbreviation inside the badge graphic (full names in the popover and
+   the label), so the smallest step is acceptable here */
+.pos small {
+  border-top: var(--divider-border) solid currentColor;
+  opacity: 0.8;
+  white-space: nowrap;
+  font-size: var(--text-4xs);
+  margin-top: var(--badge-code-gap);
+  padding-top: var(--badge-pad);
+  letter-spacing: 0;
+}
+
+/* the family comes from the base heading rule */
+.player h3 {
+  margin: 0;
+  font-weight: 700;
+  font-size: var(--text-lg);
+  letter-spacing: 0.01em;
+  line-height: 1;
+}
+
+.player h3 .name-trunc {
+  display: inline-block;
+  vertical-align: top;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-height: var(--name-target);
+  line-height: var(--name-target);
+  margin-block: calc(var(--name-lift) * -1) 0;
+}
+
+.player .meta {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  min-height: var(--name-target);
+  margin: 0 0 var(--space-2);
+  white-space: nowrap;
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+  line-height: 1.25;
+}
+
+.meta-club {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 2ch;
+}
+
+.meta-age {
+  flex: none;
+}
+
+/* ================= Score ================= */
+
+.player .score {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-end;
+  gap: var(--score-gap);
+  max-width: var(--score-max-width);
+  text-align: right;
+}
+
+.score-label {
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+  line-height: 1.1;
+}
+
+.player .score b {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-2xl);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  line-height: 1;
+}
+
+.player .score b.score-high {
+  color: var(--good);
+}
+
+.player .score b.score-mid {
+  color: var(--warn-ink);
+}
+
+.player .score b.score-low {
+  color: var(--danger);
+}
+
+/* ================= Meters ================= */
+
+.player .metrics {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3) var(--space-4);
+  margin: var(--space-3) 0;
+}
+
+.player .metric {
+  display: flex;
+  flex-direction: column;
+  gap: var(--meter-label-gap);
+}
+
+.player .metric span {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-2xs);
+  color: var(--ink-soft);
+}
+
+.player .metric b {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+/* the bar tint comes from --tint, set per bar by its value band; the number stays the
+   primary cue */
+.player .metric progress {
+  display: block;
+  width: 100%;
+  height: var(--meter-height);
+  margin: 0;
+  appearance: none;
+  border: none;
+  border-radius: var(--radius-round);
+  background: var(--board-deep);
+}
+
+.player .metric progress::-webkit-progress-bar {
+  background: var(--board-deep);
+  border-radius: var(--radius-round);
+  border: var(--divider-border) solid var(--frame-soft);
+}
+
+.player .metric progress::-webkit-progress-value {
+  transition: width var(--duration-slow) var(--ease-standard);
+  background: var(--tint, var(--action));
+  border-radius: var(--radius-round);
+}
+
+.player .metric progress::-moz-progress-bar {
+  background: var(--tint, var(--action));
+  border-radius: var(--radius-round);
+}
+
+/* ================= Actions ================= */
+
+.player-actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.player-actions .select-btn,
+.player-actions .profile-btn,
+.player-actions .compare-btn {
+  min-height: var(--strip-button-height);
+  flex: 1 1 auto;
+  border-radius: var(--radius-sm);
+  border: var(--control-border) solid var(--frame);
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 700;
+  font-size: var(--text-sm);
+  padding: 0 var(--space-3);
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
+}
+
+.player-actions .select-btn {
+  background: var(--action);
+  border-color: var(--action);
+  color: var(--on-action);
+}
+
+.player-actions .select-btn:hover {
+  background: var(--action-strong);
+}
+
+.player-actions .select-btn[aria-pressed="true"] {
+  background: var(--select);
+  border-color: var(--select);
+  color: var(--on-select);
+}
+
+.player-actions .select-btn[aria-pressed="true"]:hover {
+  background: var(--select-strong);
+}
+
+.player-actions .profile-btn:hover {
+  background: var(--board-deep);
+  border-color: var(--action);
+}
+
+.player-actions .compare-btn:hover,
+.player-actions .compare-btn[aria-pressed="true"] {
+  background: var(--board-deep);
+  border-color: var(--action);
+  color: var(--action);
+}
+
+.player-actions .select-btn[aria-pressed="true"]:hover,
+.player-actions .compare-btn[aria-pressed="true"]:hover {
+  box-shadow: inset 0 0 0 var(--divider-border) currentColor;
+}
+
+.player-actions button:active {
+  transform: translateY(var(--divider-border));
+}
+
+/* ================= States ================= */
+
+/* called up: a pale wash and a thick select bar; the padding gives back the extra bar
+   width, so the content does not move */
+.player.selected {
+  background: var(--surface-selected);
+  border-left: var(--strip-bar-selected) solid var(--select);
+  border-bottom-color: var(--selected-edge);
+  padding-left: calc(
+    var(--space-4) - (var(--strip-bar-selected) - var(--strip-bar))
+  );
+}
+
+.player.compare-on {
+  outline: var(--compare-outline) solid var(--action);
+  outline-offset: calc(var(--compare-outline) * -1);
+}
+
+/* ================= Widths ================= */
+
+@media (max-width: 1023.98px) {
+  /* the label takes the width of its longer word, so the name keeps that space */
+  .player .score-label {
+    width: min-content;
+  }
+
+  /* equal thirds: the buttons keep their place when a label changes */
+  .player .player-actions {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+  }
+
+  .player .player-actions > button {
+    min-width: 0;
+    padding-inline: var(--space-1);
+  }
+}
+
+@media (max-width: 399.98px) {
+  .player h3 {
+    font-size: var(--text-md);
+  }
+}
+
+@media (min-width: 1024px) {
+  .player {
+    grid-template-columns:
+      minmax(var(--strip-name-min), var(--strip-name-max))
+      minmax(var(--space-4), 1fr)
+      minmax(var(--strip-meters-min), var(--strip-meters-max))
+      var(--strip-score-col)
+      minmax(var(--strip-actions-min), var(--strip-actions-max));
+    align-items: center;
+    align-content: center;
+    gap: var(--space-3);
+    min-height: var(--strip-min-height-desktop);
+  }
+
+  /* tags under "club • age", indented to the name text (badge width + gap) */
+  .player .tags {
+    grid-column: 1;
+    grid-row: 2;
+    padding-left: calc(var(--badge-width) + var(--space-2));
+    align-self: start;
+    margin-top: calc(var(--space-2) * -1);
+  }
+
+  .player .metrics {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--score-gap) var(--space-2);
+    margin: 0;
+  }
+
+  .player .metric span {
+    gap: var(--space-1);
+  }
+
+  .player .score {
+    grid-column: 4;
+    grid-row: 1 / span 2;
+    max-width: none;
+  }
+
+  .player .score b {
+    font-size: var(--text-xl);
+  }
+
+  .player .player-actions {
+    grid-column: 5;
+    grid-row: 1 / span 2;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: var(--space-1);
+  }
+
+  .player-actions .select-btn,
+  .player-actions .profile-btn,
+  .player-actions .compare-btn {
+    min-height: var(--strip-button-height-desktop);
+    font-size: var(--text-2xs);
+    padding: 0 var(--space-2);
+  }
+}
+
+/* 1024-1239 px: too narrow for one row, so the meters take a third row */
+@media (min-width: 1024px) and (max-width: 1239.98px) {
+  .player {
+    grid-template-columns:
+      minmax(0, 1fr) var(--strip-score-col-mid)
+      minmax(var(--strip-actions-min-mid), var(--strip-actions-max-mid));
+    row-gap: var(--space-2);
+  }
+
+  .player .metrics {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    margin-top: var(--space-1);
+  }
+
+  .player .score {
+    grid-column: 2;
+  }
+
+  .player .player-actions {
+    grid-column: 3;
+  }
+}
+
+@media (min-width: 1240px) {
+  .player .metrics {
+    grid-column: 3;
+    margin-right: var(--space-5);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .player,
+  button.pos:active,
+  .player-actions button:active {
+    transition: none;
+    transform: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .player-actions .select-btn[aria-pressed="true"],
+  .player-actions .compare-btn[aria-pressed="true"] {
+    outline: var(--forced-outline-width) solid Highlight;
+    outline-offset: calc(var(--forced-outline-width) * -1);
+  }
+
+  /* the called-up strip loses its wash in forced colours; a frame keeps it apart */
+  .player.selected {
+    outline: var(--forced-outline-width) solid Highlight;
+    outline-offset: calc(var(--forced-outline-width) * -1);
+  }
+
+  /* compared and called up at once: a double frame keeps both marks */
+  .player.selected.compare-on {
+    outline-style: double;
+    outline-width: calc(var(--forced-outline-width) * 2);
+  }
+}
