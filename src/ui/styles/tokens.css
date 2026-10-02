@@ -112,10 +112,10 @@
 
   /* Layout and safe areas */
   --topbar-height: 56px;
-  /* The page column: the top bar, the content and the dock share it. The gutter widens
-     from 760 px (below). */
-  --page-max-width: 1180px;
-  --page-gutter: 14px;
+  /* The page column: the top bar, the content and the dock share it. At most 1280 px wide
+     with the gutters; the gutter widens from 1024 px (below), where the side column starts. */
+  --page-max-width: 1280px;
+  --page-gutter: var(--space-4);
   /* space between the top bar and the first content of every screen */
   --topbar-gap: var(--space-5);
   --button-primary-size: var(--text-base);
@@ -202,8 +202,8 @@
   --dock-scroll-padding: calc(var(--space-8) * 2);
 }
 
-@media (min-width: 760px) {
+@media (min-width: 1024px) {
   :root {
-    --page-gutter: 24px;
+    --page-gutter: var(--space-6);
   }
 }

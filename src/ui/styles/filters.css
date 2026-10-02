@@ -126,6 +126,19 @@
   color: var(--ink);
 }
 
+/* the two foot boxes sit side by side where they fit and stack in the narrow desktop column */
+.filter-group-leg {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  align-content: flex-start;
+  gap: var(--space-1) var(--space-4);
+}
+
+.filter-group-leg > .filter-hint {
+  flex-basis: 100%;
+}
+
 .filter-hint {
   margin: 0 0 var(--space-1);
   font-size: var(--text-2xs);
