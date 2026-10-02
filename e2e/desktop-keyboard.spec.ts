@@ -65,10 +65,34 @@ test("desktop game is playable with the keyboard alone", async ({ page }) => {
   expect(cardOutline, "the focused formation card shows the ring").not.toBe(
     "none",
   );
-  for (let step = 0; step < 3 && !(await radio433.isChecked()); step++)
+  const checkedRadio = page.getByRole("radio", { checked: true });
+  let previousValue = "";
+  for (let step = 0; step < 3 && !(await radio433.isChecked()); step++) {
+    previousValue = await checkedRadio.inputValue();
     await page.keyboard.press("ArrowRight");
+  }
   await expect(radio433).toBeChecked();
   await expect(page.getByRole("img", { name: /^4–3–3/ })).toBeVisible();
+
+  // Space on the checked formation changes nothing.
+  await page.keyboard.press("Space");
+  await expect(radio433).toBeChecked();
+  await expect(page.getByRole("img", { name: /^4–3–3/ })).toBeVisible();
+
+  // Undo from the keyboard restores the formation before the last change.
+  expect(previousValue, "arrows changed the formation").not.toBe("");
+  const previousName =
+    text.systems[previousValue as keyof typeof text.systems].name;
+  await activate(page, page.getByRole("button", { name: text.undo }));
+  await expect(page.locator(`input[value="${previousValue}"]`)).toBeChecked();
+  await expect(
+    page.getByRole("img", { name: new RegExp(`^${previousName}`) }),
+  ).toBeVisible();
+
+  // Back to 4–3–3 for the rest of the journey.
+  await radio433.focus();
+  await page.keyboard.press("Space");
+  await expect(radio433).toBeChecked();
   const start = page.getByRole("button", { name: text.start });
   await page.keyboard.press("Tab");
   await expect(start).toBeFocused();
@@ -200,6 +224,14 @@ test("checked formation keeps an outline in forced colours", async ({
     .locator("xpath=..")
     .evaluate((element) => getComputedStyle(element).outlineStyle);
   expect(outline).not.toBe("none");
+
+  // The checked dot stays filled and distinct from its card.
+  const fill = await checked.evaluate((element) => ({
+    dot: getComputedStyle(element).backgroundColor,
+    card: getComputedStyle(element.parentElement!).backgroundColor,
+  }));
+  expect(fill.dot).not.toBe("rgba(0, 0, 0, 0)");
+  expect(fill.dot).not.toBe(fill.card);
 
   // Keyboard focus on the checked card must look different from checked alone.
   const ring = (element: Element) => {
