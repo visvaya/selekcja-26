@@ -16,10 +16,16 @@ export function OutsidersDialog({
 }) {
   return (
     <GameDialog
+      form="drawer"
       title={text.outOfFormationTitle(outsiders.length)}
       eyebrow={text.outOfFormationEyebrow}
       onClose={onClose}
       restoreFocusFallback={restoreFocusFallback}
+      footer={
+        <button className="action-button start-button" onClick={onClose}>
+          {text.returnToPitch}
+        </button>
+      }
     >
       <p>{text.outOfFormationExplanation}</p>
       {outsiders.map((player) => (
@@ -34,9 +40,6 @@ export function OutsidersDialog({
           </small>
         </button>
       ))}
-      <button className="close start-button" onClick={onClose}>
-        {text.returnToPitch}
-      </button>
     </GameDialog>
   );
 }

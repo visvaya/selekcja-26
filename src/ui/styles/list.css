@@ -95,10 +95,6 @@
   margin-bottom: var(--space-4);
 }
 
-.confirm-actions .action-button {
-  margin-top: 0;
-}
-
 /* The design's buttons for the list actions and the empty-list card: the legacy
    .action-button (stretching, thin border, 800 weight, padding on all sides) stays for the
    screens that have not been restyled yet. */
@@ -115,13 +111,6 @@
 .game-actions .action-button:disabled,
 .noCandidates .action-button:disabled {
   opacity: 1;
-}
-
-.confirm-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-  margin-top: var(--space-4);
 }
 
 @media (max-width: 767.98px) {

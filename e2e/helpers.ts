@@ -248,9 +248,10 @@ export function collectPageErrors(page: Page): string[] {
   return errors;
 }
 
-// The game dialogs; the open phone board sheet is also a dialog and is excluded.
+// The game dialogs and confirmations; the open phone board sheet is also a dialog and is
+// excluded.
 export function dialog(page: Page): Locator {
-  return page.locator('[role="dialog"]:not(.phone-dock)');
+  return page.locator('[role="dialog"]:not(.phone-dock), [role="alertdialog"]');
 }
 
 export function saveBanner(page: Page): Locator {

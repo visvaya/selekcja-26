@@ -19,6 +19,16 @@ export const DIALOGS_TEXT = {
     confirm: "Zacznij nową grę",
     cancel: "Wróć do gry",
   },
+  confirmRestart: {
+    eyebrow: "Nowa gra",
+    title: "Zagrać od początku?",
+    description:
+      "Raport turnieju i obecna selekcja przepadną. Tego nie da się cofnąć.",
+    confirm: "Zagraj od początku",
+    cancel: "Wróć do raportu",
+  },
+  closeDialog: "Zamknij",
+  closeDialogHint: "Zamknij okno. Nic się nie zmieni.",
   profileMetrics: [
     "Ocena selekcyjna",
     "Jakość",

@@ -269,6 +269,28 @@
   --finalize-min-height: 44px;
   /* Side column actions under the desktop board: 36 px buttons. */
   --side-action-height: 36px;
+
+  /* Stacking order: hints over their layer, the dialog layer over the page and the phone
+     sheet. */
+  --layer-hint: 20;
+  --layer-dialog: 50;
+
+  /* Dialogs: a 480 px panel (560 px from 1024 px) with a 3 px frame and a 5 px offset shadow;
+     the drawer below 768 px is at most 600 px tall with a 4 px shadow on its top edge. The X
+     is a 36 px button with an 18 px icon, and headings keep 44 px clear of it. The drawer
+     handle catches a 160 x 32 px area around its bar. */
+  --dialog-max-width: 480px;
+  --dialog-max-width-wide: 560px;
+  --dialog-border: 3px;
+  --dialog-shadow-offset: 5px;
+  --drawer-shadow-offset: 4px;
+  --drawer-max-height: 600px;
+  --dialog-close-size: 36px;
+  --dialog-close-icon: 18px;
+  --dialog-close-clearance: 44px;
+  --dialog-panel-lift: 8px;
+  --dialog-handle-hit-x: 60px;
+  --dialog-handle-hit-y: 14px;
 }
 
 @media (min-width: 1024px) {

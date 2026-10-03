@@ -33,10 +33,28 @@ export function ComparisonDialog({
   ];
   return (
     <GameDialog
+      form="drawer"
+      className="compare-dialog"
       title={text.comparisonTitle}
       eyebrow={text.comparisonEyebrow}
       onClose={onClose}
       restoreFocusFallback={restoreFocusFallback}
+      footer={
+        <>
+          <button
+            className="primary start-button"
+            onClick={() => {
+              onClearComparison();
+              onClose();
+            }}
+          >
+            {text.clearComparison}
+          </button>
+          <button className="action-button start-button" onClick={onClose}>
+            {text.returnWithoutClearing}
+          </button>
+        </>
+      }
     >
       <div className="compare-grid">
         {[left, right].map((player) => (
@@ -60,18 +78,6 @@ export function ComparisonDialog({
           </div>
         ))}
       </div>
-      <button
-        className="primary start-button"
-        onClick={() => {
-          onClearComparison();
-          onClose();
-        }}
-      >
-        {text.clearComparison}
-      </button>
-      <button className="close start-button" onClick={onClose}>
-        {text.returnWithoutClearing}
-      </button>
     </GameDialog>
   );
 }

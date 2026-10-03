@@ -179,51 +179,6 @@ span.pos {
 .compare-btn {
   color: var(--ink-soft);
 }
-.modal-wrap {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  background: var(--scrim);
-  display: grid;
-  place-items: end center;
-  padding: 0;
-}
-.modal {
-  background: var(--surface-dialog);
-  width: 100%;
-  max-width: 620px;
-  border-radius: 22px 22px 0 0;
-  padding: var(--legacy-space-11) var(--legacy-space-9)
-    calc(var(--legacy-space-11) + env(safe-area-inset-bottom));
-  max-height: 88vh;
-  overflow: auto;
-}
-.modal h2 {
-  font-size: 26px;
-  letter-spacing: -0.04em;
-  margin: var(--legacy-space-3) 0 var(--legacy-space-4);
-}
-.modal p {
-  color: var(--ink-soft);
-}
-.decision {
-  display: block;
-  width: 100%;
-  text-align: left;
-  border: 1px solid var(--frame);
-  background: var(--surface-dialog);
-  padding: var(--legacy-space-7);
-  border-radius: 12px;
-  margin-top: 9px;
-}
-.decision b {
-  display: block;
-}
-.decision small {
-  display: block;
-  color: var(--ink-soft);
-  margin-top: 3px;
-}
 .compare-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -253,13 +208,6 @@ span.pos {
 .better {
   color: var(--good);
   font-weight: 900;
-}
-.close {
-  border: 1px solid var(--frame);
-  background: var(--surface-dialog);
-  border-radius: 10px;
-  padding: 9px var(--legacy-space-6);
-  font-weight: 750;
 }
 .result {
   max-width: 760px;
@@ -342,15 +290,6 @@ span.pos {
 }
 .hidden {
   display: none !important;
-}
-@media (min-width: 760px) {
-  .modal-wrap {
-    place-items: center;
-    padding: var(--legacy-space-10);
-  }
-  .modal {
-    border-radius: 22px;
-  }
 }
 .profile-head {
   display: flex;
@@ -441,9 +380,6 @@ body {
 .compare-select {
   width: 100%;
   margin-top: var(--space-medium);
-}
-.modal .eyebrow {
-  margin-bottom: var(--space-small);
 }
 .modal .profile-head p {
   margin: 0;

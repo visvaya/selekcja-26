@@ -28,11 +28,13 @@ export function CampReportDialog({
       eyebrow={text.campReportEyebrow}
       onClose={onClose}
       restoreFocusFallback={restoreFocusFallback}
+      footer={
+        <button className="primary start-button" onClick={onClose}>
+          {text.continueToFinal}
+        </button>
+      }
     >
       <p>{text.campReportBody(best, doubts)}</p>
-      <button className="primary start-button" onClick={onClose}>
-        {text.continueToFinal}
-      </button>
     </GameDialog>
   );
 }

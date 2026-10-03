@@ -23,6 +23,11 @@ export function EventDialog({
       onClose={onClose}
       blocking
       restoreFocusFallback={restoreFocusFallback}
+      footer={
+        <button className="action-button" onClick={onUndo}>
+          {text.undo}
+        </button>
+      }
     >
       <p>{copy.description}</p>
       {copy.choices.map((choice, index) => (
@@ -35,9 +40,6 @@ export function EventDialog({
           <small>{choice.description}</small>
         </button>
       ))}
-      <button className="action-button" onClick={onUndo}>
-        {text.undo}
-      </button>
     </GameDialog>
   );
 }

@@ -22,6 +22,7 @@ import { useMediaQuery } from "./use-media-query.ts";
 import { useScrollLock } from "./use-scroll-lock.ts";
 import { useSheetDrag } from "./use-sheet-drag.ts";
 import { useSheetSlide } from "./use-sheet-slide.ts";
+import { openPopovers } from "./open-popovers.ts";
 
 function Chevron() {
   return (
@@ -41,16 +42,6 @@ function Chevron() {
       />
     </svg>
   );
-}
-
-// Open popovers (a list strip's menu): the sheet closes them on opening and leaves Escape
-// to them. Engines without the :popover-open selector have none.
-function openPopovers(): HTMLElement[] {
-  try {
-    return [...document.querySelectorAll<HTMLElement>(":popover-open")];
-  } catch {
-    return [];
-  }
 }
 
 // The scrim keeps the page behind the open sheet still: wheel and touch scrolling stop on

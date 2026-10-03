@@ -43,8 +43,6 @@ function assignRef<T>(ref: Ref<T> | undefined, value: T | null) {
 // An icon-only button with a hint: the hint is the accessible description and a tooltip that
 // CSS shows on visible focus at once and on hover after a delay. Escape dismisses a shown hint
 // and is consumed, so the layer under it stays open; leaving or blurring restores the hint.
-// @public: not wired into a screen yet; drop this tag once a dialog renders it.
-/** @public */
 export function HintButton({
   hint,
   label,

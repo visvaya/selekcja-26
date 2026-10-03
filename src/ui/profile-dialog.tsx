@@ -38,10 +38,26 @@ export function ProfileDialog({
   ];
   return (
     <GameDialog
+      form="drawer"
       title={player.name}
       eyebrow={text.profile}
       onClose={onClose}
       restoreFocusFallback={restoreFocusFallback}
+      footer={
+        <>
+          <button
+            className="primary start-button"
+            onClick={() => onToggle(player.id)}
+          >
+            {state.selected.has(player.id)
+              ? text.removeFromSquad
+              : text.addToSquad}
+          </button>
+          <button className="action-button start-button" onClick={onClose}>
+            {text.returnToList}
+          </button>
+        </>
+      }
     >
       <div className="profile-head">
         <p>
@@ -73,15 +89,6 @@ export function ProfileDialog({
           </div>
         ))}
       </div>
-      <button
-        className="primary start-button"
-        onClick={() => onToggle(player.id)}
-      >
-        {state.selected.has(player.id) ? text.removeFromSquad : text.addToSquad}
-      </button>
-      <button className="close start-button" onClick={onClose}>
-        {text.returnToList}
-      </button>
     </GameDialog>
   );
 }

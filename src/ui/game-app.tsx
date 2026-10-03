@@ -50,6 +50,7 @@ type ModalState =
   | { kind: "outsiders" }
   | { kind: "campReport" }
   | { kind: "confirmNewGame" }
+  | { kind: "confirmRestart" }
   | { kind: "message"; title: string; description: string };
 
 // A player stuck with a broken save can open the game with ?reset to start over.
@@ -188,9 +189,14 @@ export function GameApp() {
   // for one being open right now and steps aside if so; that also means closing a dialog on
   // its own (Escape, a close button) does not re-run this and steal focus back from the
   // opener that GameDialog's own cleanup just restored it to, since only the screen itself
-  // (not the dialog state) is a dependency here.
+  // (not the dialog state) is a dependency here. A confirmation is an alertdialog; the open
+  // phone sheet (also a dialog) counts too, since the heading behind it is inert.
   useEffect(() => {
-    if (!ready || document.querySelector('[role="dialog"]')) return;
+    if (
+      !ready ||
+      document.querySelector('[role="dialog"], [role="alertdialog"]')
+    )
+      return;
     headingRef.current?.focus();
   }, [state.stage, state.started, state.report, ready]);
 
@@ -292,7 +298,9 @@ export function GameApp() {
     if (activeModal.kind === "event") {
       const event = activeModal.event;
       return (
+        // one mount per event: each event takes focus on its own open
         <EventDialog
+          key={event.id}
           event={event}
           onClose={close}
           onChoose={(index, choiceTitle) => {
@@ -317,15 +325,17 @@ export function GameApp() {
           restoreFocusFallback={focusHeading}
         />
       );
-    if (activeModal.kind === "confirmNewGame") {
-      const copy = text.confirmNewGame;
+    if (
+      activeModal.kind === "confirmNewGame" ||
+      activeModal.kind === "confirmRestart"
+    ) {
       return (
         <ConfirmDialog
-          eyebrow={copy.eyebrow}
-          title={copy.title}
-          description={copy.description}
-          confirmLabel={copy.confirm}
-          cancelLabel={copy.cancel}
+          copy={
+            activeModal.kind === "confirmNewGame"
+              ? text.confirmNewGame
+              : text.confirmRestart
+          }
           onConfirm={restart}
           onClose={close}
           restoreFocusFallback={focusHeading}
@@ -358,6 +368,7 @@ export function GameApp() {
       if (!player) return null;
       return (
         <ProfileDialog
+          key={player.id}
           player={player}
           state={state}
           onClose={close}
@@ -422,7 +433,7 @@ export function GameApp() {
         {state.report ? (
           <ReportScreen
             report={state.report}
-            onRestart={restart}
+            onRestart={() => setModal({ kind: "confirmRestart" })}
             headingRef={headingRef}
           />
         ) : !state.started ? (

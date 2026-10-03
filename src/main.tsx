@@ -16,6 +16,7 @@ import "./ui/styles/topbar.css";
 import "./ui/styles/pitch.css";
 import "./ui/styles/board.css";
 import "./ui/styles/phone-board.css";
+import "./ui/styles/dialogs.css";
 import "./ui/styles/start.css";
 import "./ui/styles/list.css";
 import "./ui/styles/filters.css";

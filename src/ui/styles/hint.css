@@ -8,7 +8,7 @@
   position: absolute;
   right: 0;
   top: calc(100% + var(--hint-gap));
-  z-index: 20;
+  z-index: var(--layer-hint);
   width: max-content;
   max-width: var(--hint-max-width);
   padding: var(--space-1) var(--space-2);

@@ -13,6 +13,7 @@ import {
   positionShort,
 } from "../logic/selection.ts";
 import { displayGrade } from "../logic/report-grade.ts";
+import { focusSelf } from "./focus-self.ts";
 import { groupPositions } from "./group-order.ts";
 import { UI_TEXT as text } from "./text.ts";
 
@@ -108,7 +109,13 @@ export function ReportScreen({
       {report.rulesRevision !== RULES_REVISION && (
         <p className="fineprint">{text.reportFromOlderRules}</p>
       )}
-      <button className="primary restart" onClick={onRestart}>
+      <button
+        className="primary restart"
+        onClick={(event) => {
+          focusSelf(event);
+          onRestart();
+        }}
+      >
         {text.restart}
       </button>
       <p className="fineprint">{text.simulationDisclaimer}</p>
