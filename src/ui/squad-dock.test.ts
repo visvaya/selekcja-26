@@ -394,3 +394,199 @@ test("SquadDock is a pinned bar that opens a modal sheet", async () => {
     }
   });
 });
+
+// Motion, drag and the hiding bar: a dock rendered with stubbed media queries.
+async function withMotionDock(
+  queries: Record<string, boolean>,
+  body: (tools: {
+    dom: import("jsdom").JSDOM;
+    view: { container: HTMLElement; rerender: (expanded: boolean) => void };
+    closes: () => number;
+  }) => Promise<void> | void,
+) {
+  await withJsdomWindow(async (dom) => {
+    const win = dom.window as unknown as Window & typeof globalThis;
+    win.matchMedia = ((query: string) => ({
+      matches: queries[query] ?? false,
+      media: query,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    })) as unknown as typeof window.matchMedia;
+    const React = await import("react");
+    const { render, cleanup } = await import("@testing-library/react");
+    const { vite, SquadDock } = await loadDock();
+    try {
+      let closed = 0;
+      const state = boardState("camp", squadOf(2, 7, 0, 0));
+      const element = (expanded: boolean) =>
+        React.createElement(SquadDock, {
+          state,
+          expanded,
+          onToggle: () => {},
+          onClose: () => {
+            closed += 1;
+          },
+          onOutsiders: () => {},
+          onFinalize: () => {},
+          actions: null,
+          toggleRef: React.createRef<HTMLButtonElement>(),
+        });
+      const rendered = render(element(false));
+      await body({
+        dom,
+        view: {
+          container: rendered.container,
+          rerender: (expanded) => rendered.rerender(element(expanded)),
+        },
+        closes: () => closed,
+      });
+    } finally {
+      cleanup();
+      await vite.close();
+    }
+  });
+}
+
+const REDUCED = "(prefers-reduced-motion: reduce)";
+const DRAG = "(max-width: 767.98px)";
+
+test("with reduced motion the sheet and the scrim show and hide at once", async () => {
+  await withMotionDock({ [REDUCED]: true }, ({ view }) => {
+    const sheet =
+      view.container.querySelector<HTMLElement>(".phone-dock-more")!;
+    const scrim =
+      view.container.querySelector<HTMLElement>(".phone-dock-scrim")!;
+    assert.equal(sheet.hidden, true);
+    assert.equal(scrim.hidden, true);
+    view.rerender(true);
+    assert.equal(sheet.hidden, false);
+    assert.equal(scrim.hidden, false);
+    assert.equal(scrim.classList.contains("is-visible"), true);
+    assert.equal(sheet.style.transform, "");
+    view.rerender(false);
+    assert.equal(sheet.hidden, true);
+    assert.equal(scrim.hidden, true);
+    assert.equal(sheet.style.transform, "");
+  });
+});
+
+test("the sheet slides down and hides on transitionend or the fallback timer", async () => {
+  await withMotionDock({}, ({ dom, view }) => {
+    test.mock.timers.enable({ apis: ["setTimeout"] });
+    try {
+      const sheet =
+        view.container.querySelector<HTMLElement>(".phone-dock-more")!;
+      const scrim =
+        view.container.querySelector<HTMLElement>(".phone-dock-scrim")!;
+      view.rerender(true);
+      assert.equal(sheet.hidden, false);
+      view.rerender(false);
+      assert.match(sheet.style.transform, /^translateY\(-?\d+(\.\d+)?px\)$/);
+      assert.equal(sheet.hidden, false);
+      assert.equal(scrim.classList.contains("is-visible"), false);
+      const end = new dom.window.Event("transitionend");
+      Object.assign(end, { propertyName: "transform" });
+      sheet.dispatchEvent(end);
+      assert.equal(sheet.hidden, true);
+      assert.equal(scrim.hidden, true);
+      assert.equal(sheet.style.transform, "");
+
+      // fallback: no transitionend
+      view.rerender(true);
+      view.rerender(false);
+      assert.equal(sheet.hidden, false);
+      test.mock.timers.tick(500);
+      assert.equal(sheet.hidden, true);
+
+      // reopening during the closing slide continues
+      view.rerender(true);
+      view.rerender(false);
+      view.rerender(true);
+      assert.equal(sheet.style.transform, "");
+      sheet.dispatchEvent(end);
+      test.mock.timers.tick(500);
+      assert.equal(sheet.hidden, false);
+      assert.equal(scrim.hidden, false);
+    } finally {
+      test.mock.timers.reset();
+    }
+  });
+});
+
+function pointer(
+  dom: import("jsdom").JSDOM,
+  target: Element,
+  type: string,
+  clientY: number,
+  timeStamp = 0,
+) {
+  const event = new dom.window.MouseEvent(type, { bubbles: true, clientY });
+  Object.defineProperty(event, "pointerId", { value: 1 });
+  Object.defineProperty(event, "timeStamp", { value: timeStamp });
+  target.dispatchEvent(event);
+}
+
+test("dragging the handle springs back or closes the sheet", async () => {
+  await withMotionDock({ [DRAG]: true }, ({ dom, view, closes }) => {
+    view.rerender(true);
+    const sheet =
+      view.container.querySelector<HTMLElement>(".phone-dock-more")!;
+    const handle =
+      view.container.querySelector<HTMLElement>(".phone-dock-handle")!;
+    // jsdom has no layout: a 600 px sheet closes past 160 px
+    Object.defineProperty(sheet, "offsetHeight", { value: 600 });
+    pointer(dom, handle, "pointerdown", 100);
+    assert.equal(sheet.classList.contains("is-dragging"), true);
+    pointer(dom, handle, "pointermove", 140);
+    assert.equal(sheet.style.transform, "translateY(40px)");
+    pointer(dom, handle, "pointerup", 140, 400);
+    assert.equal(closes(), 0);
+    assert.equal(sheet.style.transform, "");
+    assert.equal(sheet.classList.contains("is-dragging"), false);
+    handle.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
+    assert.equal(closes(), 0, "the click ending a drag is swallowed");
+
+    pointer(dom, handle, "pointerdown", 100);
+    pointer(dom, handle, "pointermove", 300);
+    pointer(dom, handle, "pointerup", 300, 400);
+    assert.equal(closes(), 1);
+  });
+});
+
+test("without the drag query a move does not follow the finger", async () => {
+  await withMotionDock({}, ({ dom, view }) => {
+    view.rerender(true);
+    const sheet =
+      view.container.querySelector<HTMLElement>(".phone-dock-more")!;
+    const handle =
+      view.container.querySelector<HTMLElement>(".phone-dock-handle")!;
+    pointer(dom, handle, "pointerdown", 100);
+    pointer(dom, handle, "pointermove", 300);
+    assert.equal(sheet.style.transform, "");
+  });
+});
+
+test("the closed bar hides while scrolling down and returns on focus", async () => {
+  await withMotionDock({}, ({ dom, view }) => {
+    const win = dom.window;
+    Object.defineProperty(win.document.documentElement, "scrollHeight", {
+      configurable: true,
+      value: 5000,
+    });
+    const scrollTo = (y: number) => {
+      Object.defineProperty(win, "scrollY", { configurable: true, value: y });
+      win.dispatchEvent(new win.Event("scroll"));
+    };
+    const dock = view.container.querySelector<HTMLElement>(".phone-dock")!;
+    for (const y of [0, 50, 100, 150, 200]) scrollTo(y);
+    assert.equal(dock.classList.contains("is-away"), true);
+    const toggle = dock.querySelector<HTMLElement>(".phone-dock-toggle")!;
+    toggle.dispatchEvent(new win.FocusEvent("focusin", { bubbles: true }));
+    assert.equal(dock.classList.contains("is-away"), false);
+
+    scrollTo(0);
+    view.rerender(true);
+    for (const y of [0, 50, 100, 150, 200]) scrollTo(y);
+    assert.equal(dock.classList.contains("is-away"), false);
+  });
+});

@@ -8,6 +8,12 @@
   right: 0;
   bottom: 0;
   overflow: hidden;
+  transition: transform var(--duration-base) var(--ease-standard);
+}
+
+/* The closed bar slides away while the page scrolls down. */
+.phone-dock.is-away {
+  transform: translateY(calc(100% + var(--space-2)));
 }
 
 /* The open sheet locks the page; a classic scrollbar's width stays as padding so the page
@@ -87,6 +93,12 @@ html.is-sheet-open .phone-dock {
   background: var(--board-deep);
   border: var(--board-frame-width) solid var(--frame);
   border-bottom: none;
+  transition: transform var(--duration-slow) var(--ease-emphasized);
+}
+
+/* The sheet follows the finger while its handle is dragged. */
+.phone-dock-more.is-dragging {
+  transition: none;
 }
 
 .phone-dock-more[hidden] {
@@ -178,6 +190,7 @@ html.is-sheet-open .phone-dock {
   z-index: 29;
   background: var(--scrim);
   opacity: 0;
+  transition: opacity var(--duration-slow) var(--ease-emphasized);
   touch-action: none;
 }
 
@@ -234,6 +247,14 @@ html.is-sheet-open .phone-dock {
 
   .phone-dock-body:has(> .pitch-panel[hidden]) {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .phone-dock,
+  .phone-dock-more,
+  .phone-dock-scrim {
+    transition: none;
   }
 }
 

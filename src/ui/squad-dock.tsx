@@ -15,8 +15,13 @@ import { Pitch } from "./pitch.tsx";
 import { PitchOutsiders } from "./pitch-outsiders.tsx";
 import { SlotSquares } from "./slot-squares.tsx";
 import { UI_TEXT as text } from "./text.ts";
+import { UI_CONFIG } from "./ui-config.ts";
+import { useBarHide } from "./use-bar-hide.ts";
 import { useDockHeight } from "./use-dock-height.ts";
+import { useMediaQuery } from "./use-media-query.ts";
 import { useScrollLock } from "./use-scroll-lock.ts";
+import { useSheetDrag } from "./use-sheet-drag.ts";
+import { useSheetSlide } from "./use-sheet-slide.ts";
 
 function Chevron() {
   return (
@@ -91,6 +96,8 @@ export function SquadDock({
   actions: ReactNode;
   toggleRef: RefObject<HTMLButtonElement | null>;
 }) {
+  const dockRef = useRef<HTMLDivElement>(null);
+  const sheetRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
   const handleRef = useRef<HTMLButtonElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
@@ -100,17 +107,28 @@ export function SquadDock({
   useDockHeight(barRef, true);
   useScrollLock(expanded);
   useScrim(scrimRef, expanded);
+  useSheetSlide({ sheetRef, bodyRef, scrimRef, open: expanded });
+  useBarHide({ dockRef, open: expanded });
+  const canDrag = useMediaQuery(UI_CONFIG.sheetDragQuery);
+  const drag = useSheetDrag({
+    handleRef,
+    sheetRef,
+    enabled: expanded && canDrag,
+    onClose: closeByUser,
+  });
   useEffect(() => {
     if (!expanded) return;
     for (const popover of openPopovers()) popover.hidePopover();
-    if (bodyRef.current) bodyRef.current.scrollTop = 0;
     handleRef.current?.focus({ preventScroll: true });
   }, [expanded]);
 
   const outsiders = formationOutsiders(state);
   const description = boardToggleDescription(state);
 
+  // Every close first ends a drag in progress; a close driven by the screen ends it when
+  // the drag hook is disabled.
   function closeByUser() {
+    drag.cancel();
     onClose();
     toggleRef.current?.focus({ preventScroll: true });
   }
@@ -124,9 +142,8 @@ export function SquadDock({
   return (
     <>
       <div
-        className={`phone-dock-scrim${expanded ? " is-visible" : ""}`}
+        className="phone-dock-scrim"
         aria-hidden="true"
-        hidden={!expanded}
         ref={scrimRef}
         onClick={closeByUser}
       />
@@ -137,9 +154,10 @@ export function SquadDock({
         role={expanded ? "dialog" : "complementary"}
         aria-modal={expanded ? true : undefined}
         aria-label={expanded ? text.sheetTitle : text.yourSquad}
+        ref={dockRef}
         onKeyDown={handleKeyDown}
       >
-        <div className="phone-dock-more" id={sheetId} hidden={!expanded}>
+        <div className="phone-dock-more" id={sheetId} ref={sheetRef}>
           <div className="phone-dock-sheet-head">
             <button
               type="button"
