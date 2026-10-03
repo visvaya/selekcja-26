@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useReducer, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import { flushSync } from "react-dom";
 import { players } from "../data/catalog.ts";
 import { APP_CONFIG } from "../data/constants.ts";
@@ -92,20 +99,44 @@ export function GameApp() {
   // the three is ever mounted at a time, so a single tabIndex={-1} target is enough to give
   // every full-screen transition somewhere safe to send focus.
   const headingRef = useRef<HTMLHeadingElement>(null);
-  // A dialog whose opener is gone or disabled falls back to the open phone board sheet's
-  // handle (the page behind it is inert), otherwise to the screen's heading. Read from the
-  // DOM so the callback stays stable for the dialogs' focus effects.
+  // The open phone board sheet's handle and whether the sheet is open, kept in refs so
+  // the fallback below stays stable for the dialogs' focus effects.
+  const sheetHandleRef = useRef<HTMLButtonElement>(null);
+  const sheetOpenRef = useRef(false);
+  // A dialog whose opener is gone or disabled falls back to the open sheet's handle (the
+  // page behind it is inert), otherwise to the screen's heading.
   const focusHeading = useCallback(() => {
-    const handle = document.querySelector<HTMLElement>(
-      ".phone-dock.is-open .phone-dock-handle",
-    );
+    const handle = sheetOpenRef.current ? sheetHandleRef.current : null;
     (handle ?? headingRef.current)?.focus();
   }, []);
+  const showDock = state.started && !state.report && !wide;
+  // The open sheet is modal: the page behind it is inert, the live region, the dock and
+  // the game dialogs (opened above the sheet) are not.
+  const sheetOpen = showDock && expanded;
+  useLayoutEffect(() => {
+    sheetOpenRef.current = sheetOpen;
+  }, [sheetOpen]);
   // The list's "Cofnij" button: focus target after clearing the squad, because the clicked
   // button becomes disabled and would otherwise drop focus to the page.
   const undoRef = useRef<HTMLButtonElement>(null);
   // The phone board toggle: focus target after a user closes the sheet.
   const dockToggleRef = useRef<HTMLButtonElement>(null);
+  // The side board region: focus target when the layout switches to wide.
+  const sideBoardRef = useRef<HTMLDivElement>(null);
+  // When the width crosses 1024 px and the focused board or actions unmounted (focus fell to
+  // the body), focus the new board's entry. Focus anywhere else is left alone.
+  const firstLayoutRef = useRef(true);
+  useLayoutEffect(() => {
+    if (firstLayoutRef.current) {
+      firstLayoutRef.current = false;
+      return;
+    }
+    const active = document.activeElement;
+    if (active !== null && active !== document.body) return;
+    (wide ? sideBoardRef.current : dockToggleRef.current)?.focus({
+      preventScroll: true,
+    });
+  }, [wide]);
   // Screen-reader announcements for actions that change the squad without moving focus
   // (undo, a successful random fill, resolving a camp event). Local UI state, never saved,
   // no undo step. flushSync commits the empty string as its own render before the real
@@ -354,10 +385,6 @@ export function GameApp() {
   }
 
   const stageText = text.stages[state.stage];
-  const showDock = state.started && !state.report && !wide;
-  // The open sheet is modal: the page behind it is inert, the live region, the dock and
-  // the game dialogs (opened above the sheet) are not.
-  const sheetOpen = showDock && expanded;
   const actions = (
     <GameActions
       canUndo={state.history.length > 0}
@@ -418,6 +445,7 @@ export function GameApp() {
             wide={wide}
             onOutsiders={() => setModal({ kind: "outsiders" })}
             onFinalize={finishStage}
+            sideBoardRef={sideBoardRef}
           />
         )}
       </main>
@@ -431,6 +459,7 @@ export function GameApp() {
           onFinalize={finishStage}
           actions={actions}
           toggleRef={dockToggleRef}
+          handleRef={sheetHandleRef}
         />
       )}
       {renderModal()}

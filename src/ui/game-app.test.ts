@@ -732,6 +732,12 @@ test("the open phone board sheet makes the page inert and keeps dialogs above it
       );
       assert.equal(expanded(), "true");
       assert.equal(locked(), true);
+      // The full squad disables "Dobierz losowo", so the last dialog falls back to the
+      // open sheet's handle rather than the inert heading.
+      assert.equal(
+        doc.activeElement?.classList.contains("phone-dock-handle"),
+        true,
+      );
 
       // Finishing the camp from the bar closes the sheet and unlocks the page.
       fireEvent.click(
@@ -752,6 +758,82 @@ test("the open phone board sheet makes the page inert and keeps dialogs above it
       await view.findByRole("heading", { name: /Bilet na EURO/ });
       assert.equal(locked(), false);
       assert.deepEqual(inertRoots(), [false, false, false]);
+    } finally {
+      cleanup();
+      await vite.close();
+    }
+  });
+});
+
+// A matchMedia stub whose wide query can flip at runtime, firing its `change` listeners.
+function controllableMatchMedia(dom: JSDOM, initiallyWide: boolean) {
+  const wideQuery = "(min-width: 1024px)";
+  let wide = initiallyWide;
+  const listeners = new Set<() => void>();
+  Object.defineProperty(dom.window, "matchMedia", {
+    configurable: true,
+    value: (query: string) =>
+      ({
+        get matches() {
+          return query === wideQuery && wide;
+        },
+        media: query,
+        addEventListener: (_type: string, listener: () => void) =>
+          listeners.add(listener),
+        removeEventListener: (_type: string, listener: () => void) =>
+          listeners.delete(listener),
+      }) as unknown as MediaQueryList,
+  });
+  return (next: boolean) => {
+    wide = next;
+    for (const listener of listeners) listener();
+  };
+}
+
+test("focus survives the 1024 px switch when the focused board unmounts", async () => {
+  await withJsdomWindow(async (dom) => {
+    const setWide = controllableMatchMedia(dom, true);
+    const { fireEvent, act, cleanup, vite, view } = await renderGameApp(dom);
+    try {
+      const doc = dom.window.document;
+      fireEvent.click(
+        await view.findByRole("button", { name: "Rozpocznij odprawę" }),
+      );
+      await view.findByRole("heading", {
+        name: "Wybierz 23 zawodników na test",
+      });
+      const region = () =>
+        doc.querySelector<HTMLElement>('.dock[role="region"]');
+      const isToggle = () =>
+        doc.activeElement?.classList.contains("phone-dock-toggle") === true;
+      const isRegion = () =>
+        doc.activeElement !== null && doc.activeElement === region();
+
+      // Wide to narrow: focus in the side board moves to the dock toggle.
+      region()!.focus();
+      assert.equal(isRegion(), true);
+      act(() => setWide(false));
+      assert.equal(isToggle(), true);
+
+      // Narrow to wide: focus on "Cofnij" in the open sheet moves to the side board region.
+      await openBoard(view);
+      view.getByRole("button", { name: "Cofnij" }).focus();
+      act(() => setWide(true));
+      assert.equal(isRegion(), true);
+      assert.equal(doc.querySelector("[inert]") === null, true);
+      assert.equal(
+        doc.documentElement.classList.contains("is-sheet-open"),
+        false,
+      );
+
+      // Focus outside the board stays where it is.
+      const profile = view.getAllByRole("button", { name: /^Profil: / })[0]!;
+      const profileName = profile.getAttribute("aria-label");
+      profile.focus();
+      act(() => setWide(false));
+      assert.equal(doc.activeElement?.getAttribute("aria-label"), profileName);
+      act(() => setWide(true));
+      assert.equal(doc.activeElement?.getAttribute("aria-label"), profileName);
     } finally {
       cleanup();
       await vite.close();

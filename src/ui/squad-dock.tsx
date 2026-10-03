@@ -86,6 +86,7 @@ export function SquadDock({
   onFinalize,
   actions,
   toggleRef,
+  handleRef,
 }: {
   state: GameState;
   expanded: boolean;
@@ -95,11 +96,12 @@ export function SquadDock({
   onFinalize: () => void;
   actions: ReactNode;
   toggleRef: RefObject<HTMLButtonElement | null>;
+  // Shared with the dialogs' focus fallback while the sheet is open.
+  handleRef: RefObject<HTMLButtonElement | null>;
 }) {
   const dockRef = useRef<HTMLDivElement>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
-  const handleRef = useRef<HTMLButtonElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
   const scrimRef = useRef<HTMLDivElement>(null);
   const sheetId = useId();
@@ -120,7 +122,7 @@ export function SquadDock({
     if (!expanded) return;
     for (const popover of openPopovers()) popover.hidePopover();
     handleRef.current?.focus({ preventScroll: true });
-  }, [expanded]);
+  }, [expanded, handleRef]);
 
   const outsiders = formationOutsiders(state);
   const description = boardToggleDescription(state);

@@ -2,6 +2,7 @@ import { useId, useRef, type CSSProperties } from "react";
 import { GAME_RULES } from "../data/constants.ts";
 import type { GameState, Player, PlayerId } from "../data/types.ts";
 import { modelScore, trialImpact } from "../logic/scoring.ts";
+import { focusSelf } from "./focus-self.ts";
 import { PositionBadge } from "./position-badge.tsx";
 import { stripTraits } from "./player-tags.tsx";
 import { scoreBand } from "./score-band.ts";
@@ -175,7 +176,10 @@ export function PlayerCard({
           className="select-btn"
           aria-pressed={chosen}
           aria-label={text.playerAction(selectLabel, player.name)}
-          onClick={() => onToggle(player.id)}
+          onClick={(event) => {
+            focusSelf(event);
+            onToggle(player.id);
+          }}
         >
           {chosen ? text.selected : text.select}
         </button>
@@ -183,7 +187,10 @@ export function PlayerCard({
           type="button"
           className="profile-btn"
           aria-label={text.playerAction(text.profile, player.name)}
-          onClick={() => onProfile(player.id)}
+          onClick={(event) => {
+            focusSelf(event);
+            onProfile(player.id);
+          }}
         >
           {text.profile}
         </button>
@@ -192,7 +199,10 @@ export function PlayerCard({
           className="compare-btn"
           aria-pressed={compared}
           aria-label={text.playerAction(compareLabel, player.name)}
-          onClick={() => onCompare(player.id)}
+          onClick={(event) => {
+            focusSelf(event);
+            onCompare(player.id);
+          }}
         >
           {compareLabel}
         </button>

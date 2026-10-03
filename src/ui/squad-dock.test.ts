@@ -99,6 +99,7 @@ test("SquadDock renders the board anatomy and a stage button with a reason", asy
             onClose: () => {},
             actions: null,
             toggleRef: React.createRef<HTMLButtonElement>(),
+            handleRef: React.createRef<HTMLButtonElement>(),
             onOutsiders: () => {},
             onFinalize: () => {
               finalized += 1;
@@ -261,6 +262,7 @@ test("SquadDock is a pinned bar that opens a modal sheet", async () => {
             onOutsiders: () => {},
             onFinalize: () => {},
             toggleRef: React.createRef<HTMLButtonElement>(),
+            handleRef: React.createRef<HTMLButtonElement>(),
             actions: React.createElement(GameActions, {
               canUndo: true,
               canAutoFill: true,
@@ -430,6 +432,7 @@ async function withMotionDock(
           onFinalize: () => {},
           actions: null,
           toggleRef: React.createRef<HTMLButtonElement>(),
+          handleRef: React.createRef<HTMLButtonElement>(),
         });
       const rendered = render(element(false));
       await body({

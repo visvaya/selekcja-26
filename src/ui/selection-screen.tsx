@@ -22,6 +22,7 @@ export function SelectionScreen({
   wide,
   onOutsiders,
   onFinalize,
+  sideBoardRef,
 }: {
   state: GameState;
   headingRef: RefObject<HTMLHeadingElement | null>;
@@ -34,6 +35,7 @@ export function SelectionScreen({
   wide: boolean;
   onOutsiders: () => void;
   onFinalize: () => void;
+  sideBoardRef?: RefObject<HTMLDivElement | null>;
 }) {
   // Screen state, not saved: the panel starts collapsed on every visit.
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -89,6 +91,7 @@ export function SelectionScreen({
               state={state}
               onOutsiders={onOutsiders}
               onFinalize={onFinalize}
+              regionRef={sideBoardRef}
             />
           }
         >
