@@ -68,8 +68,11 @@ html.is-sheet-open .phone-dock {
   font-size: var(--bar-count-size);
 }
 
+/* The headline and the hint keep the default control line height, so the bar stays as
+   compact as the design. */
 .phone-dock-bar .dock-copy {
   grid-area: copy;
+  line-height: normal;
 }
 
 .phone-dock-bar .finalize {
@@ -163,7 +166,7 @@ html.is-sheet-open .phone-dock {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-2);
-  margin: 0;
+  margin: 0 0 var(--space-4);
 }
 
 .phone-dock-body .phone-dock-actions .action-button {
