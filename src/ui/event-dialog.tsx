@@ -58,7 +58,7 @@ export function EventDialog({
       restoreFocusFallback={restoreFocusFallback}
     >
       <p className="event-context">
-        {text.eventContext(ordinal.atPlayers, ordinal.index, ordinal.total)}
+        {text.eventContext(state.selected.size, ordinal.index, ordinal.total)}
       </p>
       <p className="event-current">
         {text.eventCurrent}{" "}

@@ -258,24 +258,16 @@ test("live region announces undo, random fill and event outcomes", async () => {
       // render and while the save load (there is none to load here) settles.
       assert.equal(liveRegionText(), "");
 
-      // Two system swaps before the game starts (neither changes the selected squad) give
-      // two undo steps to exercise: reverting either always lands on the same "0 z 23"
-      // wording, which is exactly the repeated-announcement case the mechanism must handle.
-      fireEvent.click(
-        view.getByRole("radio", {
-          name: new RegExp(`^${UI_TEXT.systems["3421"].name} `),
-        }),
-      );
-      fireEvent.click(
-        view.getByRole("radio", {
-          name: new RegExp(`^${UI_TEXT.systems["433"].name} `),
-        }),
-      );
-
-      const expectedUndo = UI_TEXT.announcements.undo(
-        0,
-        GAME_RULES.camp.squadSizePlayers,
-      );
+      // The same system swap before the game starts, undone twice, announces the same
+      // wording twice: exactly the repeated-announcement case the mechanism must handle.
+      const swap = () =>
+        fireEvent.click(
+          view.getByRole("radio", {
+            name: new RegExp(`^${UI_TEXT.systems["3421"].name} `),
+          }),
+        );
+      const expectedUndo = UI_TEXT.undone.system(UI_TEXT.systems["4231"].name);
+      swap();
       fireEvent.click(view.getByRole("button", { name: "Cofnij" }));
       await waitFor(() => assert.equal(liveRegionText(), expectedUndo));
 
@@ -293,6 +285,7 @@ test("live region announces undo, random fill and event outcomes", async () => {
         characterData: true,
         subtree: true,
       });
+      swap();
       fireEvent.click(view.getByRole("button", { name: "Cofnij" }));
       await waitFor(() => assert.equal(liveRegionText(), expectedUndo));
       assert.ok(

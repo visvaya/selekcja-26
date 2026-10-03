@@ -5,9 +5,21 @@ export const SYSTEM_TEXT = {
   introPhase: "ODPRAWA",
   resultPhase: "RAPORT",
   loading: "Wczytywanie gry…",
+  undone: {
+    finish: "Cofnięto zatwierdzenie kadry turniejowej.",
+    completeCamp: "Cofnięto zakończenie zgrupowania.",
+    start: "Cofnięto rozpoczęcie odprawy.",
+    event: (title: string) => `Cofnięto decyzję w zdarzeniu: ${title}.`,
+    system: (name: string) => `Cofnięto zmianę formacji. Formacja: ${name}.`,
+    callUp: (name: string) => `Cofnięto powołanie: ${name}.`,
+    callUps: (count: number) => `Cofnięto powołanie ${count} zawodników.`,
+    release: (name: string) => `Cofnięto odwołanie: ${name}.`,
+    releases: (count: number) => `Cofnięto odwołanie ${count} zawodników.`,
+    other: "Cofnięto ostatnią decyzję.",
+  },
   announcements: {
-    undo: (count: number, limit: number) =>
-      `Cofnięto ostatnią decyzję. Powołani: ${count} z ${limit}.`,
+    undo: (sentence: string, count: number, limit: number) =>
+      `${sentence} Powołani: ${count} z ${limit}.`,
     autoFill: (added: number, count: number, limit: number) =>
       `Losowo dobrano zawodników: ${added}. Powołani: ${count} z ${limit}.`,
     clearSquad:
