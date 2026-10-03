@@ -221,8 +221,9 @@
 }
 
 /* both cards stretch to the taller one; margin-top: auto lines up both button stacks */
-.compare-card .select-btn,
-.compare-card .profile-btn {
+/* .modal outranks the shared strip button rules, which this card reuses for colours */
+.modal .compare-card .select-btn,
+.modal .compare-card .profile-btn {
   flex: none;
   width: 100%;
   min-height: var(--control-height);

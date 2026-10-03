@@ -54,6 +54,12 @@
   animation: panel-in var(--duration-slow) var(--ease-emphasized);
 }
 
+/* the plain form flows as blocks, so adjacent text and action margins collapse as in the
+   design */
+.modal-wrap:not(.drawer-phone) > .modal {
+  display: block;
+}
+
 /* the drawer form scrolls its body and keeps the footer in view */
 .drawer-phone .modal {
   overflow: hidden;
@@ -62,6 +68,41 @@
 .modal > .eyebrow,
 .dlg-scroll > .eyebrow {
   margin-bottom: var(--space-2);
+}
+
+/* The design's type and buttons inside dialogs, scoped here: the shared legacy rules (body
+   line height, inherited button font, eyebrow, button shapes) stay for the screens that have
+   not been restyled yet. Buttons keep the browser's normal line height, as in the design. */
+.modal-wrap {
+  line-height: 1.4;
+}
+
+.modal button {
+  line-height: normal;
+}
+
+.modal .eyebrow {
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.modal .primary,
+.modal .action-button {
+  min-height: var(--control-height);
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+}
+
+.modal .primary {
+  padding: 0 var(--space-5);
+  font-size: var(--button-primary-size);
+}
+
+.modal .action-button {
+  margin-top: 0;
+  padding: 0 var(--space-4);
+  border-width: var(--control-border);
+  font-size: var(--text-base);
 }
 
 /* the drawer heading takes focus on open; a ring shows only for keyboard focus */
@@ -253,7 +294,7 @@
 
 .decision small {
   display: block;
-  margin-top: var(--space-1);
+  margin-top: var(--dialog-line-gap);
   font-size: var(--text-sm);
   color: var(--ink-soft);
 }
@@ -428,7 +469,7 @@
 
 /* outsiders dialog: one row per player (badge, name opening the profile, remove X), then
    the bulk action */
-.outsiders-list {
+.modal .outsiders-list {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
@@ -505,7 +546,7 @@
   }
 }
 
-.outsiders-remove-all {
+.modal .outsiders-remove-all {
   width: 100%;
   margin-top: var(--space-3);
 }
