@@ -1,0 +1,249 @@
+/* The phone squad board below 1024 px: a bar pinned to the bottom that opens a modal sheet
+   above it. The sheet slides from behind the bar, so the bar lies on top. */
+
+.phone-dock {
+  position: fixed;
+  z-index: 30;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+}
+
+/* The open sheet locks the page; a classic scrollbar's width stays as padding so the page
+   and the bar do not shift. */
+html.is-sheet-open {
+  overflow: hidden;
+  padding-right: var(--locked-scrollbar-width, 0px);
+}
+
+html.is-sheet-open .phone-dock {
+  right: var(--locked-scrollbar-width, 0px);
+}
+
+/* The bar: count and toggle in one row, the stage button full width below. */
+.phone-dock-bar {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas: "ring copy" "go go";
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-3) max(var(--space-3), var(--safe-right))
+    calc(var(--space-3) + var(--safe-bottom))
+    max(var(--space-3), var(--safe-left));
+  background: var(--board-deep);
+  border: var(--board-frame-width) solid var(--frame);
+}
+
+.phone-dock.is-open .phone-dock-bar {
+  border-top: 1px solid var(--frame-soft);
+}
+
+/* The count is a bare number on the bar, inset like the toggle's text beside it. */
+.phone-dock-bar .count-ring {
+  grid-area: ring;
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding-inline-start: var(--space-3);
+  background: none;
+  border: none;
+  box-shadow: none;
+}
+
+.phone-dock-bar .count-ring b {
+  width: auto;
+  height: auto;
+  background: none;
+  border: none;
+  box-shadow: none;
+  font-size: var(--bar-count-size);
+}
+
+.phone-dock-bar .dock-copy {
+  grid-area: copy;
+}
+
+.phone-dock-bar .finalize {
+  grid-area: go;
+  width: 100%;
+  margin: 0;
+}
+
+/* The sheet: a head with the handle that never scrolls and a body that scrolls itself.
+   The top padding stays on the sheet; the side and bottom padding sit in the head and the
+   body, so focus rings at the edges are not clipped by the scroll box. */
+.phone-dock-more {
+  position: relative;
+  z-index: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sheet-head-gap);
+  max-height: var(--sheet-max-height);
+  margin: 0;
+  padding: var(--sheet-head-inset) 0 0;
+  background: var(--board-deep);
+  border: var(--board-frame-width) solid var(--frame);
+  border-bottom: none;
+}
+
+.phone-dock-more[hidden] {
+  display: none;
+}
+
+.phone-dock-sheet-head {
+  flex: 0 0 auto;
+  padding: 0 max(var(--space-3), var(--safe-right)) 0
+    max(var(--space-3), var(--safe-left));
+}
+
+.phone-dock-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: var(--sheet-handle-row);
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: grab;
+  touch-action: none;
+}
+
+.phone-dock-handle span {
+  width: var(--sheet-handle-width);
+  height: var(--sheet-handle-height);
+  border-radius: var(--radius-round);
+  background: var(--frame);
+}
+
+.phone-dock-handle:hover span {
+  background: var(--ink);
+}
+
+.phone-dock-body {
+  display: grid;
+  gap: var(--space-3);
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 max(var(--space-3), var(--safe-right)) var(--space-3)
+    max(var(--space-3), var(--safe-left));
+}
+
+.phone-dock-body .phone-dock-kpis {
+  margin-top: 0;
+}
+
+.phone-dock-body .dock-slots {
+  max-width: none;
+  padding-inline: var(--space-2);
+}
+
+.phone-dock-body .pitch-panel {
+  margin: 0;
+}
+
+.phone-dock-body .phone-dock-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.phone-dock-body .phone-dock-actions .action-button {
+  min-height: var(--side-action-height);
+  padding: 0 var(--space-2);
+  font-size: var(--text-sm);
+}
+
+/* With a mouse a thin bar takes most of the right padding and keeps its place, so the
+   content sits about as far from both edges. */
+@media (pointer: fine) {
+  .phone-dock-body {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+    scrollbar-gutter: stable;
+    padding-right: max(var(--space-1), var(--safe-right));
+  }
+}
+
+/* The scrim dims the page behind the open sheet; a tap on it closes the sheet. */
+.phone-dock-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 29;
+  background: var(--scrim);
+  opacity: 0;
+  touch-action: none;
+}
+
+.phone-dock-scrim[hidden] {
+  display: none;
+}
+
+.phone-dock-scrim.is-visible {
+  opacity: 1;
+}
+
+/* A phone in landscape: the bar is one compact row (the hint goes, the chevron stays) and
+   the sheet takes most of the height with the pitch in a second column. */
+@media (orientation: landscape) and (max-height: 500px) {
+  :root {
+    --sheet-head-inset: 0px;
+    --sheet-head-gap: var(--space-1);
+  }
+
+  .phone-dock-bar {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: "ring copy go";
+    padding-block: var(--space-2) calc(var(--space-2) + var(--safe-bottom));
+  }
+
+  .phone-dock-bar .finalize {
+    width: auto;
+    min-height: var(--bar-stage-min-height-landscape);
+    padding-inline: var(--bar-stage-padding-landscape);
+  }
+
+  .phone-dock-bar .dock-copy-hint {
+    display: none;
+  }
+
+  .phone-dock-more {
+    max-height: var(--sheet-max-height-landscape);
+  }
+
+  .phone-dock-body {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    column-gap: var(--space-5);
+  }
+
+  .phone-dock-body > .pitch-panel {
+    grid-column: 2;
+    grid-row: 1 / span 4;
+  }
+
+  .phone-dock-body > :not(.pitch-panel) {
+    grid-column: 1;
+  }
+
+  .phone-dock-body:has(> .pitch-panel[hidden]) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (forced-colors: active) {
+  .phone-dock-handle span {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+
+  .phone-dock-scrim {
+    border-top: 1px solid CanvasText;
+  }
+}

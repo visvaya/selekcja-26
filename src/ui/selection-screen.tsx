@@ -1,10 +1,8 @@
-import { useRef, useState, type RefObject } from "react";
+import { useRef, useState, type ReactNode, type RefObject } from "react";
 import type { GameState, ListFilters, PlayerId } from "../data/types.ts";
 import { clearAllFilters, visiblePlayers } from "../logic/list-filters.ts";
-import { squadLimit } from "../logic/selection.ts";
 import { EmptyList } from "./empty-list.tsx";
 import { FiltersPanel } from "./filters-panel.tsx";
-import { GameActions } from "./game-actions.tsx";
 import { GAME_HEADING_ID, GameHead } from "./game-head.tsx";
 import { ListHeading } from "./list-heading.tsx";
 import { PlayerCard } from "./player-card.tsx";
@@ -16,11 +14,7 @@ import { UI_TEXT as text } from "./text.ts";
 export function SelectionScreen({
   state,
   headingRef,
-  onAutoFill,
-  onUndo,
-  onClearSquad,
-  onNewGame,
-  undoRef,
+  actions,
   onList,
   onToggle,
   onProfile,
@@ -31,11 +25,8 @@ export function SelectionScreen({
 }: {
   state: GameState;
   headingRef: RefObject<HTMLHeadingElement | null>;
-  onAutoFill: () => void;
-  onUndo: () => void;
-  onClearSquad: () => void;
-  onNewGame: () => void;
-  undoRef: RefObject<HTMLButtonElement | null>;
+  // The game actions, shown in the side column from 1024 px (the phone sheet below).
+  actions: ReactNode;
   onList: (patch: Partial<ListFilters>) => void;
   onToggle: (id: PlayerId) => void;
   onProfile: (id: PlayerId) => void;
@@ -52,24 +43,10 @@ export function SelectionScreen({
   const title =
     positions.length === 1 ? text.positions[positions[0]!] : text.allCandidates;
   const visible = visiblePlayers(state);
-  const actions = (
-    <GameActions
-      canUndo={state.history.length > 0}
-      canAutoFill={state.selected.size < squadLimit(state)}
-      canClear={state.selected.size > 0}
-      onUndo={onUndo}
-      onAutoFill={onAutoFill}
-      onClear={onClearSquad}
-      onNewGame={onNewGame}
-      undoRef={undoRef}
-      className={wide ? "side-actions" : undefined}
-    />
-  );
   return (
     <div className="screen-layout">
       <section aria-labelledby={GAME_HEADING_ID}>
-        <GameHead state={state} headingRef={headingRef} showKpis={!wide} />
-        {!wide && actions}
+        <GameHead state={state} headingRef={headingRef} />
         <FiltersPanel
           state={state}
           open={filtersOpen}

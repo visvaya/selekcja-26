@@ -134,6 +134,15 @@
   --sheet-handle-height: 4px;
   --sheet-head-gap: var(--space-3);
 
+  /* Phone board: the open sheet takes up to 60 % of the screen above the pinned bar (85 %
+     with the bar on a short landscape screen); the landscape stage button keeps a 44 px
+     target. */
+  --sheet-max-height: calc(60dvh + var(--space-3) + 2px);
+  --sheet-max-height-landscape: calc(85dvh - var(--dock-height, 0px));
+  --bar-count-size: var(--text-xl);
+  --bar-stage-min-height-landscape: 44px;
+  --bar-stage-padding-landscape: var(--space-5);
+
   /* Range filter: two 56 px number fields, a 16 px separator and two 4 px gaps form the 136 px pair; the
      handles are 24 px targets with a 2 px ring, inset 10 px so they meet the track ends. */
   --range-input-width: 56px;

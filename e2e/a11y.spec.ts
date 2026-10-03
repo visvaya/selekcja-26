@@ -9,7 +9,9 @@ import {
   CAMP_EVENT_CHOICES,
   campSave,
   dialog,
+  closeBoard,
   dockToggle,
+  openBoard,
   finalizeButton,
   finalSave,
   finishedOtherRulesReportSave,
@@ -172,6 +174,7 @@ test.describe.serial("axe WCAG 2.2 AA scan", () => {
       .getByRole("button", { name: text.clearComparison })
       .click();
 
+    await openBoard(page);
     await page.getByRole("button", { name: text.autoFill }).click();
     await expect(dialog(page)).toHaveAccessibleName(text.events.doctor.title);
     await scan(page, "event dialog", scanned);
@@ -181,10 +184,10 @@ test.describe.serial("axe WCAG 2.2 AA scan", () => {
         .click();
     await expect(squadCount(page)).toHaveText("23/23");
 
-    await dockToggle(page).click();
+    // The board sheet stays open after the events: it shows the formation map.
     await expect(dockToggle(page)).toHaveAttribute("aria-expanded", "true");
     await scan(page, "formation map", scanned);
-    await dockToggle(page).click();
+    await closeBoard(page);
 
     await finalizeButton(page).click();
     await expect(dialog(page)).toHaveAccessibleName(text.campReportTitle);
@@ -206,6 +209,7 @@ test.describe.serial("axe WCAG 2.2 AA scan", () => {
     await scan(page, "final list camp squad only", scanned, { fullList: true });
     await onlyCamp.uncheck();
 
+    await openBoard(page);
     await page.getByRole("button", { name: text.autoFill }).click();
     await finalizeButton(page).click();
     await expect(

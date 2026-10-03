@@ -4,7 +4,7 @@ import type { RefObject } from "react";
 const PROPERTY = "--dock-height";
 
 // Publishes the fixed squad bar's rendered height on the root, so the page reserves room
-// for it and focus scrolling keeps controls above it. Reset to 0 px when inactive or gone.
+// for it and focus scrolling keeps controls above it. Removed when inactive or gone.
 export function useDockHeight(
   ref: RefObject<HTMLElement | null>,
   active: boolean,
@@ -12,7 +12,7 @@ export function useDockHeight(
   useEffect(() => {
     const element = ref.current;
     const root = document.documentElement;
-    const reset = () => root.style.setProperty(PROPERTY, "0px");
+    const reset = () => root.style.removeProperty(PROPERTY);
     if (!element || !active) {
       reset();
       return;

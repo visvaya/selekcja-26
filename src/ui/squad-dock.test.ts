@@ -11,7 +11,7 @@ import type {
 } from "../data/types.ts";
 import { detailedPositions } from "../logic/selection.ts";
 import { createInitialState, reduceGameState } from "../logic/state.ts";
-import { boardReason } from "./board-summary.ts";
+import { boardReason, boardToggleDescription } from "./board-summary.ts";
 import { withJsdomWindow } from "./test-jsdom-window.ts";
 
 // `hmr: false` keeps this server off the default HMR port other test files may use.
@@ -95,7 +95,10 @@ test("SquadDock renders the board anatomy and a stage button with a reason", asy
           React.createElement(SquadDock, {
             state,
             expanded,
-            onExpand: () => {},
+            onToggle: () => {},
+            onClose: () => {},
+            actions: null,
+            toggleRef: React.createRef<HTMLButtonElement>(),
             onOutsiders: () => {},
             onFinalize: () => {
               finalized += 1;
@@ -116,11 +119,13 @@ test("SquadDock renders the board anatomy and a stage button with a reason", asy
         (ring as HTMLElement).style.getPropertyValue("--progress"),
         "39",
       );
-      const toggle = view.container.querySelector("button.dock-copy")!;
+      const toggle = view.container.querySelector("button.phone-dock-toggle")!;
       assert.equal(toggle.getAttribute("aria-expanded"), "false");
       assert.ok(toggle.textContent?.startsWith("Zostało 14 miejsc"));
       assert.equal(
-        view.container.querySelector("#dockBreakdown")?.hasAttribute("hidden"),
+        view.container
+          .querySelector(".phone-dock-more")
+          ?.hasAttribute("hidden"),
         true,
       );
       let finalize = view.container.querySelector(".finalize")!;
@@ -137,7 +142,9 @@ test("SquadDock renders the board anatomy and a stage button with a reason", asy
 
       // 3-4-2-1 with outsiders: groups, pitch, magnets and the outside marker.
       view = renderDock(outsidersState(), true);
-      const slots = view.container.querySelector("#dockBreakdown .dock-slots")!;
+      const slots = view.container.querySelector(
+        ".phone-dock-body .dock-slots",
+      )!;
       assert.equal(slots.getAttribute("aria-hidden"), "true");
       assert.deepEqual(
         [...slots.querySelectorAll(".dock-slot-group")].map(
@@ -160,9 +167,9 @@ test("SquadDock renders the board anatomy and a stage button with a reason", asy
           .length,
         3,
       );
-      assert.ok(view.container.querySelector("#dockBreakdown .mini-pitch"));
+      assert.ok(view.container.querySelector(".phone-dock-body .mini-pitch"));
       assert.ok(
-        view.container.querySelector("#dockBreakdown button.pitch-outsiders"),
+        view.container.querySelector(".phone-dock-body button.pitch-outsiders"),
       );
       const marker = slots.querySelector(".dock-outside-marker")!;
       assert.equal(
@@ -218,6 +225,167 @@ test("SquadDock renders the board anatomy and a stage button with a reason", asy
       assert.equal(
         view.container.querySelector('[role="status"]')?.textContent,
         "",
+      );
+      cleanup();
+    } finally {
+      cleanup();
+      await vite.close();
+    }
+  });
+});
+
+test("SquadDock is a pinned bar that opens a modal sheet", async () => {
+  await withJsdomWindow(async (dom) => {
+    const React = await import("react");
+    const { render, cleanup, fireEvent } =
+      await import("@testing-library/react");
+    const { vite, SquadDock } = await loadDock();
+    const { GameActions } = (await vite.ssrLoadModule(
+      "/src/ui/game-actions.tsx",
+    )) as typeof import("./game-actions.tsx");
+    try {
+      const doc = dom.window.document;
+      let closed = 0;
+      let toggled = 0;
+      const renderDock = (state: GameState, expanded: boolean) =>
+        render(
+          React.createElement(SquadDock, {
+            state,
+            expanded,
+            onToggle: () => {
+              toggled += 1;
+            },
+            onClose: () => {
+              closed += 1;
+            },
+            onOutsiders: () => {},
+            onFinalize: () => {},
+            toggleRef: React.createRef<HTMLButtonElement>(),
+            actions: React.createElement(GameActions, {
+              canUndo: true,
+              canAutoFill: true,
+              canClear: true,
+              onUndo: () => {},
+              onAutoFill: () => {},
+              onClear: () => {},
+              onNewGame: () => {},
+              className: "phone-dock-actions",
+            }),
+          }),
+        );
+      const short = boardState("camp", squadOf(2, 7, 0, 0));
+
+      // Closed: a complementary bar with the toggle, the ring and the stage button.
+      let view = renderDock(short, false);
+      let docks = view.container.querySelectorAll(".phone-dock");
+      assert.equal(docks.length, 1);
+      let dock = docks[0]!;
+      assert.equal(dock.classList.contains("dock"), true);
+      assert.equal(dock.getAttribute("role"), "complementary");
+      assert.equal(dock.getAttribute("aria-label"), "Twoja kadra");
+      let sheet = dock.querySelector(".phone-dock-more")!;
+      assert.equal(sheet.hasAttribute("hidden"), true);
+      let toggle = dock.querySelector("button.phone-dock-toggle")!;
+      assert.equal(toggle.getAttribute("aria-expanded"), "false");
+      assert.equal(toggle.getAttribute("aria-controls"), sheet.id);
+      assert.ok(sheet.id);
+      assert.equal(
+        toggle.getAttribute("aria-label"),
+        "Zostało 14 miejsc: rozwiń tablicę",
+      );
+      assert.equal(
+        toggle.querySelector(".dock-copy-hint")?.textContent,
+        "Dotknij, aby rozwinąć",
+      );
+      assert.equal(
+        doc.getElementById(toggle.getAttribute("aria-describedby") ?? "")
+          ?.textContent,
+        boardToggleDescription(short),
+      );
+      assert.equal(
+        dock.querySelector(".phone-dock-bar .count-ring b")?.textContent,
+        "9/23",
+      );
+      assert.ok(dock.querySelector(".phone-dock-bar .finalize"));
+      const scrim = view.container.querySelector(".phone-dock-scrim")!;
+      assert.equal(scrim.getAttribute("aria-hidden"), "true");
+      assert.equal(scrim.hasAttribute("hidden"), true);
+      fireEvent.click(toggle);
+      assert.equal(toggled, 1);
+      cleanup();
+
+      // Open: the same element is a modal dialog with the handle and the body.
+      view = renderDock(short, true);
+      docks = view.container.querySelectorAll(".phone-dock");
+      assert.equal(docks.length, 1);
+      dock = docks[0]!;
+      assert.equal(dock.getAttribute("role"), "dialog");
+      assert.equal(dock.getAttribute("aria-modal"), "true");
+      assert.equal(dock.getAttribute("aria-label"), "Tablica kadry");
+      sheet = dock.querySelector(".phone-dock-more")!;
+      assert.equal(sheet.hasAttribute("hidden"), false);
+      const handle = dock.querySelector<HTMLButtonElement>(
+        ".phone-dock-sheet-head button.phone-dock-handle",
+      )!;
+      assert.equal(handle.getAttribute("aria-label"), "Zwiń tablicę");
+      assert.equal(doc.activeElement === handle, true);
+      assert.deepEqual(
+        [...dock.querySelector(".phone-dock-body")!.children].map((child) =>
+          [...child.classList].find((name) =>
+            [
+              "phone-dock-kpis",
+              "dock-slots",
+              "pitch-panel",
+              "phone-dock-actions",
+            ].includes(name),
+          ),
+        ),
+        ["phone-dock-kpis", "dock-slots", "pitch-panel", "phone-dock-actions"],
+      );
+      assert.equal(
+        dock.querySelectorAll(".phone-dock-actions button").length,
+        4,
+      );
+      toggle = dock.querySelector("button.phone-dock-toggle")!;
+      assert.equal(toggle.getAttribute("aria-expanded"), "true");
+      assert.ok(toggle.getAttribute("aria-label")?.endsWith("zwiń tablicę"));
+      assert.equal(
+        toggle.querySelector(".dock-copy-hint")?.textContent,
+        "Dotknij, aby zwinąć",
+      );
+      assert.equal(
+        view.container
+          .querySelector(".phone-dock-scrim")!
+          .hasAttribute("hidden"),
+        false,
+      );
+      fireEvent.keyDown(handle, { key: "Escape" });
+      assert.equal(closed, 1);
+      assert.equal(doc.activeElement === toggle, true);
+      // An Escape another handler already used does not close the sheet.
+      handle.addEventListener("keydown", (event) => event.preventDefault());
+      fireEvent.keyDown(handle, { key: "Escape" });
+      assert.equal(closed, 1);
+      fireEvent.click(view.container.querySelector(".phone-dock-scrim")!);
+      assert.equal(closed, 2);
+      fireEvent.click(handle);
+      assert.equal(closed, 3);
+      fireEvent.click(toggle);
+      assert.equal(closed, 4);
+      assert.equal(toggled, 1);
+      cleanup();
+
+      // A legal full squad: nothing to describe.
+      const ready = boardState(
+        "camp",
+        squadOf(2, 7, 7, 1).concat(ofGroup("ATA", 7).slice(1)),
+      );
+      view = renderDock(ready, false);
+      assert.equal(
+        view.container
+          .querySelector("button.phone-dock-toggle")!
+          .hasAttribute("aria-describedby"),
+        false,
       );
       cleanup();
     } finally {

@@ -7,6 +7,7 @@ import type { GroupPosition } from "../src/data/types.ts";
 import {
   CAMP_EVENT_CHOICES,
   campSave,
+  closeBoard,
   collectPageErrors,
   dialog,
   dockToggle,
@@ -14,6 +15,7 @@ import {
   expectFocusVisible,
   expectNoHorizontalScroll,
   finalizeButton,
+  openBoard,
   readReport,
   seedStorage,
   squadCount,
@@ -61,13 +63,16 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
   await expectFocusVisible(page, "start -> camp");
 
   // A random fill crosses every event threshold; undo inside the blocking
-  // event dialog reverts the whole fill as one step.
+  // event dialog reverts the whole fill as one step and closes the board sheet.
+  await openBoard(page);
+  await expectFocusVisible(page, "board sheet open");
   await page.getByRole("button", { name: text.autoFill }).tap();
   await expect(dialog(page)).toHaveAccessibleName(text.events.doctor.title);
   await expectFocusVisible(page, "random fill dialog open");
   await dialog(page).getByRole("button", { name: text.undo }).tap();
   await expect(dialog(page)).toBeHidden();
   await expect(squadCount(page)).toHaveText("0/23");
+  await expect(dockToggle(page)).toHaveAttribute("aria-expanded", "false");
   await expectFocusVisible(page, "random fill dialog undo (closed)");
 
   // A player with no 3-4-2-1 position keeps the outsiders strip on the pitch whatever the
@@ -81,6 +86,7 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
   // which must come out from under the sticky top bar.
   await page.evaluate(() => window.scrollTo(0, 600));
 
+  await openBoard(page);
   await page.getByRole("button", { name: text.autoFill }).tap();
   for (const choice of CAMP_EVENT_CHOICES) {
     await expect(dialog(page)).toBeVisible();
@@ -92,6 +98,10 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
   await expect(dialog(page)).toBeHidden();
   await expect(squadCount(page)).toHaveText("23/23");
   await expectFocusVisible(page, "event dialogs closed");
+  // The sheet stays open above the page after the events; its handle closes it.
+  await expect(dockToggle(page)).toHaveAttribute("aria-expanded", "true");
+  await closeBoard(page);
+  await expect(dockToggle(page)).toBeFocused();
 
   // The dock stays reachable at the bottom of a long list.
   await page.evaluate(() =>
@@ -124,7 +134,9 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
   ).toBeVisible();
   await expect(squadCount(page)).toHaveText("23/23");
   await expect(dialog(page)).toBeHidden();
+  await openBoard(page);
   await expect(page.getByRole("button", { name: text.undo })).toBeEnabled();
+  await closeBoard(page);
 
   await finalizeButton(page).tap();
   await expect(dialog(page)).toHaveAccessibleName(text.campReportTitle);
@@ -160,6 +172,7 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
   await filtersToggle.tap();
   await expect(filtersToggle).toHaveAttribute("aria-expanded", "false");
 
+  await openBoard(page);
   await page.getByRole("button", { name: text.autoFill }).tap();
   await expect(squadCount(page)).toHaveText("26/26");
   await expect(finalizeButton(page)).toBeEnabled();

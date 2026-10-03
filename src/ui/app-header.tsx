@@ -1,9 +1,15 @@
 import { GAME_VERSION } from "../data/changelog.ts";
 import { UI_TEXT as text } from "./text.ts";
 
-export function AppHeader({ phase }: { phase: string }) {
+export function AppHeader({
+  phase,
+  inert = false,
+}: {
+  phase: string;
+  inert?: boolean;
+}) {
   return (
-    <header className="topbar">
+    <header className="topbar" inert={inert}>
       <div className="topbar-inner">
         <div className="brand-group">
           <div className="brand">

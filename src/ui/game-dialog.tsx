@@ -40,8 +40,14 @@ export function GameDialog({
     return () => {
       // The opener can still be in the document but no longer focusable (e.g. the finalize
       // button is disabled once the next screen starts empty), so a failed focus() call must
-      // also fall through to the fallback rather than leaving focus on the body.
-      if (previouslyFocused && document.contains(previouslyFocused)) {
+      // also fall through to the fallback rather than leaving focus on the body. An opener
+      // inside the phone board sheet that closed meanwhile is hidden: skip it explicitly,
+      // since not every engine refuses focus on a hidden element.
+      if (
+        previouslyFocused &&
+        document.contains(previouslyFocused) &&
+        !previouslyFocused.closest("[hidden]")
+      ) {
         previouslyFocused.focus();
         if (document.activeElement === previouslyFocused) return;
       }

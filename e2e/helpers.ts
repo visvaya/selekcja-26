@@ -239,8 +239,9 @@ export function collectPageErrors(page: Page): string[] {
   return errors;
 }
 
+// The game dialogs; the open phone board sheet is also a dialog and is excluded.
 export function dialog(page: Page): Locator {
-  return page.getByRole("dialog");
+  return page.locator('[role="dialog"]:not(.phone-dock)');
 }
 
 export function saveBanner(page: Page): Locator {
@@ -308,7 +309,32 @@ export function finalizeButton(page: Page): Locator {
 }
 
 export function dockToggle(page: Page): Locator {
-  return page.locator(".dock .dock-copy");
+  return page.locator(".phone-dock .phone-dock-toggle");
+}
+
+// Opens the phone board sheet with a tap (or a click without touch) on the bar toggle.
+// From 1024 px there is no sheet (the actions sit in the side column), so it does nothing.
+export async function openBoard(page: Page): Promise<void> {
+  if ((await page.locator(".phone-dock").count()) === 0) return;
+  const toggle = dockToggle(page);
+  if ((await toggle.getAttribute("aria-expanded")) !== "true")
+    await tapOrClick(page, toggle);
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+}
+
+// Closes the phone board sheet through its handle; nothing to do from 1024 px.
+export async function closeBoard(page: Page): Promise<void> {
+  if ((await page.locator(".phone-dock").count()) === 0) return;
+  const toggle = dockToggle(page);
+  if ((await toggle.getAttribute("aria-expanded")) === "true")
+    await tapOrClick(page, page.locator(".phone-dock .phone-dock-handle"));
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+}
+
+async function tapOrClick(page: Page, target: Locator): Promise<void> {
+  const touch = await page.evaluate(() => navigator.maxTouchPoints > 0);
+  if (touch) await target.tap();
+  else await target.click();
 }
 
 // Asserts the focus invariant that must hold after every screen transition: focus is never
