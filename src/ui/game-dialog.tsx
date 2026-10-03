@@ -110,7 +110,8 @@ function useScrimClose(
   }, [wrapRef, enabled]);
 }
 
-function CloseIcon() {
+// The drawn X of the close button and the outsiders rows.
+export function CloseIcon() {
   return (
     <svg
       viewBox="0 0 24 24"

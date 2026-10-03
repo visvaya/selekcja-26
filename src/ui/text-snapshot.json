@@ -47,6 +47,28 @@
       "Zdarzenie rozstrzygnięte: Półfinał.",
       "Zdarzenie rozstrzygnięte: 2026-10-01."
     ],
+    "outsiderRemoved": [
+      "Odwołano: 0. Możesz to cofnąć przyciskiem „Cofnij”.",
+      "Odwołano: 1. Możesz to cofnąć przyciskiem „Cofnij”.",
+      "Odwołano: 2. Możesz to cofnąć przyciskiem „Cofnij”.",
+      "Odwołano: 5. Możesz to cofnąć przyciskiem „Cofnij”.",
+      "Odwołano: 12. Możesz to cofnąć przyciskiem „Cofnij”.",
+      "Odwołano: 22. Możesz to cofnąć przyciskiem „Cofnij”.",
+      "Odwołano: X. Możesz to cofnąć przyciskiem „Cofnij”.",
+      "Odwołano: Półfinał. Możesz to cofnąć przyciskiem „Cofnij”.",
+      "Odwołano: 2026-10-01. Możesz to cofnąć przyciskiem „Cofnij”."
+    ],
+    "outsidersRemoved": [
+      "Odwołano zawodników spoza ustawienia: 0. Możesz to cofnąć przyciskiem „Cofnij”.",
+      "Odwołano zawodników spoza ustawienia: 1. Możesz to cofnąć przyciskiem „Cofnij”.",
+      "Odwołano zawodników spoza ustawienia: 2. Możesz to cofnąć przyciskiem „Cofnij”.",
+      "Odwołano zawodników spoza ustawienia: 5. Możesz to cofnąć przyciskiem „Cofnij”.",
+      "Odwołano zawodników spoza ustawienia: 12. Możesz to cofnąć przyciskiem „Cofnij”.",
+      "Odwołano zawodników spoza ustawienia: 22. Możesz to cofnąć przyciskiem „Cofnij”.",
+      "Odwołano zawodników spoza ustawienia: X. Możesz to cofnąć przyciskiem „Cofnij”.",
+      "Odwołano zawodników spoza ustawienia: Półfinał. Możesz to cofnąć przyciskiem „Cofnij”.",
+      "Odwołano zawodników spoza ustawienia: 2026-10-01. Możesz to cofnąć przyciskiem „Cofnij”."
+    ],
     "undo": [
       "Cofnięto ostatnią decyzję. Powołani: 0 z 0.",
       "Cofnięto ostatnią decyzję. Powołani: 1 z 1.",
@@ -567,6 +589,20 @@
     "w tym poza ustawieniem: X",
     "w tym poza ustawieniem: Półfinał",
     "w tym poza ustawieniem: 2026-10-01"
+  ],
+  "outsiderRemove": "Odwołaj",
+  "outsiderRemoveHint": "Odwołaj z kadry. Możesz to cofnąć przyciskiem „Cofnij”.",
+  "outsidersRemoveAllLead": "Odwołaj wszystkich poza",
+  "outsidersRemoveAllTail": [
+    "ustawieniem (0)",
+    "ustawieniem (1)",
+    "ustawieniem (2)",
+    "ustawieniem (5)",
+    "ustawieniem (12)",
+    "ustawieniem (22)",
+    "ustawieniem (X)",
+    "ustawieniem (Półfinał)",
+    "ustawieniem (2026-10-01)"
   ],
   "phaseLabel": "Etap:",
   "pitchDescription": "Liczby pokazują, ilu powołanych może grać na danej pozycji.",

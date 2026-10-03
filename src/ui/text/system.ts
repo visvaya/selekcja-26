@@ -16,6 +16,10 @@ export const SYSTEM_TEXT = {
       `Wybrano do porównania: ${name}. Wybierz drugiego zawodnika.`,
     eventResolved: (choiceTitle: string) =>
       `Zdarzenie rozstrzygnięte: ${choiceTitle}.`,
+    outsiderRemoved: (name: string) =>
+      `Odwołano: ${name}. Możesz to cofnąć przyciskiem „Cofnij”.`,
+    outsidersRemoved: (count: number) =>
+      `Odwołano zawodników spoza ustawienia: ${count}. Możesz to cofnąć przyciskiem „Cofnij”.`,
   },
   save: {
     messages: {

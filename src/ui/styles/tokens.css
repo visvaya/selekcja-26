@@ -306,6 +306,9 @@
   --h2h-value-width: 44px;
   --dialog-line-gap: 2px;
   --h2h-edge-inset: 10px;
+  /* Outsiders dialog: a 32 px remove button with a 16 px X beside each row's badge. */
+  --row-remove-size: 32px;
+  --row-remove-icon: 16px;
 }
 
 @media (min-width: 1024px) {

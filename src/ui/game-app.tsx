@@ -9,7 +9,7 @@ import {
 import { flushSync } from "react-dom";
 import { players } from "../data/catalog.ts";
 import { APP_CONFIG } from "../data/constants.ts";
-import type { GameState, PlayerId } from "../data/types.ts";
+import type { GameState, Player, PlayerId } from "../data/types.ts";
 import { fillSquadRandomly } from "../logic/random-squad.ts";
 import { createInitialState, reduceGameState } from "../logic/state.ts";
 import { clearGame, loadGame, saveGame } from "../logic/storage.ts";
@@ -124,6 +124,12 @@ export function GameApp() {
   const dockToggleRef = useRef<HTMLButtonElement>(null);
   // The side board region: focus target when the layout switches to wide.
   const sideBoardRef = useRef<HTMLDivElement>(null);
+  // The outsiders dialog's opener (the pitch outsiders button) is gone once no outsider
+  // remains: focus goes to the board's entry instead (the side board, or the open sheet's handle).
+  const focusBoardEntry = useCallback(() => {
+    if (sideBoardRef.current) sideBoardRef.current.focus();
+    else focusHeading();
+  }, [focusHeading]);
   // When the width crosses 1024 px and the focused board or actions unmounted (focus fell to
   // the body), focus the new board's entry. Focus anywhere else is left alone.
   // The render-time `expanded` reset on this switch already releases inert and the scroll lock.
@@ -270,6 +276,25 @@ export function GameApp() {
     announce(text.announcements.clearSquad);
     undoRef.current?.focus();
   }
+  // flushSync commits the removal before the dialog moves focus to the next row's X.
+  function removeOutsider(id: PlayerId, last: boolean) {
+    const player = players.find((candidate) => candidate.id === id);
+    flushSync(() => {
+      dispatch({ type: "togglePlayer", id, limit: squadLimit(state) });
+      if (last) setModal(null);
+    });
+    if (player) announce(text.announcements.outsiderRemoved(player.name));
+  }
+  function removeAllOutsiders(outsiders: readonly Player[]) {
+    flushSync(() => {
+      dispatch({
+        type: "removePlayers",
+        ids: outsiders.map((player) => player.id),
+      });
+      setModal(null);
+    });
+    announce(text.announcements.outsidersRemoved(outsiders.length));
+  }
   function restart() {
     dispatch({ type: "reset", seed: randomSeed() });
     setModal(null);
@@ -363,7 +388,9 @@ export function GameApp() {
           outsiders={outsiders}
           onClose={close}
           onOpenProfile={(id) => setModal({ kind: "profile", id })}
-          restoreFocusFallback={focusHeading}
+          onRemove={(id) => removeOutsider(id, outsiders.length === 1)}
+          onRemoveAll={() => removeAllOutsiders(outsiders)}
+          restoreFocusFallback={focusBoardEntry}
         />
       );
     }

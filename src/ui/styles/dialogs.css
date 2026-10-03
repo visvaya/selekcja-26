@@ -425,3 +425,92 @@
     color: ButtonText;
   }
 }
+
+/* outsiders dialog: one row per player (badge, name opening the profile, remove X), then
+   the bulk action */
+.outsiders-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.outsiders-list .squad-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.outsiders-list .pos {
+  flex: none;
+  width: var(--profile-badge-size);
+  height: var(--profile-badge-size);
+}
+
+.outsiders-list .squad-name {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.squad-name-button {
+  display: block;
+  max-width: 100%;
+  min-height: var(--target-min);
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  text-align: left;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.squad-name-button:hover {
+  text-decoration: underline;
+}
+
+.row-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: var(--row-remove-size);
+  height: var(--row-remove-size);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
+.row-remove svg {
+  width: var(--row-remove-icon);
+  height: var(--row-remove-icon);
+}
+
+.row-remove:hover {
+  background: var(--board-deep);
+  color: var(--ink);
+}
+
+.row-remove:active {
+  box-shadow: inset 0 0 0 var(--control-border-thin) currentColor;
+}
+
+@media (forced-colors: active) {
+  .row-remove {
+    border: var(--control-border-thin) solid ButtonText;
+  }
+}
+
+.outsiders-remove-all {
+  width: 100%;
+  margin-top: var(--space-3);
+}
+
+/* the last word and a count stay on one line, so "(5)" never wraps alone */
+.keep-together {
+  white-space: nowrap;
+}

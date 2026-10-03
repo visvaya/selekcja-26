@@ -63,6 +63,11 @@ export const DIALOGS_TEXT = {
   outOfFormationExplanation:
     "Ci zawodnicy nie mają żadnej naturalnej pozycji w wybranej formacji. Możesz ich powołać, ale będzie to wymagało zmiany ustawienia lub gry poza nominalną rolą.",
   returnToPitch: "Wróć do mapy",
+  outsiderRemove: "Odwołaj",
+  outsiderRemoveHint: "Odwołaj z kadry. Możesz to cofnąć przyciskiem „Cofnij”.",
+  // The last word and the count stay together, so "(5)" never wraps alone.
+  outsidersRemoveAllLead: "Odwołaj wszystkich poza",
+  outsidersRemoveAllTail: (count: number) => `ustawieniem (${count})`,
   events: {
     doctor: {
       title: "Raport medyczny: przeciążenie",
