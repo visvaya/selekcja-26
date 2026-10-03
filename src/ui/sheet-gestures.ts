@@ -32,25 +32,47 @@ export const isRealDrag = (startY: number, y: number): boolean =>
   Math.abs(y - startY) > UI_CONFIG.sheetDragClickSlopPx;
 
 export type BarScroll = {
-  lastY: number;
+  anchorY: number;
   y: number;
   nearEnd: boolean;
   reducedMotion: boolean;
   away: boolean;
 };
 
-// The closed bar slides away while the list scrolls down and returns on
-// scrolling up, near the end of the page and always with reduced motion.
+// The closed bar slides away while the list scrolls down and returns on scrolling up,
+// near the end of the page and always with reduced motion. The movement is measured from
+// an anchor (see `nextBarScroll`), so many small scroll events add up.
 export function nextBarAway({
-  lastY,
+  anchorY,
   y,
   nearEnd,
   reducedMotion,
   away,
 }: BarScroll): boolean {
-  if (reducedMotion || nearEnd || y < lastY - UI_CONFIG.barScrollStepPx)
+  if (reducedMotion || nearEnd || y < anchorY - UI_CONFIG.barScrollStepPx)
     return false;
-  if (y > lastY + UI_CONFIG.barScrollStepPx && y > UI_CONFIG.barHideMinScrollPx)
+  if (
+    y > anchorY + UI_CONFIG.barScrollStepPx &&
+    y > UI_CONFIG.barHideMinScrollPx
+  )
     return true;
   return away;
+}
+
+export type BarScrollStep = Omit<BarScroll, "anchorY"> & {
+  anchorY: number;
+  lastY: number;
+};
+
+// One scroll event: the anchor moves to the previous position when the direction turns
+// and to the current one when the decision changes.
+export function nextBarScroll({ lastY, ...input }: BarScrollStep): {
+  away: boolean;
+  anchorY: number;
+} {
+  const turned =
+    Math.sign(input.y - lastY) * Math.sign(lastY - input.anchorY) < 0;
+  const anchorY = turned ? lastY : input.anchorY;
+  const away = nextBarAway({ ...input, anchorY });
+  return { away, anchorY: away === input.away ? anchorY : input.y };
 }
