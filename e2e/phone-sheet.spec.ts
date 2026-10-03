@@ -18,6 +18,7 @@ import {
   squadCount,
   STORAGE_KEY,
   text,
+  touchDrag,
 } from "./helpers.ts";
 
 // The phone board sheet below 1024 px: dialogs above it, its gestures, its Escape order and the
@@ -132,45 +133,14 @@ test("a dialog opened from the open sheet sits above it, and leaving the stage c
 test.describe("drag on the handle", () => {
   test.use(MOTION);
 
-  // Synthetic pointer events on the handle, dispatched in the page with measured gaps between
-  // them: page.touchscreen sends taps only, and one Playwright dispatchEvent round trip takes
-  // about 120 ms on a slow machine, too slow for a 20 ms flick. The gaps spin on the clock
-  // instead of a timer, which a loaded machine can stretch past the flick speed.
-  async function drag(
+  // A touch drag on the sheet's handle.
+  function drag(
     page: Page,
     distance: number,
     steps: number,
     gapMs: number,
   ): Promise<void> {
-    await handle(page).evaluate(
-      (element, { dy, count, gap }) => {
-        const rect = element.getBoundingClientRect();
-        const startY = rect.top + rect.height / 2;
-        const fire = (type: string, clientY: number) =>
-          element.dispatchEvent(
-            new PointerEvent(type, {
-              pointerId: 1,
-              pointerType: "touch",
-              isPrimary: true,
-              clientY,
-              bubbles: true,
-              cancelable: true,
-              composed: true,
-            }),
-          );
-        const wait = () => {
-          const until = performance.now() + gap;
-          while (performance.now() < until);
-        };
-        fire("pointerdown", startY);
-        for (let step = 1; step <= count; step++) {
-          wait();
-          fire("pointermove", startY + (dy * step) / count);
-        }
-        fire("pointerup", startY + dy);
-      },
-      { dy: distance, count: steps, gap: gapMs },
-    );
+    return touchDrag(handle(page), distance, steps, gapMs);
   }
 
   async function sheetTransform(page: Page): Promise<string> {

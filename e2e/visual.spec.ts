@@ -8,6 +8,7 @@ import {
   dialog,
   finishedReportSave,
   openBoard,
+  outsidersSave,
   seedStorage,
   text,
 } from "./helpers.ts";
@@ -150,6 +151,32 @@ for (const size of SIZES) {
         page.getByRole("heading", { name: text.outcomes.roundOf16 }),
       ).toBeVisible();
       await shot(page, `${size.name}-report`, { fullPage: true });
+    });
+
+    test("restart confirmation", async ({ page }) => {
+      await seedStorage(page, finishedReportSave(RULES_REVISION));
+      await page.goto("/");
+      await page.getByRole("button", { name: text.restart }).click();
+      await expect(dialog(page)).toHaveAccessibleName(
+        text.confirmRestart.title,
+      );
+      await shot(page, `${size.name}-restart-confirmation`);
+    });
+
+    test("outsiders dialog", async ({ page }) => {
+      await seedStorage(page, outsidersSave().save);
+      await page.goto("/");
+      // Below 1024 px the pitch is in the sheet, and the drawer opens above it.
+      const wide = await page.evaluate(
+        (query) => window.matchMedia(query).matches,
+        UI_CONFIG.wideLayoutQuery,
+      );
+      if (!wide) await openBoard(page);
+      await page.locator("button.pitch-outsiders").first().click();
+      await expect(dialog(page)).toHaveAccessibleName(
+        text.outOfFormationTitle(5),
+      );
+      await shot(page, `${size.name}-outsiders`);
     });
   });
 }

@@ -10,6 +10,7 @@ import {
   closeBoard,
   dockToggle,
   openBoard,
+  outsidersSave,
   finalizeButton,
   finalSave,
   finishedOtherRulesReportSave,
@@ -57,6 +58,9 @@ const EXPECTED_STATES = [
   "side board final with excess",
   "phone sheet open",
   "phone landscape sheet open",
+  "outsiders drawer over the sheet",
+  "restart confirmation",
+  "comparison dialog at desktop width",
 ] as const;
 type ScreenState = (typeof EXPECTED_STATES)[number];
 
@@ -219,6 +223,12 @@ test.describe.serial("axe WCAG 2.2 AA scan", () => {
       page.getByRole("heading", { name: text.tournamentProgress }),
     ).toBeVisible();
     await scan(page, "tournament report", scanned);
+
+    await page.getByRole("button", { name: text.restart }).click();
+    await expect(page.getByRole("alertdialog")).toHaveAccessibleName(
+      text.confirmRestart.title,
+    );
+    await scan(page, "restart confirmation", scanned);
   });
 
   test("rules changed notice from an unfinished save with other rules", async ({
@@ -264,6 +274,32 @@ test.describe.serial("axe WCAG 2.2 AA scan", () => {
     );
     await expect(boardRegion(page)).toContainText(text.excessMarker(1));
     await scan(page, "side board final with excess", scanned);
+  });
+
+  test("outsiders drawer over the open sheet", async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 740 });
+    await seedStorage(page, outsidersSave().save);
+    await page.goto("/");
+    await openBoard(page);
+    await page.locator(".phone-dock button.pitch-outsiders").click();
+    await expect(dialog(page)).toHaveAccessibleName(
+      text.outOfFormationTitle(5),
+    );
+    await scan(page, "outsiders drawer over the sheet", scanned);
+  });
+
+  test("comparison dialog at desktop width", async ({ page }) => {
+    await page.setViewportSize(DESKTOP_VIEWPORT);
+    await seedStorage(
+      page,
+      campSave({ selectedIds: idsInGroup("BR", 2), events: [] }),
+    );
+    await page.goto("/");
+    const compare = page.locator(".compare-btn");
+    await compare.nth(0).click();
+    await compare.nth(1).click();
+    await expect(dialog(page)).toHaveAccessibleName(text.comparisonEyebrow);
+    await scan(page, "comparison dialog at desktop width", scanned);
   });
 
   for (const { state, viewport } of SHEET_VIEWPORTS)

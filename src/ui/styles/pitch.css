@@ -224,6 +224,12 @@
   height: var(--outsider-magnet-size);
 }
 
+/* full-strength codes: the magnets sit on the pitch tint, and under a dialog's scrim the
+   badge's softened code would fall below the text contrast minimum */
+.pitch-outsiders-strip .pos small {
+  opacity: 1;
+}
+
 .pitch-outsiders-name {
   flex: 1 1 0;
   min-width: 0;
