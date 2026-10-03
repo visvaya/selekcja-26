@@ -1,6 +1,8 @@
 import { expect } from "@playwright/test";
 import type { Locator, Page } from "@playwright/test";
+import { players } from "../src/data/catalog.ts";
 import { APP_CONFIG, RULES_REVISION } from "../src/data/constants.ts";
+import type { GroupPosition } from "../src/data/types.ts";
 import { UI_TEXT as text } from "../src/ui/text.ts";
 
 export { text };
@@ -26,6 +28,13 @@ export async function seedStorage(page: Page, value: string): Promise<void> {
     [STORAGE_KEY, value],
   );
 }
+
+// The IDs of the first `count` candidates of a position group, in catalog order.
+export const idsInGroup = (group: GroupPosition, count: number) =>
+  players
+    .filter((player) => player.pos === group)
+    .slice(0, count)
+    .map((player) => player.id);
 
 // A minimal version 3 save state, used as the base for the "other rules" scenarios below.
 function v3Snapshot(

@@ -3,7 +3,6 @@ import type { Page } from "@playwright/test";
 import { players, systems } from "../src/data/catalog.ts";
 import { detailedPositions } from "../src/logic/selection.ts";
 import { GAME_VERSION } from "../src/data/changelog.ts";
-import type { GroupPosition } from "../src/data/types.ts";
 import {
   CAMP_EVENT_CHOICES,
   campSave,
@@ -15,6 +14,7 @@ import {
   expectFocusVisible,
   expectNoHorizontalScroll,
   finalizeButton,
+  idsInGroup,
   openBoard,
   readReport,
   seedStorage,
@@ -207,12 +207,6 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
   expect(errors).toEqual([]);
 });
 
-const idsInGroup = (group: GroupPosition, count: number) =>
-  players
-    .filter((player) => player.pos === group)
-    .slice(0, count)
-    .map((player) => player.id);
-
 const SYSTEM_3421 = systems.find((system) => system.id === "3421")!;
 const OUTSIDER_3421 = players.find(
   (player) =>
@@ -233,34 +227,47 @@ async function focusLastCompare(page: Page): Promise<void> {
   await expect(last).toBeFocused();
 }
 
+// A full camp squad without goalkeepers is blocked, so the dock headline takes two lines and
+// the bar grows. Returns the measured bar height.
+async function openCampSquad(page: Page, blocked: boolean): Promise<number> {
+  const selectedIds = blocked
+    ? [
+        ...idsInGroup("OBR", 8),
+        ...idsInGroup("POM", 8),
+        ...idsInGroup("ATA", 7),
+      ]
+    : [];
+  await seedStorage(
+    page,
+    campSave({
+      selectedIds,
+      events: blocked ? ["doctor", "captain", "scout"] : [],
+    }),
+  );
+  await page.goto("/");
+  await expect(squadCount(page)).toHaveText(`${selectedIds.length}/23`);
+  if (blocked)
+    await expect(finalizeButton(page)).toHaveAttribute("aria-disabled", "true");
+  await page.evaluate(() => document.fonts.ready);
+  return page
+    .locator(".phone-dock-bar")
+    .evaluate((bar) => bar.getBoundingClientRect().height);
+}
+
 for (const blocked of [false, true])
   test(`the last strip's compare button stays above the bottom dock${blocked ? " when a full squad is blocked" : ""}`, async ({
     page,
+    context,
   }) => {
     const errors = collectPageErrors(page);
-    // A full camp squad without goalkeepers is blocked, so the dock headline takes two lines
-    // and the bar grows.
-    const selectedIds = blocked
-      ? [
-          ...idsInGroup("OBR", 8),
-          ...idsInGroup("POM", 8),
-          ...idsInGroup("ATA", 7),
-        ]
-      : [];
-    await seedStorage(
-      page,
-      campSave({
-        selectedIds,
-        events: blocked ? ["doctor", "captain", "scout"] : [],
-      }),
-    );
-    await page.goto("/");
-    await expect(squadCount(page)).toHaveText(`${selectedIds.length}/23`);
-    if (blocked)
-      await expect(finalizeButton(page)).toHaveAttribute(
-        "aria-disabled",
-        "true",
-      );
+    const barHeight = await openCampSquad(page, blocked);
+    if (blocked) {
+      // Measured against the short headline in a second tab of the same device.
+      const shortPage = await context.newPage();
+      const shortHeight = await openCampSquad(shortPage, false);
+      await shortPage.close();
+      expect(barHeight).toBeGreaterThan(shortHeight);
+    }
     await focusLastCompare(page);
     await expectFocusVisible(
       page,

@@ -6,8 +6,8 @@ import { UI_CONFIG } from "../src/ui/ui-config.ts";
 import {
   campSave,
   dialog,
-  dockToggle,
   finishedReportSave,
+  openBoard,
   seedStorage,
   text,
 } from "./helpers.ts";
@@ -92,14 +92,16 @@ for (const size of SIZES) {
         campSave({ selectedIds: firstIds(10), events: ["doctor"] }),
       );
       await page.goto("/");
-      // Only the phone bottom dock collapses; the desktop side board is always expanded.
+      // Below 1024 px this is the open sheet; the desktop side board is always expanded.
       const wide = await page.evaluate(
         (query) => window.matchMedia(query).matches,
         UI_CONFIG.wideLayoutQuery,
       );
       if (!wide) {
-        await dockToggle(page).click();
-        await expect(dockToggle(page)).toHaveAttribute("aria-expanded", "true");
+        await openBoard(page);
+        await expect(
+          page.getByRole("dialog", { name: text.sheetTitle }),
+        ).toBeVisible();
       }
       await shot(page, `${size.name}-board`);
     });
@@ -151,3 +153,20 @@ for (const size of SIZES) {
     });
   });
 }
+
+// A short landscape phone puts the count, the toggle and the stage button in one bar row.
+test.describe("phone landscape 740px", () => {
+  test.use({ viewport: { width: 740, height: 360 } });
+
+  test("phone landscape bar", async ({ page }) => {
+    await seedStorage(
+      page,
+      campSave({ selectedIds: firstIds(10), events: ["doctor"] }),
+    );
+    await page.goto("/");
+    await expect(
+      page.getByRole("heading", { name: text.stages.camp.heading }),
+    ).toBeVisible();
+    await shot(page, "phone-landscape-bar");
+  });
+});
