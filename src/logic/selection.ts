@@ -48,6 +48,28 @@ export function selectedPlayers(state: GameState): Player[] {
   return players.filter((player) => state.selected.has(player.id));
 }
 
+// The board's quality value: rounded mean quality plus event effects; null for an empty squad.
+export function squadQuality(state: GameState): number | null {
+  const selected = selectedPlayers(state);
+  return selected.length
+    ? Math.round(
+        selected.reduce((sum, player) => sum + player.ov, 0) / selected.length +
+          state.effects.quality,
+      )
+    : null;
+}
+
+// Whether two players can be called up together: "absent" when either already is,
+// "blocked" when fewer than two places are left.
+export function canSelectBoth(
+  state: GameState,
+  ids: readonly [PlayerId, PlayerId],
+  limit: number,
+): "absent" | "blocked" | "ready" {
+  if (ids.some((id) => state.selected.has(id))) return "absent";
+  return state.selected.size + 2 > limit ? "blocked" : "ready";
+}
+
 export function groupCounts(state: GameState): Record<GroupPosition, number> {
   const counts: Record<GroupPosition, number> = {
     BR: 0,

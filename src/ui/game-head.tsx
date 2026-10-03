@@ -1,6 +1,10 @@
 import type { RefObject } from "react";
 import type { GameState } from "../data/types.ts";
-import { riskLevel, selectedPlayers } from "../logic/selection.ts";
+import {
+  riskLevel,
+  selectedPlayers,
+  squadQuality,
+} from "../logic/selection.ts";
 import { UI_TEXT as text } from "./text.ts";
 
 export const GAME_HEADING_ID = "game-heading";
@@ -20,15 +24,7 @@ export function Kpis({
     <div className={`kpis ${className}`}>
       <div className="kpi">
         <span>{text.kpis.quality}</span>
-        <b>
-          {selected.length
-            ? Math.round(
-                selected.reduce((sum, player) => sum + player.ov, 0) /
-                  selected.length +
-                  state.effects.quality,
-              )
-            : text.emptyValue}
-        </b>
+        <b>{squadQuality(state) ?? text.emptyValue}</b>
       </div>
       <div className="kpi">
         <span>{text.kpis.fit}</span>
