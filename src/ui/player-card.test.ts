@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { createServer } from "vite";
 import type { GameState, Player } from "../data/types.ts";
+import { fillSquadRandomly } from "../logic/random-squad.ts";
 import { modelScore } from "../logic/scoring.ts";
 import { scoreBand } from "./score-band.ts";
 import { withJsdomWindow } from "./test-jsdom-window.ts";
@@ -22,7 +23,17 @@ async function loadModules() {
   return { vite, card, anchoring };
 }
 
-async function renderCard(target: Player, state: GameState) {
+type CardHandlers = {
+  onToggle?: () => void;
+  onProfile?: () => void;
+  onCompare?: () => void;
+};
+
+async function renderCard(
+  target: Player,
+  state: GameState,
+  handlers: CardHandlers = {},
+) {
   const React = await import("react");
   const { render } = await import("@testing-library/react");
   const { vite, card } = await loadModules();
@@ -31,9 +42,9 @@ async function renderCard(target: Player, state: GameState) {
     React.createElement(card.PlayerCard, {
       player: target,
       state,
-      onToggle: noop,
-      onProfile: noop,
-      onCompare: noop,
+      onToggle: handlers.onToggle ?? noop,
+      onProfile: handlers.onProfile ?? noop,
+      onCompare: handlers.onCompare ?? noop,
     }),
   );
   return { vite, ...result };
@@ -271,6 +282,67 @@ test("popover anchoring closes a popover whose trigger is gone", async () => {
       Object.defineProperty(event, "newState", { value: "open" });
       popover.dispatchEvent(event);
       assert.equal(hidden, 1);
+    } finally {
+      cleanup();
+      await vite.close();
+    }
+  });
+});
+
+test("a tapped strip button focuses itself before its callback runs", async () => {
+  await withJsdomWindow(async (dom) => {
+    const { cleanup, fireEvent } = await import("@testing-library/react");
+    const target = player("jan-bednarek");
+    const seen: string[] = [];
+    const record = () =>
+      seen.push(
+        dom.window.document.activeElement?.getAttribute("aria-label") ?? "",
+      );
+    const { vite, getByRole } = await renderCard(target, campState(), {
+      onToggle: record,
+      onProfile: record,
+      onCompare: record,
+    });
+    try {
+      const names = ["Powołaj", "Profil", "Porównaj"].map(
+        (label) => `${label}: ${target.name}`,
+      );
+      for (const name of names) fireEvent.click(getByRole("button", { name }));
+      assert.deepEqual(seen, names);
+    } finally {
+      cleanup();
+      await vite.close();
+    }
+  });
+});
+
+test("the ready stage button focuses itself before finishing the stage", async () => {
+  await withJsdomWindow(async (dom) => {
+    const React = await import("react");
+    const { render, cleanup, fireEvent } =
+      await import("@testing-library/react");
+    const vite = await createServer({
+      server: { middlewareMode: true, hmr: false, watch: null },
+      appType: "custom",
+    });
+    const module = (await vite.ssrLoadModule(
+      "/src/ui/finalize-button.tsx",
+    )) as typeof import("./finalize-button.tsx");
+    const base = campState();
+    const filled = fillSquadRandomly(base);
+    assert.ok(filled.ok);
+    const state: GameState = { ...base, selected: filled.selected };
+    const seen: string[] = [];
+    const view = render(
+      React.createElement(module.FinalizeButton, {
+        state,
+        onFinalize: () =>
+          seen.push(dom.window.document.activeElement?.className ?? ""),
+      }),
+    );
+    try {
+      fireEvent.click(view.container.querySelector(".finalize")!);
+      assert.deepEqual(seen, ["finalize"]);
     } finally {
       cleanup();
       await vite.close();

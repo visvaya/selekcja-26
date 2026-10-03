@@ -2,11 +2,14 @@ import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 import {
   boardRegion,
+  closeBoard,
   collectPageErrors,
   dockToggle,
   expectFocusVisible,
+  expectPageLive,
   finalizeButton,
   forceSaveErrorBanner,
+  openBoard,
   patchStorageFailures,
   saveBanner,
   STORAGE_KEY,
@@ -16,6 +19,9 @@ import {
 // These run in the phone projects and switch the viewport across the 1024 px breakpoint.
 const DESKTOP = { width: 1280, height: 800 };
 const TABLET = { width: 800, height: 800 };
+const NARROW = { width: 400, height: 800 };
+const PORTRAIT = { width: 360, height: 740 };
+const LANDSCAPE = { width: 740, height: 360 };
 
 async function startCamp(page: Page): Promise<void> {
   await page.goto("/");
@@ -25,13 +31,20 @@ async function startCamp(page: Page): Promise<void> {
   ).toBeVisible();
 }
 
-// Exactly one board and one undo button at every width, and the side column is no landmark.
+// Exactly one board and one set of actions at every width, and the side column is no landmark.
+// Below 1024 px the actions live in the sheet, so they are counted with the sheet open.
 async function expectSingleBoard(page: Page, wide: boolean): Promise<void> {
   await expect(page.locator(".dock")).toHaveCount(1);
-  await expect(page.getByRole("button", { name: text.undo })).toHaveCount(1);
   await expect(page.locator("main aside")).toHaveCount(0);
-  if (wide) await expect(boardRegion(page)).toBeVisible();
-  else await expect(dockToggle(page)).toHaveAttribute("aria-expanded", "false");
+  if (wide) {
+    await expect(boardRegion(page)).toBeVisible();
+    await expect(page.getByRole("button", { name: text.undo })).toHaveCount(1);
+    return;
+  }
+  await expect(dockToggle(page)).toHaveAttribute("aria-expanded", "false");
+  await openBoard(page);
+  await expect(page.getByRole("button", { name: text.undo })).toHaveCount(1);
+  await closeBoard(page);
 }
 
 test("the board switches form across the breakpoint without duplicates", async ({
@@ -93,4 +106,57 @@ test("the side board fits under the save error banner and its stage button is re
   await finalizeButton(page).focus();
   await expect(finalizeButton(page)).toBeInViewport();
   await expectFocusVisible(page, "stage button after the board scrolled");
+});
+
+test("an open sheet survives resizing across the breakpoint and rotating", async ({
+  page,
+}) => {
+  const errors = collectPageErrors(page);
+  await page.setViewportSize(NARROW);
+  await startCamp(page);
+  await openBoard(page);
+  await expect(page.locator(".phone-dock .phone-dock-handle")).toBeFocused();
+
+  // Focus was in the sheet, so it moves to the side board region, and the page is live.
+  await page.setViewportSize(DESKTOP);
+  await expect(boardRegion(page)).toBeVisible();
+  await expect(page.locator(".dock")).toHaveCount(1);
+  await expectPageLive(page);
+  await expect(boardRegion(page)).toBeFocused();
+
+  // Back below 1024 px: the bar comes back closed, with focus on its toggle.
+  await page.setViewportSize(NARROW);
+  await expect(dockToggle(page)).toHaveAttribute("aria-expanded", "false");
+  await expect(dockToggle(page)).toBeFocused();
+  await expectPageLive(page);
+
+  // Rotating with the sheet open keeps it open in the landscape layout.
+  await page.setViewportSize(PORTRAIT);
+  await openBoard(page);
+  await page.setViewportSize(LANDSCAPE);
+  await expect(dockToggle(page)).toHaveAttribute("aria-expanded", "true");
+  await expect(page.locator(".phone-dock")).toHaveAttribute("role", "dialog");
+  await expect
+    .poll(() =>
+      page
+        .locator(".phone-dock-body")
+        .evaluate(
+          (body) =>
+            getComputedStyle(body).gridTemplateColumns.trim().split(" ").length,
+        ),
+    )
+    .toBe(2);
+  const rows = await page.evaluate(() => {
+    const top = (selector: string) =>
+      document.querySelector(selector)!.getBoundingClientRect().top;
+    const bottom = (selector: string) =>
+      document.querySelector(selector)!.getBoundingClientRect().bottom;
+    return {
+      finalizeTop: top(".phone-dock-bar .finalize"),
+      toggleBottom: bottom(".phone-dock-bar .phone-dock-toggle"),
+    };
+  });
+  // The stage button shares the bar row with the toggle instead of a row below it.
+  expect(rows.finalizeTop).toBeLessThan(rows.toggleBottom);
+  expect(errors).toEqual([]);
 });

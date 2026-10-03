@@ -1,7 +1,8 @@
 import type { RefObject } from "react";
+import { focusSelf } from "./focus-self.ts";
 import { UI_TEXT as text } from "./text.ts";
 
-// The four list actions, in-flow on phones and tablets, in the side column on desktop.
+// The four game actions: in the phone board sheet below 1024 px, in the side column above.
 export function GameActions({
   canUndo,
   canAutoFill,
@@ -35,7 +36,10 @@ export function GameActions({
       </button>
       <button
         className="action-button"
-        onClick={onAutoFill}
+        onClick={(event) => {
+          focusSelf(event);
+          onAutoFill();
+        }}
         disabled={!canAutoFill}
       >
         {text.autoFill}
@@ -43,7 +47,13 @@ export function GameActions({
       <button className="action-button" onClick={onClear} disabled={!canClear}>
         {text.clearSquad}
       </button>
-      <button className="action-button danger" onClick={onNewGame}>
+      <button
+        className="action-button danger"
+        onClick={(event) => {
+          focusSelf(event);
+          onNewGame();
+        }}
+      >
         {text.newGame}
       </button>
     </div>

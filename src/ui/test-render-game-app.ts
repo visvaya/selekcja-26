@@ -19,3 +19,17 @@ export async function renderGameApp(dom: JSDOM) {
   const view = testingLibrary.render(React.createElement(GameApp));
   return { ...testingLibrary, vite, view };
 }
+
+// Opens the phone board sheet through its toggle and waits until it reports open.
+export async function openBoard(view: { container: HTMLElement }) {
+  const { fireEvent, waitFor } = await import("@testing-library/react");
+  const toggle = view.container.querySelector<HTMLButtonElement>(
+    ".phone-dock .phone-dock-toggle",
+  );
+  if (!toggle) throw new Error("The phone board toggle is not rendered");
+  if (toggle.getAttribute("aria-expanded") !== "true") fireEvent.click(toggle);
+  await waitFor(() => {
+    if (toggle.getAttribute("aria-expanded") !== "true")
+      throw new Error("The phone board sheet did not open");
+  });
+}

@@ -20,7 +20,10 @@ async function loadSelectionScreen() {
   const { SelectionScreen } = (await vite.ssrLoadModule(
     "/src/ui/selection-screen.tsx",
   )) as typeof import("./selection-screen.tsx");
-  return { vite, SelectionScreen };
+  const { GameActions } = (await vite.ssrLoadModule(
+    "/src/ui/game-actions.tsx",
+  )) as typeof import("./game-actions.tsx");
+  return { vite, SelectionScreen, GameActions };
 }
 
 function campState(): GameState {
@@ -45,17 +48,22 @@ async function renderScreen(
 ) {
   const React = await import("react");
   const { render } = await import("@testing-library/react");
-  const { vite, SelectionScreen } = await loadSelectionScreen();
+  const { vite, SelectionScreen, GameActions } = await loadSelectionScreen();
   const noop = () => {};
   const result = render(
     React.createElement(SelectionScreen, {
       state,
       headingRef: React.createRef<HTMLHeadingElement>(),
-      onAutoFill: noop,
-      onUndo: noop,
-      onClearSquad: noop,
-      onNewGame: noop,
-      undoRef: React.createRef<HTMLButtonElement>(),
+      actions: React.createElement(GameActions, {
+        canUndo: false,
+        canAutoFill: true,
+        canClear: false,
+        onUndo: noop,
+        onAutoFill: noop,
+        onClear: noop,
+        onNewGame: noop,
+        className: "side-actions",
+      }),
       onList,
       onToggle: noop,
       onProfile: noop,
@@ -75,7 +83,7 @@ function facts(container: HTMLElement): string[][] {
   ]);
 }
 
-test("camp list head shows the heading, facts, hint and inline KPIs", async () => {
+test("camp list head shows the heading, facts and hint, no KPIs or actions", async () => {
   await withJsdomWindow(async () => {
     const { cleanup } = await import("@testing-library/react");
     const { vite, container, getByRole } = await renderScreen(campState());
@@ -96,13 +104,10 @@ test("camp list head shows the heading, facts, hint and inline KPIs", async () =
           .querySelector(".game-head > p")
           ?.textContent?.startsWith("To moment na sprawdzenie") ?? false,
       );
-      const labels = [
-        ...container.querySelectorAll(".kpis.kpis-inline .kpi span"),
-      ].map((span) => span.textContent);
-      assert.deepEqual(labels, ["Jakość", "Dopasowanie", "Ryzyko urazu"]);
-      // phone form in jsdom: no side column
+      // phone form: the KPIs and the actions live in the board sheet, not on the screen
       assert.equal(container.querySelector(".dock-side") === null, true);
-      assert.ok(container.querySelector("section .game-actions"));
+      assert.equal(container.querySelector(".kpis") === null, true);
+      assert.equal(container.querySelector(".game-actions") === null, true);
       const text = container.textContent ?? "";
       assert.equal(text.includes("LISTA KONTROLNA"), false);
       assert.equal(text.includes("MARZEC 2028"), false);
@@ -334,11 +339,7 @@ test("a narrowed list announces the visible count once after the pause", async (
         React.createElement(SelectionScreen, {
           state: narrowed,
           headingRef: React.createRef<HTMLHeadingElement>(),
-          onAutoFill: noop,
-          onUndo: noop,
-          onClearSquad: noop,
-          onNewGame: noop,
-          undoRef: React.createRef<HTMLButtonElement>(),
+          actions: null,
           onList: noop,
           onToggle: noop,
           onProfile: noop,

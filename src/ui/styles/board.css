@@ -1,76 +1,6 @@
 /* Squad board anatomy: count ring, slot squares, markers and the stage button, shared by
    the phone bar and the desktop board. */
 
-/* The phone bar: fixed to the bottom, its content in the page column. */
-.dock {
-  position: fixed;
-  z-index: 30;
-  bottom: 0;
-  left: 0;
-  right: 0;
-}
-
-.dock-inner {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  grid-template-areas: "ring copy" "go go";
-  align-items: center;
-  gap: var(--space-2) var(--space-3);
-  padding: var(--space-3)
-    max(
-      var(--page-gutter),
-      calc((100% - var(--page-max-width)) / 2 + var(--page-gutter))
-    )
-    calc(var(--space-3) + env(safe-area-inset-bottom));
-  background: var(--board-deep);
-  border-top: var(--board-frame-width) solid var(--frame);
-}
-
-.dock-inner .count-ring {
-  grid-area: ring;
-}
-
-.dock-inner .dock-copy {
-  grid-area: copy;
-}
-
-.dock-inner .finalize {
-  grid-area: go;
-}
-
-/* The breakdown opens above the bar, in the page column, and scrolls inside itself. */
-.dock-breakdown {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  /* Clears the sticky top bar (and the save banner above it) and the bar below. */
-  max-height: calc(
-    100dvh - var(--dock-height, 0px) - var(--topbar-height) -
-      var(--save-banner-offset, 0px) - var(--space-4)
-  );
-  overflow: auto;
-  margin: 0
-    max(
-      var(--page-gutter),
-      calc((100% - var(--page-max-width)) / 2 + var(--page-gutter))
-    )
-    var(--space-2);
-  padding: var(--space-4);
-  background: var(--board-deep);
-  border: var(--board-frame-width) solid var(--frame);
-  border-radius: var(--radius-md);
-  transition: opacity var(--duration-base) var(--ease-standard);
-}
-
-.dock-breakdown[hidden] {
-  display: none;
-}
-
-.dock-breakdown .dock-slots {
-  max-width: none;
-  padding-inline: var(--space-2);
-}
-
 /* Count ring: the progress arc around a surface disc. */
 .count-ring {
   flex-shrink: 0;
@@ -137,7 +67,7 @@ button.dock-copy:active {
   font-size: var(--text-base);
 }
 
-.dock-copy small {
+.dock-copy-hint {
   display: block;
   font-size: var(--text-xs);
   color: var(--ink-soft);
@@ -363,7 +293,6 @@ button.dock-copy:active {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dock-breakdown,
   .dock-copy-chevron {
     transition: none;
   }
@@ -379,7 +308,7 @@ button.dock-copy:active {
     );
     display: flex;
     flex-direction: column;
-    /* dvh as for the phone breakdown: on a tablet wide enough for this column the browser
+    /* dvh as for the phone sheet: on a tablet wide enough for this column the browser
        toolbar can still collapse, and 100vh would then hide the board's last rows. */
     max-height: calc(
       100dvh - var(--topbar-height) - var(--space-4) * 2 -
@@ -393,7 +322,6 @@ button.dock-copy:active {
   }
 
   .dock-side > .dock {
-    position: static;
     flex: 1 1 auto;
     min-height: 0;
     overflow-y: auto;
@@ -408,8 +336,6 @@ button.dock-copy:active {
     align-items: center;
     gap: var(--space-2);
     padding: var(--space-5) var(--space-4);
-    background: none;
-    border: none;
   }
 
   /* More room between the ring and the slot squares than the row gap. */
@@ -436,14 +362,11 @@ button.dock-copy:active {
   }
 
   .dock-side .dock-breakdown {
-    max-height: none;
-    overflow: visible;
-    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
     padding: var(--space-4);
-    background: none;
-    border: none;
     border-top: var(--board-frame-width) solid var(--frame);
-    border-radius: 0;
   }
 
   .dock-side .side-actions {

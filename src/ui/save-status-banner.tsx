@@ -46,16 +46,18 @@ export function SaveStatusBanner({
   status,
   onRetry,
   onDismiss,
+  inert = false,
 }: {
   status: SaveStatus;
   onRetry: () => void;
   onDismiss: () => void;
+  inert?: boolean;
 }) {
   const issue = visibleSaveIssue(status);
   const ref = useBannerOffset(issue !== null);
   const showRecovered = status.recovered && issue === null;
   return (
-    <div className="save-status" ref={ref}>
+    <div className="save-status" ref={ref} inert={inert}>
       <div
         className={`save-status-alert${issue ? "" : " save-status-alert-empty"}`}
       >

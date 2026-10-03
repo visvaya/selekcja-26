@@ -384,6 +384,6 @@
 
 /* The fixed squad bar covers the bottom of the viewport: focus and scroll-into-view keep
    the focused control above its measured height. */
-html:has(.dock) {
+html:has(.phone-dock) {
   scroll-padding-bottom: calc(var(--dock-height, 0px) + var(--space-2));
 }

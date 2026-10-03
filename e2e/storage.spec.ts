@@ -6,6 +6,7 @@ import {
   dialog,
   expectSavedSchemaVersion,
   finishedOtherRulesReportSave,
+  openBoard,
   patchStorageFailures,
   saveAlert,
   saveBanner,
@@ -235,8 +236,9 @@ test("?reset discards the saved game and removes the parameter", async ({
   const errors = collectPageErrors(page);
   await page.goto("/");
   await page.getByRole("button", { name: text.start }).click();
+  await openBoard(page);
   await page.getByRole("button", { name: text.autoFill }).click();
-  await expect(page.getByRole("dialog")).toBeVisible();
+  await expect(dialog(page)).toBeVisible();
   await page.goto("/?reset");
   await expect(
     page.getByRole("heading", { name: text.ticket.title }),
@@ -302,6 +304,7 @@ test("a generic save failure recovers after a later action without retry", async
   await expect(saveAlert(page)).toHaveText(text.save.messages.failed);
 
   await setStorageFailureMode(page, "none");
+  await openBoard(page);
   await page.getByRole("button", { name: text.autoFill }).click();
   await expect(dialog(page)).toHaveAccessibleName(text.events.doctor.title);
   await dialog(page)
@@ -330,8 +333,9 @@ test("unavailable storage shows a dismissible banner and keeps the game playable
   ).toBeVisible();
   await expect(saveAlert(page)).toHaveText("");
 
+  await openBoard(page);
   await page.getByRole("button", { name: text.autoFill }).click();
-  await expect(page.getByRole("dialog")).toBeVisible();
+  await expect(dialog(page)).toBeVisible();
   await expect(saveAlert(page)).toHaveText("");
   expect(errors).toEqual([]);
 });
@@ -399,6 +403,7 @@ test("list filters survive a squad change, undo and reload", async ({
   await expect(
     page.getByRole("checkbox", { name: text.onlySelected(3) }),
   ).toBeVisible();
+  await openBoard(page);
   await page.getByRole("button", { name: text.undo }).click();
   await expect(
     page.getByRole("checkbox", { name: text.onlySelected(2) }),
@@ -412,6 +417,7 @@ test("list filters survive a squad change, undo and reload", async ({
   // A squad change and its undo leave the filters alone.
   await callUp.nth(0).click();
   await expect(profiles).toHaveCount(1);
+  await openBoard(page);
   await page.getByRole("button", { name: text.undo }).click();
   await expect(profiles).toHaveCount(2);
 

@@ -1,19 +1,20 @@
 import { AxeBuilder } from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
-import { players } from "../src/data/catalog.ts";
 import { CHANGELOG } from "../src/data/changelog.ts";
-import type { GroupPosition } from "../src/data/types.ts";
 import {
   boardRegion,
   CAMP_EVENT_CHOICES,
   campSave,
   dialog,
+  closeBoard,
   dockToggle,
+  openBoard,
   finalizeButton,
   finalSave,
   finishedOtherRulesReportSave,
   forceSaveErrorBanner,
+  idsInGroup,
   patchStorageFailures,
   saveAlert,
   seedStorage,
@@ -54,17 +55,21 @@ const EXPECTED_STATES = [
   "older rules report",
   "side board camp",
   "side board final with excess",
+  "phone sheet open",
+  "phone landscape sheet open",
 ] as const;
 type ScreenState = (typeof EXPECTED_STATES)[number];
 
 // The side board states run in this phone project at desktop width.
 const DESKTOP_VIEWPORT = { width: 1280, height: 800 };
-
-const idsInGroup = (group: GroupPosition, count: number) =>
-  players
-    .filter((player) => player.pos === group)
-    .slice(0, count)
-    .map((player) => player.id);
+// The open phone sheet in both orientations; landscape has its own two-column layout.
+const SHEET_VIEWPORTS = [
+  { state: "phone sheet open", viewport: { width: 360, height: 740 } },
+  {
+    state: "phone landscape sheet open",
+    viewport: { width: 740, height: 360 },
+  },
+] as const;
 
 // The candidate list renders every card with the same PlayerCard component, so once its markup
 // is scanned in full on "camp list" and "final list" (the two required full-list scans; the
@@ -172,6 +177,7 @@ test.describe.serial("axe WCAG 2.2 AA scan", () => {
       .getByRole("button", { name: text.clearComparison })
       .click();
 
+    await openBoard(page);
     await page.getByRole("button", { name: text.autoFill }).click();
     await expect(dialog(page)).toHaveAccessibleName(text.events.doctor.title);
     await scan(page, "event dialog", scanned);
@@ -181,10 +187,10 @@ test.describe.serial("axe WCAG 2.2 AA scan", () => {
         .click();
     await expect(squadCount(page)).toHaveText("23/23");
 
-    await dockToggle(page).click();
+    // The board sheet stays open after the events: it shows the formation map.
     await expect(dockToggle(page)).toHaveAttribute("aria-expanded", "true");
     await scan(page, "formation map", scanned);
-    await dockToggle(page).click();
+    await closeBoard(page);
 
     await finalizeButton(page).click();
     await expect(dialog(page)).toHaveAccessibleName(text.campReportTitle);
@@ -206,6 +212,7 @@ test.describe.serial("axe WCAG 2.2 AA scan", () => {
     await scan(page, "final list camp squad only", scanned, { fullList: true });
     await onlyCamp.uncheck();
 
+    await openBoard(page);
     await page.getByRole("button", { name: text.autoFill }).click();
     await finalizeButton(page).click();
     await expect(
@@ -258,6 +265,25 @@ test.describe.serial("axe WCAG 2.2 AA scan", () => {
     await expect(boardRegion(page)).toContainText(text.excessMarker(1));
     await scan(page, "side board final with excess", scanned);
   });
+
+  for (const { state, viewport } of SHEET_VIEWPORTS)
+    test(`${state}`, async ({ page }) => {
+      await page.setViewportSize(viewport);
+      // One goalkeeper short of the camp quota, so the squares and the markers show a gap.
+      await seedStorage(
+        page,
+        campSave({
+          selectedIds: [...idsInGroup("BR", 1), ...idsInGroup("OBR", 3)],
+          events: [],
+        }),
+      );
+      await page.goto("/");
+      await openBoard(page);
+      await expect(
+        page.getByRole("dialog", { name: text.sheetTitle }),
+      ).toBeVisible();
+      await scan(page, state, scanned);
+    });
 
   test("older rules report from a finished save with other rules", async ({
     page,

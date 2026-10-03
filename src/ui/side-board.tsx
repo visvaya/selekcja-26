@@ -1,3 +1,4 @@
+import type { RefObject } from "react";
 import type { GameState } from "../data/types.ts";
 import { formationOutsiders, squadLimit } from "../logic/selection.ts";
 import { boardHeadline } from "./board-summary.ts";
@@ -14,13 +15,16 @@ export function SideBoard({
   state,
   onOutsiders,
   onFinalize,
+  regionRef,
 }: {
   state: GameState;
   onOutsiders: () => void;
   onFinalize: () => void;
+  regionRef?: RefObject<HTMLDivElement | null>;
 }) {
   return (
     <div
+      ref={regionRef}
       className="dock"
       role="region"
       // The board scrolls inside itself, so keyboard users must be able to focus it.

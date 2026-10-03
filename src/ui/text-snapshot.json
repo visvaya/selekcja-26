@@ -202,8 +202,21 @@
     "Filtry szczegółowe, aktywne: 2026-10-01"
   ],
   "disclaimer": "Nieoficjalna gra fanowska. Nie jest rzeczywistym produktem PZPN/UEFA.",
-  "dockCoverage": "Dotknij, aby zobaczyć obsadę",
-  "dockOpen": "Dotknij, aby zobaczyć podział miejsc",
+  "dockHint": {
+    "closed": "Dotknij, aby rozwinąć",
+    "open": "Dotknij, aby zwinąć"
+  },
+  "dockToggleName": [
+    "0: rozwiń tablicę",
+    "1: zwiń tablicę",
+    "2: zwiń tablicę",
+    "5: zwiń tablicę",
+    "12: zwiń tablicę",
+    "22: zwiń tablicę",
+    "X: zwiń tablicę",
+    "Półfinał: zwiń tablicę",
+    "2026-10-01: zwiń tablicę"
+  ],
   "emptyValue": "Brak",
   "errorBoundary": {
     "message": "Gra napotkała nieoczekiwany błąd. Odśwież stronę – ostatni zapisany postęp powinien się wczytać. Jeśli błąd wraca, zacznij od nowa; zapisana gra zostanie wtedy usunięta.",
@@ -267,17 +280,6 @@
     "Turniej wymaga dokładnie Półfinał bramkarzy.",
     "Turniej wymaga dokładnie 2026-10-01 bramkarzy."
   ],
-  "excess": [
-    "jest o 0 × 0 za dużo",
-    "jest o 1 × 1 za dużo",
-    "jest o 2 × 2 za dużo",
-    "jest o 5 × 5 za dużo",
-    "jest o 12 × 12 za dużo",
-    "jest o 22 × 22 za dużo",
-    "jest o X × X za dużo",
-    "jest o Półfinał × Półfinał za dużo",
-    "jest o 2026-10-01 × 2026-10-01 za dużo"
-  ],
   "excessMarker": [
     "W tym ponad limit: 0",
     "W tym ponad limit: 1",
@@ -288,6 +290,17 @@
     "W tym ponad limit: X",
     "W tym ponad limit: Półfinał",
     "W tym ponad limit: 2026-10-01"
+  ],
+  "excessNote": [
+    "w tym ponad limit: 0",
+    "w tym ponad limit: 1",
+    "w tym ponad limit: 2",
+    "w tym ponad limit: 5",
+    "w tym ponad limit: 12",
+    "w tym ponad limit: 22",
+    "w tym ponad limit: X",
+    "w tym ponad limit: Półfinał",
+    "w tym ponad limit: 2026-10-01"
   ],
   "excessReason": [
     "W tym ponad limit: 0.",
@@ -472,17 +485,6 @@
     "Tylko powołani (2026-10-01)"
   ],
   "outOfFormation": "Poza ustawieniem",
-  "outOfFormationCount": [
-    "0 poza ustawieniem",
-    "1 poza ustawieniem",
-    "2 poza ustawieniem",
-    "5 poza ustawieniem",
-    "12 poza ustawieniem",
-    "22 poza ustawieniem",
-    "X poza ustawieniem",
-    "Półfinał poza ustawieniem",
-    "2026-10-01 poza ustawieniem"
-  ],
   "outOfFormationExplanation": "Ci zawodnicy nie mają żadnej naturalnej pozycji w wybranej formacji. Możesz ich powołać, ale będzie to wymagało zmiany ustawienia lub gry poza nominalną rolą.",
   "outOfFormationEyebrow": "Dopasowanie do ustawienia",
   "outOfFormationTitle": [
@@ -514,6 +516,17 @@
     "W tym poza ustawieniem: X",
     "W tym poza ustawieniem: Półfinał",
     "W tym poza ustawieniem: 2026-10-01"
+  ],
+  "outsideNote": [
+    "w tym poza ustawieniem: 0",
+    "w tym poza ustawieniem: 1",
+    "w tym poza ustawieniem: 2",
+    "w tym poza ustawieniem: 5",
+    "w tym poza ustawieniem: 12",
+    "w tym poza ustawieniem: 22",
+    "w tym poza ustawieniem: X",
+    "w tym poza ustawieniem: Półfinał",
+    "w tym poza ustawieniem: 2026-10-01"
   ],
   "phaseLabel": "Etap:",
   "pitchDescription": "Liczby pokazują, ilu powołanych może grać na danej pozycji.",
@@ -753,6 +766,8 @@
   "selected": "Powołany ✓",
   "selectedName": "Powołany",
   "selectionScore": "Ocena selekcyjna",
+  "sheetHandle": "Zwiń tablicę",
+  "sheetTitle": "Tablica kadry",
   "shortName": [
     "0 (0)",
     "1 (1)",

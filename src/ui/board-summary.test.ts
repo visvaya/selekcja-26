@@ -1,12 +1,21 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { players } from "../data/catalog.ts";
-import type { GameState, GroupPosition, Player, Stage } from "../data/types.ts";
+import { players, systems } from "../data/catalog.ts";
+import type {
+  GameState,
+  GroupPosition,
+  Player,
+  Stage,
+  SystemId,
+} from "../data/types.ts";
+import { detailedPositions } from "../logic/selection.ts";
 import { slotGroups } from "../logic/squad-board.ts";
 import { createInitialState, reduceGameState } from "../logic/state.ts";
 import {
   boardHeadline,
   boardReason,
+  boardToggleDescription,
+  boardToggleName,
   groupPlayersText,
   slotGroupLabelText,
 } from "./board-summary.ts";
@@ -138,4 +147,73 @@ test("slot group labels show the short code, quota and pool", () => {
     "NAP 6 (min. 3)",
     "Dowolne 3/4",
   ]);
+});
+
+const fitsSystem = (player: Player, system: SystemId): boolean => {
+  const fits = systems.find((candidate) => candidate.id === system)!.fits;
+  return detailedPositions(player).some((position) => fits.includes(position));
+};
+
+function pick(count: number, predicate: (player: Player) => boolean): Player[] {
+  const found = players.filter(predicate).slice(0, count);
+  assert.equal(found.length, count, `catalogue has ${count} matching players`);
+  return found;
+}
+
+test("the toggle name joins the headline and the open state", () => {
+  const empty = boardState("camp", []);
+  assert.equal(
+    boardToggleName(empty, false),
+    "Zostały 23 miejsca: rozwiń tablicę",
+  );
+  assert.equal(
+    boardToggleName(empty, true),
+    "Zostały 23 miejsca: zwiń tablicę",
+  );
+  assert.equal(
+    boardToggleName(boardState("camp", squadOf(2, 7, 7, 7)), false),
+    `${text.stages.camp.completed}: rozwiń tablicę`,
+  );
+});
+
+test("the toggle description lists missing groups, outsiders and excess", () => {
+  assert.equal(
+    boardToggleDescription(boardState("camp", squadOf(2, 3, 3, 1))),
+    "brakuje 4 × OBR • brakuje 4 × POM • brakuje 2 × NAP",
+  );
+  const started = reduceGameState(
+    reduceGameState(createInitialState(7), {
+      type: "setSystem",
+      value: "3421",
+    }),
+    { type: "start" },
+  );
+  const outsiders: GameState = {
+    ...started,
+    selected: new Set(
+      [
+        ...pick(2, (p) => p.pos === "BR"),
+        ...pick(3, (p) => p.pos === "OBR" && fitsSystem(p, "3421")),
+        ...pick(3, (p) => p.pos === "POM" && fitsSystem(p, "3421")),
+        ...pick(
+          1,
+          (p) => p.pos === "ATA" && detailedPositions(p).includes("N"),
+        ),
+        ...pick(5, (p) => p.pos === "ATA" && !fitsSystem(p, "3421")),
+      ].map((player) => player.id),
+    ),
+  };
+  assert.ok(
+    boardToggleDescription(outsiders).endsWith(" • w tym poza ustawieniem: 5"),
+    boardToggleDescription(outsiders),
+  );
+  const excess = boardToggleDescription(
+    boardState("final", squadOf(4, 6, 6, 5)),
+  );
+  assert.ok(excess.includes("w tym ponad limit: 1 bramkarz"), excess);
+  assert.ok(!excess.includes("jest o"), excess);
+  assert.equal(
+    boardToggleDescription(boardState("camp", squadOf(2, 7, 7, 7))),
+    "",
+  );
 });

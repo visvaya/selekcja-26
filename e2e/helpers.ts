@@ -1,6 +1,8 @@
 import { expect } from "@playwright/test";
 import type { Locator, Page } from "@playwright/test";
+import { players } from "../src/data/catalog.ts";
 import { APP_CONFIG, RULES_REVISION } from "../src/data/constants.ts";
+import type { GroupPosition } from "../src/data/types.ts";
 import { UI_TEXT as text } from "../src/ui/text.ts";
 
 export { text };
@@ -26,6 +28,13 @@ export async function seedStorage(page: Page, value: string): Promise<void> {
     [STORAGE_KEY, value],
   );
 }
+
+// The IDs of the first `count` candidates of a position group, in catalog order.
+export const idsInGroup = (group: GroupPosition, count: number) =>
+  players
+    .filter((player) => player.pos === group)
+    .slice(0, count)
+    .map((player) => player.id);
 
 // A minimal version 3 save state, used as the base for the "other rules" scenarios below.
 function v3Snapshot(
@@ -239,8 +248,9 @@ export function collectPageErrors(page: Page): string[] {
   return errors;
 }
 
+// The game dialogs; the open phone board sheet is also a dialog and is excluded.
 export function dialog(page: Page): Locator {
-  return page.getByRole("dialog");
+  return page.locator('[role="dialog"]:not(.phone-dock)');
 }
 
 export function saveBanner(page: Page): Locator {
@@ -308,7 +318,32 @@ export function finalizeButton(page: Page): Locator {
 }
 
 export function dockToggle(page: Page): Locator {
-  return page.locator(".dock .dock-copy");
+  return page.locator(".phone-dock .phone-dock-toggle");
+}
+
+// Opens the phone board sheet with a tap (or a click without touch) on the bar toggle.
+// From 1024 px there is no sheet (the actions sit in the side column), so it does nothing.
+export async function openBoard(page: Page): Promise<void> {
+  if ((await page.locator(".phone-dock").count()) === 0) return;
+  const toggle = dockToggle(page);
+  if ((await toggle.getAttribute("aria-expanded")) !== "true")
+    await tapOrClick(page, toggle);
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+}
+
+// Closes the phone board sheet through its handle; nothing to do from 1024 px.
+export async function closeBoard(page: Page): Promise<void> {
+  if ((await page.locator(".phone-dock").count()) === 0) return;
+  const toggle = dockToggle(page);
+  if ((await toggle.getAttribute("aria-expanded")) === "true")
+    await tapOrClick(page, page.locator(".phone-dock .phone-dock-handle"));
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+}
+
+async function tapOrClick(page: Page, target: Locator): Promise<void> {
+  const touch = await page.evaluate(() => navigator.maxTouchPoints > 0);
+  if (touch) await target.tap();
+  else await target.click();
 }
 
 // Asserts the focus invariant that must hold after every screen transition: focus is never
@@ -443,4 +478,10 @@ export async function forceSaveErrorBanner(page: Page): Promise<void> {
   await setStorageFailureMode(page, "failed");
   await page.locator(".select-btn").first().click();
   await expect(saveAlert(page)).toHaveText(text.save.messages.failed);
+}
+
+// No part of the page is left inert and the page scroll is not left locked.
+export async function expectPageLive(page: Page): Promise<void> {
+  await expect(page.locator("[inert]")).toHaveCount(0);
+  await expect(page.locator("html")).not.toHaveClass(/is-sheet-open/);
 }

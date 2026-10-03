@@ -8,7 +8,7 @@ import { tournamentStory } from "../logic/tournament.ts";
 import type { GroupPosition, OutcomeId, Player } from "../data/types.ts";
 import type { JSDOM } from "jsdom";
 import { withJsdomWindow } from "./test-jsdom-window.ts";
-import { renderGameApp } from "./test-render-game-app.ts";
+import { openBoard, renderGameApp } from "./test-render-game-app.ts";
 import { UI_TEXT } from "./text.ts";
 
 test("start, profile, comparison, event and position filter work together", async () => {
@@ -64,13 +64,15 @@ test("start, profile, comparison, event and position filter work together", asyn
       fireEvent.click(
         screen.getByRole("button", { name: /^Wszyscy \(0\/61\)/ }),
       );
+      await openBoard(view);
       fireEvent.click(screen.getByRole("button", { name: "Dobierz losowo" }));
       assert.ok(
         screen.getByRole("heading", { name: "Raport medyczny: przeciążenie" }),
       );
       fireEvent.click(
         screen
-          .getByRole("dialog")
+          .getByRole("heading", { name: "Raport medyczny: przeciążenie" })
+          .closest('[role="dialog"]')!
           .querySelector<HTMLButtonElement>(".action-button")!,
       );
       assert.equal(
@@ -283,6 +285,7 @@ test("live region announces undo, random fill and event outcomes", async () => {
         GAME_RULES.camp.squadSizePlayers,
         GAME_RULES.camp.squadSizePlayers,
       );
+      await openBoard(view);
       fireEvent.click(view.getByRole("button", { name: "Dobierz losowo" }));
       await waitFor(() => assert.equal(liveRegionText(), expectedAutoFill));
 
@@ -525,6 +528,7 @@ test("clear-squad and new-game actions on the list", async () => {
       await view.findByRole("heading", {
         name: "Wybierz 23 zawodników na test",
       });
+      await openBoard(view);
       const actions = [
         ...view.container.querySelectorAll(".game-actions button"),
       ];
@@ -568,7 +572,10 @@ test("clear-squad and new-game actions on the list", async () => {
       assert.ok(view.getByRole("dialog", { name: "Zacząć nową grę?" }));
       assert.equal(focusedName(), "Wróć do gry");
       fireEvent.click(view.getByRole("button", { name: "Wróć do gry" }));
-      assert.equal(view.queryByRole("dialog"), null);
+      assert.equal(
+        view.queryByRole("dialog", { name: "Zacząć nową grę?" }) === null,
+        true,
+      );
       assert.equal(focusedName(), "Nowa gra");
       assert.ok(
         view.getByRole("heading", { name: "Wybierz 23 zawodników na test" }),
@@ -585,6 +592,10 @@ test("clear-squad and new-game actions on the list", async () => {
       fireEvent.click(view.getByRole("button", { name: "Rozpocznij odprawę" }));
       // the new game's history holds only its start step: one undo leads back to the start
       // screen, not into the previous game
+      await view.findByRole("heading", {
+        name: "Wybierz 23 zawodników na test",
+      });
+      await openBoard(view);
       fireEvent.click(await view.findByRole("button", { name: "Cofnij" }));
       assert.ok(await view.findByRole("heading", { name: /Bilet na EURO/ }));
       // nothing is left to undo: the saved game has an empty history
@@ -635,10 +646,12 @@ test("one board per width: the side board from 1024 px, the bottom dock below", 
           assert.equal(doc.querySelectorAll(".dock").length, 1);
           assert.equal(regions.length, 1);
           assert.equal(regions[0]!.classList.contains("dock"), true);
-          assert.equal(doc.querySelector("aside.dock") === null, true);
+          assert.equal(doc.querySelector(".phone-dock") === null, true);
         } else {
-          assert.equal(doc.querySelectorAll("aside.dock").length, 1);
+          assert.equal(doc.querySelectorAll(".dock").length, 1);
+          assert.equal(doc.querySelectorAll(".phone-dock").length, 1);
           assert.equal(regions.length, 0);
+          await openBoard(view);
         }
         assert.equal(view.getAllByRole("button", { name: "Cofnij" }).length, 1);
       } finally {
@@ -647,4 +660,183 @@ test("one board per width: the side board from 1024 px, the bottom dock below", 
       }
     });
   }
+});
+
+test("the open phone board sheet makes the page inert and keeps dialogs above it", async () => {
+  await withJsdomWindow(async (dom) => {
+    const { fireEvent, waitFor, cleanup, vite, view } =
+      await renderGameApp(dom);
+    try {
+      const doc = dom.window.document;
+      fireEvent.click(
+        await view.findByRole("button", { name: "Rozpocznij odprawę" }),
+      );
+      await view.findByRole("heading", {
+        name: "Wybierz 23 zawodników na test",
+      });
+      const inertRoots = () =>
+        ["main", ".topbar", ".save-status"].map(
+          (selector) =>
+            doc.querySelector(selector)?.hasAttribute("inert") ?? null,
+        );
+      const toggle = () =>
+        doc.querySelector<HTMLButtonElement>(".phone-dock-toggle")!;
+      const expanded = () => toggle().getAttribute("aria-expanded");
+      const locked = () =>
+        doc.documentElement.classList.contains("is-sheet-open");
+      const liveRegionInert = () =>
+        doc.querySelector('[aria-live="polite"]')?.closest("[inert]") !== null;
+
+      // Phone default: no KPIs and no actions in the head or the list.
+      assert.equal(doc.querySelector(".game-head .kpis") === null, true);
+      assert.equal(doc.querySelector("main .kpis") === null, true);
+      assert.equal(doc.querySelector("main .game-actions") === null, true);
+      assert.deepEqual(inertRoots(), [false, false, false]);
+      assert.equal(locked(), false);
+
+      await openBoard(view);
+      assert.deepEqual(inertRoots(), [true, true, true]);
+      assert.equal(liveRegionInert(), false);
+      assert.equal(locked(), true);
+      assert.equal(
+        doc.activeElement?.classList.contains("phone-dock-handle"),
+        true,
+      );
+      fireEvent.keyDown(doc.activeElement!, { key: "Escape" });
+      assert.equal(expanded(), "false");
+      assert.deepEqual(inertRoots(), [false, false, false]);
+      assert.equal(locked(), false);
+      assert.equal(doc.activeElement === toggle(), true);
+
+      // A random fill from the sheet opens the event dialog above it; Escape in the
+      // blocking dialog does not close the sheet, and the sheet stays open after the choices.
+      await openBoard(view);
+      fireEvent.click(view.getByRole("button", { name: "Dobierz losowo" }));
+      const heading = await view.findByRole("heading", {
+        name: "Raport medyczny: przeciążenie",
+      });
+      const eventDialog = heading.closest('[role="dialog"]');
+      assert.equal(eventDialog !== null, true);
+      assert.equal(eventDialog?.closest("[inert]") === null, true);
+      assert.equal(eventDialog?.closest(".phone-dock") === null, true);
+      fireEvent.keyDown(doc.activeElement!, { key: "Escape" });
+      assert.equal(expanded(), "true");
+      for (let step = 0; step < 5; step++) {
+        const decision =
+          doc.querySelector<HTMLButtonElement>(".modal .decision");
+        if (!decision) break;
+        fireEvent.click(decision);
+      }
+      await waitFor(() =>
+        assert.equal(doc.querySelector(".modal .decision") === null, true),
+      );
+      assert.equal(expanded(), "true");
+      assert.equal(locked(), true);
+      // The full squad disables "Dobierz losowo", so the last dialog falls back to the
+      // open sheet's handle rather than the inert heading.
+      assert.equal(
+        doc.activeElement?.classList.contains("phone-dock-handle"),
+        true,
+      );
+
+      // Finishing the camp from the bar closes the sheet and unlocks the page.
+      fireEvent.click(
+        doc.querySelector<HTMLButtonElement>(".phone-dock .finalize")!,
+      );
+      await waitFor(() => assert.equal(locked(), false));
+      assert.equal(expanded(), "false");
+      assert.deepEqual(inertRoots(), [false, false, false]);
+      fireEvent.click(
+        view.getByRole("button", { name: "Przejdź do powołań na EURO" }),
+      );
+
+      // A confirmed new game closes the sheet too.
+      await openBoard(view);
+      assert.equal(locked(), true);
+      fireEvent.click(view.getByRole("button", { name: "Nowa gra" }));
+      fireEvent.click(view.getByRole("button", { name: "Zacznij nową grę" }));
+      await view.findByRole("heading", { name: /Bilet na EURO/ });
+      assert.equal(locked(), false);
+      assert.deepEqual(inertRoots(), [false, false, false]);
+    } finally {
+      cleanup();
+      await vite.close();
+    }
+  });
+});
+
+// A matchMedia stub whose wide query can flip at runtime, firing its `change` listeners.
+function controllableMatchMedia(dom: JSDOM, initiallyWide: boolean) {
+  const wideQuery = "(min-width: 1024px)";
+  let wide = initiallyWide;
+  const listeners = new Set<() => void>();
+  Object.defineProperty(dom.window, "matchMedia", {
+    configurable: true,
+    value: (query: string) =>
+      ({
+        get matches() {
+          return query === wideQuery && wide;
+        },
+        media: query,
+        addEventListener: (_type: string, listener: () => void) =>
+          listeners.add(listener),
+        removeEventListener: (_type: string, listener: () => void) =>
+          listeners.delete(listener),
+      }) as unknown as MediaQueryList,
+  });
+  return (next: boolean) => {
+    wide = next;
+    for (const listener of listeners) listener();
+  };
+}
+
+test("focus survives the 1024 px switch when the focused board unmounts", async () => {
+  await withJsdomWindow(async (dom) => {
+    const setWide = controllableMatchMedia(dom, true);
+    const { fireEvent, act, cleanup, vite, view } = await renderGameApp(dom);
+    try {
+      const doc = dom.window.document;
+      fireEvent.click(
+        await view.findByRole("button", { name: "Rozpocznij odprawę" }),
+      );
+      await view.findByRole("heading", {
+        name: "Wybierz 23 zawodników na test",
+      });
+      const region = () =>
+        doc.querySelector<HTMLElement>('.dock[role="region"]');
+      const isToggle = () =>
+        doc.activeElement?.classList.contains("phone-dock-toggle") === true;
+      const isRegion = () =>
+        doc.activeElement !== null && doc.activeElement === region();
+
+      // Wide to narrow: focus in the side board moves to the dock toggle.
+      region()!.focus();
+      assert.equal(isRegion(), true);
+      act(() => setWide(false));
+      assert.equal(isToggle(), true);
+
+      // Narrow to wide: focus on "Cofnij" in the open sheet moves to the side board region.
+      await openBoard(view);
+      view.getByRole("button", { name: "Cofnij" }).focus();
+      act(() => setWide(true));
+      assert.equal(isRegion(), true);
+      assert.equal(doc.querySelector("[inert]") === null, true);
+      assert.equal(
+        doc.documentElement.classList.contains("is-sheet-open"),
+        false,
+      );
+
+      // Focus outside the board stays where it is.
+      const profile = view.getAllByRole("button", { name: /^Profil: / })[0]!;
+      const profileName = profile.getAttribute("aria-label");
+      profile.focus();
+      act(() => setWide(false));
+      assert.equal(doc.activeElement?.getAttribute("aria-label"), profileName);
+      act(() => setWide(true));
+      assert.equal(doc.activeElement?.getAttribute("aria-label"), profileName);
+    } finally {
+      cleanup();
+      await vite.close();
+    }
+  });
 });

@@ -3,10 +3,10 @@ import type { Page } from "@playwright/test";
 import { players, systems } from "../src/data/catalog.ts";
 import { detailedPositions } from "../src/logic/selection.ts";
 import { GAME_VERSION } from "../src/data/changelog.ts";
-import type { GroupPosition } from "../src/data/types.ts";
 import {
   CAMP_EVENT_CHOICES,
   campSave,
+  closeBoard,
   collectPageErrors,
   dialog,
   dockToggle,
@@ -14,6 +14,8 @@ import {
   expectFocusVisible,
   expectNoHorizontalScroll,
   finalizeButton,
+  idsInGroup,
+  openBoard,
   readReport,
   seedStorage,
   squadCount,
@@ -61,13 +63,16 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
   await expectFocusVisible(page, "start -> camp");
 
   // A random fill crosses every event threshold; undo inside the blocking
-  // event dialog reverts the whole fill as one step.
+  // event dialog reverts the whole fill as one step and closes the board sheet.
+  await openBoard(page);
+  await expectFocusVisible(page, "board sheet open");
   await page.getByRole("button", { name: text.autoFill }).tap();
   await expect(dialog(page)).toHaveAccessibleName(text.events.doctor.title);
   await expectFocusVisible(page, "random fill dialog open");
   await dialog(page).getByRole("button", { name: text.undo }).tap();
   await expect(dialog(page)).toBeHidden();
   await expect(squadCount(page)).toHaveText("0/23");
+  await expect(dockToggle(page)).toHaveAttribute("aria-expanded", "false");
   await expectFocusVisible(page, "random fill dialog undo (closed)");
 
   // A player with no 3-4-2-1 position keeps the outsiders strip on the pitch whatever the
@@ -81,6 +86,7 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
   // which must come out from under the sticky top bar.
   await page.evaluate(() => window.scrollTo(0, 600));
 
+  await openBoard(page);
   await page.getByRole("button", { name: text.autoFill }).tap();
   for (const choice of CAMP_EVENT_CHOICES) {
     await expect(dialog(page)).toBeVisible();
@@ -92,6 +98,10 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
   await expect(dialog(page)).toBeHidden();
   await expect(squadCount(page)).toHaveText("23/23");
   await expectFocusVisible(page, "event dialogs closed");
+  // The sheet stays open above the page after the events; its handle closes it.
+  await expect(dockToggle(page)).toHaveAttribute("aria-expanded", "true");
+  await closeBoard(page);
+  await expect(dockToggle(page)).toBeFocused();
 
   // The dock stays reachable at the bottom of a long list.
   await page.evaluate(() =>
@@ -124,7 +134,9 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
   ).toBeVisible();
   await expect(squadCount(page)).toHaveText("23/23");
   await expect(dialog(page)).toBeHidden();
+  await openBoard(page);
   await expect(page.getByRole("button", { name: text.undo })).toBeEnabled();
+  await closeBoard(page);
 
   await finalizeButton(page).tap();
   await expect(dialog(page)).toHaveAccessibleName(text.campReportTitle);
@@ -160,6 +172,7 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
   await filtersToggle.tap();
   await expect(filtersToggle).toHaveAttribute("aria-expanded", "false");
 
+  await openBoard(page);
   await page.getByRole("button", { name: text.autoFill }).tap();
   await expect(squadCount(page)).toHaveText("26/26");
   await expect(finalizeButton(page)).toBeEnabled();
@@ -194,12 +207,6 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
   expect(errors).toEqual([]);
 });
 
-const idsInGroup = (group: GroupPosition, count: number) =>
-  players
-    .filter((player) => player.pos === group)
-    .slice(0, count)
-    .map((player) => player.id);
-
 const SYSTEM_3421 = systems.find((system) => system.id === "3421")!;
 const OUTSIDER_3421 = players.find(
   (player) =>
@@ -220,34 +227,47 @@ async function focusLastCompare(page: Page): Promise<void> {
   await expect(last).toBeFocused();
 }
 
+// A full camp squad without goalkeepers is blocked, so the dock headline takes two lines and
+// the bar grows. Returns the measured bar height.
+async function openCampSquad(page: Page, blocked: boolean): Promise<number> {
+  const selectedIds = blocked
+    ? [
+        ...idsInGroup("OBR", 8),
+        ...idsInGroup("POM", 8),
+        ...idsInGroup("ATA", 7),
+      ]
+    : [];
+  await seedStorage(
+    page,
+    campSave({
+      selectedIds,
+      events: blocked ? ["doctor", "captain", "scout"] : [],
+    }),
+  );
+  await page.goto("/");
+  await expect(squadCount(page)).toHaveText(`${selectedIds.length}/23`);
+  if (blocked)
+    await expect(finalizeButton(page)).toHaveAttribute("aria-disabled", "true");
+  await page.evaluate(() => document.fonts.ready);
+  return page
+    .locator(".phone-dock-bar")
+    .evaluate((bar) => bar.getBoundingClientRect().height);
+}
+
 for (const blocked of [false, true])
   test(`the last strip's compare button stays above the bottom dock${blocked ? " when a full squad is blocked" : ""}`, async ({
     page,
+    context,
   }) => {
     const errors = collectPageErrors(page);
-    // A full camp squad without goalkeepers is blocked, so the dock headline takes two lines
-    // and the bar grows.
-    const selectedIds = blocked
-      ? [
-          ...idsInGroup("OBR", 8),
-          ...idsInGroup("POM", 8),
-          ...idsInGroup("ATA", 7),
-        ]
-      : [];
-    await seedStorage(
-      page,
-      campSave({
-        selectedIds,
-        events: blocked ? ["doctor", "captain", "scout"] : [],
-      }),
-    );
-    await page.goto("/");
-    await expect(squadCount(page)).toHaveText(`${selectedIds.length}/23`);
-    if (blocked)
-      await expect(finalizeButton(page)).toHaveAttribute(
-        "aria-disabled",
-        "true",
-      );
+    const barHeight = await openCampSquad(page, blocked);
+    if (blocked) {
+      // Measured against the short headline in a second tab of the same device.
+      const shortPage = await context.newPage();
+      const shortHeight = await openCampSquad(shortPage, false);
+      await shortPage.close();
+      expect(barHeight).toBeGreaterThan(shortHeight);
+    }
     await focusLastCompare(page);
     await expectFocusVisible(
       page,

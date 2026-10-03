@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useReducer, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import { flushSync } from "react-dom";
 import { players } from "../data/catalog.ts";
 import { APP_CONFIG } from "../data/constants.ts";
@@ -31,6 +38,7 @@ import {
 } from "../logic/selection.ts";
 import { SelectionScreen } from "./selection-screen.tsx";
 import { SquadDock } from "./squad-dock.tsx";
+import { GameActions } from "./game-actions.tsx";
 import { ReportScreen } from "./report-screen.tsx";
 import { UI_TEXT as text } from "./text.ts";
 import { UI_CONFIG } from "./ui-config.ts";
@@ -71,7 +79,7 @@ export function GameApp() {
   const [modal, setModal] = useState<ModalState | null>(null);
   const [expanded, setExpanded] = useState(false);
   // Decided once for the whole app, so exactly one board renders: the side board from
-  // 1024 px, the bottom dock below. A width change closes the phone breakdown.
+  // 1024 px, the bottom dock below. A width change closes the phone sheet.
   const wide = useMediaQuery(UI_CONFIG.wideLayoutQuery);
   const [layoutWide, setLayoutWide] = useState(wide);
   if (layoutWide !== wide) {
@@ -91,10 +99,45 @@ export function GameApp() {
   // the three is ever mounted at a time, so a single tabIndex={-1} target is enough to give
   // every full-screen transition somewhere safe to send focus.
   const headingRef = useRef<HTMLHeadingElement>(null);
-  const focusHeading = useCallback(() => headingRef.current?.focus(), []);
+  // The open phone board sheet's handle and whether the sheet is open, kept in refs so
+  // the fallback below stays stable for the dialogs' focus effects.
+  const sheetHandleRef = useRef<HTMLButtonElement>(null);
+  const sheetOpenRef = useRef(false);
+  // A dialog whose opener is gone or disabled falls back to the open sheet's handle (the
+  // page behind it is inert), otherwise to the screen's heading.
+  const focusHeading = useCallback(() => {
+    const handle = sheetOpenRef.current ? sheetHandleRef.current : null;
+    (handle ?? headingRef.current)?.focus();
+  }, []);
+  const showDock = state.started && !state.report && !wide;
+  // The open sheet is modal: the page behind it is inert, the live region, the dock and
+  // the game dialogs (opened above the sheet) are not.
+  const sheetOpen = showDock && expanded;
+  useLayoutEffect(() => {
+    sheetOpenRef.current = sheetOpen;
+  }, [sheetOpen]);
   // The list's "Cofnij" button: focus target after clearing the squad, because the clicked
   // button becomes disabled and would otherwise drop focus to the page.
   const undoRef = useRef<HTMLButtonElement>(null);
+  // The phone board toggle: focus target after a user closes the sheet.
+  const dockToggleRef = useRef<HTMLButtonElement>(null);
+  // The side board region: focus target when the layout switches to wide.
+  const sideBoardRef = useRef<HTMLDivElement>(null);
+  // When the width crosses 1024 px and the focused board or actions unmounted (focus fell to
+  // the body), focus the new board's entry. Focus anywhere else is left alone.
+  // The render-time `expanded` reset on this switch already releases inert and the scroll lock.
+  const firstLayoutRef = useRef(true);
+  useLayoutEffect(() => {
+    if (firstLayoutRef.current) {
+      firstLayoutRef.current = false;
+      return;
+    }
+    const active = document.activeElement;
+    if (active !== null && active !== document.body) return;
+    (wide ? sideBoardRef.current : dockToggleRef.current)?.focus({
+      preventScroll: true,
+    });
+  }, [wide]);
   // Screen-reader announcements for actions that change the squad without moving focus
   // (undo, a successful random fill, resolving a camp event). Local UI state, never saved,
   // no undo step. flushSync commits the empty string as its own render before the real
@@ -343,6 +386,19 @@ export function GameApp() {
   }
 
   const stageText = text.stages[state.stage];
+  const actions = (
+    <GameActions
+      canUndo={state.history.length > 0}
+      canAutoFill={state.selected.size < squadLimit(state)}
+      canClear={state.selected.size > 0}
+      onUndo={undo}
+      onAutoFill={autoFill}
+      onClear={clearSquad}
+      onNewGame={() => setModal({ kind: "confirmNewGame" })}
+      undoRef={undoRef}
+      className={wide ? "side-actions" : "phone-dock-actions"}
+    />
+  );
   return (
     <div className="app">
       <LiveAnnouncer message={announcement} />
@@ -350,8 +406,10 @@ export function GameApp() {
         status={saveStatus}
         onRetry={retrySave}
         onDismiss={dismissSaveIssue}
+        inert={sheetOpen}
       />
       <AppHeader
+        inert={sheetOpen}
         phase={
           state.report
             ? text.resultPhase
@@ -360,7 +418,7 @@ export function GameApp() {
               : text.introPhase
         }
       />
-      <main className="main">
+      <main className="main" inert={sheetOpen}>
         {state.report ? (
           <ReportScreen
             report={state.report}
@@ -380,11 +438,7 @@ export function GameApp() {
           <SelectionScreen
             state={state}
             headingRef={headingRef}
-            onAutoFill={autoFill}
-            onUndo={undo}
-            onClearSquad={clearSquad}
-            onNewGame={() => setModal({ kind: "confirmNewGame" })}
-            undoRef={undoRef}
+            actions={wide ? actions : null}
             onList={(patch) => dispatch({ type: "setList", patch })}
             onToggle={togglePlayer}
             onProfile={(id) => setModal({ kind: "profile", id })}
@@ -392,16 +446,21 @@ export function GameApp() {
             wide={wide}
             onOutsiders={() => setModal({ kind: "outsiders" })}
             onFinalize={finishStage}
+            sideBoardRef={sideBoardRef}
           />
         )}
       </main>
-      {state.started && !state.report && !wide && (
+      {showDock && (
         <SquadDock
           state={state}
           expanded={expanded}
-          onExpand={() => setExpanded((open) => !open)}
+          onToggle={() => setExpanded((open) => !open)}
+          onClose={() => setExpanded(false)}
           onOutsiders={() => setModal({ kind: "outsiders" })}
           onFinalize={finishStage}
+          actions={actions}
+          toggleRef={dockToggleRef}
+          handleRef={sheetHandleRef}
         />
       )}
       {renderModal()}

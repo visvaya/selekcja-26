@@ -1,7 +1,8 @@
-import { useId } from "react";
+import { useId, type MouseEvent } from "react";
 import type { GameState } from "../data/types.ts";
 import { canFinalize, squadLimit } from "../logic/selection.ts";
 import { boardReason } from "./board-summary.ts";
+import { focusSelf } from "./focus-self.ts";
 import { UI_TEXT as text } from "./text.ts";
 
 // Never `disabled`, so it stays focusable and explains itself: while blocked it is
@@ -25,7 +26,14 @@ export function FinalizeButton({
         className="finalize"
         aria-disabled={ready ? undefined : true}
         aria-describedby={ready ? undefined : reasonId}
-        onClick={ready ? onFinalize : undefined}
+        onClick={
+          ready
+            ? (event: MouseEvent<HTMLButtonElement>) => {
+                focusSelf(event);
+                onFinalize();
+              }
+            : undefined
+        }
       >
         {text.stages[state.stage].finalize}
       </button>

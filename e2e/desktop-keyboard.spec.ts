@@ -232,13 +232,19 @@ test("desktop game is playable with the keyboard alone", async ({ page }) => {
   const board = boardRegion(page);
   await expect(board).toHaveAccessibleName(text.boardRegion.camp);
   await expect(board.locator("button.dock-copy")).toHaveCount(0);
-  await finalizeButton(page).focus();
-  await page.keyboard.press("Shift+Tab");
+  // Reached forward from the list heading, the way the page reads; a search keeps the list
+  // short, and is cleared afterwards.
+  await search.fill("Lewandowski");
+  await expect(page.locator(".player")).toHaveCount(1);
+  await page.locator(".list-heading h2").focus();
+  await tabUntil(page, board);
   await expectVisibleFocus(board);
   await expectFocusVisible(page, "side board region");
   await page.keyboard.press("Tab");
   await expect(board.locator(".finalize")).toBeFocused();
   await expectVisibleFocus(finalizeButton(page));
+  await search.fill("");
+  await finalizeButton(page).focus();
 
   await activate(page, finalizeButton(page));
   await expect(dialog(page)).toHaveAccessibleName(text.campReportTitle);

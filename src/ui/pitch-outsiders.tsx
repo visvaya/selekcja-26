@@ -2,6 +2,7 @@ import { useRef } from "react";
 import type { Player } from "../data/types.ts";
 import { detailedPositions } from "../logic/selection.ts";
 import { splitName } from "./fit-name.ts";
+import { focusSelf } from "./focus-self.ts";
 import { POSITION_GROUP_CLASS } from "./position-badge.tsx";
 import { UI_TEXT as text } from "./text.ts";
 import { useFittedLabel } from "./use-fitted-label.ts";
@@ -42,9 +43,7 @@ export function PitchOutsiders({
       className="pitch-outsiders"
       aria-label={text.outOfFormationTitle(players.length)}
       onClick={(event) => {
-        // Safari does not focus a tapped button, so the dialog would return focus to the
-        // heading under the open board instead of to this button.
-        event.currentTarget.focus();
+        focusSelf(event);
         onOpen();
       }}
     >

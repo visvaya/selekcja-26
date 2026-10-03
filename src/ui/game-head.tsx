@@ -5,8 +5,8 @@ import { UI_TEXT as text } from "./text.ts";
 
 export const GAME_HEADING_ID = "game-heading";
 
-// The three squad indicators. The head shows them inline on narrow screens; from 1024 px
-// the side column shows them instead.
+// The three squad indicators: in the phone board sheet below 1024 px, in the side column
+// from 1024 px.
 export function Kpis({
   state,
   className,
@@ -49,11 +49,9 @@ export function Kpis({
 export function GameHead({
   state,
   headingRef,
-  showKpis,
 }: {
   state: GameState;
   headingRef: RefObject<HTMLHeadingElement | null>;
-  showKpis: boolean;
 }) {
   const stageText = text.stages[state.stage];
   return (
@@ -72,7 +70,6 @@ export function GameHead({
         </div>
       </dl>
       <p>{stageText.hint}</p>
-      {showKpis && <Kpis state={state} className="kpis-inline" />}
     </div>
   );
 }
