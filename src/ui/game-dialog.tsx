@@ -18,6 +18,9 @@ type GameDialogProps = {
   titleAsEyebrow?: boolean;
   // Rendered as a paragraph that describes the dialog (aria-describedby).
   description?: string;
+  // Placed in one title row with the eyebrow and the heading (the profile's club line and
+  // score), so the score can sit next to the name.
+  titleRow?: ReactNode;
   children?: ReactNode;
   footer?: ReactNode;
   onClose: () => void;
@@ -129,6 +132,7 @@ export function GameDialog({
   title,
   titleAsEyebrow = false,
   description,
+  titleRow,
   children,
   footer,
   onClose,
@@ -234,10 +238,25 @@ export function GameDialog({
       {title}
     </h2>
   );
+  const eyebrowLine = eyebrow && !titleAsEyebrow && (
+    <div className="eyebrow">{eyebrow}</div>
+  );
   const content = (
     <>
-      {eyebrow && !titleAsEyebrow && <div className="eyebrow">{eyebrow}</div>}
-      {heading}
+      {titleRow ? (
+        <div className="profile-title-row">
+          <div className="profile-heading">
+            {eyebrowLine}
+            {heading}
+          </div>
+          {titleRow}
+        </div>
+      ) : (
+        <>
+          {eyebrowLine}
+          {heading}
+        </>
+      )}
       {description && <p id={descriptionId}>{description}</p>}
       {children}
     </>

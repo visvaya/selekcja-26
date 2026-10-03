@@ -133,7 +133,7 @@ test("desktop game is playable with the keyboard alone", async ({ page }) => {
   const compareButtons = page.locator(".compare-btn");
   await activate(page, compareButtons.nth(0));
   await activate(page, compareButtons.nth(1));
-  await expect(dialog(page)).toHaveAccessibleName(text.comparisonTitle);
+  await expect(dialog(page)).toHaveAccessibleName(text.comparisonEyebrow);
   await expectFocusVisible(page, "comparison dialog open");
   const clear = dialog(page).getByRole("button", {
     name: text.clearComparison,

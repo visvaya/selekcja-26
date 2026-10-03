@@ -129,7 +129,7 @@ for (const size of SIZES) {
       const compare = page.locator(".compare-btn");
       await compare.nth(0).click();
       await compare.nth(1).click();
-      await expect(dialog(page)).toHaveAccessibleName(text.comparisonTitle);
+      await expect(dialog(page)).toHaveAccessibleName(text.comparisonEyebrow);
       await shot(page, `${size.name}-comparison`);
     });
 

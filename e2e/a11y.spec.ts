@@ -171,7 +171,7 @@ test.describe.serial("axe WCAG 2.2 AA scan", () => {
     const compareButtons = page.locator(".compare-btn");
     await compareButtons.nth(0).click();
     await compareButtons.nth(1).click();
-    await expect(dialog(page)).toHaveAccessibleName(text.comparisonTitle);
+    await expect(dialog(page)).toHaveAccessibleName(text.comparisonEyebrow);
     await scan(page, "comparison dialog", scanned);
     await dialog(page)
       .getByRole("button", { name: text.clearComparison })

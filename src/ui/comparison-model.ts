@@ -2,8 +2,6 @@ import type { GameState, Player } from "../data/types.ts";
 import { experienceScore, groupScore, modelScore } from "../logic/scoring.ts";
 import type { Trait } from "./trait-order.ts";
 
-export { canSelectBoth } from "../logic/selection.ts";
-
 export type ComparisonMetricId =
   | "selectionScore"
   | "quality"

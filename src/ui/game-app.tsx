@@ -212,16 +212,18 @@ export function GameApp() {
     ? { kind: "event" as const, event: pendingEvent }
     : modal;
 
-  function togglePlayer(id: PlayerId) {
+  // Returns false when the squad is full and the message opened instead.
+  function togglePlayer(id: PlayerId): boolean {
     if (!state.selected.has(id) && state.selected.size >= squadLimit(state)) {
       setModal({
         kind: "message",
         title: text.fullSquadTitle,
         description: text.fullSquadMessage,
       });
-      return;
+      return false;
     }
     dispatch({ type: "togglePlayer", id, limit: squadLimit(state) });
+    return true;
   }
   function autoFill() {
     const result = fillSquadRandomly(state);
@@ -276,6 +278,9 @@ export function GameApp() {
   function comparePlayer(id: PlayerId) {
     const willCompare = !state.compare.includes(id);
     dispatch({ type: "toggleCompare", id });
+    const player = players.find((candidate) => candidate.id === id);
+    if (willCompare && state.compare.length === 0 && player)
+      announce(text.announcements.compareFirst(player.name));
     if (willCompare) setModal({ kind: "comparison" });
   }
   function finishStage() {
@@ -372,7 +377,10 @@ export function GameApp() {
           player={player}
           state={state}
           onClose={close}
-          onToggle={togglePlayer}
+          onToggle={(id) => {
+            // a call-up or removal from the profile closes it; an event then opens on its own
+            if (togglePlayer(id)) close();
+          }}
           restoreFocusFallback={focusHeading}
         />
       );
@@ -388,6 +396,14 @@ export function GameApp() {
           state={state}
           onClose={close}
           onToggle={togglePlayer}
+          onSelectBoth={() =>
+            dispatch({
+              type: "selectBoth",
+              ids: [left.id, right.id],
+              limit: squadLimit(state),
+            })
+          }
+          onOpenProfile={(id) => setModal({ kind: "profile", id })}
           onClearComparison={() => dispatch({ type: "clearCompare" })}
           restoreFocusFallback={focusHeading}
         />

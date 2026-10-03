@@ -1,0 +1,399 @@
+/* Profile (5a) and comparison (5b) dialog content. The chassis (frame, X, handle, scroll
+   body, footer) lives in dialogs.css. */
+
+/* ================= Profile ================= */
+
+/* name and score share one row; the eyebrow takes the whole first row (beside the X), so
+   the score starts below the X */
+.profile-title-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "eyebrow eyebrow" "name score" "club score";
+  align-items: start;
+  column-gap: var(--space-3);
+  row-gap: var(--dialog-line-gap);
+  margin-bottom: var(--space-4);
+}
+
+.profile-heading {
+  display: contents;
+}
+
+.modal .profile-heading .eyebrow {
+  grid-area: eyebrow;
+  margin: 0;
+}
+
+.modal:has(> .dlg-close) .profile-heading .eyebrow {
+  display: flex;
+  align-items: center;
+  min-height: var(--dialog-close-size);
+  padding-right: var(--dialog-close-clearance);
+}
+
+.modal .profile-title-row h2 {
+  grid-area: name;
+  margin: 0;
+  padding-right: 0;
+}
+
+.profile-head {
+  grid-area: club;
+  margin: 0;
+  color: var(--ink-soft);
+}
+
+.profile-score {
+  grid-area: score;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--dialog-line-gap);
+  margin-top: var(--space-2);
+  text-align: right;
+}
+
+.profile-score b {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-3xl);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.profile-score b.score-high {
+  color: var(--good);
+}
+
+.profile-score b.score-mid {
+  color: var(--warn-ink);
+}
+
+.profile-score b.score-low {
+  color: var(--danger);
+}
+
+.profile-score .score-label,
+.profile-fact dt,
+.profile-section-label {
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-soft);
+}
+
+.profile-score .score-label {
+  font-size: var(--text-xs);
+  letter-spacing: 0.02em;
+}
+
+/* a narrow body keeps the name on one line: the score goes under the club line */
+@container (max-width: 440px) {
+  .profile-title-row {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "eyebrow" "name" "club" "score";
+  }
+
+  .profile-score {
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: flex-start;
+    gap: var(--space-2);
+    text-align: left;
+  }
+}
+
+/* positions, lead foot and traits: one label column as wide as the longest label */
+.profile-facts {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+  margin: var(--space-3) 0 var(--space-4);
+}
+
+.profile-fact {
+  display: contents;
+}
+
+.profile-fact dt {
+  white-space: nowrap;
+}
+
+.profile-fact dd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--ink);
+}
+
+.profile-fact .pos {
+  width: var(--profile-badge-size);
+  height: var(--profile-badge-size);
+}
+
+.profile-section-label {
+  margin: 0 0 var(--space-1);
+  padding-top: var(--space-2);
+}
+
+/* one column of meters: label and value on one line, the bar under them */
+.profile-metrics {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-3);
+  margin: 0 0 var(--space-4);
+}
+
+.profile-metric {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "label value" "bar bar";
+  align-items: baseline;
+  gap: var(--space-1) var(--space-2);
+}
+
+.profile-metric small {
+  grid-area: label;
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}
+
+.profile-metric b {
+  grid-area: value;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.profile-metric progress.meter {
+  grid-area: bar;
+  height: var(--dialog-meter-height);
+}
+
+/* ================= Comparison ================= */
+
+/* minmax(0, 1fr): an unbreakable name must not push the grid past the panel */
+.compare-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.compare-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--board-deep);
+  text-align: center;
+}
+
+.compare-card > .pos {
+  margin: var(--space-2) auto 0;
+}
+
+.compare-card-name {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dialog-line-gap);
+  width: 100%;
+  min-width: 0;
+}
+
+.compare-card h3 {
+  margin: 0;
+  font-size: var(--text-base);
+  overflow-wrap: anywhere;
+}
+
+.compare-card-name small {
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+}
+
+/* both cards stretch to the taller one; margin-top: auto lines up both button stacks */
+.compare-card .select-btn,
+.compare-card .profile-btn {
+  flex: none;
+  width: 100%;
+  min-height: var(--control-height);
+  padding-block: 0;
+}
+
+.compare-card .compare-select {
+  margin-top: auto;
+}
+
+.h2h {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+}
+
+.h2h-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2) 0;
+}
+
+.h2h-label {
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+  text-align: center;
+}
+
+.h2h-values {
+  display: grid;
+  grid-template-columns:
+    var(--h2h-value-width) minmax(0, 1fr)
+    var(--h2h-value-width);
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.h2h-value {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-md);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--ink-soft);
+}
+
+.h2h-value.better,
+.is-tie .h2h-value {
+  color: var(--meter-high);
+}
+
+/* the score row keeps its band colours; its winner cue is the "+N" in ink and the bar */
+.h2h-value.score-high {
+  color: var(--good);
+}
+
+.h2h-value.score-mid {
+  color: var(--warn-ink);
+}
+
+.h2h-value.score-low {
+  color: var(--danger);
+}
+
+.h2h-diff {
+  margin-bottom: var(--dialog-line-gap);
+  font-family: var(--font-body);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  color: var(--good);
+}
+
+.h2h-row-score .h2h-diff {
+  color: var(--ink);
+}
+
+/* a centred two-sided bar: each half grows from the middle by its player's value */
+.h2h-bar {
+  display: flex;
+  width: 100%;
+  height: var(--dialog-meter-height);
+  overflow: hidden;
+  border: var(--divider-border) solid var(--frame-soft);
+  border-radius: var(--radius-round);
+  background: var(--board-deep);
+}
+
+.h2h-bar-left,
+.h2h-bar-right {
+  display: flex;
+  flex: 1 1 50%;
+  height: 100%;
+}
+
+.h2h-bar-left {
+  justify-content: flex-end;
+}
+
+.h2h-bar i {
+  display: block;
+  height: 100%;
+  background: var(--frame-soft);
+}
+
+.h2h-bar-left i {
+  width: calc(var(--progress-left) * 1%);
+}
+
+.h2h-bar-right i {
+  width: calc(var(--progress-right) * 1%);
+}
+
+.h2h-bar i.better {
+  background: var(--meter-high);
+}
+
+/* text rows: each player's facts at their own edge */
+.h2h-edges {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding-inline: var(--h2h-edge-inset);
+}
+
+.h2h-fact {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-sm);
+  color: var(--ink);
+}
+
+.h2h-edge-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+}
+
+.h2h-edge-list.h2h-edge-right {
+  align-items: flex-end;
+}
+
+.tag.tag-shared {
+  font-weight: 700;
+  border-color: var(--ink);
+  box-shadow: inset 0 0 0 var(--divider-border) var(--ink);
+}
+
+.tag.tag-own {
+  background: transparent;
+  border-color: var(--frame-soft);
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+/* the reason under a blocked "Powołaj obu" */
+.compare-reason {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+}
+
+@media (forced-colors: active) {
+  .h2h-bar i.better {
+    background: CanvasText;
+  }
+}

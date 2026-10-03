@@ -321,7 +321,7 @@ button.pos:active {
 
 /* the bar tint comes from --tint, set per bar by its value band; the number stays the
    primary cue */
-.player .metric progress {
+progress.meter {
   display: block;
   width: 100%;
   height: var(--meter-height);
@@ -332,19 +332,19 @@ button.pos:active {
   background: var(--board-deep);
 }
 
-.player .metric progress::-webkit-progress-bar {
+progress.meter::-webkit-progress-bar {
   background: var(--board-deep);
   border-radius: var(--radius-round);
   border: var(--divider-border) solid var(--frame-soft);
 }
 
-.player .metric progress::-webkit-progress-value {
+progress.meter::-webkit-progress-value {
   transition: width var(--duration-slow) var(--ease-standard);
   background: var(--tint, var(--action));
   border-radius: var(--radius-round);
 }
 
-.player .metric progress::-moz-progress-bar {
+progress.meter::-moz-progress-bar {
   background: var(--tint, var(--action));
   border-radius: var(--radius-round);
 }

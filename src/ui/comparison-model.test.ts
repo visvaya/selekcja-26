@@ -2,12 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { players } from "../data/catalog.ts";
 import { createInitialState } from "../logic/state.ts";
-import {
-  canSelectBoth,
-  comparisonRows,
-  splitTraits,
-} from "./comparison-model.ts";
-import type { ComparisonMetricId, H2hSide } from "./comparison-model.ts";
+import { comparisonRows, splitTraits } from "./comparison-model.ts";
 import type { Trait } from "./trait-order.ts";
 
 const state = createInitialState(5);
@@ -31,12 +26,10 @@ test("comparison rows follow the design order, mark the winner and ties", () => 
     ],
   );
   const quality = rows[1]!;
-  const loser: H2hSide = { value: right.ov, diff: null, better: false };
-  const qualityId: ComparisonMetricId = "quality";
   assert.deepEqual(quality, {
-    id: qualityId,
+    id: "quality",
     left: { value: left.ov, diff: left.ov - right.ov, better: true },
-    right: loser,
+    right: { value: right.ov, diff: null, better: false },
     tie: false,
   });
   const reversed = comparisonRows(right, left, state)[1]!;
@@ -86,9 +79,4 @@ test("shared traits come first in Polish order", () => {
       .shared.length,
     0,
   );
-});
-
-test("the comparison exposes the shared call-up rule", () => {
-  const ids = [players[0]!.id, players[1]!.id] as const;
-  assert.equal(canSelectBoth(state, ids, 23), "ready");
 });

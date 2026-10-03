@@ -161,10 +161,4 @@ export const LIST_TEXT = {
     uncertain: "niepewny",
     disappointed: "rozczarował",
   } satisfies Record<TrialNoteId, string>,
-  foot: {
-    both: "Obunożny",
-    left: "Lewa",
-    right: "Prawa",
-    lead: "Wiodąca noga:",
-  },
 } as const;

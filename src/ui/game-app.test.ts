@@ -52,7 +52,7 @@ test("start, profile, comparison, event and position filter work together", asyn
       );
       assert.ok(
         screen.getByRole("heading", {
-          name: "Dwóch kandydatów, jedno miejsce?",
+          name: "Analiza porównawcza",
         }),
       );
       fireEvent.click(

@@ -25,6 +25,17 @@
       "Losowo dobrano zawodników: 2026-10-01. Powołani: 2026-10-01 z 2026-10-01."
     ],
     "clearSquad": "Odwołano wszystkich zawodników. Możesz to cofnąć przyciskiem „Cofnij”.",
+    "compareFirst": [
+      "Wybrano do porównania: 0. Wybierz drugiego zawodnika.",
+      "Wybrano do porównania: 1. Wybierz drugiego zawodnika.",
+      "Wybrano do porównania: 2. Wybierz drugiego zawodnika.",
+      "Wybrano do porównania: 5. Wybierz drugiego zawodnika.",
+      "Wybrano do porównania: 12. Wybierz drugiego zawodnika.",
+      "Wybrano do porównania: 22. Wybierz drugiego zawodnika.",
+      "Wybrano do porównania: X. Wybierz drugiego zawodnika.",
+      "Wybrano do porównania: Półfinał. Wybierz drugiego zawodnika.",
+      "Wybrano do porównania: 2026-10-01. Wybierz drugiego zawodnika."
+    ],
     "eventResolved": [
       "Zdarzenie rozstrzygnięte: 0.",
       "Zdarzenie rozstrzygnięte: 1.",
@@ -182,7 +193,6 @@
   "compare": "Porównaj",
   "compared": "Wybrany",
   "comparisonEyebrow": "Analiza porównawcza",
-  "comparisonTitle": "Dwóch kandydatów, jedno miejsce?",
   "confirmNewGame": {
     "cancel": "Wróć do gry",
     "confirm": "Zacznij nową grę",
@@ -327,12 +337,6 @@
     "term": "Termin"
   },
   "filtersAll": "Wszyscy",
-  "foot": {
-    "both": "Obunożny",
-    "lead": "Wiodąca noga:",
-    "left": "Lewa",
-    "right": "Prawa"
-  },
   "footHint": "Zaznacz obie, aby pokazać obunożnych.",
   "footLeft": "Lewa noga",
   "footLegend": "Noga wiodąca",
@@ -424,6 +428,11 @@
     "fit": "Dopasowanie",
     "quality": "Jakość",
     "risk": "Ryzyko urazu"
+  },
+  "leadFoot": {
+    "both": "obie",
+    "left": "lewa",
+    "right": "prawa"
   },
   "loading": "Wczytywanie gry…",
   "luck": {
@@ -614,16 +623,17 @@
     "ŚP": "Środkowy pomocnik"
   },
   "profile": "Profil",
+  "profileAttributes": "Atrybuty",
   "profileMetrics": [
-    "Ocena selekcyjna",
     "Jakość",
-    "Forma i rytm",
+    "Forma",
     "Zdrowie",
     "Taktyka",
     "Doświadczenie",
     "Zgranie kadrowe",
     "Wpływ na grupę"
   ],
+  "profilePositions": "Pozycje",
   "rangeFrom": [
     "0 od",
     "1 od",
@@ -671,7 +681,6 @@
     "Zostało 2026-10-01 miejsc"
   ],
   "removeFromSquad": "Odwołaj z kadry",
-  "removeShort": "Odwołaj",
   "reportEyebrow": "Raport turniejowy",
   "reportFromOlderRules": "Ten raport powstał według wcześniejszej wersji zasad gry.",
   "reportKpis": {
@@ -772,9 +781,33 @@
   "searchLabel": "Szukaj zawodnika",
   "searchPlaceholder": "Szukaj zawodnika lub klubu…",
   "select": "Powołaj",
+  "selectBoth": "Powołaj obu",
+  "selectBothBlocked": "Zostało za mało miejsc, by powołać obu",
+  "selectBothName": [
+    "Powołaj obu: 0 i 0",
+    "Powołaj obu: 1 i 1",
+    "Powołaj obu: 2 i 2",
+    "Powołaj obu: 5 i 5",
+    "Powołaj obu: 12 i 12",
+    "Powołaj obu: 22 i 22",
+    "Powołaj obu: X i X",
+    "Powołaj obu: Półfinał i Półfinał",
+    "Powołaj obu: 2026-10-01 i 2026-10-01"
+  ],
   "selected": "Powołany ✓",
   "selectedName": "Powołany",
   "selectionScore": "Ocena selekcyjna",
+  "sharedTraits": [
+    "Wspólne cechy: 0.",
+    "Wspólne cechy: 1.",
+    "Wspólne cechy: 2.",
+    "Wspólne cechy: 5.",
+    "Wspólne cechy: 12.",
+    "Wspólne cechy: 22.",
+    "Wspólne cechy: X.",
+    "Wspólne cechy: Półfinał.",
+    "Wspólne cechy: 2026-10-01."
+  ],
   "sheetHandle": "Zwiń tablicę",
   "sheetTitle": "Tablica kadry",
   "shortName": [

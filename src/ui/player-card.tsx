@@ -1,28 +1,16 @@
-import { useId, useRef, type CSSProperties } from "react";
-import { GAME_RULES } from "../data/constants.ts";
+import { useId, useRef } from "react";
 import type { GameState, Player, PlayerId } from "../data/types.ts";
 import { modelScore, trialImpact } from "../logic/scoring.ts";
 import { focusSelf } from "./focus-self.ts";
+import { Meter } from "./meter.tsx";
 import { PositionBadge } from "./position-badge.tsx";
-import { stripTraits } from "./player-tags.tsx";
+import { stripTraits, tagClass } from "./player-tags.tsx";
 import { scoreBand } from "./score-band.ts";
 import { splitName } from "./fit-name.ts";
 import { useFittedClub } from "./use-fitted-club.ts";
 import { useFittedName } from "./use-fitted-name.ts";
 import { useFittedTraits } from "./use-fitted-traits.ts";
 import { UI_TEXT as text } from "./text.ts";
-import type { Trait } from "./trait-order.ts";
-
-function tagClass(trait: Trait, impact: number): string {
-  if (trait.kind === "flag") return "tag alert";
-  if (trait.kind === "role") return "tag";
-  if (impact > 0) return "tag tag-camp camp-plus";
-  if (impact < 0) return "tag tag-camp camp-minus";
-  return "tag tag-camp";
-}
-
-const tint = (value: number) =>
-  ({ "--tint": `var(--meter-${scoreBand(value)})` }) as CSSProperties;
 
 export function PlayerCard({
   player,
@@ -161,12 +149,7 @@ export function PlayerCard({
               {label}
               <b>{value}</b>
             </span>
-            <progress
-              style={tint(value)}
-              value={value}
-              max={GAME_RULES.ratingMaximumPoints}
-              aria-label={`${label}: ${value}`}
-            />
+            <Meter label={label} value={value} />
           </div>
         ))}
       </div>

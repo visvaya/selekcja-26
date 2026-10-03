@@ -291,6 +291,14 @@
   --dialog-panel-lift: 8px;
   --dialog-handle-hit-x: 60px;
   --dialog-handle-hit-y: 14px;
+  /* Profile and comparison: a 40 px position badge in the profile facts, 8 px bars, 44 px
+     value columns beside the comparison bars, 2 px between a heading's lines and a 10 px
+     inset for the comparison's text rows. */
+  --profile-badge-size: 40px;
+  --dialog-meter-height: 8px;
+  --h2h-value-width: 44px;
+  --dialog-line-gap: 2px;
+  --h2h-edge-inset: 10px;
 }
 
 @media (min-width: 1024px) {

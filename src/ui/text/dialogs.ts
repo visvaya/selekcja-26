@@ -1,4 +1,5 @@
 import type { EventId } from "../../data/events.ts";
+import { joinNames } from "./polish-format.ts";
 
 export const DIALOGS_TEXT = {
   autoFillErrors: {
@@ -29,10 +30,13 @@ export const DIALOGS_TEXT = {
   },
   closeDialog: "Zamknij",
   closeDialogHint: "Zamknij okno. Nic się nie zmieni.",
+  profilePositions: "Pozycje",
+  profileAttributes: "Atrybuty",
+  leadFoot: { both: "obie", left: "lewa", right: "prawa" },
+  // the profile meters and the comparison rows after "Ocena selekcyjna", in this order
   profileMetrics: [
-    "Ocena selekcyjna",
     "Jakość",
-    "Forma i rytm",
+    "Forma",
     "Zdrowie",
     "Taktyka",
     "Doświadczenie",
@@ -41,7 +45,6 @@ export const DIALOGS_TEXT = {
   ],
   removeFromSquad: "Odwołaj z kadry",
   addToSquad: "Powołaj do kadry",
-  removeShort: "Odwołaj",
   returnToList: "Wróć do listy",
   fullSquadTitle: "Lista jest pełna",
   fullSquadMessage:
@@ -49,7 +52,11 @@ export const DIALOGS_TEXT = {
   notice: "Uwaga",
   understood: "Rozumiem",
   comparisonEyebrow: "Analiza porównawcza",
-  comparisonTitle: "Dwóch kandydatów, jedno miejsce?",
+  selectBoth: "Powołaj obu",
+  selectBothName: (first: string, second: string) =>
+    `Powołaj obu: ${joinNames([first, second])}`,
+  selectBothBlocked: "Zostało za mało miejsc, by powołać obu",
+  sharedTraits: (names: string) => `Wspólne cechy: ${names}.`,
   clearComparison: "Wyczyść porównanie",
   returnWithoutClearing: "Wróć bez czyszczenia",
   outOfFormationEyebrow: "Dopasowanie do ustawienia",
