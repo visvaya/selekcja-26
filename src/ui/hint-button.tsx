@@ -28,6 +28,13 @@ function hasVisibleFocus(element: HTMLElement): boolean {
   }
 }
 
+// Where matchMedia is missing (tests), hovering is assumed possible.
+function canHover(element: HTMLElement): boolean {
+  const view = element.ownerDocument.defaultView;
+  if (!view || typeof view.matchMedia !== "function") return true;
+  return view.matchMedia("(hover: hover)").matches;
+}
+
 function assignRef<T>(ref: Ref<T> | undefined, value: T | null) {
   if (typeof ref === "function") ref(value);
   else if (ref) (ref as { current: T | null }).current = value;
@@ -64,7 +71,13 @@ export function HintButton({
   useEffect(() => {
     const button = ownRef.current;
     if (!button) return undefined;
-    const enter = () => setHovered(true);
+    // The tip shows on hover only where the pointer can hover, never for touch.
+    const enter = (event: Event) => {
+      const type = (event as PointerEvent).pointerType;
+      if (type !== "mouse" && type !== "pen") return;
+      if (!canHover(button)) return;
+      setHovered(true);
+    };
     const leave = () => {
       setHovered(false);
       setDismissed(false);

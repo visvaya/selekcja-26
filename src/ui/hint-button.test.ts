@@ -25,10 +25,15 @@ test("HintButton describes the button and dismisses on Escape", async () => {
       await import("@testing-library/react");
     const { vite, HintButton } = await loadHint();
     // jsdom may lack PointerEvent; a MouseEvent with the same type name reaches the same listeners.
-    const pointer = (type: string) =>
-      "PointerEvent" in window
-        ? new window.PointerEvent(type)
-        : new window.MouseEvent(type);
+    // pointerType is set by hand, since the MouseEvent fallback has none.
+    const pointer = (type: string, pointerType = "mouse") => {
+      const event =
+        "PointerEvent" in window
+          ? new window.PointerEvent(type)
+          : new window.MouseEvent(type);
+      Object.defineProperty(event, "pointerType", { value: pointerType });
+      return event;
+    };
     const escape = (target: Element) => {
       const event = new window.KeyboardEvent("keydown", {
         key: "Escape",
@@ -108,6 +113,30 @@ test("HintButton describes the button and dismisses on Escape", async () => {
         fireEvent(button, pointer("pointerenter"));
         assert.equal(escape(window.document.body), true);
         assert.equal(escape(window.document.body), false);
+        cleanup();
+      });
+
+      await test("Escape after a touch pointerenter passes through", () => {
+        const { button } = renderHint(base);
+        fireEvent(button, pointer("pointerenter", "touch"));
+        assert.equal(escape(window.document.body), false);
+        assert.equal(button.classList.contains("hint-dismissed"), false);
+        cleanup();
+      });
+
+      await test("Escape after a hover where hovering is impossible passes through", () => {
+        const { button } = renderHint(base);
+        const original = window.matchMedia;
+        window.matchMedia = ((query: string) => ({
+          matches: false,
+          media: query,
+        })) as unknown as typeof window.matchMedia;
+        try {
+          fireEvent(button, pointer("pointerenter"));
+          assert.equal(escape(window.document.body), false);
+        } finally {
+          window.matchMedia = original;
+        }
         cleanup();
       });
     } finally {
