@@ -36,20 +36,27 @@ export type BarScroll = {
   y: number;
   nearEnd: boolean;
   reducedMotion: boolean;
+  focusInside: boolean;
   away: boolean;
 };
 
 // The closed bar slides away while the list scrolls down and returns on scrolling up,
-// near the end of the page and always with reduced motion. The movement is measured from
-// an anchor (see `nextBarScroll`), so many small scroll events add up.
+// near the end of the page, and always with reduced motion or focus inside it. The
+// movement is measured from an anchor (see `nextBarScroll`), so small scroll events add up.
 export function nextBarAway({
   anchorY,
   y,
   nearEnd,
   reducedMotion,
+  focusInside,
   away,
 }: BarScroll): boolean {
-  if (reducedMotion || nearEnd || y < anchorY - UI_CONFIG.barScrollStepPx)
+  if (
+    focusInside ||
+    reducedMotion ||
+    nearEnd ||
+    y < anchorY - UI_CONFIG.barScrollStepPx
+  )
     return false;
   if (
     y > anchorY + UI_CONFIG.barScrollStepPx &&

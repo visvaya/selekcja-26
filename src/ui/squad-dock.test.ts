@@ -584,8 +584,13 @@ test("the closed bar hides while scrolling down and returns on focus", async () 
     for (const y of [0, 50, 100, 150, 200]) scrollTo(y);
     assert.equal(dock.classList.contains("is-away"), true);
     const toggle = dock.querySelector<HTMLElement>(".phone-dock-toggle")!;
-    toggle.dispatchEvent(new win.FocusEvent("focusin", { bubbles: true }));
+    toggle.focus();
     assert.equal(dock.classList.contains("is-away"), false);
+    // a further scroll down never hides the bar that holds focus
+    scrollTo(201);
+    scrollTo(260);
+    assert.equal(dock.classList.contains("is-away"), false);
+    toggle.blur();
 
     scrollTo(0);
     view.rerender(true);

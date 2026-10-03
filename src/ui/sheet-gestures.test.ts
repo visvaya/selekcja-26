@@ -61,7 +61,12 @@ test("the offset never goes above the start and the slop is 6 px", () => {
 });
 
 test("the bar hides after scrolling down below 60 px and returns on scrolling up", () => {
-  const base = { nearEnd: false, reducedMotion: false, away: false };
+  const base = {
+    nearEnd: false,
+    reducedMotion: false,
+    focusInside: false,
+    away: false,
+  };
   assert.equal(nextBarAway({ ...base, anchorY: 100, y: 105 }), true);
   assert.equal(nextBarAway({ ...base, anchorY: 100, y: 104 }), false);
   assert.equal(nextBarAway({ ...base, anchorY: 20, y: 50 }), false);
@@ -76,7 +81,7 @@ test("the bar hides after scrolling down below 60 px and returns on scrolling up
 });
 
 test("near the end or with reduced motion the bar is always shown", () => {
-  const base = { anchorY: 100, y: 400, away: true };
+  const base = { anchorY: 100, y: 400, away: true, focusInside: false };
   assert.equal(
     nextBarAway({ ...base, nearEnd: true, reducedMotion: false }),
     false,
@@ -102,6 +107,7 @@ function scrollSteps(from: number, to: number, away: boolean) {
       y,
       nearEnd: false,
       reducedMotion: false,
+      focusInside: false,
     });
     seen.push(state.away);
   }
@@ -135,6 +141,7 @@ test("a turn in direction restarts the measured movement", () => {
       y,
       nearEnd: false,
       reducedMotion: false,
+      focusInside: false,
     });
   assert.equal(state.away, true);
   state = nextBarScroll({
@@ -143,6 +150,23 @@ test("a turn in direction restarts the measured movement", () => {
     y: 298,
     nearEnd: false,
     reducedMotion: false,
+    focusInside: false,
   });
   assert.equal(state.away, false);
+});
+
+test("focus inside the bar keeps it shown while scrolling down", () => {
+  const input = {
+    anchorY: 100,
+    y: 200,
+    nearEnd: false,
+    reducedMotion: false,
+    away: false,
+  };
+  assert.equal(nextBarAway({ ...input, focusInside: false }), true);
+  assert.equal(nextBarAway({ ...input, focusInside: true }), false);
+  assert.equal(
+    nextBarScroll({ ...input, lastY: 199, focusInside: true }).away,
+    false,
+  );
 });

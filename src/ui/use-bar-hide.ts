@@ -40,6 +40,7 @@ export function useBarHide({
           y,
           nearEnd,
           reducedMotion: stateRef.current.reducedMotion,
+          focusInside: dock.contains(document.activeElement),
           away: dock.classList.contains(AWAY_CLASS),
         });
         dock.classList.toggle(AWAY_CLASS, next.away);
@@ -47,7 +48,11 @@ export function useBarHide({
       } else anchorY = y;
       lastY = y;
     };
-    const onFocusIn = () => dock.classList.remove(AWAY_CLASS);
+    // focus entering the bar shows it and restarts the measured movement
+    const onFocusIn = () => {
+      dock.classList.remove(AWAY_CLASS);
+      anchorY = lastY = window.scrollY;
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
     dock.addEventListener("focusin", onFocusIn);
     return () => {
