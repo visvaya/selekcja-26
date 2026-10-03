@@ -479,3 +479,9 @@ export async function forceSaveErrorBanner(page: Page): Promise<void> {
   await page.locator(".select-btn").first().click();
   await expect(saveAlert(page)).toHaveText(text.save.messages.failed);
 }
+
+// No part of the page is left inert and the page scroll is not left locked.
+export async function expectPageLive(page: Page): Promise<void> {
+  await expect(page.locator("[inert]")).toHaveCount(0);
+  await expect(page.locator("html")).not.toHaveClass(/is-sheet-open/);
+}

@@ -66,10 +66,7 @@ export function nextBarAway({
   return away;
 }
 
-export type BarScrollStep = Omit<BarScroll, "anchorY"> & {
-  anchorY: number;
-  lastY: number;
-};
+export type BarScrollStep = BarScroll & { lastY: number };
 
 // One scroll event: the anchor moves to the previous position when the direction turns
 // and to the current one when the decision changes.

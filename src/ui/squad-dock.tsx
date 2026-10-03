@@ -150,6 +150,7 @@ export function SquadDock({
         onClick={closeByUser}
       />
       {/* Escape is handled where focus is: inside the open sheet. The role is dynamic. */}
+      {/* React's className drops the imperative is-away when expanded changes: intended. */}
       {/* oxlint-disable-next-line jsx-a11y/no-static-element-interactions */}
       <div
         className={`dock phone-dock${expanded ? " is-open" : ""}`}

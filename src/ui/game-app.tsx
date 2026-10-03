@@ -125,6 +125,7 @@ export function GameApp() {
   const sideBoardRef = useRef<HTMLDivElement>(null);
   // When the width crosses 1024 px and the focused board or actions unmounted (focus fell to
   // the body), focus the new board's entry. Focus anywhere else is left alone.
+  // The render-time `expanded` reset on this switch already releases inert and the scroll lock.
   const firstLayoutRef = useRef(true);
   useLayoutEffect(() => {
     if (firstLayoutRef.current) {

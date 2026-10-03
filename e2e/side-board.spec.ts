@@ -6,6 +6,7 @@ import {
   collectPageErrors,
   dockToggle,
   expectFocusVisible,
+  expectPageLive,
   finalizeButton,
   forceSaveErrorBanner,
   openBoard,
@@ -44,12 +45,6 @@ async function expectSingleBoard(page: Page, wide: boolean): Promise<void> {
   await openBoard(page);
   await expect(page.getByRole("button", { name: text.undo })).toHaveCount(1);
   await closeBoard(page);
-}
-
-// No part of the page is left inert and the page scroll is not left locked.
-async function expectPageLive(page: Page): Promise<void> {
-  await expect(page.locator("[inert]")).toHaveCount(0);
-  await expect(page.locator("html")).not.toHaveClass(/is-sheet-open/);
 }
 
 test("the board switches form across the breakpoint without duplicates", async ({

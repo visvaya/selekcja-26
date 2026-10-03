@@ -7,6 +7,7 @@ import {
   dialog,
   dockToggle,
   expectFocusVisible,
+  expectPageLive,
   finalizeButton,
   forceSaveErrorBanner,
   idsInGroup,
@@ -89,11 +90,6 @@ async function fillCampThroughEvents(page: Page): Promise<void> {
   await expect(sheet(page)).toBeVisible();
   await expect(autoFill).toBeDisabled();
   await expect(handle(page)).toBeFocused();
-}
-
-async function expectPageLive(page: Page): Promise<void> {
-  await expect(page.locator("[inert]")).toHaveCount(0);
-  await expect(page.locator("html")).not.toHaveClass(/is-sheet-open/);
 }
 
 test("a dialog opened from the open sheet sits above it, and leaving the stage closes the sheet", async ({
