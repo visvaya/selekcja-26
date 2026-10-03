@@ -69,7 +69,7 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
   await page.getByRole("button", { name: text.autoFill }).tap();
   await expect(dialog(page)).toHaveAccessibleName(text.events.doctor.title);
   await expectFocusVisible(page, "random fill dialog open");
-  await dialog(page).getByRole("button", { name: text.undo }).tap();
+  await dialog(page).getByRole("button", { name: text.eventUndo }).tap();
   await expect(dialog(page)).toBeHidden();
   await expect(squadCount(page)).toHaveText("0/23");
   await expect(dockToggle(page)).toHaveAttribute("aria-expanded", "false");
@@ -194,6 +194,10 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
   await expect(page.getByRole("button", { name: text.undo })).toHaveCount(0);
 
   await page.getByRole("button", { name: text.restart }).tap();
+  await expect(dialog(page)).toHaveAccessibleName(text.confirmRestart.title);
+  await dialog(page)
+    .getByRole("button", { name: text.confirmRestart.confirm })
+    .tap();
   await expect(
     page.getByRole("heading", { name: text.ticket.title }),
   ).toBeVisible();

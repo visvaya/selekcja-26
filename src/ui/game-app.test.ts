@@ -33,11 +33,12 @@ test("start, profile, comparison, event and position filter work together", asyn
       // rather than falling back to the body.
       assert.equal(isFocused(campHeading), true);
       fireEvent.click(screen.getAllByRole("button", { name: /^Profil: / })[0]!);
-      assert.ok(screen.getByRole("dialog"));
+      const profile = screen.getByRole("dialog");
+      // a drawer-form dialog focuses its heading, so no state-changing button takes focus
       assert.equal(
-        dom.window.document.activeElement?.tagName,
-        "BUTTON",
-        "the dialog must focus one of its own buttons on open",
+        isFocused(profile.querySelector("h2")),
+        true,
+        "the profile must focus its own heading on open",
       );
       fireEvent.click(screen.getByRole("button", { name: "Wróć do listy" }));
       // Closing the dialog must not drop focus to the body, whether or not the button that
@@ -51,7 +52,7 @@ test("start, profile, comparison, event and position filter work together", asyn
       );
       assert.ok(
         screen.getByRole("heading", {
-          name: "Dwóch kandydatów, jedno miejsce?",
+          name: "Analiza porównawcza",
         }),
       );
       fireEvent.click(
@@ -73,7 +74,7 @@ test("start, profile, comparison, event and position filter work together", asyn
         screen
           .getByRole("heading", { name: "Raport medyczny: przeciążenie" })
           .closest('[role="dialog"]')!
-          .querySelector<HTMLButtonElement>(".action-button")!,
+          .querySelector<HTMLButtonElement>(".event-undo")!,
       );
       assert.equal(
         view.container.querySelectorAll(".player.selected").length,
@@ -187,14 +188,39 @@ test("start, profile, comparison, event and position filter work together", asyn
         /^Faza grupowa: \d+ pkt$/,
       );
       assert.equal(groupLine?.querySelectorAll("ul > li").length, 3);
-      fireEvent.click(
-        screen.getByRole("button", { name: "Zagraj od początku" }),
-      );
+      // Restarting from the report asks first; focus starts on the safe choice.
+      const restartButton = screen.getByRole("button", {
+        name: "Zagraj od początku",
+      });
+      fireEvent.click(restartButton);
+      const confirmRestart = screen.getByRole("alertdialog", {
+        name: "Zagrać od początku?",
+      });
+      const backToReport = screen.getByRole("button", {
+        name: "Wróć do raportu",
+      });
+      assert.equal(isFocused(backToReport), true);
+      fireEvent.keyDown(backToReport, { key: "Enter" });
+      fireEvent.click(backToReport);
+      assert.equal(confirmRestart.isConnected, false);
+      assert.ok(screen.getByRole("heading", { name: "Przebieg turnieju" }));
+      assert.equal(isFocused(restartButton), true);
+      fireEvent.click(restartButton);
+      const confirmButton = [
+        ...screen
+          .getByRole("alertdialog")
+          .querySelectorAll<HTMLButtonElement>("button"),
+      ].find((button) => button.textContent === "Zagraj od początku")!;
+      fireEvent.click(confirmButton);
       const introHeading = screen.getByRole("heading", {
         name: "Bilet na EURO",
       });
       assert.ok(screen.getByRole("button", { name: "Rozpocznij odprawę" }));
       assert.equal(isFocused(introHeading), true);
+      assert.equal(
+        view.container.ownerDocument.querySelector('[role="alertdialog"]'),
+        null,
+      );
       // Lets any still-in-flight autosave promise (and the reducer dispatch it triggers) settle,
       // and asks React to flush any passive effects it scheduled but hasn't run yet, while the
       // JSDOM globals are still installed. Without this, cleanup() can unmount the tree while a
@@ -569,11 +595,11 @@ test("clear-squad and new-game actions on the list", async () => {
       const newGame = view.getByRole("button", { name: "Nowa gra" });
       newGame.focus();
       fireEvent.click(newGame);
-      assert.ok(view.getByRole("dialog", { name: "Zacząć nową grę?" }));
+      assert.ok(view.getByRole("alertdialog", { name: "Zacząć nową grę?" }));
       assert.equal(focusedName(), "Wróć do gry");
-      fireEvent.click(view.getByRole("button", { name: "Wróć do gry" }));
+      fireEvent.keyDown(doc.activeElement!, { key: "Escape" });
       assert.equal(
-        view.queryByRole("dialog", { name: "Zacząć nową grę?" }) === null,
+        view.queryByRole("alertdialog", { name: "Zacząć nową grę?" }) === null,
         true,
       );
       assert.equal(focusedName(), "Nowa gra");

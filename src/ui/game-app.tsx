@@ -9,7 +9,7 @@ import {
 import { flushSync } from "react-dom";
 import { players } from "../data/catalog.ts";
 import { APP_CONFIG } from "../data/constants.ts";
-import type { GameState, PlayerId } from "../data/types.ts";
+import type { GameState, Player, PlayerId } from "../data/types.ts";
 import { fillSquadRandomly } from "../logic/random-squad.ts";
 import { createInitialState, reduceGameState } from "../logic/state.ts";
 import { clearGame, loadGame, saveGame } from "../logic/storage.ts";
@@ -50,6 +50,7 @@ type ModalState =
   | { kind: "outsiders" }
   | { kind: "campReport" }
   | { kind: "confirmNewGame" }
+  | { kind: "confirmRestart" }
   | { kind: "message"; title: string; description: string };
 
 // A player stuck with a broken save can open the game with ?reset to start over.
@@ -123,6 +124,12 @@ export function GameApp() {
   const dockToggleRef = useRef<HTMLButtonElement>(null);
   // The side board region: focus target when the layout switches to wide.
   const sideBoardRef = useRef<HTMLDivElement>(null);
+  // The outsiders dialog's opener (the pitch outsiders button) is gone once no outsider
+  // remains: focus goes to the board's entry instead (the side board, or the open sheet's handle).
+  const focusBoardEntry = useCallback(() => {
+    if (sideBoardRef.current) sideBoardRef.current.focus();
+    else focusHeading();
+  }, [focusHeading]);
   // When the width crosses 1024 px and the focused board or actions unmounted (focus fell to
   // the body), focus the new board's entry. Focus anywhere else is left alone.
   // The render-time `expanded` reset on this switch already releases inert and the scroll lock.
@@ -188,9 +195,14 @@ export function GameApp() {
   // for one being open right now and steps aside if so; that also means closing a dialog on
   // its own (Escape, a close button) does not re-run this and steal focus back from the
   // opener that GameDialog's own cleanup just restored it to, since only the screen itself
-  // (not the dialog state) is a dependency here.
+  // (not the dialog state) is a dependency here. A confirmation is an alertdialog; the open
+  // phone sheet (also a dialog) counts too, since the heading behind it is inert.
   useEffect(() => {
-    if (!ready || document.querySelector('[role="dialog"]')) return;
+    if (
+      !ready ||
+      document.querySelector('[role="dialog"], [role="alertdialog"]')
+    )
+      return;
     headingRef.current?.focus();
   }, [state.stage, state.started, state.report, ready]);
 
@@ -206,16 +218,18 @@ export function GameApp() {
     ? { kind: "event" as const, event: pendingEvent }
     : modal;
 
-  function togglePlayer(id: PlayerId) {
+  // Returns false when the squad is full and the message opened instead.
+  function togglePlayer(id: PlayerId): boolean {
     if (!state.selected.has(id) && state.selected.size >= squadLimit(state)) {
       setModal({
         kind: "message",
         title: text.fullSquadTitle,
         description: text.fullSquadMessage,
       });
-      return;
+      return false;
     }
     dispatch({ type: "togglePlayer", id, limit: squadLimit(state) });
+    return true;
   }
   function autoFill() {
     const result = fillSquadRandomly(state);
@@ -262,6 +276,25 @@ export function GameApp() {
     announce(text.announcements.clearSquad);
     undoRef.current?.focus();
   }
+  // flushSync commits the removal before the dialog moves focus to the next row's X.
+  function removeOutsider(id: PlayerId, last: boolean) {
+    const player = players.find((candidate) => candidate.id === id);
+    flushSync(() => {
+      dispatch({ type: "togglePlayer", id, limit: squadLimit(state) });
+      if (last) setModal(null);
+    });
+    if (player) announce(text.announcements.outsiderRemoved(player.name));
+  }
+  function removeAllOutsiders(outsiders: readonly Player[]) {
+    flushSync(() => {
+      dispatch({
+        type: "removePlayers",
+        ids: outsiders.map((player) => player.id),
+      });
+      setModal(null);
+    });
+    announce(text.announcements.outsidersRemoved(outsiders.length));
+  }
   function restart() {
     dispatch({ type: "reset", seed: randomSeed() });
     setModal(null);
@@ -270,6 +303,9 @@ export function GameApp() {
   function comparePlayer(id: PlayerId) {
     const willCompare = !state.compare.includes(id);
     dispatch({ type: "toggleCompare", id });
+    const player = players.find((candidate) => candidate.id === id);
+    if (willCompare && state.compare.length === 0 && player)
+      announce(text.announcements.compareFirst(player.name));
     if (willCompare) setModal({ kind: "comparison" });
   }
   function finishStage() {
@@ -292,8 +328,11 @@ export function GameApp() {
     if (activeModal.kind === "event") {
       const event = activeModal.event;
       return (
+        // one mount per event: each event takes focus on its own open
         <EventDialog
+          key={event.id}
           event={event}
+          state={state}
           onClose={close}
           onChoose={(index, choiceTitle) => {
             dispatch({
@@ -317,15 +356,17 @@ export function GameApp() {
           restoreFocusFallback={focusHeading}
         />
       );
-    if (activeModal.kind === "confirmNewGame") {
-      const copy = text.confirmNewGame;
+    if (
+      activeModal.kind === "confirmNewGame" ||
+      activeModal.kind === "confirmRestart"
+    ) {
       return (
         <ConfirmDialog
-          eyebrow={copy.eyebrow}
-          title={copy.title}
-          description={copy.description}
-          confirmLabel={copy.confirm}
-          cancelLabel={copy.cancel}
+          copy={
+            activeModal.kind === "confirmNewGame"
+              ? text.confirmNewGame
+              : text.confirmRestart
+          }
           onConfirm={restart}
           onClose={close}
           restoreFocusFallback={focusHeading}
@@ -347,7 +388,9 @@ export function GameApp() {
           outsiders={outsiders}
           onClose={close}
           onOpenProfile={(id) => setModal({ kind: "profile", id })}
-          restoreFocusFallback={focusHeading}
+          onRemove={(id) => removeOutsider(id, outsiders.length === 1)}
+          onRemoveAll={() => removeAllOutsiders(outsiders)}
+          restoreFocusFallback={focusBoardEntry}
         />
       );
     }
@@ -358,10 +401,14 @@ export function GameApp() {
       if (!player) return null;
       return (
         <ProfileDialog
+          key={player.id}
           player={player}
           state={state}
           onClose={close}
-          onToggle={togglePlayer}
+          onToggle={(id) => {
+            // a call-up or removal from the profile closes it; an event then opens on its own
+            if (togglePlayer(id)) close();
+          }}
           restoreFocusFallback={focusHeading}
         />
       );
@@ -377,6 +424,14 @@ export function GameApp() {
           state={state}
           onClose={close}
           onToggle={togglePlayer}
+          onSelectBoth={() =>
+            dispatch({
+              type: "selectBoth",
+              ids: [left.id, right.id],
+              limit: squadLimit(state),
+            })
+          }
+          onOpenProfile={(id) => setModal({ kind: "profile", id })}
           onClearComparison={() => dispatch({ type: "clearCompare" })}
           restoreFocusFallback={focusHeading}
         />
@@ -422,7 +477,7 @@ export function GameApp() {
         {state.report ? (
           <ReportScreen
             report={state.report}
-            onRestart={restart}
+            onRestart={() => setModal({ kind: "confirmRestart" })}
             headingRef={headingRef}
           />
         ) : !state.started ? (

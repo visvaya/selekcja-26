@@ -12,8 +12,14 @@ export const SYSTEM_TEXT = {
       `Losowo dobrano zawodników: ${added}. Powołani: ${count} z ${limit}.`,
     clearSquad:
       "Odwołano wszystkich zawodników. Możesz to cofnąć przyciskiem „Cofnij”.",
+    compareFirst: (name: string) =>
+      `Wybrano do porównania: ${name}. Wybierz drugiego zawodnika.`,
     eventResolved: (choiceTitle: string) =>
       `Zdarzenie rozstrzygnięte: ${choiceTitle}.`,
+    outsiderRemoved: (name: string) =>
+      `Odwołano: ${name}. Możesz to cofnąć przyciskiem „Cofnij”.`,
+    outsidersRemoved: (count: number) =>
+      `Odwołano zawodników spoza ustawienia: ${count}. Możesz to cofnąć przyciskiem „Cofnij”.`,
   },
   save: {
     messages: {

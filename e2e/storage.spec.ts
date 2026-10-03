@@ -214,6 +214,9 @@ test("a finished report from other rules is shown frozen with the older-rules no
   await expect(page.getByText(text.reportFromOlderRules)).toBeVisible();
 
   await page.getByRole("button", { name: text.restart }).click();
+  await dialog(page)
+    .getByRole("button", { name: text.confirmRestart.confirm })
+    .click();
   await expect(
     page.getByRole("heading", { name: text.ticket.title }),
   ).toBeVisible();

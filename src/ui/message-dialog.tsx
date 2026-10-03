@@ -18,11 +18,13 @@ export function MessageDialog({
       eyebrow={text.notice}
       onClose={onClose}
       restoreFocusFallback={restoreFocusFallback}
+      footer={
+        <button className="primary start-button" onClick={onClose}>
+          {text.understood}
+        </button>
+      }
     >
       <p>{description}</p>
-      <button className="primary start-button" onClick={onClose}>
-        {text.understood}
-      </button>
     </GameDialog>
   );
 }

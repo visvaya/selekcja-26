@@ -1,4 +1,5 @@
 import type { EventId } from "../../data/events.ts";
+import { joinNames } from "./polish-format.ts";
 
 export const DIALOGS_TEXT = {
   autoFillErrors: {
@@ -19,10 +20,23 @@ export const DIALOGS_TEXT = {
     confirm: "Zacznij nową grę",
     cancel: "Wróć do gry",
   },
+  confirmRestart: {
+    eyebrow: "Nowa gra",
+    title: "Zagrać od początku?",
+    description:
+      "Raport turnieju i obecna selekcja przepadną. Tego nie da się cofnąć.",
+    confirm: "Zagraj od początku",
+    cancel: "Wróć do raportu",
+  },
+  closeDialog: "Zamknij",
+  closeDialogHint: "Zamknij okno. Nic się nie zmieni.",
+  profilePositions: "Pozycje",
+  profileAttributes: "Atrybuty",
+  leadFoot: { both: "obie", left: "lewa", right: "prawa" },
+  // the profile meters and the comparison rows after "Ocena selekcyjna", in this order
   profileMetrics: [
-    "Ocena selekcyjna",
     "Jakość",
-    "Forma i rytm",
+    "Forma",
     "Zdrowie",
     "Taktyka",
     "Doświadczenie",
@@ -31,7 +45,6 @@ export const DIALOGS_TEXT = {
   ],
   removeFromSquad: "Odwołaj z kadry",
   addToSquad: "Powołaj do kadry",
-  removeShort: "Odwołaj",
   returnToList: "Wróć do listy",
   fullSquadTitle: "Lista jest pełna",
   fullSquadMessage:
@@ -39,13 +52,22 @@ export const DIALOGS_TEXT = {
   notice: "Uwaga",
   understood: "Rozumiem",
   comparisonEyebrow: "Analiza porównawcza",
-  comparisonTitle: "Dwóch kandydatów, jedno miejsce?",
+  selectBoth: "Powołaj obu",
+  selectBothName: (first: string, second: string) =>
+    `Powołaj obu: ${joinNames([first, second])}`,
+  selectBothBlocked: "Zostało za mało miejsc, by powołać obu",
+  sharedTraits: (names: string) => `Wspólne cechy: ${names}.`,
   clearComparison: "Wyczyść porównanie",
   returnWithoutClearing: "Wróć bez czyszczenia",
   outOfFormationEyebrow: "Dopasowanie do ustawienia",
   outOfFormationExplanation:
     "Ci zawodnicy nie mają żadnej naturalnej pozycji w wybranej formacji. Możesz ich powołać, ale będzie to wymagało zmiany ustawienia lub gry poza nominalną rolą.",
   returnToPitch: "Wróć do mapy",
+  outsiderRemove: "Odwołaj",
+  outsiderRemoveHint: "Odwołaj z kadry. Możesz to cofnąć przyciskiem „Cofnij”.",
+  // The last word and the count stay together, so "(5)" never wraps alone.
+  outsidersRemoveAllLead: "Odwołaj wszystkich poza",
+  outsidersRemoveAllTail: (count: number) => `ustawieniem (${count})`,
   events: {
     doctor: {
       title: "Raport medyczny: przeciążenie",
@@ -102,6 +124,16 @@ export const DIALOGS_TEXT = {
     }
   >,
   eventEyebrow: "Sytuacja ze zgrupowania",
+  eventContext: (atPlayers: number, index: number, total: number) =>
+    `Przy ${atPlayers} powołaniach sztab zgłasza sprawę do rozstrzygnięcia (${index} z ${total}). Twój wybór wpłynie na ocenę całej kadry.`,
+  eventCurrent: "Obecnie:",
+  eventEffects: {
+    risk: "Ryzyko urazu",
+    quality: "Jakość",
+    chemistry: "Zgranie",
+  },
+  effectDirection: { up: "rośnie", down: "spada" },
+  eventUndo: "Cofnij ostatnie powołanie",
   campReportEyebrow: "Raport po zgrupowaniu",
   campReportTitle: "Masz więcej danych. Nie wszystkie są wygodne.",
   campReportBody: (best: string, doubts: string) =>

@@ -12,12 +12,15 @@ import type {
   SystemId,
 } from "../data/types.ts";
 import { DEFAULT_LIST_FILTERS } from "./list-filters.ts";
+import { canSelectBoth } from "./selection.ts";
 
 export type GameAction =
   | { type: "setSystem"; value: SystemId }
   | { type: "setList"; patch: Partial<ListFilters> }
   | { type: "start" }
   | { type: "togglePlayer"; id: PlayerId; limit: number }
+  | { type: "selectBoth"; ids: [PlayerId, PlayerId]; limit: number }
+  | { type: "removePlayers"; ids: PlayerId[] }
   | { type: "autoFill"; selected: Set<string>; seed: number }
   | { type: "undo" }
   | { type: "clearSquad" }
@@ -93,6 +96,22 @@ export function reduceGameState(
       else if (selected.size < action.limit) selected.add(action.id);
       return selected.size === state.selected.size &&
         selected.has(action.id) === state.selected.has(action.id)
+        ? state
+        : remember(state, { ...state, selected });
+    }
+    case "selectBoth":
+      return canSelectBoth(state, action.ids, action.limit) === "ready"
+        ? remember(state, {
+            ...state,
+            selected: new Set([...state.selected, ...action.ids]),
+          })
+        : state;
+    case "removePlayers": {
+      const removed = new Set(action.ids);
+      const selected = new Set(
+        [...state.selected].filter((id) => !removed.has(id)),
+      );
+      return selected.size === state.selected.size
         ? state
         : remember(state, { ...state, selected });
     }

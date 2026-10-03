@@ -1,10 +1,4 @@
-import type {
-  AvailabilityFlagId,
-  GameState,
-  Player,
-  RoleId,
-  TrialNoteId,
-} from "../data/types.ts";
+import type { GameState, Player, RoleId, TrialNoteId } from "../data/types.ts";
 import { trialImpact } from "../logic/scoring.ts";
 import { UI_TEXT as text } from "./text.ts";
 import { formatSignedImpact } from "./text/polish-format.ts";
@@ -19,6 +13,15 @@ const shownRoles = (roles: readonly RoleId[]): RoleId[] =>
 
 function campTagLabel(note: TrialNoteId, impact: number): string {
   return `${text.campResult}: ${text.trialNotes[note]} (${formatSignedImpact(impact)})`;
+}
+
+// The tag classes of one trait: flags warn, the camp result shows its impact's direction.
+export function tagClass(trait: Trait, impact: number): string {
+  if (trait.kind === "flag") return "tag alert";
+  if (trait.kind === "role") return "tag";
+  if (impact > 0) return "tag tag-camp camp-plus";
+  if (impact < 0) return "tag tag-camp camp-minus";
+  return "tag tag-camp";
 }
 
 // The strip's traits in display order: the camp result (final stage only), the flag, then roles.
@@ -48,35 +51,4 @@ export function stripTraits(player: Player, state: GameState): Trait[] {
     label: text.roles[role],
   }));
   return traitOrder([...camp, ...flag, ...roles]);
-}
-
-export function RoleTags({ roles }: { roles: RoleId[] }) {
-  return (
-    <>
-      {shownRoles(roles).map((role) => (
-        <span className="tag" key={role}>
-          {text.roles[role]}
-        </span>
-      ))}
-    </>
-  );
-}
-
-export function FlagTag({ flag }: { flag: AvailabilityFlagId | null }) {
-  if (!flag) return null;
-  return <span className="tag alert">{text.availabilityFlags[flag]}</span>;
-}
-
-export function TrialTag({
-  note,
-  impact,
-}: {
-  note: TrialNoteId;
-  impact: number;
-}) {
-  return (
-    <span className={`tag ${impact < 0 ? "alert" : ""}`}>
-      {text.campResult}: {text.trialNotes[note]} • {formatSignedImpact(impact)}
-    </span>
-  );
 }

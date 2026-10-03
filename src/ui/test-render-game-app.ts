@@ -1,4 +1,5 @@
 import { createServer } from "vite";
+import { createElement, type FunctionComponent } from "react";
 import type { JSDOM } from "jsdom";
 
 // Shared by game-app.test.ts's scenarios: boots a Vite middleware server, loads GameApp
@@ -32,4 +33,25 @@ export async function openBoard(view: { container: HTMLElement }) {
     if (toggle.getAttribute("aria-expanded") !== "true")
       throw new Error("The phone board sheet did not open");
   });
+}
+
+// Renders one exported component of a UI module alone, loaded through Vite like GameApp.
+// The caller owns `vite.close()` and `cleanup()`.
+export async function renderComponent<P extends object>(
+  path: string,
+  exportName: string,
+  props: P,
+) {
+  const testingLibrary = await import("@testing-library/react");
+  const vite = await createServer({
+    server: { middlewareMode: true, hmr: false, watch: null },
+    appType: "custom",
+  });
+  const loaded: Record<string, FunctionComponent<P>> = await vite.ssrLoadModule(
+    path,
+  );
+  const component = loaded[exportName]!;
+  const view = testingLibrary.render(createElement(component, props));
+  const { cleanup, fireEvent } = testingLibrary;
+  return { cleanup, fireEvent, vite, view };
 }

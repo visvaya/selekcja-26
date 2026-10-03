@@ -104,21 +104,26 @@ test("desktop game is playable with the keyboard alone", async ({ page }) => {
   await expect(page.getByRole("main")).toContainText(text.systems["433"].name);
   await expectFocusVisible(page, "start -> camp");
 
-  // Profile dialog: focus moves in, Tab is trapped, Escape closes and restores focus.
+  // Profile dialog: focus moves to its heading, Tab is trapped, Escape closes and restores
+  // focus.
   const profile = page
     .getByRole("button", { name: new RegExp(`^${text.profile}: `) })
     .first();
   await activate(page, profile);
   await expect(dialog(page)).toBeVisible();
   const dialogButtons = dialog(page).getByRole("button");
-  await expect(dialogButtons.first()).toBeFocused();
+  await expect(dialog(page).getByRole("heading", { level: 2 })).toBeFocused();
   await expectFocusVisible(page, "profile dialog open");
-  const buttonCount = await dialogButtons.count();
-  for (let step = 0; step < buttonCount; step++)
-    await page.keyboard.press("Tab");
+  // the X comes first, then the footer buttons; Tab wraps in both directions
+  await page.keyboard.press("Shift+Tab");
   await expect(dialogButtons.first()).toBeFocused();
   await page.keyboard.press("Shift+Tab");
   await expect(dialogButtons.last()).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(dialogButtons.first()).toBeFocused();
+  // on the X the first Escape only dismisses its hint; the next one closes the dialog
+  await page.keyboard.press("Escape");
+  await expect(dialog(page)).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(dialog(page)).toBeHidden();
   await expect(profile).toBeFocused();
@@ -128,7 +133,7 @@ test("desktop game is playable with the keyboard alone", async ({ page }) => {
   const compareButtons = page.locator(".compare-btn");
   await activate(page, compareButtons.nth(0));
   await activate(page, compareButtons.nth(1));
-  await expect(dialog(page)).toHaveAccessibleName(text.comparisonTitle);
+  await expect(dialog(page)).toHaveAccessibleName(text.comparisonEyebrow);
   await expectFocusVisible(page, "comparison dialog open");
   const clear = dialog(page).getByRole("button", {
     name: text.clearComparison,
@@ -268,6 +273,14 @@ test("desktop game is playable with the keyboard alone", async ({ page }) => {
   await expectCoherentReport(page);
 
   await activate(page, page.getByRole("button", { name: text.restart }));
+  await expect(dialog(page)).toHaveAccessibleName(text.confirmRestart.title);
+  await expect(
+    dialog(page).getByRole("button", { name: text.confirmRestart.cancel }),
+  ).toBeFocused();
+  await activate(
+    page,
+    dialog(page).getByRole("button", { name: text.confirmRestart.confirm }),
+  );
   await expect(
     page.getByRole("heading", { name: text.ticket.title }),
   ).toBeVisible();

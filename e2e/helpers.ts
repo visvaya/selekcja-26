@@ -1,8 +1,9 @@
 import { expect } from "@playwright/test";
 import type { Locator, Page } from "@playwright/test";
-import { players } from "../src/data/catalog.ts";
+import { players, systems } from "../src/data/catalog.ts";
 import { APP_CONFIG, RULES_REVISION } from "../src/data/constants.ts";
-import type { GroupPosition } from "../src/data/types.ts";
+import type { GroupPosition, Player } from "../src/data/types.ts";
+import { detailedPositions } from "../src/logic/selection.ts";
 import { UI_TEXT as text } from "../src/ui/text.ts";
 
 export { text };
@@ -202,6 +203,29 @@ export function campSave({
   });
 }
 
+// 3-4-2-1 in the camp with five forwards that have no position in the system, so the pitch
+// shows "Poza ustawieniem: 5"; eight call-ups, so no camp event is pending.
+export function outsidersSave(): { save: string; outsiders: Player[] } {
+  const fits = systems.find((system) => system.id === "3421")!.fits;
+  const fitsSystem = (player: Player) =>
+    detailedPositions(player).some((position) => fits.includes(position));
+  const outsiders = players
+    .filter((player) => player.pos === "ATA" && !fitsSystem(player))
+    .slice(0, 5);
+  const striker = players.find(
+    (player) => player.pos === "ATA" && detailedPositions(player).includes("N"),
+  )!;
+  const selectedIds = [
+    ...idsInGroup("BR", 2),
+    striker.id,
+    ...outsiders.map((player) => player.id),
+  ];
+  return {
+    save: campSave({ selectedIds, events: [], system: "3421" }),
+    outsiders,
+  };
+}
+
 // An unfinished final-stage save for the running rules; the camp squad is the given selection.
 export function finalSave({
   selectedIds,
@@ -248,9 +272,10 @@ export function collectPageErrors(page: Page): string[] {
   return errors;
 }
 
-// The game dialogs; the open phone board sheet is also a dialog and is excluded.
+// The game dialogs and confirmations; the open phone board sheet is also a dialog and is
+// excluded.
 export function dialog(page: Page): Locator {
-  return page.locator('[role="dialog"]:not(.phone-dock)');
+  return page.locator('[role="dialog"]:not(.phone-dock), [role="alertdialog"]');
 }
 
 export function saveBanner(page: Page): Locator {
@@ -484,4 +509,45 @@ export async function forceSaveErrorBanner(page: Page): Promise<void> {
 export async function expectPageLive(page: Page): Promise<void> {
   await expect(page.locator("[inert]")).toHaveCount(0);
   await expect(page.locator("html")).not.toHaveClass(/is-sheet-open/);
+}
+
+// A touch drag on an element as synthetic pointer events, dispatched in the page with measured
+// gaps between them: page.touchscreen sends taps only, and one Playwright dispatchEvent round
+// trip takes about 120 ms on a slow machine, too slow for a 20 ms flick. The gaps spin on the
+// clock instead of a timer, which a loaded machine can stretch past the flick speed.
+export async function touchDrag(
+  target: Locator,
+  distance: number,
+  steps: number,
+  gapMs: number,
+): Promise<void> {
+  await target.evaluate(
+    (element, { dy, count, gap }) => {
+      const rect = element.getBoundingClientRect();
+      const startY = rect.top + rect.height / 2;
+      const fire = (type: string, clientY: number) =>
+        element.dispatchEvent(
+          new PointerEvent(type, {
+            pointerId: 1,
+            pointerType: "touch",
+            isPrimary: true,
+            clientY,
+            bubbles: true,
+            cancelable: true,
+            composed: true,
+          }),
+        );
+      const wait = () => {
+        const until = performance.now() + gap;
+        while (performance.now() < until);
+      };
+      fire("pointerdown", startY);
+      for (let step = 1; step <= count; step++) {
+        wait();
+        fire("pointermove", startY + (dy * step) / count);
+      }
+      fire("pointerup", startY + dy);
+    },
+    { dy: distance, count: steps, gap: gapMs },
+  );
 }

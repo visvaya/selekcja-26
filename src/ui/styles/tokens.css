@@ -110,6 +110,14 @@
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --ease-emphasized: cubic-bezier(0.3, 0, 0.1, 1);
 
+  /* Hints on icon-only buttons: hover delay, hold after leaving, tip geometry. */
+  --hint-delay: 300ms;
+  --hint-hold: 200ms;
+  --hint-gap: 6px;
+  --hint-bridge: 8px;
+  --hint-max-width: 220px;
+  --hint-shadow-offset: 2px;
+
   /* Layout and safe areas */
   --topbar-height: 56px;
   /* The page column: the top bar, the content and the dock share it. At most 1280 px wide
@@ -261,6 +269,46 @@
   --finalize-min-height: 44px;
   /* Side column actions under the desktop board: 36 px buttons. */
   --side-action-height: 36px;
+
+  /* Stacking order: hints over their layer, the dialog layer over the page and the phone
+     sheet. */
+  --layer-hint: 20;
+  --layer-dialog: 50;
+
+  /* Dialogs: a 480 px panel (560 px from 1024 px) with a 3 px frame and a 5 px offset shadow;
+     the drawer below 768 px is at most 600 px tall with a 4 px shadow on its top edge. The X
+     is a 36 px button with an 18 px icon, and headings keep 44 px clear of it. The drawer
+     handle catches a 160 x 32 px area around its bar. */
+  --dialog-max-width: 480px;
+  --dialog-max-width-wide: 560px;
+  --dialog-border: 3px;
+  --dialog-shadow-offset: 5px;
+  --drawer-shadow-offset: 4px;
+  --drawer-max-height: 600px;
+  --dialog-close-size: 36px;
+  --dialog-close-icon: 18px;
+  --dialog-close-clearance: 44px;
+  --dialog-panel-lift: 8px;
+  --dialog-handle-hit-x: 60px;
+  --dialog-handle-hit-y: 14px;
+  /* Camp event: a 3 px rule beside the context line, effect chips with 2 px block padding,
+     1 px borders and 10 px arrows, and a 24 px target for the quiet undo button. */
+  --event-context-rule: 3px;
+  --effect-pad-block: 2px;
+  --control-border-thin: 1px;
+  --effect-arrow-size: 10px;
+  --target-min: 24px;
+  /* Profile and comparison: a 40 px position badge in the profile facts, 8 px bars, 44 px
+     value columns beside the comparison bars, 2 px between a heading's lines and a 10 px
+     inset for the comparison's text rows. */
+  --profile-badge-size: 40px;
+  --dialog-meter-height: 8px;
+  --h2h-value-width: 44px;
+  --dialog-line-gap: 2px;
+  --h2h-edge-inset: 10px;
+  /* Outsiders dialog: a 32 px remove button with a 16 px X beside each row's badge. */
+  --row-remove-size: 32px;
+  --row-remove-icon: 16px;
 }
 
 @media (min-width: 1024px) {

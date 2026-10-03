@@ -321,7 +321,7 @@ button.pos:active {
 
 /* the bar tint comes from --tint, set per bar by its value band; the number stays the
    primary cue */
-.player .metric progress {
+progress.meter {
   display: block;
   width: 100%;
   height: var(--meter-height);
@@ -332,19 +332,19 @@ button.pos:active {
   background: var(--board-deep);
 }
 
-.player .metric progress::-webkit-progress-bar {
+progress.meter::-webkit-progress-bar {
   background: var(--board-deep);
   border-radius: var(--radius-round);
   border: var(--divider-border) solid var(--frame-soft);
 }
 
-.player .metric progress::-webkit-progress-value {
+progress.meter::-webkit-progress-value {
   transition: width var(--duration-slow) var(--ease-standard);
   background: var(--tint, var(--action));
   border-radius: var(--radius-round);
 }
 
-.player .metric progress::-moz-progress-bar {
+progress.meter::-moz-progress-bar {
   background: var(--tint, var(--action));
   border-radius: var(--radius-round);
 }
@@ -357,8 +357,8 @@ button.pos:active {
   flex-wrap: wrap;
 }
 
-.player-actions .select-btn,
-.player-actions .profile-btn,
+:is(.player-actions, .compare-card) .select-btn,
+:is(.player-actions, .compare-card) .profile-btn,
 .player-actions .compare-btn {
   min-height: var(--strip-button-height);
   flex: 1 1 auto;
@@ -376,27 +376,27 @@ button.pos:active {
     transform var(--duration-fast) var(--ease-standard);
 }
 
-.player-actions .select-btn {
+:is(.player-actions, .compare-card) .select-btn {
   background: var(--action);
   border-color: var(--action);
   color: var(--on-action);
 }
 
-.player-actions .select-btn:hover {
+:is(.player-actions, .compare-card) .select-btn:hover {
   background: var(--action-strong);
 }
 
-.player-actions .select-btn[aria-pressed="true"] {
+:is(.player-actions, .compare-card) .select-btn[aria-pressed="true"] {
   background: var(--select);
   border-color: var(--select);
   color: var(--on-select);
 }
 
-.player-actions .select-btn[aria-pressed="true"]:hover {
+:is(.player-actions, .compare-card) .select-btn[aria-pressed="true"]:hover {
   background: var(--select-strong);
 }
 
-.player-actions .profile-btn:hover {
+:is(.player-actions, .compare-card) .profile-btn:hover {
   background: var(--board-deep);
   border-color: var(--action);
 }
@@ -408,7 +408,7 @@ button.pos:active {
   color: var(--action);
 }
 
-.player-actions .select-btn[aria-pressed="true"]:hover,
+:is(.player-actions, .compare-card) .select-btn[aria-pressed="true"]:hover,
 .player-actions .compare-btn[aria-pressed="true"]:hover {
   box-shadow: inset 0 0 0 var(--divider-border) currentColor;
 }
@@ -671,7 +671,7 @@ button.meta-club:active {
 }
 
 @media (forced-colors: active) {
-  .player-actions .select-btn[aria-pressed="true"],
+  :is(.player-actions, .compare-card) .select-btn[aria-pressed="true"],
   .player-actions .compare-btn[aria-pressed="true"] {
     outline: var(--forced-outline-width) solid Highlight;
     outline-offset: calc(var(--forced-outline-width) * -1);
