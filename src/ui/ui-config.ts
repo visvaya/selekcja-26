@@ -4,7 +4,6 @@ export const UI_CONFIG = Object.freeze({
   popoverGapPx: 8,
   popoverEdgePx: 8,
   liveCountDebounceMs: 500,
-  hintDelayMs: 300,
   // The desktop layout: side column with the board, no bottom dock.
   wideLayoutQuery: "(min-width: 1024px)",
   // The phone sheet: drag to close only on narrow screens.
