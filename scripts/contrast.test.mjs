@@ -318,12 +318,6 @@ const BOARD_PAIRS = [
     required: TEXT_RATIO,
     note: ".dock-outside-marker label text on the board",
   },
-  {
-    fg: "on-ink",
-    bg: "ink",
-    required: TEXT_RATIO,
-    note: ".hint-tip text on its ink background",
-  },
 ];
 
 for (const pair of [...INTERIM_PAIRS, ...BOARD_PAIRS]) {

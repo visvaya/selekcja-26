@@ -67,7 +67,6 @@
 
   /* Text on ink panels */
   --ink-tile: oklch(0.32 0.02 40);
-  --on-ink: oklch(0.99 0 0);
   --on-ink-dim: oklch(0.85 0.02 40);
   --on-ink-meta: oklch(0.82 0.02 40);
   --on-ink-lead: oklch(0.88 0.015 40);
@@ -117,6 +116,7 @@
   --hint-gap: 6px;
   --hint-bridge: 8px;
   --hint-max-width: 220px;
+  --hint-shadow-offset: 2px;
 
   /* Layout and safe areas */
   --topbar-height: 56px;
