@@ -291,6 +291,13 @@
   --dialog-panel-lift: 8px;
   --dialog-handle-hit-x: 60px;
   --dialog-handle-hit-y: 14px;
+  /* Camp event: a 3 px rule beside the context line, effect chips with 2 px block padding,
+     1 px borders and 10 px arrows, and a 24 px target for the quiet undo button. */
+  --event-context-rule: 3px;
+  --effect-pad-block: 2px;
+  --control-border-thin: 1px;
+  --effect-arrow-size: 10px;
+  --target-min: 24px;
   /* Profile and comparison: a 40 px position badge in the profile facts, 8 px bars, 44 px
      value columns beside the comparison bars, 2 px between a heading's lines and a 10 px
      inset for the comparison's text rows. */

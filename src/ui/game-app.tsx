@@ -307,6 +307,7 @@ export function GameApp() {
         <EventDialog
           key={event.id}
           event={event}
+          state={state}
           onClose={close}
           onChoose={(index, choiceTitle) => {
             dispatch({

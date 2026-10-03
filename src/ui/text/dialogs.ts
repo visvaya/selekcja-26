@@ -119,6 +119,16 @@ export const DIALOGS_TEXT = {
     }
   >,
   eventEyebrow: "Sytuacja ze zgrupowania",
+  eventContext: (atPlayers: number, index: number, total: number) =>
+    `Przy ${atPlayers} powołaniach sztab zgłasza sprawę do rozstrzygnięcia (${index} z ${total}). Twój wybór wpłynie na ocenę całej kadry.`,
+  eventCurrent: "Obecnie:",
+  eventEffects: {
+    risk: "Ryzyko urazu",
+    quality: "Jakość",
+    chemistry: "Zgranie",
+  },
+  effectDirection: { up: "rośnie", down: "spada" },
+  eventUndo: "Cofnij ostatnie powołanie",
   campReportEyebrow: "Raport po zgrupowaniu",
   campReportTitle: "Masz więcej danych. Nie wszystkie są wygodne.",
   campReportBody: (best: string, doubts: string) =>

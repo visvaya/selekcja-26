@@ -69,7 +69,7 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
   await page.getByRole("button", { name: text.autoFill }).tap();
   await expect(dialog(page)).toHaveAccessibleName(text.events.doctor.title);
   await expectFocusVisible(page, "random fill dialog open");
-  await dialog(page).getByRole("button", { name: text.undo }).tap();
+  await dialog(page).getByRole("button", { name: text.eventUndo }).tap();
   await expect(dialog(page)).toBeHidden();
   await expect(squadCount(page)).toHaveText("0/23");
   await expect(dockToggle(page)).toHaveAttribute("aria-expanded", "false");

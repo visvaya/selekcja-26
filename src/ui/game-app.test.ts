@@ -74,7 +74,7 @@ test("start, profile, comparison, event and position filter work together", asyn
         screen
           .getByRole("heading", { name: "Raport medyczny: przeciążenie" })
           .closest('[role="dialog"]')!
-          .querySelector<HTMLButtonElement>(".action-button")!,
+          .querySelector<HTMLButtonElement>(".event-undo")!,
       );
       assert.equal(
         view.container.querySelectorAll(".player.selected").length,

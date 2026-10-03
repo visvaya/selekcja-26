@@ -236,6 +236,10 @@
     "Półfinał: zwiń tablicę",
     "2026-10-01: zwiń tablicę"
   ],
+  "effectDirection": {
+    "down": "spada",
+    "up": "rośnie"
+  },
   "emptyValue": "Brak",
   "errorBoundary": {
     "message": "Gra napotkała nieoczekiwany błąd. Odśwież stronę – ostatni zapisany postęp powinien się wczytać. Jeśli błąd wraca, zacznij od nowa; zapisana gra zostanie wtedy usunięta.",
@@ -243,7 +247,25 @@
     "reset": "Zacznij od nowa",
     "title": "Coś poszło nie tak"
   },
+  "eventContext": [
+    "Przy 0 powołaniach sztab zgłasza sprawę do rozstrzygnięcia (0 z 0). Twój wybór wpłynie na ocenę całej kadry.",
+    "Przy 1 powołaniach sztab zgłasza sprawę do rozstrzygnięcia (1 z 1). Twój wybór wpłynie na ocenę całej kadry.",
+    "Przy 2 powołaniach sztab zgłasza sprawę do rozstrzygnięcia (2 z 2). Twój wybór wpłynie na ocenę całej kadry.",
+    "Przy 5 powołaniach sztab zgłasza sprawę do rozstrzygnięcia (5 z 5). Twój wybór wpłynie na ocenę całej kadry.",
+    "Przy 12 powołaniach sztab zgłasza sprawę do rozstrzygnięcia (12 z 12). Twój wybór wpłynie na ocenę całej kadry.",
+    "Przy 22 powołaniach sztab zgłasza sprawę do rozstrzygnięcia (22 z 22). Twój wybór wpłynie na ocenę całej kadry.",
+    "Przy X powołaniach sztab zgłasza sprawę do rozstrzygnięcia (X z X). Twój wybór wpłynie na ocenę całej kadry.",
+    "Przy Półfinał powołaniach sztab zgłasza sprawę do rozstrzygnięcia (Półfinał z Półfinał). Twój wybór wpłynie na ocenę całej kadry.",
+    "Przy 2026-10-01 powołaniach sztab zgłasza sprawę do rozstrzygnięcia (2026-10-01 z 2026-10-01). Twój wybór wpłynie na ocenę całej kadry."
+  ],
+  "eventCurrent": "Obecnie:",
+  "eventEffects": {
+    "chemistry": "Zgranie",
+    "quality": "Jakość",
+    "risk": "Ryzyko urazu"
+  },
   "eventEyebrow": "Sytuacja ze zgrupowania",
+  "eventUndo": "Cofnij ostatnie powołanie",
   "events": {
     "captain": {
       "choices": [
