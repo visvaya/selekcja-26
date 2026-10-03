@@ -275,6 +275,42 @@ test("the sheet closes an open position popover and Escape then closes the sheet
   expect(errors).toEqual([]);
 });
 
+test("undo in the open sheet shows a short note above it that fades away", async ({
+  page,
+}) => {
+  const errors = collectPageErrors(page);
+  await startCamp(page);
+  const pick = page.getByRole("button", { name: /^Powołaj: / }).first();
+  const name = (await pick.getAttribute("aria-label"))!.replace(
+    /^Powołaj: /,
+    "",
+  );
+  await pick.tap();
+  await openBoard(page);
+  await sheet(page).getByRole("button", { name: text.undo }).tap();
+
+  const note = page.locator(".undo-toast");
+  await expect(note).toHaveText(`Cofnięto powołanie: ${name}.`);
+  await expect(note).toHaveCSS("opacity", "1");
+  await expect(note).toHaveAttribute("aria-hidden", "true");
+  await expect(note).toHaveCSS("pointer-events", "none");
+  await expect(sheet(page)).toBeVisible();
+  // The note sits above the sheet: it is the topmost element at its centre.
+  const onTop = await note.evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    element.style.pointerEvents = "auto";
+    const hit = document.elementFromPoint(
+      rect.left + rect.width / 2,
+      rect.top + rect.height / 2,
+    );
+    element.style.pointerEvents = "";
+    return hit === element;
+  });
+  expect(onTop, "note above the sheet").toBe(true);
+  await expect(note).toHaveCSS("opacity", "0", { timeout: 6000 });
+  expect(errors).toEqual([]);
+});
+
 test.describe("the bar while the page scrolls", () => {
   // Scrolls the window in one step (the page scrolls smoothly otherwise, in many small steps)
   // and waits until the scroll listeners have run.

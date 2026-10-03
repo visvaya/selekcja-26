@@ -35,6 +35,8 @@ const liveText = (doc: Document) =>
   doc.querySelector('[aria-live="polite"]')?.textContent ?? "";
 const sheetExpanded = (doc: Document) =>
   doc.querySelector(".phone-dock-toggle")?.getAttribute("aria-expanded");
+const toastText = (doc: Document) =>
+  doc.querySelector('.undo-toast[aria-hidden="true"]')?.textContent ?? null;
 const eventContext = (doc: Document) =>
   doc.querySelector(".modal .event-context")?.textContent ?? "";
 
@@ -72,6 +74,7 @@ test("a random fill's events name the real count and their undo reverts the fill
       ),
     );
     assert.equal(doc.querySelector(".modal .event-context"), null);
+    assert.equal(toastText(doc), "Cofnięto powołanie 18 zawodników.");
     assert.equal(sheetExpanded(doc), "true");
   });
 });
@@ -93,6 +96,7 @@ test("undo in the open sheet keeps it open and focuses its handle when history e
       fireEvent.click(pick);
       await openBoard(view);
       const undoButton = view.getByRole("button", { name: "Cofnij" });
+      assert.equal(toastText(doc), null);
       undoButton.focus();
       fireEvent.click(undoButton);
       await waitFor(() =>
@@ -101,6 +105,7 @@ test("undo in the open sheet keeps it open and focuses its handle when history e
           `Cofnięto powołanie: ${name}. Powołani: 0 z 23.`,
         ),
       );
+      assert.equal(toastText(doc), `Cofnięto powołanie: ${name}.`);
       assert.equal(sheetExpanded(doc), "true");
       assert.equal(undoButton.hasAttribute("disabled"), true);
       assert.equal(
@@ -151,5 +156,6 @@ test("undoing the camp end from the sheet closes it", async () => {
       ),
     );
     assert.equal(sheetExpanded(doc), "false");
+    assert.equal(toastText(doc), "Cofnięto zakończenie zgrupowania.");
   });
 });

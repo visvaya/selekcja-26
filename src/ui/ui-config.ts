@@ -18,4 +18,6 @@ export const UI_CONFIG = Object.freeze({
   // The closed bar hides while the page scrolls down.
   barScrollStepPx: 4,
   barHideMinScrollPx: 60,
+  // How long the note after an undo stays visible.
+  undoToastMs: 4000,
 });

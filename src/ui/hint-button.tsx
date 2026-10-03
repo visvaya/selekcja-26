@@ -122,7 +122,7 @@ export function HintButton({
       }}
     >
       {children}
-      <span className="hint-tip" role="tooltip" id={tipId}>
+      <span className="hint-tip tip-surface" role="tooltip" id={tipId}>
         {hint}
       </span>
     </button>

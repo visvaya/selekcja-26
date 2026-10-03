@@ -1,16 +1,5 @@
-/* Hints on icon-only buttons: the tip shows below the button on visible focus at once and on
-   hover after a delay; Escape dismisses it (script). */
-.has-hint {
-  position: relative;
-}
-
-.hint-tip {
-  position: absolute;
-  right: 0;
-  top: calc(100% + var(--hint-gap));
-  z-index: var(--layer-hint);
-  width: max-content;
-  max-width: var(--hint-max-width);
+/* The light tip look shared by the hints and the undo note. */
+.tip-surface {
   padding: var(--space-1) var(--space-2);
   border: var(--control-border-thin) solid var(--frame);
   border-radius: var(--radius-sm);
@@ -24,6 +13,27 @@
   white-space: normal;
   box-shadow: var(--hint-shadow-offset) var(--hint-shadow-offset) 0
     var(--shadow);
+}
+
+@media (forced-colors: active) {
+  .tip-surface {
+    border-color: CanvasText;
+  }
+}
+
+/* Hints on icon-only buttons: the tip shows below the button on visible focus at once and on
+   hover after a delay; Escape dismisses it (script). */
+.has-hint {
+  position: relative;
+}
+
+.hint-tip {
+  position: absolute;
+  right: 0;
+  top: calc(100% + var(--hint-gap));
+  z-index: var(--layer-hint);
+  width: max-content;
+  max-width: var(--hint-max-width);
   pointer-events: auto;
   opacity: 0;
   visibility: hidden;
@@ -67,11 +77,5 @@
 @media (prefers-reduced-motion: reduce) {
   .hint-tip {
     transition-duration: 0s;
-  }
-}
-
-@media (forced-colors: active) {
-  .hint-tip {
-    border-color: CanvasText;
   }
 }
