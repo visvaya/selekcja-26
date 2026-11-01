@@ -96,6 +96,8 @@ export const GAME_RULES = Object.freeze({
     favorableLuckThresholdPoints: 3,
     unfavorableLuckThresholdPoints: -3,
     // Group results for each points total; the order is shuffled when the story is drawn.
+    // The assertion below keeps the lists read-only and indexable by any points total.
+    // oxlint-disable-next-line typescript/no-unnecessary-type-assertion
     groupResultsByPoints: {
       9: [["win", "win", "win"]],
       7: [["win", "win", "draw"]],

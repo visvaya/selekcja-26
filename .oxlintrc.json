@@ -5,12 +5,35 @@
     "correctness": "error",
     "suspicious": "warn"
   },
+  "options": {
+    "typeAware": true,
+    "denyWarnings": true
+  },
   "env": {
     "browser": true,
     "node": true,
     "es2024": true
   },
   "rules": {
+    // node:test registers tests through the promises that test() and describe() return.
+    "typescript/no-floating-promises": [
+      "error",
+      {
+        "allowForKnownSafeCalls": [
+          {
+            "from": "package",
+            "name": ["test", "describe"],
+            "package": "node:test"
+          }
+        ]
+      }
+    ],
+    // Off outside the save boundary (override below): the other assertions narrow Object.keys,
+    // DOM events and CSS custom properties, which the type system cannot express.
+    "typescript/no-unsafe-type-assertion": "off",
+    // tsc already checks returns against the declared types; this rule only flagged exhaustive
+    // switches and effect cleanups.
+    "typescript/consistent-return": "off",
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
     "react/react-in-jsx-scope": "off",
@@ -53,6 +76,13 @@
             ]
           }
         ]
+      }
+    },
+    {
+      // Saves come from storage the player controls; narrow them with checks, not assertions.
+      "files": ["src/logic/save-format.ts", "src/logic/save-migration.ts"],
+      "rules": {
+        "typescript/no-unsafe-type-assertion": "error"
       }
     },
     {

@@ -130,7 +130,9 @@ export const LIST_TEXT = {
   compared: "Wybrany",
   playerAction: (label: string, name: string) => `${label}: ${name}`,
   // codes and names arrive joined with ", "; the names read lowercase inside the sentence
+  // The text snapshot calls every function with sample numbers, so names is coerced first.
   positionBadgeName: (codes: string, names: string) =>
+    // oxlint-disable-next-line typescript/no-unnecessary-template-expression
     `${codes}: ${`${names}`.toLocaleLowerCase("pl")}`,
   positionPopoverSeparator: " · ",
   positionMore: (count: number) => `+${count}`,

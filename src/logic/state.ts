@@ -5,7 +5,6 @@ import type {
   Effects,
   FinalReport,
   GameState,
-  GameSnapshot,
   Player,
   PlayerId,
   ListFilters,
@@ -56,7 +55,7 @@ function remember(previous: GameState, next: GameState): GameState {
   const { history: _history, list: _list, ...snapshot } = previous;
   return {
     ...next,
-    history: [...previous.history, snapshot as GameSnapshot].slice(
+    history: [...previous.history, snapshot].slice(
       -GAME_RULES.undoHistoryLimitActions,
     ),
   };

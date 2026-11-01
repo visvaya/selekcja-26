@@ -125,7 +125,7 @@ test("the drawer form: labelled panel, X with a hint, handle, footer and heading
     const eyebrow = panel.querySelector(".eyebrow")!;
     assert.equal(
       Boolean(
-        eyebrow.compareDocumentPosition(heading!) &
+        eyebrow.compareDocumentPosition(heading) &
         dom.window.Node.DOCUMENT_POSITION_FOLLOWING,
       ),
       true,

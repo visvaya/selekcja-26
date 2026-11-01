@@ -728,7 +728,7 @@ test("the open phone board sheet makes the page inert and keeps dialogs above it
         doc.activeElement?.classList.contains("phone-dock-handle"),
         true,
       );
-      fireEvent.keyDown(doc.activeElement!, { key: "Escape" });
+      fireEvent.keyDown(doc.activeElement, { key: "Escape" });
       assert.equal(expanded(), "false");
       assert.deepEqual(inertRoots(), [false, false, false]);
       assert.equal(locked(), false);
@@ -745,7 +745,7 @@ test("the open phone board sheet makes the page inert and keeps dialogs above it
       assert.equal(eventDialog !== null, true);
       assert.equal(eventDialog?.closest("[inert]") === null, true);
       assert.equal(eventDialog?.closest(".phone-dock") === null, true);
-      fireEvent.keyDown(doc.activeElement!, { key: "Escape" });
+      fireEvent.keyDown(doc.activeElement, { key: "Escape" });
       assert.equal(expanded(), "true");
       for (let step = 0; step < 5; step++) {
         const decision =

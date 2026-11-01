@@ -283,9 +283,7 @@ test.describe("the bar while the page scrolls", () => {
       (target) =>
         new Promise<void>((resolve) => {
           const top =
-            target === "end"
-              ? document.documentElement.scrollHeight
-              : (target as number);
+            target === "end" ? document.documentElement.scrollHeight : target;
           if (Math.abs(window.scrollY - top) < 1) return resolve();
           window.addEventListener(
             "scroll",

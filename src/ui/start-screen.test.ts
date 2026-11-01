@@ -196,7 +196,7 @@ test("StartScreen groups the actions in one row and shows the notes side by side
         ["Rozpocznij odprawę", "Cofnij"],
       );
       assert.equal(buttons[1]?.classList.contains("action-button"), true);
-      fireEvent.click(buttons[1]!);
+      fireEvent.click(buttons[1]);
       assert.equal(undoCalls, 1);
       cleanup();
     } finally {

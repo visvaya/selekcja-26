@@ -303,7 +303,7 @@ test.describe.serial("axe WCAG 2.2 AA scan", () => {
   });
 
   for (const { state, viewport } of SHEET_VIEWPORTS)
-    test(`${state}`, async ({ page }) => {
+    test(state, async ({ page }) => {
       await page.setViewportSize(viewport);
       // One goalkeeper short of the camp quota, so the squares and the markers show a gap.
       await seedStorage(

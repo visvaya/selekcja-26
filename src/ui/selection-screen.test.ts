@@ -192,9 +192,9 @@ test("position chips form a labelled multi-select group with counts", async () =
         chips[1]?.getAttribute("aria-label"),
         `BR (0/${brTotal}): bramkarz, powołani 0 z ${brTotal}`,
       );
-      fireEvent.click(chips[1]!);
+      fireEvent.click(chips[1]);
       assert.deepEqual(patches.at(-1), { positions: ["BR"] });
-      fireEvent.click(chips[0]!);
+      fireEvent.click(chips[0]);
       assert.deepEqual(patches.at(-1), { positions: [] });
     } finally {
       cleanup();

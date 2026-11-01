@@ -61,7 +61,7 @@ const isRecord = (value: unknown): value is RawRecord =>
 const isNumber = (value: unknown): value is number =>
   typeof value === "number" && Number.isFinite(value);
 const isRevision = (value: unknown): value is number =>
-  Number.isInteger(value) && (value as number) >= 1;
+  typeof value === "number" && Number.isInteger(value) && value >= 1;
 const isStringArray = (value: unknown): value is string[] =>
   Array.isArray(value) && value.every((item) => typeof item === "string");
 const isPlayerIdArray = (value: unknown): value is string[] =>
@@ -88,7 +88,7 @@ const KNOCKOUT_ROUND_IDS: readonly unknown[] = Object.keys({
 } satisfies Record<KnockoutRoundId, 0>);
 
 const isGoals = (value: unknown): boolean =>
-  Number.isInteger(value) && (value as number) >= 0;
+  typeof value === "number" && Number.isInteger(value) && value >= 0;
 
 function isMatchScore(value: unknown): value is RawRecord {
   if (!isRecord(value)) return false;
@@ -248,8 +248,11 @@ function restoreSnapshot(value: GameSnapshot): GameSnapshot {
   };
 }
 
-function serializeSnapshot(value: GameSnapshot) {
-  const { history: _history, list: _list, ...snapshot } = value as GameState;
+// Takes the whole state or one history snapshot; history and list never enter a snapshot.
+function serializeSnapshot(
+  value: GameSnapshot & Partial<Pick<GameState, "history" | "list">>,
+) {
+  const { history: _history, list: _list, ...snapshot } = value;
   return {
     ...snapshot,
     selected: [...snapshot.selected],
@@ -299,7 +302,7 @@ function upgrade(saved: RawRecord): { state: unknown; rulesRevision: unknown } {
 
 function restoreState(state: unknown): GameState | null {
   if (!isSnapshot(state)) return null;
-  const { history, list } = state as unknown as RawRecord;
+  const { history, list }: RawRecord = state;
   if (!isListFilters(list)) return null;
   if (
     !Array.isArray(history) ||

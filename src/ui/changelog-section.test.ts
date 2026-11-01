@@ -30,8 +30,8 @@ test("changelog section on the start screen and in isolation", async () => {
         await screen.findByRole("heading", { name: text.changelogTitle }),
       );
       assert.ok(screen.getByText(text.topBarVersionAccessible(GAME_VERSION)));
-      const latest = CHANGELOG[0]!,
-        older = CHANGELOG[1]!;
+      const latest = CHANGELOG[0],
+        older = CHANGELOG[1];
       assert.ok(
         screen.getByText(
           text.changelogVersionLabel(latest.version, latest.date),

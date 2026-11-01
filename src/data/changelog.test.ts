@@ -59,7 +59,7 @@ test("every version is unique", () => {
 });
 
 test("GAME_VERSION matches the first entry and package.json", () => {
-  assert.equal(GAME_VERSION, CHANGELOG[0]!.version);
+  assert.equal(GAME_VERSION, CHANGELOG[0].version);
   const packageJson = JSON.parse(readFileSync(packageJsonPath(), "utf8")) as {
     version: string;
   };
