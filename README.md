@@ -22,7 +22,7 @@ Along the way the player can open profiles, compare two candidates, filter by 14
 - **Mobile first and accessible.** Full keyboard support, visible focus, focus-trapping dialogs, landmarks, and correct `aria-pressed` and `aria-expanded` states. Every screen and dialog is scanned with axe against WCAG 2.2 AA.
 - **Tested at two levels.** Logic, UI and tooling tests run on `node --test` with coverage thresholds. Playwright plays the whole game on the production build: on a narrow phone in Chromium and WebKit, and with the keyboard alone on a desktop.
 
-**Stack:** React 19, TypeScript 7, Vite 8, Playwright with axe, oxlint, Prettier, jscpd, knip. No state library and no backend; the build is a static site.
+**Stack:** React 19, TypeScript 7, Vite 8, Playwright with axe, oxlint, oxfmt, jscpd, knip. No state library and no backend; the build is a static site.
 
 ## Getting started
 

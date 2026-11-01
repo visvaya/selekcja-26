@@ -1,9 +1,0 @@
-dist/
-node_modules/
-pnpm-lock.yaml
-test-results/
-playwright-report/
-blob-report/
-src/logic/golden/traces/
-.superpowers/
-src/ui/text-snapshot.json
