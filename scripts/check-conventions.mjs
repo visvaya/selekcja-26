@@ -1,4 +1,4 @@
-// Enforces the repository conventions from AGENTS.md that a linter cannot express:
+// Enforces the repository conventions that a linter cannot express:
 // - file names in kebab-case (tool-mandated names excepted),
 // - no classes in src/ except Error subclasses and a React error boundary,
 // - CSS colors only as tokens inside :root blocks,
@@ -11,9 +11,6 @@ import { basename } from "node:path";
 
 const TOOL_MANDATED_NAMES = new Set([
   "README.md",
-  "AGENTS.md",
-  "CLAUDE.md",
-  "SKILL.md",
   "LICENSE",
   "SECURITY.md",
   "_headers",
