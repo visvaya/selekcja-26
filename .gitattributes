@@ -1,4 +1,4 @@
-# Keep LF everywhere so Prettier, git diff --check and the sh hooks behave the same on Windows.
+# Keep LF everywhere so the formatter, git diff --check and the sh hooks behave the same on Windows.
 * text=auto eol=lf
 *.png binary
 *.jpg binary

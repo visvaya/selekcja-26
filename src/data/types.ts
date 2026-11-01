@@ -86,7 +86,10 @@ export interface Effects {
   quality: number;
 }
 export type KnockoutRoundId =
-  "roundOf16" | "quarterfinal" | "semifinal" | "final";
+  | "roundOf16"
+  | "quarterfinal"
+  | "semifinal"
+  | "final";
 export type MatchResultId = "win" | "draw" | "loss";
 export interface MatchScore {
   goalsFor: number;
