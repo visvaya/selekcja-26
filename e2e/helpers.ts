@@ -305,6 +305,8 @@ export async function patchStorageFailures(
     ([key, mode]) => {
       const win = window as typeof window & { saveFailureMode: string };
       win.saveFailureMode = mode!;
+      // Called below with the storage as `this`.
+      // oxlint-disable-next-line typescript/unbound-method
       const originalSetItem = Storage.prototype.setItem;
       Storage.prototype.setItem = function (
         this: Storage,
@@ -386,7 +388,7 @@ export async function expectFocusVisible(
       const tag = element.tagName.toLowerCase();
       const className =
         element instanceof HTMLElement && element.className
-          ? `.${element.className.toString().trim().split(/\s+/).join(".")}`
+          ? `.${element.className.trim().split(/\s+/).join(".")}`
           : "";
       const label = (element.textContent ?? "").trim().slice(0, 60);
       return `<${tag}${className}> "${label}"`;

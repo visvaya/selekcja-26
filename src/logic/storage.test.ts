@@ -78,7 +78,7 @@ test("state round-trips through the asynchronous storage adapter", async () => {
     assert.ok(restored?.selected.has("robert-lewandowski"));
     assert.equal(restored?.seed, 8);
     assert.equal(restored?.history.length, 1);
-    assert.equal(reduceGameState(restored!, { type: "undo" }).selected.size, 0);
+    assert.equal(reduceGameState(restored, { type: "undo" }).selected.size, 0);
   });
 });
 
@@ -341,7 +341,7 @@ test("a finished report from other rules is kept without undo", async () => {
     assert.equal(loaded.discardedForRulesChange, false);
     assert.deepEqual(loaded.state?.report, saved.report);
     assert.deepEqual(loaded.state?.history, []);
-    await saveGame(loaded.state!);
+    await saveGame(loaded.state);
     const again = await loadGame();
     assert.equal(again.state?.report?.rulesRevision, RULES_REVISION + 1);
     assert.equal(JSON.parse(values.get(KEY)!).rulesRevision, RULES_REVISION);

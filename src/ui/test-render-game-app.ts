@@ -37,19 +37,20 @@ export async function openBoard(view: { container: HTMLElement }) {
 
 // Renders one exported component of a UI module alone, loaded through Vite like GameApp.
 // The caller owns `vite.close()` and `cleanup()`.
-export async function renderComponent<P extends object>(
+export async function renderComponent(
   path: string,
   exportName: string,
-  props: P,
+  props: object,
 ) {
   const testingLibrary = await import("@testing-library/react");
   const vite = await createServer({
     server: { middlewareMode: true, hmr: false, watch: null },
     appType: "custom",
   });
-  const loaded: Record<string, FunctionComponent<P>> = await vite.ssrLoadModule(
-    path,
-  );
+  const loaded: Record<
+    string,
+    FunctionComponent<object>
+  > = await vite.ssrLoadModule(path);
   const component = loaded[exportName]!;
   const view = testingLibrary.render(createElement(component, props));
   const { cleanup, fireEvent } = testingLibrary;

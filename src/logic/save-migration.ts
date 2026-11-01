@@ -105,7 +105,10 @@ function migrateReport(report: unknown): unknown {
 }
 
 function migrateSnapshot(snapshot: unknown): unknown {
-  if (!isRecord(snapshot)) return snapshot;
+  return isRecord(snapshot) ? migrateSnapshotRecord(snapshot) : snapshot;
+}
+
+function migrateSnapshotRecord(snapshot: RawRecord): RawRecord {
   const trial = isRecord(snapshot.trial)
     ? Object.fromEntries(
         Object.entries(snapshot.trial).map(([name, result]) => [
@@ -138,7 +141,7 @@ export function migrateLegacyState(
         : Array.isArray(state.history)
           ? state.history.map(migrateSnapshot)
           : state.history;
-    return { ...(migrateSnapshot(state) as RawRecord), history };
+    return { ...migrateSnapshotRecord(state), history };
   } catch (error) {
     if (error instanceof LegacyNameError) return null;
     throw error;
@@ -149,7 +152,10 @@ export function migrateLegacyState(
 const DROPPED_KEYS = ["filter", "query", "sort", "priority"] as const;
 
 function withoutDroppedKeys(snapshot: unknown): unknown {
-  if (!isRecord(snapshot)) return snapshot;
+  return isRecord(snapshot) ? dropKeys(snapshot) : snapshot;
+}
+
+function dropKeys(snapshot: RawRecord): RawRecord {
   return Object.fromEntries(
     Object.entries(snapshot).filter(
       ([key]) => !(DROPPED_KEYS as readonly string[]).includes(key),
@@ -176,5 +182,5 @@ export function migrateV3State(state: unknown): unknown {
   const history = Array.isArray(state.history)
     ? state.history.map(withoutDroppedKeys)
     : state.history;
-  return { ...(withoutDroppedKeys(state) as RawRecord), list, history };
+  return { ...dropKeys(state), list, history };
 }
