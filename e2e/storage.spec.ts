@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 import { APP_CONFIG, RULES_REVISION } from "../src/data/constants.ts";
 import {
   STORAGE_KEY,
+  closeBoard,
   collectPageErrors,
   dialog,
   expectSavedSchemaVersion,
@@ -408,6 +409,8 @@ test("list filters survive a squad change, undo and reload", async ({
   ).toBeVisible();
   await openBoard(page);
   await page.getByRole("button", { name: text.undo }).click();
+  // Undo keeps the board sheet open; close it to reach the list again.
+  await closeBoard(page);
   await expect(
     page.getByRole("checkbox", { name: text.onlySelected(2) }),
   ).toBeVisible();
@@ -422,6 +425,7 @@ test("list filters survive a squad change, undo and reload", async ({
   await expect(profiles).toHaveCount(1);
   await openBoard(page);
   await page.getByRole("button", { name: text.undo }).click();
+  await closeBoard(page);
   await expect(profiles).toHaveCount(2);
 
   const names = () =>
