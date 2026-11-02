@@ -8,7 +8,11 @@ import { tournamentStory } from "../logic/tournament.ts";
 import type { GroupPosition, OutcomeId, Player } from "../data/types.ts";
 import type { JSDOM } from "jsdom";
 import { withJsdomWindow } from "./test-jsdom-window.ts";
-import { openBoard, renderGameApp } from "./test-render-game-app.ts";
+import {
+  openBoard,
+  renderGameApp,
+  stubMatchMedia,
+} from "./test-render-game-app.ts";
 import { UI_TEXT } from "./text.ts";
 
 test("start, profile, comparison, event and position filter work together", async () => {
@@ -631,19 +635,6 @@ test("clear-squad and new-game actions on the list", async () => {
     }
   });
 });
-
-function stubMatchMedia(dom: JSDOM, matching: string | null) {
-  Object.defineProperty(dom.window, "matchMedia", {
-    configurable: true,
-    value: (query: string) =>
-      ({
-        matches: query === matching,
-        media: query,
-        addEventListener: () => {},
-        removeEventListener: () => {},
-      }) as unknown as MediaQueryList,
-  });
-}
 
 test("one board per width: the side board from 1024 px, the bottom dock below", async () => {
   for (const wide of [true, false]) {

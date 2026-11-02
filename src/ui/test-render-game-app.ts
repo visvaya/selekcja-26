@@ -56,3 +56,17 @@ export async function renderComponent(
   const { cleanup, fireEvent } = testingLibrary;
   return { cleanup, fireEvent, vite, view };
 }
+
+// Makes matchMedia report `matching` (or nothing) as the only matching query.
+export function stubMatchMedia(dom: JSDOM, matching: string | null) {
+  Object.defineProperty(dom.window, "matchMedia", {
+    configurable: true,
+    value: (query: string) =>
+      ({
+        matches: query === matching,
+        media: query,
+        addEventListener: () => {},
+        removeEventListener: () => {},
+      }) as unknown as MediaQueryList,
+  });
+}

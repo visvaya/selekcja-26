@@ -4,7 +4,11 @@ import { APP_CONFIG } from "../data/constants.ts";
 import { encodeSave } from "../logic/save-format.ts";
 import { createInitialState } from "../logic/state.ts";
 import { withJsdomWindow } from "./test-jsdom-window.ts";
-import { openBoard, renderGameApp } from "./test-render-game-app.ts";
+import {
+  openBoard,
+  renderGameApp,
+  stubMatchMedia,
+} from "./test-render-game-app.ts";
 
 type Rendered = Awaited<ReturnType<typeof renderGameApp>>;
 
@@ -76,6 +80,39 @@ test("a random fill's events name the real count and their undo reverts the fill
     assert.equal(doc.querySelector(".modal .event-context"), null);
     assert.equal(toastText(doc), "Cofnięto powołanie 18 zawodników.");
     assert.equal(sheetExpanded(doc), "true");
+  });
+});
+
+test("from 1024 px, undo that empties history focuses the side board", async () => {
+  const saved = encodeSave({ ...createInitialState(11), started: true });
+  await withJsdomWindow(async (dom) => {
+    stubMatchMedia(dom, "(min-width: 1024px)");
+    dom.window.localStorage.setItem(APP_CONFIG.storageKey, saved);
+    const app = await renderGameApp(dom);
+    const { fireEvent, waitFor, view } = app;
+    const doc = dom.window.document;
+    try {
+      await view.findByRole("heading", {
+        name: "Wybierz 23 zawodników na test",
+      });
+      fireEvent.click(view.getAllByRole("button", { name: /^Powołaj: / })[0]!);
+      const undoButton = view.getByRole("button", { name: "Cofnij" });
+      undoButton.focus();
+      fireEvent.click(undoButton);
+      await waitFor(() =>
+        assert.equal(undoButton.hasAttribute("disabled"), true),
+      );
+      const board = view.getByRole("region", {
+        name: "Tablica kadry – zgrupowanie",
+      });
+      assert.equal(doc.activeElement === board, true);
+      await app.act(async () => {
+        await new Promise((resolve) => setImmediate(resolve));
+      });
+    } finally {
+      app.cleanup();
+      await app.vite.close();
+    }
   });
 });
 
