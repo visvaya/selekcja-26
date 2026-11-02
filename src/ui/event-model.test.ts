@@ -21,17 +21,14 @@ test("effect chips invert fitness into risk and skip zero", () => {
 
 test("event ordinal from the event list", () => {
   assert.deepEqual(eventOrdinal("doctor"), {
-    atPlayers: 9,
     index: 1,
     total: 3,
   });
   assert.deepEqual(eventOrdinal("captain"), {
-    atPlayers: 17,
     index: 2,
     total: 3,
   });
   assert.deepEqual(eventOrdinal("scout"), {
-    atPlayers: 22,
     index: 3,
     total: 3,
   });
