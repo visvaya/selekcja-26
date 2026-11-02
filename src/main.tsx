@@ -12,6 +12,7 @@ import "./ui/styles/fonts.css";
 import "./ui/styles/tokens.css";
 import "./ui/styles/base.css";
 import "./ui/styles/hint.css";
+import "./ui/styles/undo-toast.css";
 import "./ui/styles/topbar.css";
 import "./ui/styles/pitch.css";
 import "./ui/styles/board.css";

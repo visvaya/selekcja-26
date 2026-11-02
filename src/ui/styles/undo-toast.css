@@ -1,0 +1,34 @@
+/* The note after an undo: bottom centre inside the page gutter, above the phone bar, the
+   open sheet and the dialogs; it never takes pointer input. */
+.undo-toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--dock-height, 0px) + var(--space-3) + var(--safe-bottom));
+  z-index: var(--layer-toast);
+  width: max-content;
+  max-width: calc(100vw - 2 * var(--page-gutter));
+  transform: translateX(-50%);
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--duration-base) var(--ease-standard);
+}
+
+.undo-toast.is-visible {
+  opacity: 1;
+  animation: undo-toast-in var(--duration-base) var(--ease-standard);
+}
+
+@keyframes undo-toast-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .undo-toast,
+  .undo-toast.is-visible {
+    transition: none;
+    animation: none;
+  }
+}

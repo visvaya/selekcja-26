@@ -70,15 +70,15 @@
       "Odwołano zawodników spoza ustawienia: 2026-10-01. Możesz to cofnąć przyciskiem „Cofnij”."
     ],
     "undo": [
-      "Cofnięto ostatnią decyzję. Powołani: 0 z 0.",
-      "Cofnięto ostatnią decyzję. Powołani: 1 z 1.",
-      "Cofnięto ostatnią decyzję. Powołani: 2 z 2.",
-      "Cofnięto ostatnią decyzję. Powołani: 5 z 5.",
-      "Cofnięto ostatnią decyzję. Powołani: 12 z 12.",
-      "Cofnięto ostatnią decyzję. Powołani: 22 z 22.",
-      "Cofnięto ostatnią decyzję. Powołani: X z X.",
-      "Cofnięto ostatnią decyzję. Powołani: Półfinał z Półfinał.",
-      "Cofnięto ostatnią decyzję. Powołani: 2026-10-01 z 2026-10-01."
+      "0 Powołani: 0 z 0.",
+      "1 Powołani: 1 z 1.",
+      "2 Powołani: 2 z 2.",
+      "5 Powołani: 5 z 5.",
+      "12 Powołani: 12 z 12.",
+      "22 Powołani: 22 z 22.",
+      "X Powołani: X z X.",
+      "Półfinał Powołani: Półfinał z Półfinał.",
+      "2026-10-01 Powołani: 2026-10-01 z 2026-10-01."
     ]
   },
   "autoFill": "Dobierz losowo",
@@ -287,7 +287,7 @@
     "risk": "Ryzyko urazu"
   },
   "eventEyebrow": "Sytuacja ze zgrupowania",
-  "eventUndo": "Cofnij ostatnie powołanie",
+  "eventUndo": "Cofnij ostatnią decyzję",
   "events": {
     "captain": {
       "choices": [
@@ -1097,6 +1097,78 @@
   },
   "understood": "Rozumiem",
   "undo": "Cofnij",
+  "undone": {
+    "callUp": [
+      "Cofnięto powołanie: 0.",
+      "Cofnięto powołanie: 1.",
+      "Cofnięto powołanie: 2.",
+      "Cofnięto powołanie: 5.",
+      "Cofnięto powołanie: 12.",
+      "Cofnięto powołanie: 22.",
+      "Cofnięto powołanie: X.",
+      "Cofnięto powołanie: Półfinał.",
+      "Cofnięto powołanie: 2026-10-01."
+    ],
+    "callUps": [
+      "Cofnięto powołanie 0 zawodników.",
+      "Cofnięto powołanie 1 zawodników.",
+      "Cofnięto powołanie 2 zawodników.",
+      "Cofnięto powołanie 5 zawodników.",
+      "Cofnięto powołanie 12 zawodników.",
+      "Cofnięto powołanie 22 zawodników.",
+      "Cofnięto powołanie X zawodników.",
+      "Cofnięto powołanie Półfinał zawodników.",
+      "Cofnięto powołanie 2026-10-01 zawodników."
+    ],
+    "completeCamp": "Cofnięto zakończenie zgrupowania.",
+    "event": [
+      "Cofnięto decyzję w zdarzeniu: 0.",
+      "Cofnięto decyzję w zdarzeniu: 1.",
+      "Cofnięto decyzję w zdarzeniu: 2.",
+      "Cofnięto decyzję w zdarzeniu: 5.",
+      "Cofnięto decyzję w zdarzeniu: 12.",
+      "Cofnięto decyzję w zdarzeniu: 22.",
+      "Cofnięto decyzję w zdarzeniu: X.",
+      "Cofnięto decyzję w zdarzeniu: Półfinał.",
+      "Cofnięto decyzję w zdarzeniu: 2026-10-01."
+    ],
+    "finish": "Cofnięto zatwierdzenie kadry turniejowej.",
+    "other": "Cofnięto ostatnią decyzję.",
+    "release": [
+      "Cofnięto odwołanie: 0.",
+      "Cofnięto odwołanie: 1.",
+      "Cofnięto odwołanie: 2.",
+      "Cofnięto odwołanie: 5.",
+      "Cofnięto odwołanie: 12.",
+      "Cofnięto odwołanie: 22.",
+      "Cofnięto odwołanie: X.",
+      "Cofnięto odwołanie: Półfinał.",
+      "Cofnięto odwołanie: 2026-10-01."
+    ],
+    "releases": [
+      "Cofnięto odwołanie 0 zawodników.",
+      "Cofnięto odwołanie 1 zawodników.",
+      "Cofnięto odwołanie 2 zawodników.",
+      "Cofnięto odwołanie 5 zawodników.",
+      "Cofnięto odwołanie 12 zawodników.",
+      "Cofnięto odwołanie 22 zawodników.",
+      "Cofnięto odwołanie X zawodników.",
+      "Cofnięto odwołanie Półfinał zawodników.",
+      "Cofnięto odwołanie 2026-10-01 zawodników."
+    ],
+    "start": "Cofnięto rozpoczęcie odprawy.",
+    "system": [
+      "Cofnięto zmianę formacji. Formacja: 0.",
+      "Cofnięto zmianę formacji. Formacja: 1.",
+      "Cofnięto zmianę formacji. Formacja: 2.",
+      "Cofnięto zmianę formacji. Formacja: 5.",
+      "Cofnięto zmianę formacji. Formacja: 12.",
+      "Cofnięto zmianę formacji. Formacja: 22.",
+      "Cofnięto zmianę formacji. Formacja: X.",
+      "Cofnięto zmianę formacji. Formacja: Półfinał.",
+      "Cofnięto zmianę formacji. Formacja: 2026-10-01."
+    ]
+  },
   "visibleCount": [
     "Widoczni: 0 z 0",
     "Widoczni: 1 z 1",

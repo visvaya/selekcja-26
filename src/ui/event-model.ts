@@ -28,13 +28,11 @@ export function effectChips(effects: Partial<Effects>): EffectChip[] {
 }
 
 export function eventOrdinal(id: EventId): {
-  atPlayers: number;
   index: number;
   total: number;
 } {
   const index = EVENTS.findIndex((event) => event.id === id);
   return {
-    atPlayers: EVENTS[index]!.atPlayers,
     index: index + 1,
     total: EVENTS.length,
   };

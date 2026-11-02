@@ -41,7 +41,9 @@ import { SquadDock } from "./squad-dock.tsx";
 import { GameActions } from "./game-actions.tsx";
 import { ReportScreen } from "./report-screen.tsx";
 import { UI_TEXT as text } from "./text.ts";
+import { summarizeUndo, undoSentence } from "./undo-summary.ts";
 import { UI_CONFIG } from "./ui-config.ts";
+import { UndoToast, type UndoMessage } from "./undo-toast.tsx";
 import { useMediaQuery } from "./use-media-query.ts";
 
 type ModalState =
@@ -152,6 +154,8 @@ export function GameApp() {
   // the live region's text content and gets read out again instead of being silently
   // skipped by React's same-value bailout.
   const [announcement, setAnnouncement] = useState("");
+  // The visible note after an undo; a new object per undo restarts its timer.
+  const [undoMessage, setUndoMessage] = useState<UndoMessage | null>(null);
   function announce(message: string) {
     flushSync(() => setAnnouncement(""));
     setAnnouncement(message);
@@ -263,11 +267,41 @@ export function GameApp() {
   }
   function undo() {
     const next = reduceGameState(state, { type: "undo" });
-    if (next !== state)
-      announce(text.announcements.undo(next.selected.size, squadLimit(next)));
-    dispatch({ type: "undo" });
-    setModal(null);
-    setExpanded(false);
+    if (next !== state) {
+      const sentence = undoSentence(summarizeUndo(state, next));
+      setUndoMessage((previous) => ({
+        id: (previous?.id ?? 0) + 1,
+        text: sentence,
+      }));
+      announce(
+        next.started
+          ? text.announcements.undo(
+              sentence,
+              next.selected.size,
+              squadLimit(next),
+            )
+          : sentence,
+      );
+    }
+    // The open sheet stays open unless the undo changes the screen.
+    const screenChanged =
+      next.stage !== state.stage ||
+      next.started !== state.started ||
+      next.report !== state.report;
+    // flushSync commits the disabled "Cofnij" before focus is checked below.
+    flushSync(() => {
+      dispatch({ type: "undo" });
+      setModal(null);
+      if (screenChanged) setExpanded(false);
+    });
+    // The clicked "Cofnij" is disabled once the history is empty: send focus that fell
+    // to the page (or stayed on the disabled button) to the board's entry.
+    const active = document.activeElement;
+    if (
+      next.history.length === 0 &&
+      (!active || active === document.body || active.matches("button:disabled"))
+    )
+      focusBoardEntry();
   }
   function clearSquad() {
     if (state.selected.size === 0) return;
@@ -457,6 +491,7 @@ export function GameApp() {
   return (
     <div className="app">
       <LiveAnnouncer message={announcement} />
+      <UndoToast message={undoMessage} />
       <SaveStatusBanner
         status={saveStatus}
         onRetry={retrySave}

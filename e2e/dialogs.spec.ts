@@ -43,7 +43,7 @@ function pitchOutsiders(page: Page): Locator {
   return page.locator(".phone-dock button.pitch-outsiders");
 }
 
-// "Cofnij" in the open sheet; undo closes the sheet, so it is opened again to read the pitch.
+// "Cofnij" in the open sheet; undo keeps the sheet open (the call reopens it if a screen change closed it).
 async function undoInSheet(page: Page): Promise<void> {
   await sheet(page).getByRole("button", { name: text.undo }).tap();
   await openBoard(page);

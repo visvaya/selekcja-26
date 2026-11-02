@@ -133,7 +133,7 @@ export const DIALOGS_TEXT = {
     chemistry: "Zgranie",
   },
   effectDirection: { up: "rośnie", down: "spada" },
-  eventUndo: "Cofnij ostatnie powołanie",
+  eventUndo: "Cofnij ostatnią decyzję",
   campReportEyebrow: "Raport po zgrupowaniu",
   campReportTitle: "Masz więcej danych. Nie wszystkie są wygodne.",
   campReportBody: (best: string, doubts: string) =>

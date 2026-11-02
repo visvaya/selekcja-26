@@ -271,9 +271,10 @@
   --side-action-height: 36px;
 
   /* Stacking order: hints over their layer, the dialog layer over the page and the phone
-     sheet. */
+     sheet, the undo note over the dialogs. */
   --layer-hint: 20;
   --layer-dialog: 50;
+  --layer-toast: 60;
 
   /* Dialogs: a 480 px panel (560 px from 1024 px) with a 3 px frame and a 5 px offset shadow;
      the drawer below 768 px is at most 600 px tall with a 4 px shadow on its top edge. The X

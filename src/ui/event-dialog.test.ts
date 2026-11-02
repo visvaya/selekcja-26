@@ -24,6 +24,7 @@ async function withEvent(
     calls: { close: number },
     fire: (target: Element, type: string, init?: object) => void,
   ) => void,
+  eventState: GameState = state,
 ): Promise<void> {
   await withJsdomWindow(async () => {
     const calls = { close: 0 };
@@ -32,7 +33,7 @@ async function withEvent(
       "EventDialog",
       {
         event,
-        state,
+        state: eventState,
         onClose: () => {
           calls.close += 1;
         },
@@ -76,6 +77,23 @@ test("the event explains when it happens and what the squad looks like now", asy
   });
 });
 
+test("the context names the real number of called-up players", async () => {
+  const full: GameState = {
+    ...base,
+    selected: new Set(players.slice(0, 23).map((player) => player.id)),
+  };
+  await withEvent(
+    scout,
+    (panel) => {
+      assert.equal(
+        panel.querySelector(".event-context")?.textContent,
+        "Przy 23 powołaniach sztab zgłasza sprawę do rozstrzygnięcia (3 z 3). Twój wybór wpłynie na ocenę całej kadry.",
+      );
+    },
+    full,
+  );
+});
+
 test("each choice lists its non-zero effects with a direction", async () => {
   await withEvent(doctor, (panel) => {
     const first = panel.querySelectorAll(".decision")[0]!;
@@ -104,7 +122,7 @@ test("the event is blocking: undo last, no X, no Escape, no scrim", async () => 
   await withEvent(doctor, (panel, calls, fire) => {
     const buttons = [...panel.querySelectorAll("button")];
     const last = buttons.at(-1)!;
-    assert.equal(last.textContent, "Cofnij ostatnie powołanie");
+    assert.equal(last.textContent, "Cofnij ostatnią decyzję");
     assert.equal(last.classList.contains("event-undo"), true);
     assert.equal(panel.querySelector(".dlg-close"), null);
     fire(panel, "keydown", { key: "Escape" });

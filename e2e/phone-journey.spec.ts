@@ -63,7 +63,7 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
   await expectFocusVisible(page, "start -> camp");
 
   // A random fill crosses every event threshold; undo inside the blocking
-  // event dialog reverts the whole fill as one step and closes the board sheet.
+  // event dialog reverts the whole fill as one step and keeps the board sheet open.
   await openBoard(page);
   await expectFocusVisible(page, "board sheet open");
   await page.getByRole("button", { name: text.autoFill }).tap();
@@ -72,8 +72,9 @@ test("full two-stage journey on a narrow phone survives reload, undo and restart
   await dialog(page).getByRole("button", { name: text.eventUndo }).tap();
   await expect(dialog(page)).toBeHidden();
   await expect(squadCount(page)).toHaveText("0/23");
-  await expect(dockToggle(page)).toHaveAttribute("aria-expanded", "false");
+  await expect(dockToggle(page)).toHaveAttribute("aria-expanded", "true");
   await expectFocusVisible(page, "random fill dialog undo (closed)");
+  await closeBoard(page);
 
   // A player with no 3-4-2-1 position keeps the outsiders strip on the pitch whatever the
   // random fill adds; the fill keeps earlier call-ups.
