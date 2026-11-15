@@ -22,7 +22,8 @@ function run(args, subject, config = {}) {
   const file = join(directory, "message.txt");
   writeFileSync(file, `${subject}\n`);
   const [hook, ...rest] = args;
-  const entries = Object.entries(config);
+  // Set first, so the repository's own config cannot change the comment prefix either.
+  const entries = [["core.commentChar", "#"], ...Object.entries(config)];
   return spawnSync(
     process.execPath,
     ["scripts/git-hooks.mjs", hook ?? "", file, ...rest],
@@ -107,6 +108,8 @@ test("the scissors line uses the last core.commentString or core.commentChar", (
   );
   // A trailing space in the prefix is part of the line.
   assert.equal(commit("// ", { "core.commentString": "// " }), 0);
+  // "auto", in any case, means "#" for the scissors line.
+  assert.equal(commit("#", { "core.commentChar": "AUTO" }), 0);
   assert.equal(commit(";"), 1);
 });
 

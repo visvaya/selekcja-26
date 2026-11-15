@@ -103,7 +103,7 @@ function scissorsLine() {
   ).stdout;
   const last = (entries ?? "").split("\n").filter(Boolean).at(-1);
   const prefix = last?.slice(last.indexOf(" ") + 1);
-  return `${prefix === undefined || prefix === "auto" ? "#" : prefix}${SCISSORS}`;
+  return `${prefix === undefined || prefix.toLowerCase() === "auto" ? "#" : prefix}${SCISSORS}`;
 }
 
 function configuredOwnerEmails() {
