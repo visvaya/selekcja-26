@@ -14,7 +14,7 @@ const ATTRIBUTION_LINES = [
   /^[\w-]+-session:/im,
 ];
 const EM_DASH = String.fromCodePoint(0x2014);
-const SCISSORS = "# ------------------------ >8 ------------------------";
+const SCISSORS = " ------------------------ >8 ------------------------";
 const EXCLUDED_FILE_NAMES = new Set([
   "AGENTS.md",
   "CLAUDE.md",
@@ -92,6 +92,16 @@ export function excludedFiles(staged) {
   });
 }
 
+// Git starts its scissors line with core.commentChar ("#" unless configured).
+function scissorsLine() {
+  try {
+    const commentChar = git(["config", "--get", "core.commentChar"]);
+    return `${commentChar.length === 1 ? commentChar : "#"}${SCISSORS}`;
+  } catch {
+    return `#${SCISSORS}`;
+  }
+}
+
 function configuredOwnerEmails() {
   try {
     return git(["config", "--get", "hooks.ownerIdentities"])
@@ -165,7 +175,9 @@ function preCommit() {
 // A pull request title becomes the squash commit on main, so it gets no exemptions.
 function commitMsg(file, { exemptGitSubjects = true, maxLength = 72 } = {}) {
   // `git commit -v` appends the diff below a scissors line; it is not part of the message.
-  const raw = readFileSync(file, "utf8").split(SCISSORS)[0] ?? "";
+  const lines = readFileSync(file, "utf8").split("\n");
+  const scissors = lines.indexOf(scissorsLine());
+  const raw = (scissors < 0 ? lines : lines.slice(0, scissors)).join("\n");
   const message = raw
     .split("\n")
     .filter((line) => !line.startsWith("#"))

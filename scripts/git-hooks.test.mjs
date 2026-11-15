@@ -61,6 +61,8 @@ test("commit-msg rejects attribution lines, em dashes and emoji for everyone", (
     `Merge branch x ${dash} y`,
     // `git commit -m` keeps lines that start with #.
     "fix: x\n\n# Generated with Some Tool",
+    // Only a whole scissors line ends the message.
+    `fix: x\n\nsee ${scissors}\nCo-authored-by: Someone <someone@example.com>`,
   ]) {
     assert.equal(run(["commit-msg"], message), 1, message);
   }
