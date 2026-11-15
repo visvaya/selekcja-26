@@ -27,7 +27,42 @@ const COLOR_LITERAL = /#[0-9a-fA-F]{3,8}\b|\b(?:rgba?|hsla?|oklch|oklab)\(/;
 const INLINE_STYLE = /style=\{\{([^}]*)\}\}/g;
 const ABSOLUTE_PATH = /["'`](?:[A-Za-z]:[\\/]|\/home\/|\/Users\/)/;
 const CODE_FILE = /\.(?:[cm]?js|jsx|ts|tsx)$/;
-const SIZE_LITERAL = /(?<![\w.])-?\d*\.?\d+(?:px|r?em|ch|[sdl]?v[hw])\b/g;
+// Length units of CSS Values and Units Level 4 (font-relative, viewport, container, absolute).
+// Matched case-insensitively, so "q" also covers the spec's "Q".
+const CSS_LENGTH_UNITS = [
+  "em",
+  "rem",
+  "ex",
+  "rex",
+  "cap",
+  "rcap",
+  "ch",
+  "rch",
+  "ic",
+  "ric",
+  "lh",
+  "rlh",
+  ...["", "s", "l", "d"].flatMap((prefix) =>
+    ["vw", "vh", "vi", "vb", "vmin", "vmax"].map((unit) => prefix + unit),
+  ),
+  "cqw",
+  "cqh",
+  "cqi",
+  "cqb",
+  "cqmin",
+  "cqmax",
+  "px",
+  "cm",
+  "mm",
+  "q",
+  "in",
+  "pt",
+  "pc",
+];
+const SIZE_LITERAL = new RegExp(
+  String.raw`(?<![\w.])-?\d*\.?\d+(?:${CSS_LENGTH_UNITS.join("|")})\b`,
+  "gi",
+);
 const LEGACY_CSS = "src/ui/styles/legacy.css";
 // Literal sizes in LEGACY_CSS outside custom property definitions, counted 2026-11-15. New
 // rules take sizes from tokens; when a literal goes, lower this count with it.

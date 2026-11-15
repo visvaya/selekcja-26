@@ -24,3 +24,17 @@ test("a new literal size fails and asks for a token", () => {
 test("a removed literal size asks to lower the recorded count", () => {
   assert.match(legacySizeProblems(CSS, 4)[0] ?? "", /lower .* to 3/);
 });
+
+test("counts every CSS length unit, not only the common ones", () => {
+  const css = [
+    ".b {",
+    "  width: 50vmin;",
+    "  height: 2LH;",
+    "  border-width: 1pt 1Q 1mm 1in;",
+    "  inline-size: 40cqi;",
+    "  block-size: 90dvb;",
+    "  line-height: 1.5;",
+    "}",
+  ].join("\n");
+  assert.deepEqual(legacySizeProblems(css, 8), []);
+});
