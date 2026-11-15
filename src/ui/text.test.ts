@@ -122,7 +122,7 @@ function snapshotValue(value: unknown): unknown {
 test("the UI text matches the committed snapshot", async () => {
   const { readFile, writeFile } = await import("node:fs/promises");
   const actual = snapshotValue(text);
-  if (process.env.UPDATE_TEXT_SNAPSHOT === "1")
+  if (process.env["UPDATE_TEXT_SNAPSHOT"] === "1")
     await writeFile(
       SNAPSHOT_URL,
       `${JSON.stringify(actual, null, 2)}

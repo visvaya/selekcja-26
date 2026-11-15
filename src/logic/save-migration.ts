@@ -95,12 +95,12 @@ const idsFor = (names: unknown): unknown =>
   Array.isArray(names) ? names.map(idFor) : names;
 
 function migrateReport(report: unknown): unknown {
-  if (!isRecord(report) || !Array.isArray(report.s)) return report;
+  if (!isRecord(report) || !Array.isArray(report["s"])) return report;
   const { s: squad, ...rest } = report;
   return {
     ...rest,
     rulesRevision: LEGACY_RULES_REVISION,
-    squadIds: squad.map((player) => idFor(isRecord(player) && player.name)),
+    squadIds: squad.map((player) => idFor(isRecord(player) && player["name"])),
   };
 }
 
@@ -109,21 +109,21 @@ function migrateSnapshot(snapshot: unknown): unknown {
 }
 
 function migrateSnapshotRecord(snapshot: RawRecord): RawRecord {
-  const trial = isRecord(snapshot.trial)
+  const trial = isRecord(snapshot["trial"])
     ? Object.fromEntries(
-        Object.entries(snapshot.trial).map(([name, result]) => [
+        Object.entries(snapshot["trial"]).map(([name, result]) => [
           idFor(name),
           result,
         ]),
       )
-    : snapshot.trial;
+    : snapshot["trial"];
   return {
     ...snapshot,
-    selected: idsFor(snapshot.selected),
-    campSquad: idsFor(snapshot.campSquad),
-    compare: idsFor(snapshot.compare),
+    selected: idsFor(snapshot["selected"]),
+    campSquad: idsFor(snapshot["campSquad"]),
+    compare: idsFor(snapshot["compare"]),
     trial,
-    report: migrateReport(snapshot.report),
+    report: migrateReport(snapshot["report"]),
   };
 }
 
@@ -138,9 +138,9 @@ export function migrateLegacyState(
     const history =
       schemaVersion === 1
         ? []
-        : Array.isArray(state.history)
-          ? state.history.map(migrateSnapshot)
-          : state.history;
+        : Array.isArray(state["history"])
+          ? state["history"].map(migrateSnapshot)
+          : state["history"];
     return { ...migrateSnapshotRecord(state), history };
   } catch (error) {
     if (error instanceof LegacyNameError) return null;
@@ -170,17 +170,17 @@ function dropKeys(snapshot: RawRecord): RawRecord {
 export function migrateV3State(state: unknown): unknown {
   if (!isRecord(state)) return null;
   const list = {
-    positions: state.filter === "ALL" ? [] : [state.filter],
-    query: state.query,
-    sort: state.sort,
+    positions: state["filter"] === "ALL" ? [] : [state["filter"]],
+    query: state["query"],
+    sort: state["sort"],
     foot: { left: false, right: false },
     traits: [],
     ranges: {},
     onlySelected: false,
     onlyCamp: false,
   };
-  const history = Array.isArray(state.history)
-    ? state.history.map(withoutDroppedKeys)
-    : state.history;
+  const history = Array.isArray(state["history"])
+    ? state["history"].map(withoutDroppedKeys)
+    : state["history"];
   return { ...dropKeys(state), list, history };
 }

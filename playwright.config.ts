@@ -13,7 +13,7 @@ const visualProject = {
   testMatch: /visual/,
   use: { ...devices["Desktop Chrome"] },
 };
-const runVisual = Boolean(process.env.CI || process.env.VISUAL);
+const runVisual = Boolean(process.env["CI"] || process.env["VISUAL"]);
 
 // On Linux (the CI image) the browsers get e2e/fonts.conf, so generic sans-serif text renders in
 // a face with bold and Polish letters. Other systems keep their own font setup.
@@ -34,12 +34,16 @@ export default defineConfig({
   // Each spec walks a complete two-stage game, so allow more than the 30 s default.
   timeout: 120_000,
   fullyParallel: true,
-  forbidOnly: Boolean(process.env.CI),
-  retries: process.env.CI ? 1 : 0,
-  reporter: process.env.CI ? [["list"], ["html", { open: "never" }]] : "list",
+  forbidOnly: Boolean(process.env["CI"]),
+  retries: process.env["CI"] ? 1 : 0,
+  reporter: process.env["CI"]
+    ? [["list"], ["html", { open: "never" }]]
+    : "list",
   snapshotPathTemplate: "{testDir}/screenshots/{arg}-{platform}{ext}",
   updateSnapshots:
-    process.env.CI && !process.env.UPDATE_SCREENSHOTS ? "none" : "missing",
+    process.env["CI"] && !process.env["UPDATE_SCREENSHOTS"]
+      ? "none"
+      : "missing",
   use: {
     baseURL: `http://127.0.0.1:${PORT}`,
     locale: "pl-PL",
