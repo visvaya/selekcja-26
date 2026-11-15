@@ -1,0 +1,95 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# Pull request review settings. Defaults apply to everything not listed here.
+language: en-US
+tone_instructions: >-
+  Plain, short English. No emoji and no ASCII art; state the problem, its effect and the fix.
+chat:
+  art: false
+reviews:
+  profile: chill
+  # The pull request description is the author's text; the summary goes to the walkthrough comment.
+  high_level_summary_in_walkthrough: true
+  poem: false
+  in_progress_fortune: false
+  # One maintainer: no reviewer suggestions.
+  suggested_reviewers: false
+  # `CodeRabbit` status: pending while the review runs, success when it ends, is skipped or rate limited,
+  # failure when the review stops on an error.
+  commit_status: true
+  fail_commit_status: true
+  pre_merge_checks:
+    # The project has no docstring rule; the check only adds a warning to every pull request.
+    docstrings:
+      mode: "off"
+    title:
+      mode: warning
+      requirements: >-
+        Conventional Commits: type(scope): subject, with type one of feat, fix, docs, style, refactor, perf,
+        test, build, ci, chore, revert and an optional lower-case scope; the subject in the imperative mood,
+        at most 72 characters. The squash merge turns the title into the commit on the base branch.
+    custom_checks:
+      - name: Checks stated
+        mode: warning
+        instructions: >-
+          Pass when the pull request description names the checks that were run and states what was not
+          checked or not run (a section saying nothing was left out counts). Fail when it claims checks passed
+          without naming them.
+  auto_review:
+    # Keep reviewing every push: a paused review still reports a green status.
+    auto_pause_after_reviewed_commits: 0
+    # Pull requests into long-lived integration branches (redesign stages) are reviewed too, not only those
+    # into the default branch.
+    base_branches:
+      - "^redesign/.*"
+  # The gate runs these on every pull request with the project's pinned versions and configs (oxlint, the
+  # formatter, gitleaks); the copies here would repeat its findings. There is no Biome or ESLint config.
+  tools:
+    oxc:
+      enabled: false
+    biome:
+      enabled: false
+    eslint:
+      enabled: false
+    gitleaks:
+      enabled: false
+  # Generated or frozen files: their diffs are reviewed through the change that produced them.
+  path_filters:
+    - "!**/pnpm-lock.yaml"
+    - "!src/logic/golden/traces/**"
+    - "!e2e/screenshots/**"
+  path_instructions:
+    - path: "**"
+      instructions: >-
+        Project rules: no em dash (U+2014) or emoji in any file or commit; code, comments, commits and
+        documentation in English, the game's interface in Polish and only in src/ui/text.ts and src/ui/text/.
+        File names in kebab-case. Lean code: reuse existing helpers, no option or abstraction without a
+        current user. No classes except React error boundaries and Error subclasses. Prefix comments on
+        problems this pull request did not cause with "Pre-existing:". Do not comment on what the gate
+        already enforces: types (tsc strict), lint (oxlint), formatting, text rules (check:text: em dash,
+        emoji), conventions (check:conventions: colours only in :root, kebab-case, no classes), duplication
+        (jscpd), dead code (knip), coverage floors, the golden master, browser journeys with axe, the
+        contrast test, secret scan (gitleaks).
+    - path: "src/{logic,data}/**"
+      instructions: >-
+        Pure functions only: no React, DOM, storage, network, clock or Math.random; randomness comes from the
+        seeded generator in src/logic/random.ts. The reducer in src/logic/state.ts never mutates a Set or an
+        object in place. Rule constants live in src/data/constants.ts with the unit in the name. Logic holds
+        no Polish sentences; texts are passed in from the UI. Changing thresholds, quotas, ratings, formations,
+        events, scoring or tournament outcomes is a product decision: flag it, and note that a change of the
+        result for the same seed and decisions needs a RULES_REVISION bump, a changelog entry and an
+        explained golden trace update. Player IDs (player.id) never change.
+    - path: "src/logic/{storage,save-format,save-migration}.ts"
+      instructions: >-
+        Saves carry schemaVersion and rulesRevision; every shape change is validated and migrated explicitly
+        step by step, and an older save must keep loading. A save that is invalid as a whole starts a new
+        game; nothing else may drop or rename a stored save.
+    - path: "src/ui/**"
+      instructions: >-
+        Components below game-app.tsx receive data and callbacks and do not dispatch, save or announce.
+        Styles only from tokens in src/ui/styles/tokens.css; inline styles only for data-driven custom
+        properties. Keep keyboard use, visible focus, the focus trap in dialogs, accessible names and the
+        aria-pressed and aria-expanded states.
+knowledge_base:
+  # What the bot learns here stays in this repository.
+  learnings:
+    scope: local
