@@ -40,6 +40,6 @@ for (const workflow of BROWSER_WORKFLOWS) {
       text,
       /image: \$\{\{ needs\.playwright-image\.outputs\.image \}\}/,
     );
-    assert.doesNotMatch(text, /mcr\.microsoft\.com\/playwright/);
+    assert.equal(text.includes("mcr.microsoft.com/playwright"), false);
   });
 }

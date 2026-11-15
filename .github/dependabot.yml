@@ -34,6 +34,8 @@ updates:
       day: monday
       timezone: Europe/Warsaw
     open-pull-requests-limit: 5
+    # Keeps the exact versions in package.json exact instead of widening them to ranges.
+    versioning-strategy: increase
     cooldown:
       default-days: 7
     commit-message:
@@ -70,6 +72,7 @@ updates:
     directory: /
     patterns: ["@playwright/test"]
     multi-ecosystem-group: playwright
+    versioning-strategy: increase
     cooldown:
       default-days: 7
   - package-ecosystem: docker
