@@ -10,11 +10,6 @@ on:
 permissions:
   contents: read
 
-# Not cancelled: any later label event on the pull request would cancel a running regeneration.
-concurrency:
-  group: visual-baselines-${{ github.ref }}
-  cancel-in-progress: false
-
 jobs:
   playwright-image:
     name: playwright-image
@@ -24,6 +19,11 @@ jobs:
   baselines:
     name: baselines
     needs: playwright-image
+    # On the job, so label events that skip it never join the group and cannot replace a
+    # waiting regeneration; not cancelled, so a running one finishes.
+    concurrency:
+      group: visual-baselines-${{ github.ref }}
+      cancel-in-progress: false
     # Same image as ci.yml, so baselines render with the fonts the journeys see.
     container:
       # Digest-pinned: playwright-image.yml rejects any other reference.

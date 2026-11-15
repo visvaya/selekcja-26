@@ -198,17 +198,18 @@ jobs:
       - name: The site serves this build
         if: steps.deploy.outputs.deployed == 'true'
         run: |
-          # The new version can take a few seconds to reach every edge location.
-          for attempt in 1 2 3 4 5 6 7 8 9 10 11 12; do
-            if curl -sSf -o "$RUNNER_TEMP/served.html" "$SITE_URL/" &&
-              cmp -s "$RUNNER_TEMP/served.html" dist/index.html; then
-              echo "Attempt $attempt: the served index.html is this build's."
-              exit 0
+          # The new version can take a few seconds to reach every edge location. Each request is
+          # bounded, so a stalled one cannot hold the production lock past the 2-minute budget.
+          deadline=$((SECONDS + 120))
+          until curl -sSf --connect-timeout 5 --max-time 10 -o "$RUNNER_TEMP/served.html" "$SITE_URL/" &&
+            cmp -s "$RUNNER_TEMP/served.html" dist/index.html; do
+            if [ "$SECONDS" -ge "$deadline" ]; then
+              echo "::error::$SITE_URL/ does not serve this build's index.html after 2 minutes."
+              exit 1
             fi
             sleep 10
           done
-          echo "::error::$SITE_URL/ does not serve this build's index.html after 2 minutes."
-          exit 1
+          echo "The served index.html is this build's."
       - name: Response headers and indexing policy
         if: steps.deploy.outputs.deployed == 'true'
         run: node scripts/check-live-headers.mjs "$SITE_URL"
