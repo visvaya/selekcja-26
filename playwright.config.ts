@@ -35,7 +35,10 @@ export default defineConfig({
   timeout: 120_000,
   fullyParallel: true,
   forbidOnly: Boolean(process.env["CI"]),
+  // The retry keeps the report of a second attempt, but a test that passes only on it still
+  // fails the run, so a flaky test is seen and fixed instead of hidden.
   retries: process.env["CI"] ? 1 : 0,
+  failOnFlakyTests: Boolean(process.env["CI"]),
   reporter: process.env["CI"]
     ? [["list"], ["html", { open: "never" }]]
     : "list",
