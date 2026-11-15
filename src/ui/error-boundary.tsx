@@ -31,12 +31,12 @@ export class ErrorBoundary extends Component<
     return { hasError: true };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
+  override componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     // oxlint-disable-next-line no-console -- only surviving trace of a caught render error.
     console.error(error, errorInfo.componentStack);
   }
 
-  componentDidUpdate(
+  override componentDidUpdate(
     _prevProps: ErrorBoundaryProps,
     prevState: ErrorBoundaryState,
   ): void {
@@ -45,7 +45,7 @@ export class ErrorBoundary extends Component<
     }
   }
 
-  componentDidMount(): void {
+  override componentDidMount(): void {
     if (this.state.hasError) {
       this.headingRef.current?.focus();
     }
@@ -59,7 +59,7 @@ export class ErrorBoundary extends Component<
     window.location.assign(buildResetUrl(window.location.href));
   };
 
-  render(): ReactNode {
+  override render(): ReactNode {
     if (!this.state.hasError) {
       return this.props.children;
     }
