@@ -1,4 +1,4 @@
-// Shared Git hook logic for people, Codex and Claude Code. Invoked by .githooks/*.
+// Shared Git hook logic. Invoked by .githooks/*.
 // Usage: node scripts/git-hooks.mjs pre-commit
 //        node scripts/git-hooks.mjs commit-msg <message-file>
 import { execFileSync, spawnSync } from "node:child_process";

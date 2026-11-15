@@ -11,9 +11,6 @@ import { basename } from "node:path";
 
 const TOOL_MANDATED_NAMES = new Set([
   "README.md",
-  "AGENTS.md",
-  "CLAUDE.md",
-  "SKILL.md",
   "LICENSE",
   "SECURITY.md",
   "_headers",
