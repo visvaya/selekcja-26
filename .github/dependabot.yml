@@ -7,8 +7,11 @@ version: 2
 # after a version is published before proposing it.
 #
 # @playwright/test and the Playwright image the browser jobs run in
-# (.github/playwright/Dockerfile) must move together, so they share one
+# (docker/playwright/Dockerfile) must move together, so they share one
 # multi-ecosystem group and the regular npm entry ignores the package.
+# The Dockerfile stays outside .github/: Dependabot may change files there
+# only for the github-actions ecosystem, so a docker update under .github/
+# is refused when the pull request is created.
 multi-ecosystem-groups:
   playwright:
     schedule:
@@ -63,7 +66,7 @@ updates:
     cooldown:
       default-days: 7
   - package-ecosystem: docker
-    directory: /.github/playwright
+    directory: /docker/playwright
     patterns: ["*"]
     multi-ecosystem-group: playwright
     cooldown:
