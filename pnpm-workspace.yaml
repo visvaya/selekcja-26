@@ -10,3 +10,7 @@ minimumReleaseAgeExclude:
   - postcss@8.5.33
 # Fails an install when a package version has weaker trust evidence than earlier releases.
 trustPolicy: no-downgrade
+# Types only, reached through remark-cli and @types/node 22. Published after a provenance-attested
+# 7.x release, so trustPolicy: no-downgrade reports it as a downgrade.
+trustPolicyExclude:
+  - undici-types@6.21.0
