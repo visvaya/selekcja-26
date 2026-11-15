@@ -41,10 +41,11 @@
     "check:links": "remark --quiet --frail --no-stdout README.md CONTRIBUTING.md SECURITY.md .github",
     "quality:duplicates": "jscpd .",
     "quality:dead": "cross-env KNIP_DISABLE_RAW_TRANSFER=1 knip",
-    "quality": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm check:text && pnpm check:conventions && pnpm check:links",
+    "quality": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm lint:md && pnpm check:text && pnpm check:conventions && pnpm check:links",
     "verify": "pnpm quality && pnpm quality:duplicates && pnpm quality:dead && pnpm test:coverage && pnpm build && git diff --check",
     "verify:full": "pnpm verify && pnpm test:e2e",
-    "prepare": "node scripts/install-git-hooks.mjs"
+    "prepare": "node scripts/install-git-hooks.mjs",
+    "lint:md": "markdownlint-cli2 \"**/*.md\""
   },
   "engines": {
     "node": ">=24.2"
@@ -66,6 +67,7 @@
     "jscpd": "5.4.2",
     "jsdom": "31.0.0",
     "knip": "6.44.2",
+    "markdownlint-cli2": "0.24.0",
     "oxlint": "1.92.0",
     "prettier": "3.9.10",
     "remark-cli": "12.0.1",
