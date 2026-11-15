@@ -8,8 +8,8 @@ on:
 permissions:
   contents: read
 
-# A newer push to a pull request cancels its older run. Runs on main are never cancelled, so a
-# deploy is never cut off; a newer main run waits for the one before it.
+# A newer push to a pull request cancels its older run. A running main run is never cancelled;
+# a waiting one gives way to a newer push.
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -44,7 +44,7 @@ jobs:
       - name: No known vulnerabilities in production dependencies
         run: pnpm audit --prod
       - name: Known vulnerabilities in all dependencies (information only)
-        run: pnpm audit || echo "::warning::pnpm audit reports vulnerable development dependencies."
+        run: pnpm audit || echo "::warning::pnpm audit failed or reported vulnerabilities; see the log."
       - name: Static checks, unit tests with coverage, build
         run: pnpm verify
       - name: Browser journeys and accessibility scan
@@ -74,6 +74,9 @@ jobs:
     name: hygiene
     runs-on: ubuntu-24.04
     timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: read # reads the current pull request title
     # Hand-pinned tools, checked weekly against their latest releases (tool-freshness.yml).
     env:
       ACTIONLINT_VERSION: 1.7.12
@@ -90,15 +93,18 @@ jobs:
           node-version: 24
           check-latest: true
           package-manager-cache: false
-      # The title becomes the squash commit on main, so it passes the same checks as a commit
-      # message: the commit-msg hook and the em dash and emoji scan.
+      # The title becomes the squash commit on main, so it passes the commit message rules
+      # without the exemptions for subjects Git writes, and the em dash and emoji scan. It is
+      # read live, so re-running this job after a title edit checks the current title.
       - name: Pull request title is a valid commit subject
         if: github.event_name == 'pull_request'
         env:
-          PR_TITLE: ${{ github.event.pull_request.title }}
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
         run: |
-          printf '%s\n' "$PR_TITLE" > "$RUNNER_TEMP/pr-title.txt"
-          node scripts/git-hooks.mjs commit-msg "$RUNNER_TEMP/pr-title.txt"
+          gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" --jq .title > "$RUNNER_TEMP/pr-title.txt"
+          node scripts/git-hooks.mjs pr-title "$RUNNER_TEMP/pr-title.txt" "$PR_AUTHOR"
           node scripts/check-text.mjs "$RUNNER_TEMP/pr-title.txt"
       - name: Workflows pass actionlint
         if: ${{ !cancelled() }}

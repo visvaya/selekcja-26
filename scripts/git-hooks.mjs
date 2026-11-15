@@ -1,6 +1,7 @@
 // Shared Git hook logic. Invoked by .githooks/*.
 // Usage: node scripts/git-hooks.mjs pre-commit
 //        node scripts/git-hooks.mjs commit-msg <message-file>
+//        node scripts/git-hooks.mjs pr-title <title-file> <author-login>
 import { execFileSync, spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 
@@ -81,27 +82,39 @@ function preCommit() {
   if (conventions.status !== 0) fail("Repository conventions are violated.");
 }
 
-function commitMsg(file) {
+// A pull request title becomes the squash commit on main, so it gets no exemptions.
+function commitMsg(file, { exemptGitSubjects = true, maxLength = 72 } = {}) {
   const message = readFileSync(file, "utf8")
     .split("\n")
     .filter((line) => !line.startsWith("#"))
     .join("\n")
     .trim();
   const subject = message.split("\n")[0] ?? "";
-  if (/^(Merge|Revert) /.test(subject) || /^(fixup|squash)! /.test(subject))
+  if (
+    exemptGitSubjects &&
+    (/^(Merge|Revert) /.test(subject) || /^(fixup|squash)! /.test(subject))
+  )
     return;
   if (!CONVENTIONAL.test(subject))
     fail(
       `Subject "${subject}" is not a Conventional Commit, e.g. "fix(storage): report failed saves".`,
     );
-  if (subject.length > 72)
-    fail(`Subject is ${subject.length} characters; keep it at 72 or fewer.`);
+  if (subject.length > maxLength)
+    fail(
+      `Subject is ${subject.length} characters; keep it at ${maxLength} or fewer.`,
+    );
   if (AI_ATTRIBUTION.some((pattern) => pattern.test(message)))
     fail("Remove AI authorship or attribution lines from the commit message.");
   if (EMOJI.test(message)) fail("Remove emoji from the commit message.");
 }
 
-const [hook, argument] = process.argv.slice(2);
+const [hook, argument, author] = process.argv.slice(2);
 if (hook === "pre-commit") preCommit();
 else if (hook === "commit-msg" && argument) commitMsg(argument);
+else if (hook === "pr-title" && argument)
+  // Dependabot titles can exceed 72 characters; whoever merges sets the squash subject.
+  commitMsg(argument, {
+    exemptGitSubjects: false,
+    maxLength: author === "dependabot[bot]" ? Infinity : 72,
+  });
 else fail(`Unknown hook invocation: ${process.argv.slice(2).join(" ")}`);

@@ -1,6 +1,7 @@
 version: 2
 
 # Weekly, grouped updates keep the PR count low on a single-maintainer repo.
+# Short group names keep the pull request titles, which CI checks, short.
 # Security updates are not grouped here: they arrive on their own as soon as
 # an advisory lands, independent of this schedule. `cooldown` waits a week
 # after a version is published before proposing it.
@@ -32,10 +33,10 @@ updates:
     ignore:
       - dependency-name: "@playwright/test"
     groups:
-      production-minor-patch:
+      prod:
         dependency-type: production
         update-types: [minor, patch]
-      development-minor-patch:
+      dev:
         dependency-type: development
         update-types: [minor, patch]
   # Workflows pin actions to commit SHAs with the exact release as a comment
