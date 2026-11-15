@@ -22,6 +22,16 @@ test("a path gets the headers of every rule that matches it", () => {
   });
 });
 
+test("a header set by two matching rules is expected with both values joined", () => {
+  const rules = [
+    { pattern: "/*", headers: { "Cache-Control": "public" } },
+    { pattern: "/assets/*", headers: { "Cache-Control": "immutable" } },
+  ];
+  assert.deepEqual(expectedHeaders(rules, "/assets/a.js"), {
+    "Cache-Control": "public, immutable",
+  });
+});
+
 test("probes the start page and one linked path per pattern", () => {
   const html =
     '<script src="/assets/index-a1.js"></script><link href="/assets/index-b2.css"><a href="//other.example/x">';
@@ -90,4 +100,22 @@ test("robots.txt blocks the site only when all crawlers are disallowed from /", 
     false,
   );
   assert.equal(robotsDisallowsRoot(""), false);
+});
+
+test("robots.txt rules follow RFC 9309 matching and precedence", () => {
+  assert.equal(robotsDisallowsRoot("User-agent: *\nDisallow: /*$"), true);
+  assert.equal(
+    robotsDisallowsRoot("User-agent: *\nDisallow: /\nAllow: /"),
+    false,
+  );
+  assert.equal(
+    robotsDisallowsRoot("User-agent: *\nAllow: /\nDisallow: /*"),
+    true,
+  );
+  assert.equal(
+    robotsDisallowsRoot(
+      "User-agent: *\nDisallow: /\n\nUser-agent: *\nAllow: /$",
+    ),
+    false,
+  );
 });

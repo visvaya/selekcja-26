@@ -55,5 +55,6 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: pnpm exec wrangler rollback "$VERSION_ID" --message "Rollback from workflow run $GITHUB_RUN_ID" --yes
+      # Compares against main's current public/_headers, not the restored version's.
       - name: Response headers and indexing policy
         run: node scripts/check-live-headers.mjs "$SITE_URL"

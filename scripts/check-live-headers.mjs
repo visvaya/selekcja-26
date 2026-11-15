@@ -19,18 +19,23 @@ function matches(pattern, path) {
 }
 
 /**
- * Headers for a path: Cloudflare applies every rule whose pattern matches it.
+ * Headers for a path: Cloudflare applies every rule whose pattern matches it and joins the
+ * values of a header set by more than one rule with ", ".
  * @param {HeaderRule[]} rules
  * @param {string} path
  * @returns {Record<string, string>}
  */
 export function expectedHeaders(rules, path) {
-  return Object.assign(
-    {},
-    ...rules
-      .filter((rule) => matches(rule.pattern, path))
-      .map((rule) => rule.headers),
-  );
+  return rules
+    .filter((rule) => matches(rule.pattern, path))
+    .flatMap((rule) => Object.entries(rule.headers))
+    .reduce((/** @type {Record<string, string>} */ result, [name, value]) => {
+      const earlier = result[name];
+      return {
+        ...result,
+        [name]: earlier === undefined ? value : `${earlier}, ${value}`,
+      };
+    }, {});
 }
 
 /**
@@ -125,14 +130,23 @@ export function robotsDisallowsRoot(text) {
     },
     [],
   );
-  return groups.some(
-    (group) =>
-      group.agents.includes("*") &&
-      group.rules.some(
-        ({ field, value }) =>
-          field === "disallow" && (value === "/" || value === "/*"),
-      ),
-  );
+  // RFC 9309: rules matching the path compete, the longest wins and Allow wins a tie. A rule
+  // matches `/` when it is `/` or `*` once its wildcards and end anchor are removed.
+  const [winner] = groups
+    .filter((group) => group.agents.includes("*"))
+    .flatMap((group) => group.rules)
+    .filter(
+      ({ field, value }) =>
+        (field === "allow" || field === "disallow") &&
+        value !== "" &&
+        ["", "/"].includes(value.replace(/[$]$/, "").replaceAll("*", "")),
+    )
+    .sort(
+      (a, b) =>
+        b.value.length - a.value.length ||
+        Number(a.field === "disallow") - Number(b.field === "disallow"),
+    );
+  return winner?.field === "disallow";
 }
 
 /** @param {URL} url */
