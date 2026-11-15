@@ -30,10 +30,15 @@ export function expectedHeaders(rules, path) {
     .filter((rule) => matches(rule.pattern, path))
     .flatMap((rule) => Object.entries(rule.headers))
     .reduce((/** @type {Record<string, string>} */ result, [name, value]) => {
-      const earlier = result[name];
+      // Header names are case-insensitive; the first spelling is kept.
+      const key =
+        Object.keys(result).find(
+          (existing) => existing.toLowerCase() === name.toLowerCase(),
+        ) ?? name;
+      const earlier = result[key];
       return {
         ...result,
-        [name]: earlier === undefined ? value : `${earlier}, ${value}`,
+        [key]: earlier === undefined ? value : `${earlier}, ${value}`,
       };
     }, {});
 }

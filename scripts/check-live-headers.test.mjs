@@ -32,6 +32,16 @@ test("a header set by two matching rules is expected with both values joined", (
   });
 });
 
+test("header names are joined regardless of their case", () => {
+  const rules = [
+    { pattern: "/*", headers: { "cache-control": "public" } },
+    { pattern: "/assets/*", headers: { "Cache-Control": "immutable" } },
+  ];
+  assert.deepEqual(expectedHeaders(rules, "/assets/a.js"), {
+    "cache-control": "public, immutable",
+  });
+});
+
 test("probes the start page and one linked path per pattern", () => {
   const html =
     '<script src="/assets/index-a1.js"></script><link href="/assets/index-b2.css"><a href="//other.example/x">';

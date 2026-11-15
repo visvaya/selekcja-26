@@ -1,7 +1,8 @@
 name: Tool freshness
 
 # Dependabot does not see tools pinned by version and checksum in workflow env, so this compares
-# each of them with its latest release every week and fails when one is behind.
+# each of them every week with its newest stable release that is at least 3 days old (the
+# release-age rule) and fails when the pin differs.
 on:
   schedule:
     - cron: "17 6 * * 1" # Monday 06:17 UTC
@@ -29,24 +30,22 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           status=0
+          cutoff=$(date -u -d "3 days ago" +%Y-%m-%dT%H:%M:%SZ)
           check() {
-            local variable=$1 repository=$2 file=$3 pinned release latest age_days
+            local variable=$1 repository=$2 file=$3 pinned due
             pinned=$(sed -n "s/^ *${variable}: *//p" "$file" | head -n 1)
-            if ! release=$(gh release view --repo "$repository" --json tagName,publishedAt \
-              --jq '.tagName + " " + .publishedAt'); then
-              echo "::error::Could not read the latest release of $repository."
+            if ! due=$(gh release list --repo "$repository" --exclude-pre-releases --exclude-drafts \
+              --limit 30 --json tagName,publishedAt \
+              --jq "[.[] | select(.publishedAt <= \"$cutoff\")] | sort_by(.publishedAt) | last | .tagName // empty") ||
+              [ -z "$due" ]; then
+              echo "::error::Could not read the releases of $repository."
               exit 2
             fi
-            latest=${release%% *}
-            latest=${latest#v}
-            age_days=$(( ($(date +%s) - $(date -d "${release#* }" +%s)) / 86400 ))
-            if [ "$pinned" = "$latest" ]; then
-              echo "$variable $pinned is the latest release."
-            elif [ "$age_days" -lt 3 ]; then
-              # Release-age rule: a release is adopted once it is at least 3 days old.
-              echo "$variable $pinned; $latest is only $age_days day(s) old, so it is not due yet."
+            due=${due#v}
+            if [ "$pinned" = "$due" ]; then
+              echo "$variable $pinned is the newest release at least 3 days old."
             else
-              echo "::error file=$file::$variable is '$pinned', the latest release of $repository is $latest; update it and its checksum."
+              echo "::error file=$file::$variable is '$pinned', the newest release of $repository at least 3 days old is $due; update it and its checksum."
               status=1
             fi
           }
