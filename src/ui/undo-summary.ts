@@ -71,7 +71,10 @@ export function undoSentence(summary: UndoSummary): string {
       return copy.release(summary.name);
     case "releases":
       return copy.releases(summary.count);
-    default:
+    case "finish":
+    case "completeCamp":
+    case "start":
+    case "other":
       return copy[summary.kind];
   }
 }

@@ -3,11 +3,13 @@
   "plugins": ["typescript", "unicorn", "oxc", "react", "jsx-a11y", "import"],
   "categories": {
     "correctness": "error",
-    "suspicious": "warn"
+    "suspicious": "error",
+    "perf": "error"
   },
   "options": {
     "typeAware": true,
-    "denyWarnings": true
+    "denyWarnings": true,
+    "reportUnusedDisableDirectives": "error"
   },
   "env": {
     "browser": true,
@@ -35,7 +37,7 @@
     // switches and effect cleanups.
     "typescript/consistent-return": "off",
     "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "warn",
+    "react-hooks/exhaustive-deps": "error",
     "react/react-in-jsx-scope": "off",
     "react/exhaustive-effect-dependencies": "off",
     "jsx-a11y/prefer-tag-over-role": "off",
@@ -43,8 +45,27 @@
     "jsx-a11y/control-has-associated-label": "off",
     "unicorn/no-array-sort": "off",
     "unicorn/consistent-function-scoping": "off",
+    // Lists keyed by index are rendered once from immutable data and never reordered.
+    "react/no-array-index-key": "off",
+    // The suggested fixes mutate (Object.assign, push); the project builds new objects and
+    // arrays instead, and the spread inputs are a handful of items.
+    "oxc/no-map-spread": "off",
+    "oxc/no-accumulating-spread": "off",
+    "typescript/no-misused-promises": "error",
+    "typescript/no-deprecated": "error",
+    "typescript/only-throw-error": "error",
+    "typescript/prefer-promise-reject-errors": "error",
+    "typescript/use-unknown-in-catch-callback-variable": "error",
+    "typescript/switch-exhaustiveness-check": "error",
+    // Size limits at the measured maximum (2026-11-15); lower them when a refactor allows.
+    "complexity": ["error", { "max": 18 }],
+    "max-lines-per-function": ["error", { "max": 206 }],
+    "max-depth": ["error", { "max": 3 }],
+    "max-params": ["error", { "max": 5 }],
+    "max-nested-callbacks": ["error", { "max": 2 }],
+    "max-lines": ["error", { "max": 559 }],
     "import/no-unassigned-import": [
-      "warn",
+      "error",
       {
         "allow": ["**/*.css"]
       }
@@ -89,6 +110,38 @@
       "files": ["src/**/*.test.ts"],
       "rules": {
         "no-restricted-imports": "off"
+      }
+    },
+    {
+      // Tests drive the UI step by step, so awaits in loops are sequential on purpose.
+      "files": ["**/*.test.ts", "**/*.test.mjs", "e2e/**"],
+      "rules": {
+        "no-await-in-loop": "off",
+        "max-lines-per-function": ["error", { "max": 245 }],
+        "max-nested-callbacks": ["error", { "max": 5 }],
+        "max-lines": ["error", { "max": 852 }]
+      }
+    },
+    {
+      // Outliers above the limits: the game reducer's action switch.
+      "files": ["src/logic/state.ts"],
+      "rules": {
+        "complexity": ["error", { "max": 32 }]
+      }
+    },
+    {
+      // Outliers above the limits: the root UI container.
+      "files": ["src/ui/game-app.tsx"],
+      "rules": {
+        "max-lines-per-function": ["error", { "max": 484 }]
+      }
+    },
+    {
+      // Outliers above the limits: the candidate records and their positional constructor.
+      "files": ["src/data/catalog.ts"],
+      "rules": {
+        "max-params": ["error", { "max": 12 }],
+        "max-lines": ["error", { "max": 964 }]
       }
     }
   ],

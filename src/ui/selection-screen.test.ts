@@ -242,11 +242,13 @@ test("list heading shows the count, the sort label and the ticks", async () => {
       );
       const sort = getByLabelText("Sortuj:");
       assert.equal(sort.tagName, "SELECT");
-      const options = [...sort.querySelectorAll("option")].map(
-        (option) => option.textContent,
+      const options = new Set(
+        [...sort.querySelectorAll("option")].map(
+          (option) => option.textContent,
+        ),
       );
-      assert.equal(options.includes("Forma"), true);
-      assert.equal(options.includes("Taktyka"), true);
+      assert.equal(options.has("Forma"), true);
+      assert.equal(options.has("Taktyka"), true);
       const ticks = getByRole("group", { name: "Pokaż tylko" });
       assert.equal(ticks.textContent, "Tylko powołani (0)");
       assert.equal(
