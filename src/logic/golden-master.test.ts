@@ -113,6 +113,8 @@ test("the scenarios reach every outcome band", { skip: updating }, () => {
         evaluation?: { grade: string; outcome: string; points: number };
       }[];
       const evaluation = steps
+        // Takes the last match: findLast is outside the ES2022 library.
+        // oxlint-disable-next-line unicorn/prefer-array-find
         .filter((step) => step.evaluation)
         .at(-1)?.evaluation;
       return evaluation ? bandKey(evaluation) : "";

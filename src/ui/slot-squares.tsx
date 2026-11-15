@@ -16,7 +16,8 @@ function squareClass(square: SlotSquare, inPool: boolean): string {
       return `filled outside${fill}`;
     case "filled":
       return `filled${fill}`;
-    default:
+    case "empty":
+    case "excess":
       return square.kind;
   }
 }
