@@ -20,7 +20,7 @@ export function SideBoard({
   state: GameState;
   onOutsiders: () => void;
   onFinalize: () => void;
-  regionRef?: RefObject<HTMLDivElement | null>;
+  regionRef?: RefObject<HTMLDivElement | null> | undefined;
 }) {
   return (
     <div
