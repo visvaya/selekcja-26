@@ -8,50 +8,55 @@ on:
 permissions:
   contents: read
 
+# A newer push to a pull request cancels its older run. A running main run is never cancelled;
+# a waiting one gives way to a newer push.
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   playwright-image:
-    uses: ./.github/workflows/playwright-image.yml
+    name: playwright-image
+    uses: ./.github/workflows/playwright-image.yml # zizmor: ignore[self-repository] actionlint rejects the $/ form
 
   verify:
+    name: verify
     needs: playwright-image
     runs-on: ubuntu-24.04
     # Browsers and their system libraries come with the image (.github/playwright/Dockerfile), so
     # no step downloads them from the Ubuntu mirrors.
     container:
-      image: ${{ needs.playwright-image.outputs.image }}
+      # Digest-pinned: playwright-image.yml rejects any other reference.
+      image: ${{ needs.playwright-image.outputs.image }} # zizmor: ignore[unpinned-images]
       options: --user 1001
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
+          check-latest: true
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: No known vulnerabilities in production dependencies
+        run: pnpm audit --prod
+      - name: Known vulnerabilities in all dependencies (information only)
+        run: pnpm audit || echo "::warning::pnpm audit failed or reported vulnerabilities; see the log."
       - name: Static checks, unit tests with coverage, build
         run: pnpm verify
       - name: Browser journeys and accessibility scan
         run: pnpm test:e2e
-      # Deploys only a main commit whose full gate (verify and journeys) passed above; dist/ is
-      # the build the journeys ran against. Pull requests never reach this step, so the token is
-      # never exposed to pull request code. Skipped with a notice until both secrets are set.
-      - name: Deploy to Cloudflare
+      # The deploy job publishes exactly this build, the one the journeys ran against.
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          WRANGLER_VERSION: 4.136.3
-        run: |
-          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
-            echo "::notice::Cloudflare secrets are not set; skipping the deploy."
-            exit 0
-          fi
-          pnpm dlx "wrangler@${WRANGLER_VERSION}" deploy
+        with:
+          name: dist-${{ github.sha }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 7
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: failure()
         with:
@@ -60,3 +65,150 @@ jobs:
             playwright-report/
             test-results/
           retention-days: 7
+
+  secrets:
+    name: secrets
+    uses: ./.github/workflows/secrets.yml # zizmor: ignore[self-repository] actionlint rejects the $/ form
+
+  hygiene:
+    name: hygiene
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: read # reads the current pull request title
+    # Hand-pinned tools, checked weekly against their latest releases (tool-freshness.yml).
+    env:
+      ACTIONLINT_VERSION: 1.7.12
+      ACTIONLINT_SHA256: 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8
+      # The manylinux x86_64 wheel on PyPI.
+      ZIZMOR_VERSION: 1.32.0
+      ZIZMOR_SHA256: 84a6acb975accc13408786a2bd274b572537ca19c933ebbc13e78f3988562071
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          check-latest: true
+          package-manager-cache: false
+      # The title becomes the squash commit on main, so it passes the commit message rules
+      # without the exemptions for subjects Git writes, and the em dash and emoji scan. It is
+      # read live, so re-running this job after a title edit checks the current title.
+      - name: Pull request title is a valid commit subject
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" --jq .title > "$RUNNER_TEMP/pr-title.txt"
+          node scripts/git-hooks.mjs pr-title "$RUNNER_TEMP/pr-title.txt" "$PR_AUTHOR"
+          node scripts/check-text.mjs "$RUNNER_TEMP/pr-title.txt"
+      - name: Workflows pass actionlint
+        if: ${{ !cancelled() }}
+        run: |
+          archive="$RUNNER_TEMP/actionlint.tar.gz"
+          curl -sSfL -o "$archive" \
+            "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          echo "${ACTIONLINT_SHA256}  ${archive}" | sha256sum -c -
+          tar -xzf "$archive" -C "$RUNNER_TEMP" actionlint
+          "$RUNNER_TEMP/actionlint" -color
+      - name: Workflows pass the zizmor security audit
+        if: ${{ !cancelled() }}
+        run: |
+          python3 -m venv "$RUNNER_TEMP/zizmor"
+          echo "zizmor==${ZIZMOR_VERSION} --hash=sha256:${ZIZMOR_SHA256}" > "$RUNNER_TEMP/zizmor.txt"
+          "$RUNNER_TEMP/zizmor/bin/pip" install --quiet --no-deps --only-binary :all: \
+            --require-hashes -r "$RUNNER_TEMP/zizmor.txt"
+          # Offline: the audits that call the GitHub API are skipped, so no token is needed.
+          "$RUNNER_TEMP/zizmor/bin/zizmor" --persona pedantic --offline .github/workflows .github/dependabot.yml
+
+  # The one required check: green only when every gating job succeeded. It runs even when one of
+  # them failed or was cancelled, because GitHub counts a skipped required check as passed.
+  ci-ok:
+    name: ci-ok
+    needs: [playwright-image, verify, secrets, hygiene]
+    if: ${{ always() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Every gating job succeeded
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "Results: $RESULTS"
+          for result in $RESULTS; do
+            if [ "$result" != "success" ]; then
+              echo "::error::A gating job ended with '$result'."
+              exit 1
+            fi
+          done
+
+  # Publishes the build the verify job tested, on a fresh runner: the Cloudflare token never
+  # shares a machine with the steps that ran the development dependencies. The secrets live in
+  # the production environment once the maintainer moves them there; until both are set the
+  # deploy is skipped with a notice.
+  deploy:
+    name: deploy
+    needs: ci-ok
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment:
+      name: production
+      url: https://selekcja-26.visvaya.workers.dev
+    # One deploy or rollback at a time (rollback.yml shares the group), none cancelled.
+    concurrency:
+      group: production
+      cancel-in-progress: false
+    env:
+      SITE_URL: https://selekcja-26.visvaya.workers.dev
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      # No dependency cache: whatever a cache restores here would run next to the token.
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          check-latest: true
+          package-manager-cache: false
+      # wrangler comes from the lockfile, pinned exactly in package.json.
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: dist-${{ github.sha }}
+          path: dist/
+      - name: Deploy to Cloudflare
+        id: deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::notice::Cloudflare secrets are not set; skipping the deploy."
+            echo "deployed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          pnpm exec wrangler deploy --message "$GITHUB_SHA"
+          echo "deployed=true" >> "$GITHUB_OUTPUT"
+      - name: The site serves this build
+        if: steps.deploy.outputs.deployed == 'true'
+        run: |
+          # The new version can take a few seconds to reach every edge location.
+          for attempt in 1 2 3 4 5 6 7 8 9 10 11 12; do
+            if curl -sSf -o "$RUNNER_TEMP/served.html" "$SITE_URL/" &&
+              cmp -s "$RUNNER_TEMP/served.html" dist/index.html; then
+              echo "Attempt $attempt: the served index.html is this build's."
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::$SITE_URL/ does not serve this build's index.html after 2 minutes."
+          exit 1
+      - name: Response headers and indexing policy
+        if: steps.deploy.outputs.deployed == 'true'
+        run: node scripts/check-live-headers.mjs "$SITE_URL"

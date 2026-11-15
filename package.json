@@ -46,7 +46,7 @@
     "prepare": "node scripts/install-git-hooks.mjs"
   },
   "engines": {
-    "node": ">=24"
+    "node": ">=24.2"
   },
   "packageManager": "pnpm@11.1.2",
   "dependencies": {
@@ -68,6 +68,7 @@
     "oxlint": "^1.92.0",
     "prettier": "^3.9.10",
     "typescript": "^7.0.2",
-    "vite": "^8.3.8"
+    "vite": "^8.3.8",
+    "wrangler": "4.160.1"
   }
 }
