@@ -1,0 +1,50 @@
+name: Tool freshness
+
+# Dependabot does not see tools pinned by version and checksum in workflow env, so this compares
+# each of them with its latest release every week and fails when one is behind.
+on:
+  schedule:
+    - cron: "17 6 * * 1" # Monday 06:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tool-freshness
+  cancel-in-progress: true
+
+jobs:
+  pinned-tools:
+    name: pinned-tools
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: .github/workflows
+      - name: Hand-pinned tools are on their latest release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          status=0
+          check() {
+            local variable=$1 repository=$2 file=$3 pinned latest
+            pinned=$(sed -n "s/^ *${variable}: *//p" "$file" | head -n 1)
+            if ! latest=$(gh release view --repo "$repository" --json tagName --jq .tagName); then
+              echo "::error::Could not read the latest release of $repository."
+              exit 2
+            fi
+            latest=${latest#v}
+            if [ "$pinned" = "$latest" ]; then
+              echo "$variable $pinned is the latest release."
+            else
+              echo "::error file=$file::$variable is '$pinned', the latest release of $repository is $latest; update it and its checksum."
+              status=1
+            fi
+          }
+          check GITLEAKS_VERSION gitleaks/gitleaks .github/workflows/secrets.yml
+          check ACTIONLINT_VERSION rhysd/actionlint .github/workflows/ci.yml
+          check ZIZMOR_VERSION zizmorcore/zizmor .github/workflows/ci.yml
+          exit "$status"

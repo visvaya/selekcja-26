@@ -1,0 +1,35 @@
+name: Site monitor
+
+# Checks the live site against public/_headers and the indexing policy once a day. Deploys are
+# checked when they happen; this catches changes on the host side between them (Cloudflare
+# settings, a managed robots.txt). Daily, because a day is short enough for a static game and
+# costs no paid minutes in a public repository. A failed run is the alarm.
+on:
+  schedule:
+    - cron: "37 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: site-monitor
+  cancel-in-progress: true
+
+jobs:
+  headers:
+    name: headers
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # The check uses nothing but Node itself, so no package is installed.
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          check-latest: true
+          package-manager-cache: false
+      - name: Response headers and indexing policy
+        run: node scripts/check-live-headers.mjs https://selekcja-26.visvaya.workers.dev

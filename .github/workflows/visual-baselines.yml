@@ -10,21 +10,31 @@ on:
 permissions:
   contents: read
 
+# Not cancelled: any later label event on the pull request would cancel a running regeneration.
+concurrency:
+  group: visual-baselines-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   playwright-image:
+    name: playwright-image
     if: github.event_name == 'workflow_dispatch' || github.event.label.name == 'update-screenshots'
-    uses: ./.github/workflows/playwright-image.yml
+    uses: ./.github/workflows/playwright-image.yml # zizmor: ignore[self-repository] actionlint rejects the $/ form
 
   baselines:
+    name: baselines
     needs: playwright-image
     # Same image as ci.yml, so baselines render with the fonts the journeys see.
     container:
-      image: ${{ needs.playwright-image.outputs.image }}
+      # Digest-pinned: playwright-image.yml rejects any other reference.
+      image: ${{ needs.playwright-image.outputs.image }} # zizmor: ignore[unpinned-images]
       options: --user 1001
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:

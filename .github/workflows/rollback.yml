@@ -1,0 +1,59 @@
+name: Rollback
+
+# Puts an earlier Worker version back, by hand; nothing is rebuilt. Version ids are listed by
+# `pnpm exec wrangler versions list` and in the Cloudflare dashboard. The rollback lasts until
+# the next push to main deploys again.
+on:
+  workflow_dispatch:
+    inputs:
+      version_id:
+        description: Worker version id to restore (a UUID)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+# Shares its queue with the deploy job in ci.yml: one at a time, none cancelled.
+concurrency:
+  group: production
+  cancel-in-progress: false
+
+jobs:
+  rollback:
+    name: rollback
+    # Only the workflow as it is on main may roll back.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment:
+      name: production
+      url: https://selekcja-26.visvaya.workers.dev
+    env:
+      SITE_URL: https://selekcja-26.visvaya.workers.dev
+      VERSION_ID: ${{ inputs.version_id }}
+    steps:
+      - name: The input is a version id
+        run: |
+          if ! printf '%s' "$VERSION_ID" | grep -qxE '[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}'; then
+            echo "::error::'$VERSION_ID' is not a Worker version id (a lowercase UUID)."
+            exit 1
+          fi
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      # No dependency cache: whatever a cache restores here would run next to the token.
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          check-latest: true
+          package-manager-cache: false
+      - run: pnpm install --frozen-lockfile
+      - name: Roll back on Cloudflare
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: pnpm exec wrangler rollback "$VERSION_ID" --message "Rollback from workflow run $GITHUB_RUN_ID" --yes
+      - name: Response headers and indexing policy
+        run: node scripts/check-live-headers.mjs "$SITE_URL"
