@@ -1,0 +1,93 @@
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import {
+  expectedHeaders,
+  headerProblems,
+  pickProbePaths,
+  robotsDisallowsRoot,
+} from "./check-live-headers.mjs";
+
+const RULES = [
+  { pattern: "/*", headers: { "X-Content-Type-Options": "nosniff" } },
+  { pattern: "/assets/*", headers: { "Cache-Control": "immutable" } },
+];
+
+test("a path gets the headers of every rule that matches it", () => {
+  assert.deepEqual(expectedHeaders(RULES, "/"), {
+    "X-Content-Type-Options": "nosniff",
+  });
+  assert.deepEqual(expectedHeaders(RULES, "/assets/index-a1.js"), {
+    "X-Content-Type-Options": "nosniff",
+    "Cache-Control": "immutable",
+  });
+});
+
+test("probes the start page and one linked path per pattern", () => {
+  const html =
+    '<script src="/assets/index-a1.js"></script><link href="/assets/index-b2.css"><a href="//other.example/x">';
+  assert.deepEqual(pickProbePaths(RULES, html), {
+    paths: ["/", "/assets/index-a1.js"],
+    unmatched: [],
+  });
+  assert.deepEqual(pickProbePaths(RULES, "<p>no links</p>"), {
+    paths: ["/"],
+    unmatched: ["/assets/*"],
+  });
+});
+
+test("reports missing and different header values", () => {
+  const served = new Headers({ "x-content-type-options": "nosniff" });
+  assert.deepEqual(
+    headerProblems("/", { "X-Content-Type-Options": "nosniff" }, served),
+    [],
+  );
+  assert.deepEqual(
+    headerProblems(
+      "/a",
+      { "X-Content-Type-Options": "other", "Cache-Control": "immutable" },
+      served,
+    ),
+    [
+      '/a: X-Content-Type-Options is "nosniff", expected "other"',
+      '/a: Cache-Control is missing, expected "immutable"',
+    ],
+  );
+});
+
+test("an X-Robots-Tag that blocks indexing is a problem", () => {
+  for (const value of ["noindex", "googlebot: noindex, nofollow", "none"]) {
+    assert.deepEqual(
+      headerProblems("/", {}, new Headers({ "X-Robots-Tag": value })),
+      [`/: X-Robots-Tag "${value}" blocks indexing`],
+    );
+  }
+  assert.deepEqual(
+    headerProblems("/", {}, new Headers({ "X-Robots-Tag": "nosnippet" })),
+    [],
+  );
+});
+
+test("robots.txt blocks the site only when all crawlers are disallowed from /", () => {
+  assert.equal(robotsDisallowsRoot("User-agent: *\nDisallow: /\n"), true);
+  assert.equal(
+    robotsDisallowsRoot("User-agent: Googlebot\nUser-agent: *\r\nDisallow: /*"),
+    true,
+  );
+  assert.equal(
+    robotsDisallowsRoot("# Disallow: /\nUser-agent: *\nDisallow:"),
+    false,
+  );
+  assert.equal(
+    robotsDisallowsRoot(
+      "User-agent: GPTBot\nDisallow: /\n\nUser-agent: *\nDisallow: /private/",
+    ),
+    false,
+  );
+  assert.equal(
+    robotsDisallowsRoot(
+      "User-agent: *\nAllow: /\n\nUser-agent: GPTBot\nDisallow: /",
+    ),
+    false,
+  );
+  assert.equal(robotsDisallowsRoot(""), false);
+});
