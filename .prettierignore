@@ -5,3 +5,6 @@ test-results/
 playwright-report/
 blob-report/
 src/logic/golden/traces/
+# Markdown is checked by markdownlint (pnpm lint:md), not formatted: the
+# formatter renumbers ordered lists and realigns whole tables.
+*.md

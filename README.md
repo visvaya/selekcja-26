@@ -43,12 +43,12 @@ pnpm test:e2e       # browser journeys (first run: pnpm exec playwright install 
 
 A saved game can be discarded by opening the game with `?reset` added to its address.
 
-| Directory    | Contents                                                          |
+| Directory | Contents |
 | ------------ | ----------------------------------------------------------------- |
-| `src/data/`  | candidates, formations, game-rule constants, camp events          |
+| `src/data/` | candidates, formations, game-rule constants, camp events |
 | `src/logic/` | state reducer, selection, scoring, tournament, randomness, saving |
-| `src/ui/`    | React components, all Polish copy, styles                         |
-| `e2e/`       | Playwright journeys                                               |
+| `src/ui/` | React components, all Polish copy, styles |
+| `e2e/` | Playwright journeys |
 
 ## Contributing
 
