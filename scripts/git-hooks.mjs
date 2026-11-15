@@ -14,6 +14,7 @@ const ATTRIBUTION_LINES = [
   /^[\w-]+-session:/im,
 ];
 const EM_DASH = String.fromCodePoint(0x2014);
+const SCISSORS = "# ------------------------ >8 ------------------------";
 const EXCLUDED_FILE_NAMES = new Set([
   "AGENTS.md",
   "CLAUDE.md",
@@ -163,12 +164,15 @@ function preCommit() {
 
 // A pull request title becomes the squash commit on main, so it gets no exemptions.
 function commitMsg(file, { exemptGitSubjects = true, maxLength = 72 } = {}) {
-  const message = readFileSync(file, "utf8")
+  // `git commit -v` appends the diff below a scissors line; it is not part of the message.
+  const raw = readFileSync(file, "utf8").split(SCISSORS)[0] ?? "";
+  const message = raw
     .split("\n")
     .filter((line) => !line.startsWith("#"))
     .join("\n")
     .trim();
-  const problems = messageProblems(message);
+  // Unfiltered: `git commit -m` keeps lines that start with #.
+  const problems = messageProblems(raw);
   if (problems.length > 0) fail(problems.join("\n"));
   const subject = message.split("\n")[0] ?? "";
   // Subjects Git writes skip only the format and length rules.

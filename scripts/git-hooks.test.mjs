@@ -43,6 +43,12 @@ test("commit-msg rejects attribution lines, em dashes and emoji for everyone", (
   const dash = String.fromCodePoint(0x2014);
   const emoji = String.fromCodePoint(0x1f680);
   assert.equal(run(["commit-msg"], "fix: plain subject"), 0);
+  // The diff that `git commit -v` appends below the scissors line is not checked.
+  const scissors = "# ------------------------ >8 ------------------------";
+  assert.equal(
+    run(["commit-msg"], `fix: x\n${scissors}\n+text ${dash} ${emoji}`),
+    0,
+  );
   for (const message of [
     "fix: x\n\nCo-authored-by: Someone <someone@example.com>",
     "fix: x\n\nGenerated with Some Tool",
@@ -53,6 +59,8 @@ test("commit-msg rejects attribution lines, em dashes and emoji for everyone", (
     // Subjects Git writes skip only the format and length rules.
     "fixup! fix: x\n\nCo-authored-by: Someone <someone@example.com>",
     `Merge branch x ${dash} y`,
+    // `git commit -m` keeps lines that start with #.
+    "fix: x\n\n# Generated with Some Tool",
   ]) {
     assert.equal(run(["commit-msg"], message), 1, message);
   }
