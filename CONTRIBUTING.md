@@ -26,6 +26,19 @@ Rules the gate and the hooks enforce:
 - No em dash (U+2014) and no emoji in files or commit messages.
 - Gameplay rules, ratings and tournament outcomes change only together with the `RULES_REVISION` number and the golden traces (see `src/logic/golden-master.test.ts`).
 
+## Quality thresholds
+
+The gate's limits, with the file that sets each one. They only tighten: raising a limit (or adding an exception) needs its reason in the commit and the pull request, never "to make the check pass".
+
+| Limit                                                        | Value (2026-11-15)                                                                                                                             | Set in                            |
+| ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
+| Unit test coverage of `src/logic`, `src/data`, `src/storage` | lines 98 %, branches 95 %, functions 97 % (measured 98.93, 95.42, 97.30)                                                                       | `test:coverage` in `package.json` |
+| Duplication (jscpd)                                          | 0 %, clones of 12 lines and 60 tokens or more                                                                                                  | `.jscpd.json`                     |
+| Lint size and complexity                                     | complexity 18, function 206 lines, file 559 lines, depth 3, 5 parameters, 2 nested callbacks; higher limits for tests and three named outliers | `.oxlintrc.json`                  |
+| Build size of `dist/`                                        | JS 95 000 and CSS 14 100 brotli bytes, fonts 118 000 bytes                                                                                     | `scripts/check-size.mjs`          |
+| Literal sizes in `src/ui/styles/legacy.css`                  | 45, may only fall                                                                                                                              | `scripts/check-conventions.mjs`   |
+| Flaky browser tests                                          | a test that passes only on its CI retry fails the run                                                                                          | `playwright.config.ts`            |
+
 ## Commits and pull requests
 
 - Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/): `type(scope): subject`, with a subject of 72 characters or fewer.

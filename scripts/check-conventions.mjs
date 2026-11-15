@@ -3,7 +3,8 @@
 // - no classes in src/ except Error subclasses and a React error boundary,
 // - CSS colors only as tokens inside :root blocks,
 // - inline React styles only for data-driven CSS custom properties,
-// - no absolute local paths in code (they leak the machine layout and break portability).
+// - no absolute local paths in code (they leak the machine layout and break portability),
+// - no new literal sizes in the legacy stylesheet (recorded debt that may only shrink).
 // Usage: node scripts/check-conventions.mjs
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
@@ -26,6 +27,46 @@ const COLOR_LITERAL = /#[0-9a-fA-F]{3,8}\b|\b(?:rgba?|hsla?|oklch|oklab)\(/;
 const INLINE_STYLE = /style=\{\{([^}]*)\}\}/g;
 const ABSOLUTE_PATH = /["'`](?:[A-Za-z]:[\\/]|\/home\/|\/Users\/)/;
 const CODE_FILE = /\.(?:[cm]?js|jsx|ts|tsx)$/;
+// Length units of CSS Values and Units Level 4 (font-relative, viewport, container, absolute).
+// Matched case-insensitively, so "q" also covers the spec's "Q".
+const CSS_LENGTH_UNITS = [
+  "em",
+  "rem",
+  "ex",
+  "rex",
+  "cap",
+  "rcap",
+  "ch",
+  "rch",
+  "ic",
+  "ric",
+  "lh",
+  "rlh",
+  ...["", "s", "l", "d"].flatMap((prefix) =>
+    ["vw", "vh", "vi", "vb", "vmin", "vmax"].map((unit) => prefix + unit),
+  ),
+  "cqw",
+  "cqh",
+  "cqi",
+  "cqb",
+  "cqmin",
+  "cqmax",
+  "px",
+  "cm",
+  "mm",
+  "q",
+  "in",
+  "pt",
+  "pc",
+];
+const SIZE_LITERAL = new RegExp(
+  String.raw`(?<![\w.])-?\d*\.?\d+(?:${CSS_LENGTH_UNITS.join("|")})\b`,
+  "gi",
+);
+const LEGACY_CSS = "src/ui/styles/legacy.css";
+// Literal sizes in LEGACY_CSS outside custom property definitions, counted 2026-11-15. New
+// rules take sizes from tokens; when a literal goes, lower this count with it.
+const LEGACY_CSS_SIZE_LITERALS = 45;
 
 function listFiles() {
   return execFileSync(
@@ -104,22 +145,51 @@ function absolutePathProblems(file, lines) {
   );
 }
 
-const problems = listFiles().flatMap((file) => {
-  const normalized = file.replaceAll("\\", "/");
-  const content = /\.(?:[cm]?js|jsx|tsx?|css)$/.test(normalized)
-    ? readFileSync(file, "utf8")
-    : "";
-  const lines = content.split("\n");
-  return [
-    ...fileNameProblems(normalized),
-    ...classProblems(normalized, lines),
-    ...cssColorProblems(normalized, lines),
-    ...inlineStyleProblems(normalized, content),
-    ...absolutePathProblems(normalized, lines),
-  ];
-});
+/**
+ * @param {string} css
+ * @param {number} recorded the count the ratchet allows
+ * @returns {string[]}
+ */
+export function legacySizeProblems(css, recorded) {
+  const count = css
+    .split("\n")
+    .filter((line) => !line.trim().startsWith("--"))
+    .reduce((sum, line) => sum + (line.match(SIZE_LITERAL) ?? []).length, 0);
+  if (count > recorded) {
+    return [
+      `${LEGACY_CSS}: literal sizes grew from ${recorded} to ${count}; use a size token from tokens.css`,
+    ];
+  }
+  return count < recorded
+    ? [
+        `${LEGACY_CSS}: ${count} literal sizes left; lower LEGACY_CSS_SIZE_LITERALS in scripts/check-conventions.mjs to ${count}`,
+      ]
+    : [];
+}
 
-if (problems.length > 0) {
-  process.stderr.write(`Convention violations:\n${problems.join("\n")}\n`);
-  process.exit(1);
+if (import.meta.main) {
+  const problems = [
+    ...listFiles().flatMap((file) => {
+      const normalized = file.replaceAll("\\", "/");
+      const content = /\.(?:[cm]?js|jsx|tsx?|css)$/.test(normalized)
+        ? readFileSync(file, "utf8")
+        : "";
+      const lines = content.split("\n");
+      return [
+        ...fileNameProblems(normalized),
+        ...classProblems(normalized, lines),
+        ...cssColorProblems(normalized, lines),
+        ...inlineStyleProblems(normalized, content),
+        ...absolutePathProblems(normalized, lines),
+      ];
+    }),
+    ...legacySizeProblems(
+      readFileSync(LEGACY_CSS, "utf8"),
+      LEGACY_CSS_SIZE_LITERALS,
+    ),
+  ];
+  if (problems.length > 0) {
+    process.stderr.write(`Convention violations:\n${problems.join("\n")}\n`);
+    process.exit(1);
+  }
 }

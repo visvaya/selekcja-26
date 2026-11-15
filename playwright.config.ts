@@ -35,7 +35,10 @@ export default defineConfig({
   timeout: 120_000,
   fullyParallel: true,
   forbidOnly: Boolean(process.env["CI"]),
+  // The retry keeps the report of a second attempt, but a test that passes only on it still
+  // fails the run, so a flaky test is seen and fixed instead of hidden.
   retries: process.env["CI"] ? 1 : 0,
+  failOnFlakyTests: Boolean(process.env["CI"]),
   reporter: process.env["CI"]
     ? [["list"], ["html", { open: "never" }]]
     : "list",
@@ -59,7 +62,7 @@ export default defineConfig({
       // (contrast of overlapping elements, WCAG 2.2 target size) are most exposed on a narrow
       // screen. The DOM is the same at every width, so a second project repeated the same scan.
       name: "phone",
-      testMatch: /phone|storage|side-board|a11y|fonts|dialogs/,
+      testMatch: /phone|storage|side-board|a11y|fonts|dialogs|headers/,
       use: { ...devices["Pixel 7"], viewport: PHONE_VIEWPORT },
     },
     {
