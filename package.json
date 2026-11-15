@@ -42,10 +42,11 @@
     "check:size": "node scripts/check-size.mjs",
     "quality:duplicates": "jscpd .",
     "quality:dead": "cross-env KNIP_DISABLE_RAW_TRANSFER=1 knip",
-    "quality": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm check:text && pnpm check:conventions && pnpm check:links",
+    "quality": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm lint:md && pnpm check:text && pnpm check:conventions && pnpm check:links",
     "verify": "pnpm quality && pnpm quality:duplicates && pnpm quality:dead && pnpm test:coverage && pnpm build && pnpm check:size && git diff --check",
     "verify:full": "pnpm verify && pnpm test:e2e",
-    "prepare": "node scripts/install-git-hooks.mjs"
+    "prepare": "node scripts/install-git-hooks.mjs",
+    "lint:md": "markdownlint-cli2 \"**/*.md\""
   },
   "engines": {
     "node": ">=24.2"
@@ -69,6 +70,7 @@
     "jscpd": "5.4.3",
     "jsdom": "31.0.0",
     "knip": "6.45.1",
+    "markdownlint-cli2": "0.24.0",
     "oxfmt": "0.75.0",
     "oxlint": "1.90.0",
     "oxlint-tsgolint": "7.0.2005",

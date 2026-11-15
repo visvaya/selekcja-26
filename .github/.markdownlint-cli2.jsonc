@@ -1,0 +1,6 @@
+// Templates here become the start of a pull request body, which has no title heading of its own.
+{
+  "config": {
+    "MD041": false,
+  },
+}
