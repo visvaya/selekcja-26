@@ -101,7 +101,7 @@ function scissorsLine() {
     ["config", "--get-regexp", "^core[.]comment(char|string)$"],
     { encoding: "utf8" },
   ).stdout;
-  const last = (entries ?? "").split("\n").filter(Boolean).at(-1);
+  const last = (entries ?? "").split("\n").findLast(Boolean);
   const prefix = last?.slice(last.indexOf(" ") + 1);
   return `${prefix === undefined || prefix.toLowerCase() === "auto" ? "#" : prefix}${SCISSORS}`;
 }
