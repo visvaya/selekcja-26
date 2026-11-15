@@ -76,6 +76,12 @@ export default defineConfig({
       testMatch: /keyboard|dialogs/,
       use: { ...devices["Desktop Chrome"] },
     },
+    {
+      // Repeated full games with memory samples from the DevTools protocol, so Chromium only.
+      name: "leak-cycles",
+      testMatch: /leak-cycles/,
+      use: { ...devices["Desktop Chrome"] },
+    },
     ...(runVisual ? [visualProject] : []),
   ],
   // Tests run against the production build, not the dev server, so they cover what ships
