@@ -1,12 +1,13 @@
 allowBuilds:
   esbuild: false
   workerd: false
-# Dependencies resolve only to versions published at least 7 days (10080 minutes) ago.
-minimumReleaseAge: 10080
+# Dependencies resolve only to versions published at least 3 days (4320 minutes) ago. Rises to
+# 7 days (10080) on 2026-11-21, when no locked version is younger than that, so no exclusions are needed.
+minimumReleaseAge: 4320
 # Direct dependencies are added at exact versions, so the manifest shows what passed the gate.
 savePrefix: ""
-# Locked on 2026-11-15 while younger than the window (transitive, from a grouped update); remove on
-# 2026-11-20, when both are older than 7 days.
+# Locked on 2026-11-15 while younger than 3 days (transitive, from a grouped update); remove on
+# 2026-11-17, when both are older than the window.
 minimumReleaseAgeExclude:
   - "@jridgewell/resolve-uri@3.1.3"
   - postcss@8.5.33
@@ -19,6 +20,12 @@ trustPolicyExclude:
 # remark-cli pulls glob 10 and minimatch 9 (via unified-engine and @npmcli/map-workspaces),
 # affected by GHSA-g3hv-75wg-m249 (minimatch) and the glob AbortSignal advisory, with no patch
 # in their major lines; the named exports these callers use are unchanged in glob 14 and minimatch 11.
+# markdownlint 0.42.0 (through markdownlint-cli2 0.24.0) pins re2js 2.8.6, affected by
+# GHSA-gg6h-894w-4m9c, and reaches katex 0.16 through micromark-extension-math, affected by
+# GHSA-238p-pmpm-9mq7. Linting never renders math, so katex 0.18 changes no behaviour here.
+# Remove the re2js entry once markdownlint-cli2 0.24.1 or newer (re2js 2.9.1) is installed.
 overrides:
   "minimatch@>=7.0.0 <11.0.1": ^11.0.8
   "glob@>=9.0.0 <=14.0.1": ^14.0.5
+  "re2js@<2.8.7": ^2.8.7
+  "katex@<0.18.2": ^0.18.2
