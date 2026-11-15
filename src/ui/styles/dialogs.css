@@ -446,9 +446,12 @@
   }
 }
 
+/* .drawer-phone .modal outranks .modal: without it the drawer keeps its slide-in, whose first
+   keyframe WebKit shows below the viewport until the next frame. */
 @media (prefers-reduced-motion: reduce) {
   .modal-wrap,
-  .modal {
+  .modal,
+  .drawer-phone .modal {
     animation: none;
   }
 }

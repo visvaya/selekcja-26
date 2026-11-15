@@ -87,6 +87,31 @@ test.describe("outsiders drawer over the open phone sheet", () => {
     );
   });
 
+  test("with reduced motion the drawer is in place when focus lands on its heading", async ({
+    page,
+  }) => {
+    const errors = collectPageErrors(page);
+    // Measured right after the opening click, before the browser renders a frame: WebKit draws
+    // a drawer that still runs its slide-in one panel height below the viewport.
+    const heading = await pitchOutsiders(page).evaluate(
+      async (opener: HTMLElement) => {
+        opener.click();
+        for (let tick = 0; tick < 100; tick += 1) {
+          if (document.activeElement?.tagName === "H2") break;
+          await Promise.resolve();
+        }
+        const active = document.activeElement;
+        if (active?.tagName !== "H2") return null;
+        const rect = active.getBoundingClientRect();
+        return { top: rect.top, bottom: rect.bottom, viewport: innerHeight };
+      },
+    );
+    expect(heading, "focus reached the drawer heading").not.toBeNull();
+    expect(heading!.top).toBeGreaterThanOrEqual(0);
+    expect(heading!.bottom).toBeLessThanOrEqual(heading!.viewport);
+    expect(errors).toEqual([]);
+  });
+
   test("one row removal is one undo step", async ({ page }) => {
     const errors = collectPageErrors(page);
     const { outsiders } = outsidersSave();
