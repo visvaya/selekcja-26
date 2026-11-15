@@ -168,7 +168,10 @@ function commitMsg(file, { exemptGitSubjects = true, maxLength = 72 } = {}) {
     .filter((line) => !line.startsWith("#"))
     .join("\n")
     .trim();
+  const problems = messageProblems(message);
+  if (problems.length > 0) fail(problems.join("\n"));
   const subject = message.split("\n")[0] ?? "";
+  // Subjects Git writes skip only the format and length rules.
   if (
     exemptGitSubjects &&
     (/^(Merge|Revert) /.test(subject) || /^(fixup|squash)! /.test(subject))
@@ -182,8 +185,6 @@ function commitMsg(file, { exemptGitSubjects = true, maxLength = 72 } = {}) {
     fail(
       `Subject is ${subject.length} characters; keep it at ${maxLength} or fewer.`,
     );
-  const problems = messageProblems(message);
-  if (problems.length > 0) fail(problems.join("\n"));
 }
 
 // Imported by the tests, the module runs nothing.

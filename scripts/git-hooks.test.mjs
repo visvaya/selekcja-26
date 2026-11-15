@@ -50,6 +50,9 @@ test("commit-msg rejects attribution lines, em dashes and emoji for everyone", (
     `fix: x ${dash} y`,
     `fix: x\n\nbody ${dash} line`,
     `fix: x ${emoji}`,
+    // Subjects Git writes skip only the format and length rules.
+    "fixup! fix: x\n\nCo-authored-by: Someone <someone@example.com>",
+    `Merge branch x ${dash} y`,
   ]) {
     assert.equal(run(["commit-msg"], message), 1, message);
   }
