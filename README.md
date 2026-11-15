@@ -35,7 +35,7 @@ Requires Node.js 24+ and pnpm.
 ```sh
 pnpm install --frozen-lockfile
 pnpm dev            # Vite dev server
-pnpm quality        # fast static checks: types, lint, formatting, text and convention rules
+pnpm quality        # fast static checks: types, lint, formatting, text, convention and link rules
 pnpm verify         # quality plus duplication, dead code, tests with coverage and build
 pnpm verify:full    # full gate: verify plus browser journeys and the accessibility scan
 pnpm test:e2e       # browser journeys (first run: pnpm exec playwright install chromium webkit)

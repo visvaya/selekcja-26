@@ -1,3 +1,7 @@
 allowBuilds:
   esbuild: false
   workerd: false
+# Types only, reached through remark-cli and @types/node 22. Published after a provenance-attested
+# 7.x release, so trustPolicy: no-downgrade reports it as a downgrade.
+trustPolicyExclude:
+  - undici-types@6.21.0
