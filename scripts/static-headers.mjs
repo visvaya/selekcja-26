@@ -2,9 +2,11 @@
 // browser journeys, serves the same response headers as production.
 // Format: an unindented URL pattern line, then indented `Name: value` lines; `#` starts a comment.
 
+/** @typedef {{ pattern: string, headers: Record<string, string> }} HeaderRule */
+
 /**
  * @param {string} text
- * @returns {{ pattern: string, headers: Record<string, string> }[]}
+ * @returns {HeaderRule[]}
  */
 export function parseHeadersFile(text) {
   return text
@@ -35,13 +37,34 @@ export function parseHeadersFile(text) {
 }
 
 /**
- * @param {string} text
  * @param {string} pattern
+ * @param {string} path
+ */
+export function matchesPattern(pattern, path) {
+  return new URLPattern({ pathname: pattern }).test({ pathname: path });
+}
+
+/**
+ * Headers for a path: Cloudflare applies every rule whose pattern matches it and joins the
+ * values of a header set by more than one rule with ", ".
+ * @param {HeaderRule[]} rules
+ * @param {string} path
  * @returns {Record<string, string>}
  */
-export function headersForPattern(text, pattern) {
-  return (
-    parseHeadersFile(text).find((rule) => rule.pattern === pattern)?.headers ??
-    {}
-  );
+export function expectedHeaders(rules, path) {
+  return rules
+    .filter((rule) => matchesPattern(rule.pattern, path))
+    .flatMap((rule) => Object.entries(rule.headers))
+    .reduce((/** @type {Record<string, string>} */ result, [name, value]) => {
+      // Header names are case-insensitive; the first spelling is kept.
+      const key =
+        Object.keys(result).find(
+          (existing) => existing.toLowerCase() === name.toLowerCase(),
+        ) ?? name;
+      const earlier = result[key];
+      return {
+        ...result,
+        [key]: earlier === undefined ? value : `${earlier}, ${value}`,
+      };
+    }, {});
 }

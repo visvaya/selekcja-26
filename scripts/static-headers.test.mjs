@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { headersForPattern, parseHeadersFile } from "./static-headers.mjs";
+import { expectedHeaders, parseHeadersFile } from "./static-headers.mjs";
 
 test("parses patterns with their indented headers and skips comments", () => {
   const text = [
@@ -35,8 +35,39 @@ test("rejects a header line without a pattern or a name", () => {
   assert.throws(() => parseHeadersFile("/*\n  no separator"), /Invalid/);
 });
 
-test("returns an empty set for a pattern that is not listed", () => {
-  assert.deepEqual(headersForPattern("/*\n  X-Test: 1", "/other"), {});
+const RULES = [
+  { pattern: "/*", headers: { "X-Content-Type-Options": "nosniff" } },
+  { pattern: "/assets/*", headers: { "Cache-Control": "immutable" } },
+];
+
+test("a path gets the headers of every rule that matches it", () => {
+  assert.deepEqual(expectedHeaders(RULES, "/"), {
+    "X-Content-Type-Options": "nosniff",
+  });
+  assert.deepEqual(expectedHeaders(RULES, "/assets/index-a1.js"), {
+    "X-Content-Type-Options": "nosniff",
+    "Cache-Control": "immutable",
+  });
+});
+
+test("a header set by two matching rules is expected with both values joined", () => {
+  const rules = [
+    { pattern: "/*", headers: { "Cache-Control": "public" } },
+    { pattern: "/assets/*", headers: { "Cache-Control": "immutable" } },
+  ];
+  assert.deepEqual(expectedHeaders(rules, "/assets/a.js"), {
+    "Cache-Control": "public, immutable",
+  });
+});
+
+test("header names are joined regardless of their case", () => {
+  const rules = [
+    { pattern: "/*", headers: { "cache-control": "public" } },
+    { pattern: "/assets/*", headers: { "Cache-Control": "immutable" } },
+  ];
+  assert.deepEqual(expectedHeaders(rules, "/assets/a.js"), {
+    "cache-control": "public, immutable",
+  });
 });
 
 test("the committed file sends a CSP without inline scripts or styles", () => {
@@ -44,10 +75,33 @@ test("the committed file sends a CSP without inline scripts or styles", () => {
     fileURLToPath(new URL("../public/_headers", import.meta.url)),
     "utf8",
   );
-  const csp = headersForPattern(text, "/*")["Content-Security-Policy"] ?? "";
+  const csp =
+    expectedHeaders(parseHeadersFile(text), "/")["Content-Security-Policy"] ??
+    "";
 
   assert.match(csp, /script-src 'self';/);
   assert.match(csp, /style-src 'self';/);
   assert.doesNotMatch(csp, /unsafe-inline|unsafe-eval/);
   assert.match(csp, /frame-ancestors 'none'/);
+});
+
+test("the committed file sends the security and cache headers", () => {
+  const rules = parseHeadersFile(
+    readFileSync(
+      fileURLToPath(new URL("../public/_headers", import.meta.url)),
+      "utf8",
+    ),
+  );
+  const page = expectedHeaders(rules, "/");
+  assert.equal(page["X-Content-Type-Options"], "nosniff");
+  assert.equal(page["Referrer-Policy"], "strict-origin-when-cross-origin");
+  assert.equal(
+    page["Permissions-Policy"],
+    "camera=(), microphone=(), geolocation=()",
+  );
+  assert.equal(page["Cache-Control"], undefined);
+  assert.equal(
+    expectedHeaders(rules, "/assets/index-a1.js")["Cache-Control"],
+    "public, max-age=31536000, immutable",
+  );
 });

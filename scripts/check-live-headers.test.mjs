@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
-  expectedHeaders,
   headerProblems,
   pickProbePaths,
   robotsDisallowsRoot,
@@ -11,36 +10,6 @@ const RULES = [
   { pattern: "/*", headers: { "X-Content-Type-Options": "nosniff" } },
   { pattern: "/assets/*", headers: { "Cache-Control": "immutable" } },
 ];
-
-test("a path gets the headers of every rule that matches it", () => {
-  assert.deepEqual(expectedHeaders(RULES, "/"), {
-    "X-Content-Type-Options": "nosniff",
-  });
-  assert.deepEqual(expectedHeaders(RULES, "/assets/index-a1.js"), {
-    "X-Content-Type-Options": "nosniff",
-    "Cache-Control": "immutable",
-  });
-});
-
-test("a header set by two matching rules is expected with both values joined", () => {
-  const rules = [
-    { pattern: "/*", headers: { "Cache-Control": "public" } },
-    { pattern: "/assets/*", headers: { "Cache-Control": "immutable" } },
-  ];
-  assert.deepEqual(expectedHeaders(rules, "/assets/a.js"), {
-    "Cache-Control": "public, immutable",
-  });
-});
-
-test("header names are joined regardless of their case", () => {
-  const rules = [
-    { pattern: "/*", headers: { "cache-control": "public" } },
-    { pattern: "/assets/*", headers: { "Cache-Control": "immutable" } },
-  ];
-  assert.deepEqual(expectedHeaders(rules, "/assets/a.js"), {
-    "cache-control": "public, immutable",
-  });
-});
 
 test("probes the start page and one linked path per pattern", () => {
   const html =

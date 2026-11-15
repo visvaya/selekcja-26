@@ -4,44 +4,15 @@
 // crawlers. Used after each deploy and by the scheduled site monitor.
 // Usage: node scripts/check-live-headers.mjs <site-url>
 import { readFileSync } from "node:fs";
-import { parseHeadersFile } from "./static-headers.mjs";
+import {
+  expectedHeaders,
+  matchesPattern,
+  parseHeadersFile,
+} from "./static-headers.mjs";
 
 const REQUEST_TIMEOUT_MS = 15_000;
 
-/** @typedef {{ pattern: string, headers: Record<string, string> }} HeaderRule */
-
-/**
- * @param {string} pattern
- * @param {string} path
- */
-function matches(pattern, path) {
-  return new URLPattern({ pathname: pattern }).test({ pathname: path });
-}
-
-/**
- * Headers for a path: Cloudflare applies every rule whose pattern matches it and joins the
- * values of a header set by more than one rule with ", ".
- * @param {HeaderRule[]} rules
- * @param {string} path
- * @returns {Record<string, string>}
- */
-export function expectedHeaders(rules, path) {
-  return rules
-    .filter((rule) => matches(rule.pattern, path))
-    .flatMap((rule) => Object.entries(rule.headers))
-    .reduce((/** @type {Record<string, string>} */ result, [name, value]) => {
-      // Header names are case-insensitive; the first spelling is kept.
-      const key =
-        Object.keys(result).find(
-          (existing) => existing.toLowerCase() === name.toLowerCase(),
-        ) ?? name;
-      const earlier = result[key];
-      return {
-        ...result,
-        [key]: earlier === undefined ? value : `${earlier}, ${value}`,
-      };
-    }, {});
-}
+/** @typedef {import("./static-headers.mjs").HeaderRule} HeaderRule */
 
 /**
  * The paths to request so that every rule is checked once: `/` and the root-relative
@@ -60,7 +31,7 @@ export function pickProbePaths(rules, html) {
   ];
   const picked = rules.map((rule) => ({
     pattern: rule.pattern,
-    path: candidates.find((path) => matches(rule.pattern, path)),
+    path: candidates.find((path) => matchesPattern(rule.pattern, path)),
   }));
   return {
     paths: [

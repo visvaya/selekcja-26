@@ -62,7 +62,7 @@ export default defineConfig({
       // (contrast of overlapping elements, WCAG 2.2 target size) are most exposed on a narrow
       // screen. The DOM is the same at every width, so a second project repeated the same scan.
       name: "phone",
-      testMatch: /phone|storage|side-board|a11y|fonts|dialogs/,
+      testMatch: /phone|storage|side-board|a11y|fonts|dialogs|headers/,
       use: { ...devices["Pixel 7"], viewport: PHONE_VIEWPORT },
     },
     {
