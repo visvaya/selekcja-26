@@ -12,12 +12,19 @@ version: 2
 # The Dockerfile stays outside .github/: Dependabot may change files there
 # only for the github-actions ecosystem, so a docker update under .github/
 # is refused when the pull request is created.
+# In #39 the Docker half took a release younger than its cooldown while the npm
+# half did not; the version-match test (scripts/playwright-image.test.mjs) then
+# fails and the image tag is aligned by hand to the npm version.
 multi-ecosystem-groups:
   playwright:
     schedule:
       interval: weekly
       day: monday
       timezone: Europe/Warsaw
+    # CI checks the pull request title as a Conventional Commit.
+    commit-message:
+      prefix: build
+      include: scope
 
 updates:
   - package-ecosystem: npm
