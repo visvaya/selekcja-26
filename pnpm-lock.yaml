@@ -19,44 +19,44 @@ importers:
         specifier: 5.3.0
         version: 5.3.0
       react:
-        specifier: ^19.3.1
+        specifier: 19.3.1
         version: 19.3.1
       react-dom:
-        specifier: ^19.3.1
+        specifier: 19.3.1
         version: 19.3.1(react@19.3.1)
     devDependencies:
       '@axe-core/playwright':
-        specifier: ~4.13.0
+        specifier: 4.13.0
         version: 4.13.0(playwright-core@1.65.0)
       '@playwright/test':
-        specifier: ^1.65.0
+        specifier: 1.65.0
         version: 1.65.0
       '@testing-library/react':
-        specifier: ^16.3.3
+        specifier: 16.3.3
         version: 16.3.3(@testing-library/dom@10.4.2)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@types/jsdom':
-        specifier: ^30.0.0
+        specifier: 30.0.0
         version: 30.0.0
       '@types/node':
-        specifier: ^26.6.6
+        specifier: 26.6.6
         version: 26.6.6
       '@types/react':
-        specifier: ^19.3.0
+        specifier: 19.3.0
         version: 19.3.0
       '@types/react-dom':
-        specifier: ^19.3.0
+        specifier: 19.3.0
         version: 19.3.0(@types/react@19.3.0)
       cross-env:
-        specifier: ^10.1.0
+        specifier: 10.1.0
         version: 10.1.0
       jscpd:
-        specifier: ^5.4.2
+        specifier: 5.4.3
         version: 5.4.3
       jsdom:
-        specifier: ^31.0.0
+        specifier: 31.0.0
         version: 31.0.0
       knip:
-        specifier: ^6.44.2
+        specifier: 6.45.1
         version: 6.45.1
       oxfmt:
         specifier: 0.75.0
@@ -74,10 +74,10 @@ importers:
         specifier: 13.1.0
         version: 13.1.0
       typescript:
-        specifier: ^7.0.2
+        specifier: 7.0.2
         version: 7.0.2
       vite:
-        specifier: ^8.3.8
+        specifier: 8.3.8
         version: 8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1)
       wrangler:
         specifier: 4.160.1
@@ -100,10 +100,6 @@ packages:
 
   '@babel/runtime@7.29.14':
     resolution: {integrity: sha512-Y5tqevQaUAZhhj82BpYMNC1ssvLQTVAfwKdm8iy8qwmhvC2/CpcAu8OC+QEtjM7pMk7knx83u1Qj8gzkicyelw==}
-    engines: {node: '>=6.9.0'}
-
-  '@babel/runtime@7.29.7':
-    resolution: {integrity: sha512-Nq8OhGWiZIZGV6hLHoyAKLLcJihP/xFeBMGJoUrxTX2psI8dCifzLhZISFb+VWS3wFMRDmCGw5R+dOySCqPLhw==}
     engines: {node: '>=6.9.0'}
 
   '@cloudflare/kv-asset-handler@0.5.0':
@@ -522,13 +518,6 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
-
-  '@napi-rs/wasm-runtime@1.2.4':
-    resolution: {integrity: sha512-AJxoUD2/15ESHbvpcyjU274nsAPLuOtPHCk0vKJM5pj//Fg/B1FXNWjPnXTT9PymCYYiHo4zPj0ZomXBKhoy7g==}
-    engines: {node: ^20.19.0 || ^22.13.0 || >=23.5.0}
-    peerDependencies:
-      '@emnapi/core': ^1.7.1 || ^2.0.0-alpha.4
-      '@emnapi/runtime': ^1.7.1 || ^2.0.0-alpha.4
 
   '@napi-rs/wasm-runtime@1.2.6':
     resolution: {integrity: sha512-mRyDmEw9/fCDXCGfL1sbgIw/GUK0PVxRW4YwgPN61F3LQ+fSyoBFarJVzgGyhF6kRzEQZ0FejDqm4WLXSeqQmw==}
@@ -1240,9 +1229,6 @@ packages:
   '@types/node@22.20.5':
     resolution: {integrity: sha512-U2+DNr+wSjpsTS/wZGYHq7GcwfuSmKiKvoPvK22zwTlRhU91yOniN4qRR5KhIjvif7ysw/dz/hKmfDH0Ris4aA==}
 
-  '@types/node@26.6.2':
-    resolution: {integrity: sha512-X1P21scMv4zGKLYqjdGjaKa7COa0RKVYYZZN/NfvLQ1JegxFhdhpZG/Lyn8AXx6CDUavKAd11v6BvfpkDByK8g==}
-
   '@types/node@26.6.6':
     resolution: {integrity: sha512-MzQj+8Kx3XI40OmUAE6Qoh58ZMNstNNMwn2nfd3qWsfe7nDNSqJNzes4njhz6AHwrSHOffSLwXU6yb474Q4aog==}
 
@@ -1523,10 +1509,6 @@ packages:
 
   emoji-regex@10.6.0:
     resolution: {integrity: sha512-toUI84YS5YmxW219erniWD0CIVOo46xGKColeNQRgOzDorgBi1v4D71/OFzgD9GO2UGKIv1C3Sp8DAn0+j5w7A==}
-
-  entities@8.1.0:
-    resolution: {integrity: sha512-kxL7msIffSuh9aaFAMD7rxAIuTRMAHMeBtgHW2yUdWw732ZNh4MehkF2gdjvtdmikkaIP9bFDDJOPlsvm7avrA==}
-    engines: {node: '>=20.19.0'}
 
   entities@9.0.0:
     resolution: {integrity: sha512-oJFNDJg3kTPwAD1cNn2+WmUq4wFoo09npc3Ydf1D7ED4smRiWrsKnaLxykrTWgyGEcusc87P5dxlAleol9kpkg==}
@@ -2030,9 +2012,6 @@ packages:
   parse5-parser-stream@8.1.1:
     resolution: {integrity: sha512-hMcVbbUJcQmP8rURWUdYrT1flRiBiBVjq/RYGguJpDUgIXSqdYKlE0CxthmdMWoSlBAuL5bUBa73g0pttSy7Hw==}
 
-  parse5@8.0.1:
-    resolution: {integrity: sha512-z1e/HMG90obSGeidlli3hj7cbocou0/wa5HacvI3ASx34PecNjNQeaHNo5WIZpWofN9kgkqV1q5YvXe3F0FoPw==}
-
   parse5@8.1.1:
     resolution: {integrity: sha512-EcR/6WDcU7b2N3vQSxKALCk9lXGtUMQxXio008OEMBE0kavu/7JLfBEeFPzi43nMqVDSbEn3QCK+BMCc9zO//w==}
 
@@ -2494,8 +2473,6 @@ snapshots:
 
   '@babel/runtime@7.29.14': {}
 
-  '@babel/runtime@7.29.7': {}
-
   '@cloudflare/kv-asset-handler@0.5.0': {}
 
   '@cloudflare/unenv-preset@2.16.2(unenv@2.0.0-rc.24)(workerd@1.20261110.1)':
@@ -2763,7 +2740,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.3
       '@jridgewell/sourcemap-codec': 1.6.0
 
-  '@napi-rs/wasm-runtime@1.2.4(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)':
+  '@napi-rs/wasm-runtime@1.2.6(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)':
     dependencies:
       '@emnapi/core': 1.11.2
       '@emnapi/runtime': 1.11.2
@@ -2940,7 +2917,7 @@ snapshots:
     dependencies:
       '@emnapi/core': 1.11.2
       '@emnapi/runtime': 1.11.2
-      '@napi-rs/wasm-runtime': 1.2.4(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)
+      '@napi-rs/wasm-runtime': 1.2.6(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)
     optional: true
 
   '@oxc-resolver/binding-win32-arm64-msvc@11.24.2':
@@ -3168,7 +3145,7 @@ snapshots:
 
   '@testing-library/react@16.3.3(@testing-library/dom@10.4.2)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
     dependencies:
-      '@babel/runtime': 7.29.7
+      '@babel/runtime': 7.29.14
       '@testing-library/dom': 10.4.2
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
@@ -3201,9 +3178,9 @@ snapshots:
 
   '@types/jsdom@30.0.0':
     dependencies:
-      '@types/node': 26.6.2
+      '@types/node': 26.6.6
       '@types/tough-cookie': 4.0.5
-      parse5: 8.0.1
+      parse5: 8.1.1
       undici-types: 8.9.0
 
   '@types/mdast@4.0.4':
@@ -3215,10 +3192,6 @@ snapshots:
   '@types/node@22.20.5':
     dependencies:
       undici-types: 6.21.0
-
-  '@types/node@26.6.2':
-    dependencies:
-      undici-types: 8.9.0
 
   '@types/node@26.6.6':
     dependencies:
@@ -3419,8 +3392,6 @@ snapshots:
   eastasianwidth@0.2.0: {}
 
   emoji-regex@10.6.0: {}
-
-  entities@8.1.0: {}
 
   entities@9.0.0: {}
 
@@ -4066,10 +4037,6 @@ snapshots:
   parse5-parser-stream@8.1.1:
     dependencies:
       parse5: 8.1.1
-
-  parse5@8.0.1:
-    dependencies:
-      entities: 8.1.0
 
   parse5@8.1.1:
     dependencies:
