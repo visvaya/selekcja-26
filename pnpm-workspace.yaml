@@ -14,10 +14,6 @@ trustPolicy: no-downgrade
 # 7.x release, so trustPolicy: no-downgrade reports it as a downgrade.
 trustPolicyExclude:
   - undici-types@6.21.0
-  # Reached through lighthouse and puppeteer-core 25.17.0, which pins it exactly and is itself
-  # published with provenance. Since its Chrome-numbered versions the package is published by
-  # chrome-devtools-npm (a listed Google maintainer) without provenance, after 15.0.0 had it.
-  - chromium-bidi@157.0.8090-0
 # remark-cli pulls glob 10 and minimatch 9 (via unified-engine and @npmcli/map-workspaces),
 # affected by GHSA-g3hv-75wg-m249 (minimatch) and the glob AbortSignal advisory, with no patch
 # in their major lines; the named exports these callers use are unchanged in glob 14 and minimatch 11.
