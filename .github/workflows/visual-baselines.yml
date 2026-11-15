@@ -10,9 +10,11 @@ on:
 permissions:
   contents: read
 
-# Not cancelled: any later label event on the pull request would cancel a running regeneration.
+# Regeneration requests queue in their own group, in the order they arrive; label events that
+# regenerate nothing get another group, so they cannot replace a waiting request. Not
+# cancelled, so a running regeneration finishes.
 concurrency:
-  group: visual-baselines-${{ github.ref }}
+  group: visual-baselines-${{ github.ref }}-${{ github.event_name == 'workflow_dispatch' || github.event.label.name == 'update-screenshots' }}
   cancel-in-progress: false
 
 jobs:

@@ -81,6 +81,16 @@ test("robots.txt blocks the site only when all crawlers are disallowed from /", 
   assert.equal(robotsDisallowsRoot(""), false);
 });
 
+test("robots.txt lines may end in CR alone, and Sitemap does not split a group", () => {
+  assert.equal(robotsDisallowsRoot("User-agent: *\rDisallow: /\r"), true);
+  assert.equal(
+    robotsDisallowsRoot(
+      "User-agent: *\nSitemap: https://example.com/sitemap.xml\nUser-agent: ExampleBot\nDisallow: /",
+    ),
+    true,
+  );
+});
+
 test("robots.txt rules follow RFC 9309 matching and precedence", () => {
   assert.equal(robotsDisallowsRoot("User-agent: *\nDisallow: /*$"), true);
   assert.equal(

@@ -71,18 +71,23 @@ export function headerProblems(path, expected, served) {
  * @param {string} text robots.txt
  */
 export function robotsDisallowsRoot(text) {
-  const directives = text.split(/\r?\n/).flatMap((line) => {
-    const content = line.split("#")[0]?.trim() ?? "";
-    const separator = content.indexOf(":");
-    return separator <= 0
-      ? []
-      : [
-          {
-            field: content.slice(0, separator).trim().toLowerCase(),
-            value: content.slice(separator + 1).trim(),
-          },
-        ];
-  });
+  // RFC 9309 allows CRLF, CR or LF line ends. Only User-agent, Allow and Disallow form groups;
+  // other records such as Sitemap are skipped.
+  const directives = text
+    .split(/\r\n|\r|\n/)
+    .flatMap((line) => {
+      const content = line.split("#")[0]?.trim() ?? "";
+      const separator = content.indexOf(":");
+      return separator <= 0
+        ? []
+        : [
+            {
+              field: content.slice(0, separator).trim().toLowerCase(),
+              value: content.slice(separator + 1).trim(),
+            },
+          ];
+    })
+    .filter(({ field }) => ["user-agent", "allow", "disallow"].includes(field));
   // A group is a run of User-agent lines followed by the rules that apply to those agents.
   const groups = directives.reduce(
     (
