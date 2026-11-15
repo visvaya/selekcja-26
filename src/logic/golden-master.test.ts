@@ -11,7 +11,7 @@ import { SCENARIOS } from "./golden/scenarios.ts";
 import { formatTrace, replayScenario } from "./replay.ts";
 
 const TRACES_DIR = new URL("./golden/traces/", import.meta.url);
-const updating = process.env.UPDATE_GOLDEN === "1";
+const updating = process.env["UPDATE_GOLDEN"] === "1";
 
 const REVISIONS_FILE = new URL("./golden/rules-revisions.txt", import.meta.url);
 

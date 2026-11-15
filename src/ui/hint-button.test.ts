@@ -29,7 +29,7 @@ test("HintButton describes the button and dismisses on Escape", async () => {
     const pointer = (type: string, pointerType = "mouse") => {
       const event =
         "PointerEvent" in window
-          ? new window.PointerEvent(type)
+          ? new window["PointerEvent"](type)
           : new window.MouseEvent(type);
       Object.defineProperty(event, "pointerType", { value: pointerType });
       return event;

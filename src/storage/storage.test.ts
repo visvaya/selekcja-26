@@ -139,7 +139,7 @@ test("a version 2 save keeps its undo history with stable IDs", async () => {
     note: "disappointed",
   });
   const chained = migrateV3State(migrated) as Record<string, unknown>;
-  assert.deepEqual(chained.list, {
+  assert.deepEqual(chained["list"], {
     positions: ["LŚO"],
     query: "ki",
     sort: "form",
@@ -149,7 +149,7 @@ test("a version 2 save keeps its undo history with stable IDs", async () => {
     onlySelected: false,
     onlyCamp: false,
   });
-  for (const snapshot of chained.history as Record<string, unknown>[])
+  for (const snapshot of chained["history"] as Record<string, unknown>[])
     for (const key of ["filter", "query", "sort", "priority"])
       assert.equal(key in snapshot, false, key);
   await withStorage(async (values) => {
@@ -542,7 +542,7 @@ test("migrateV3State moves filter, query and sort into list", () => {
     string,
     unknown
   >;
-  assert.deepEqual(migrated.list, {
+  assert.deepEqual(migrated["list"], {
     positions: ["LŚO"],
     query: "ki",
     sort: "form",
@@ -554,7 +554,7 @@ test("migrateV3State moves filter, query and sort into list", () => {
   });
   for (const key of ["filter", "query", "sort"])
     assert.equal(key in migrated, false, key);
-  const history = migrated.history as Record<string, unknown>[];
+  const history = migrated["history"] as Record<string, unknown>[];
   assert.equal(history.length, 2);
   for (const snapshot of history)
     for (const key of ["filter", "query", "sort", "list"])
@@ -605,7 +605,7 @@ test("migrateV3State drops the priority from the state and every snapshot", () =
   const raw = JSON.parse(V3_STATE.replaceAll('"balance"', '"quality"'));
   const migrated = migrateV3State(raw) as Record<string, unknown>;
   assert.equal("priority" in migrated, false);
-  for (const snapshot of migrated.history as Record<string, unknown>[])
+  for (const snapshot of migrated["history"] as Record<string, unknown>[])
     assert.equal("priority" in snapshot, false);
 });
 

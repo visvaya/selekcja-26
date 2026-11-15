@@ -75,7 +75,7 @@ function isTrial(value: unknown): boolean {
     isRecord(value) &&
     Object.entries(value).every(
       ([id, result]) =>
-        PLAYER_IDS.has(id) && isRecord(result) && isNumber(result.delta),
+        PLAYER_IDS.has(id) && isRecord(result) && isNumber(result["delta"]),
     )
   );
 }
@@ -92,15 +92,15 @@ const isGoals = (value: unknown): boolean =>
 
 function isMatchScore(value: unknown): value is RawRecord {
   if (!isRecord(value)) return false;
-  const penalties = value.penalties;
+  const penalties = value["penalties"];
   return (
-    isGoals(value.goalsFor) &&
-    isGoals(value.goalsAgainst) &&
-    typeof value.opponent === "string" &&
+    isGoals(value["goalsFor"]) &&
+    isGoals(value["goalsAgainst"]) &&
+    typeof value["opponent"] === "string" &&
     (penalties === null ||
       (isRecord(penalties) &&
-        isGoals(penalties.goalsFor) &&
-        isGoals(penalties.goalsAgainst)))
+        isGoals(penalties["goalsFor"]) &&
+        isGoals(penalties["goalsAgainst"])))
   );
 }
 
@@ -108,7 +108,7 @@ function isMatchScore(value: unknown): value is RawRecord {
 function isStory(story: RawRecord): boolean {
   const { groupMatches, knockout } = story;
   return (
-    isNumber(story.groupPoints) &&
+    isNumber(story["groupPoints"]) &&
     Array.isArray(groupMatches) &&
     groupMatches.length === GAME_RULES.groupMatchesCount &&
     groupMatches.every(isMatchScore) &&
@@ -116,20 +116,20 @@ function isStory(story: RawRecord): boolean {
     knockout.length <= KNOCKOUT_ROUND_IDS.length &&
     knockout.every(
       (match, index) =>
-        isMatchScore(match) && match.round === KNOCKOUT_ROUND_IDS[index],
+        isMatchScore(match) && match["round"] === KNOCKOUT_ROUND_IDS[index],
     ) &&
-    typeof story.outcome === "string" &&
-    isNumber(story.seed)
+    typeof story["outcome"] === "string" &&
+    isNumber(story["seed"])
   );
 }
 
 // The flat story written under rules revision 1, kept for frozen reports.
 function isLegacyStory(story: RawRecord): boolean {
   return (
-    isStringArray(story.matches) &&
-    typeof story.outcome === "string" &&
-    typeof story.last === "string" &&
-    isNumber(story.seed)
+    isStringArray(story["matches"]) &&
+    typeof story["outcome"] === "string" &&
+    typeof story["last"] === "string" &&
+    isNumber(story["seed"])
   );
 }
 
@@ -137,17 +137,17 @@ function isLegacyStory(story: RawRecord): boolean {
 // the report is shown, so only the shape is checked here.
 function isReport(value: unknown): value is FinalReport {
   if (!isRecord(value)) return false;
-  const story = value.story;
+  const story = value["story"];
   return (
-    isRevision(value.rulesRevision) &&
-    isStringArray(value.squadIds) &&
+    isRevision(value["rulesRevision"]) &&
+    isStringArray(value["squadIds"]) &&
     ["quality", "chem", "coverage", "luck", "points"].every((key) =>
       isNumber(value[key]),
     ) &&
-    typeof value.stage === "string" &&
-    typeof value.grade === "string" &&
-    isStringArray(value.strengths) &&
-    isStringArray(value.weak) &&
+    typeof value["stage"] === "string" &&
+    typeof value["grade"] === "string" &&
+    isStringArray(value["strengths"]) &&
+    isStringArray(value["weak"]) &&
     isRecord(story) &&
     (isStory(story) || isLegacyStory(story))
   );
@@ -155,23 +155,23 @@ function isReport(value: unknown): value is FinalReport {
 
 function isSnapshot(value: unknown): value is GameSnapshot {
   if (!isRecord(value)) return false;
-  const effects = value.effects;
+  const effects = value["effects"];
   return (
-    SYSTEM_IDS.has(value.system) &&
-    (value.stage === "camp" || value.stage === "final") &&
-    typeof value.started === "boolean" &&
-    isPlayerIdArray(value.selected) &&
-    isPlayerIdArray(value.campSquad) &&
-    isTrial(value.trial) &&
-    isStringArray(value.events) &&
-    value.events.every((id) => EVENT_IDS.has(id)) &&
+    SYSTEM_IDS.has(value["system"]) &&
+    (value["stage"] === "camp" || value["stage"] === "final") &&
+    typeof value["started"] === "boolean" &&
+    isPlayerIdArray(value["selected"]) &&
+    isPlayerIdArray(value["campSquad"]) &&
+    isTrial(value["trial"]) &&
+    isStringArray(value["events"]) &&
+    value["events"].every((id) => EVENT_IDS.has(id)) &&
     isRecord(effects) &&
-    isNumber(effects.chem) &&
-    isNumber(effects.fit) &&
-    isNumber(effects.quality) &&
-    isPlayerIdArray(value.compare) &&
-    isNumber(value.seed) &&
-    (value.report === null || isReport(value.report))
+    isNumber(effects["chem"]) &&
+    isNumber(effects["fit"]) &&
+    isNumber(effects["quality"]) &&
+    isPlayerIdArray(value["compare"]) &&
+    isNumber(value["seed"]) &&
+    (value["report"] === null || isReport(value["report"]))
   );
 }
 
@@ -184,28 +184,28 @@ function isRanges(value: unknown): boolean {
       ([id, bounds]) =>
         RANGE_IDS.has(id) &&
         isRecord(bounds) &&
-        isBound(bounds.min) &&
-        isBound(bounds.max),
+        isBound(bounds["min"]) &&
+        isBound(bounds["max"]),
     )
   );
 }
 
 function isListFilters(value: unknown): value is ListFilters {
   if (!isRecord(value)) return false;
-  const foot = value.foot;
+  const foot = value["foot"];
   return (
-    Array.isArray(value.positions) &&
-    value.positions.every((position) => POSITIONS.has(position)) &&
-    typeof value.query === "string" &&
-    SORT_IDS.has(value.sort) &&
+    Array.isArray(value["positions"]) &&
+    value["positions"].every((position) => POSITIONS.has(position)) &&
+    typeof value["query"] === "string" &&
+    SORT_IDS.has(value["sort"]) &&
     isRecord(foot) &&
-    typeof foot.left === "boolean" &&
-    typeof foot.right === "boolean" &&
-    Array.isArray(value.traits) &&
-    value.traits.every((trait) => ROLE_ID_SET.has(trait)) &&
-    isRanges(value.ranges) &&
-    typeof value.onlySelected === "boolean" &&
-    typeof value.onlyCamp === "boolean"
+    typeof foot["left"] === "boolean" &&
+    typeof foot["right"] === "boolean" &&
+    Array.isArray(value["traits"]) &&
+    value["traits"].every((trait) => ROLE_ID_SET.has(trait)) &&
+    isRanges(value["ranges"]) &&
+    typeof value["onlySelected"] === "boolean" &&
+    typeof value["onlyCamp"] === "boolean"
   );
 }
 
@@ -283,20 +283,20 @@ const EMPTY: LoadedSave = { state: null, discardedForRulesChange: false };
 
 // Returns the state in the version 4 shape with the rules revision it was saved under.
 function upgrade(saved: RawRecord): { state: unknown; rulesRevision: unknown } {
-  if (saved.schemaVersion === 1 || saved.schemaVersion === 2)
+  if (saved["schemaVersion"] === 1 || saved["schemaVersion"] === 2)
     return {
       state: migrateV3State(
-        migrateLegacyState(saved.state, saved.schemaVersion),
+        migrateLegacyState(saved["state"], saved["schemaVersion"]),
       ),
       rulesRevision: LEGACY_RULES_REVISION,
     };
-  if (saved.schemaVersion === 3)
+  if (saved["schemaVersion"] === 3)
     return {
-      state: migrateV3State(saved.state),
-      rulesRevision: saved.rulesRevision,
+      state: migrateV3State(saved["state"]),
+      rulesRevision: saved["rulesRevision"],
     };
-  return saved.schemaVersion === APP_CONFIG.saveSchemaVersion
-    ? { state: saved.state, rulesRevision: saved.rulesRevision }
+  return saved["schemaVersion"] === APP_CONFIG.saveSchemaVersion
+    ? { state: saved["state"], rulesRevision: saved["rulesRevision"] }
     : { state: null, rulesRevision: null };
 }
 
