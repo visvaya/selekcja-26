@@ -78,6 +78,17 @@ test("both families load their latin and latin-ext faces from the build", async 
     ).toBe(true);
     // The variable axis covers every weight the old stylesheet uses (up to 900).
     expect(faces.every((face) => face.weight === "100 900")).toBe(true);
+    // Only the two subsets Polish needs are declared at all, so the build ships no others.
+    expect(
+      await page.evaluate(
+        (name) =>
+          [...document.fonts].filter(
+            (face) => face.family.replaceAll('"', "") === name,
+          ).length,
+        family,
+      ),
+      `${family} declared faces`,
+    ).toBe(2);
   }
   expect(
     await page.evaluate(
