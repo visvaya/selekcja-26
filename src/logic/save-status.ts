@@ -1,4 +1,7 @@
-import type { SaveFailureReason, SaveResult } from "./storage.ts";
+export type SaveFailureReason = "unavailable" | "quota" | "failed";
+export type SaveResult =
+  | { readonly ok: true }
+  | { readonly ok: false; readonly reason: SaveFailureReason };
 
 // Pure UI state for the save-failure banner (see src/ui/save-status-banner.tsx). It is not
 // part of GameState: it is never persisted and is driven only by the outcome of each save

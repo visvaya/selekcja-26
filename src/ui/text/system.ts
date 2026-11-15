@@ -1,4 +1,4 @@
-import type { SaveFailureReason } from "../../logic/storage.ts";
+import type { SaveFailureReason } from "../../logic/save-status.ts";
 
 export const SYSTEM_TEXT = {
   brand: "SELEKCJA",
