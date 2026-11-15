@@ -15,6 +15,7 @@ import {
 const WARM_UP_CYCLES = 2;
 const MEASURED_CYCLES = 10;
 const BYTES_PER_KIB = 1024;
+const SETTLE_ROUNDS = 3;
 
 // Measured on the production build in Chromium, three local runs of ten cycles after two to warm
 // up: 170 listeners and 403 nodes before and after every time, so one left behind per cycle would
@@ -33,7 +34,19 @@ type MemorySample = {
   documents: number;
 };
 
-async function memorySample(session: CDPSession): Promise<MemorySample> {
+async function memorySample(
+  page: Page,
+  session: CDPSession,
+): Promise<MemorySample> {
+  // Unmounting and effect cleanups can finish in later tasks; let the page go idle first so a
+  // sample does not depend on how fast the machine is.
+  for (let round = 0; round < SETTLE_ROUNDS; round++)
+    await page.evaluate(
+      () =>
+        new Promise<void>((resolve) => {
+          requestIdleCallback(() => resolve(), { timeout: 1000 });
+        }),
+    );
   await session.send("HeapProfiler.collectGarbage");
   const heap = await session.send("Runtime.getHeapUsage");
   const { metrics } = await session.send("Performance.getMetrics");
@@ -123,9 +136,11 @@ test("full games without a reload leave no listeners or nodes behind and the hea
   await page.goto("/");
   for (let index = 0; index < WARM_UP_CYCLES; index++) await cycle(page);
 
-  const before = await memorySample(session);
-  for (let index = 0; index < MEASURED_CYCLES; index++) await cycle(page);
-  const after = await memorySample(session);
+  const before = await memorySample(page, session);
+  for (let index = 0; index < MEASURED_CYCLES / 2; index++) await cycle(page);
+  const halfway = await memorySample(page, session);
+  for (let index = 0; index < MEASURED_CYCLES / 2; index++) await cycle(page);
+  const after = await memorySample(page, session);
 
   const growth = {
     heapUsedKib: after.heapUsedKib - before.heapUsedKib,
@@ -134,7 +149,7 @@ test("full games without a reload leave no listeners or nodes behind and the hea
     documents: after.documents - before.documents,
   };
   await testInfo.attach("leak-cycles.json", {
-    body: JSON.stringify({ before, after, growth }, null, 2),
+    body: JSON.stringify({ before, halfway, after, growth }, null, 2),
     contentType: "application/json",
   });
   expect(errors).toEqual([]);
