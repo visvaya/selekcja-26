@@ -1,15 +1,11 @@
 import { APP_CONFIG } from "../data/constants.ts";
 import type { GameState } from "../data/types.ts";
-import { decodeSave, encodeSave } from "./save-format.ts";
-import type { LoadedSave } from "./save-format.ts";
+import { decodeSave, encodeSave } from "../logic/save-format.ts";
+import type { LoadedSave } from "../logic/save-format.ts";
+import type { SaveFailureReason, SaveResult } from "../logic/save-status.ts";
 
 const STORAGE_KEY = APP_CONFIG.storageKey;
 let pendingSave: Promise<unknown> = Promise.resolve();
-
-export type SaveFailureReason = "unavailable" | "quota" | "failed";
-export type SaveResult =
-  | { readonly ok: true }
-  | { readonly ok: false; readonly reason: SaveFailureReason };
 
 interface StorageBackend {
   load: () => Promise<string | null>;

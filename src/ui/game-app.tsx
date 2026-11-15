@@ -12,7 +12,7 @@ import { APP_CONFIG } from "../data/constants.ts";
 import type { GameState, Player, PlayerId } from "../data/types.ts";
 import { fillSquadRandomly } from "../logic/random-squad.ts";
 import { createInitialState, reduceGameState } from "../logic/state.ts";
-import { clearGame, loadGame, saveGame } from "../logic/storage.ts";
+import { clearGame, loadGame, saveGame } from "../storage/storage.ts";
 import type { LoadedSave } from "../logic/save-format.ts";
 import { createLatestRequestTracker } from "../logic/latest-request.ts";
 import { initialSaveStatus, reduceSaveStatus } from "../logic/save-status.ts";

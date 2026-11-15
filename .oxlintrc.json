@@ -84,6 +84,11 @@
             "object": "Math",
             "property": "random",
             "message": "Game logic must use the seeded generator in src/logic/random.ts."
+          },
+          {
+            "object": "Date",
+            "property": "now",
+            "message": "src/logic and src/data must not read the clock; pass the time in as a parameter."
           }
         ],
         "no-restricted-imports": [
@@ -91,10 +96,68 @@
           {
             "patterns": [
               {
+                "group": ["react", "react/*", "react-dom", "react-dom/*"],
+                "message": "src/logic and src/data must not depend on React; keep components and hooks in src/ui."
+              },
+              {
                 "group": ["**/ui/*", "../ui/*"],
                 "message": "src/logic and src/data must not depend on src/ui; pass UI copy in as a parameter."
+              },
+              {
+                "group": ["**/storage/*", "../storage/*"],
+                "message": "src/logic and src/data must not do storage I/O; return data and let src/ui call the adapter in src/storage."
               }
             ]
+          }
+        ]
+      }
+    },
+    {
+      // Browser and runtime I/O globals; tests may build dates from fixtures.
+      "files": ["src/logic/**", "src/data/**"],
+      "excludeFiles": ["**/*.test.ts"],
+      "rules": {
+        "no-restricted-globals": [
+          "error",
+          {
+            "name": "window",
+            "message": "src/logic and src/data must not touch the browser; pass the value or a narrow function in as a parameter."
+          },
+          {
+            "name": "document",
+            "message": "src/logic and src/data must not touch the DOM; return data and let src/ui render it."
+          },
+          {
+            "name": "localStorage",
+            "message": "src/logic and src/data must not do storage I/O; use the adapter in src/storage from src/ui."
+          },
+          {
+            "name": "sessionStorage",
+            "message": "src/logic and src/data must not do storage I/O; use the adapter in src/storage from src/ui."
+          },
+          {
+            "name": "indexedDB",
+            "message": "src/logic and src/data must not do storage I/O; use the adapter in src/storage from src/ui."
+          },
+          {
+            "name": "fetch",
+            "message": "src/logic and src/data must not do network I/O; pass the fetched data or a narrow function in as a parameter."
+          },
+          {
+            "name": "performance",
+            "message": "src/logic and src/data must not read the clock; pass the time in as a parameter."
+          },
+          {
+            "name": "Date",
+            "message": "src/logic and src/data must not read the clock or build dates; pass the time in as a parameter."
+          },
+          {
+            "name": "globalThis",
+            "message": "src/logic and src/data must not reach globals; pass the value or a narrow function in as a parameter."
+          },
+          {
+            "name": "process",
+            "message": "src/logic and src/data must not read the environment; pass configuration in as a parameter."
           }
         ]
       }

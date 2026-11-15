@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import type { SaveResult } from "./storage.ts";
+import type { SaveResult } from "./save-status.ts";
 import {
   initialSaveStatus,
   reduceSaveStatus,
