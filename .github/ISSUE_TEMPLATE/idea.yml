@@ -1,0 +1,16 @@
+name: Idea
+description: A suggestion for the game or for this repository.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: Idea
+      description: What should change, and what would it give the player?
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Examples, real-world references or anything else that helps.

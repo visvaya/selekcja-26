@@ -1,19 +1,30 @@
 version: 2
 
 # Weekly, grouped updates keep the PR count low on a single-maintainer repo.
+# Short group names keep the pull request titles, which CI checks, short.
 # Security updates are not grouped here: they arrive on their own as soon as
 # an advisory lands, independent of this schedule. `cooldown` waits a week
 # after a version is published before proposing it.
 #
 # @playwright/test and the Playwright image the browser jobs run in
-# (.github/playwright/Dockerfile) must move together, so they share one
+# (docker/playwright/Dockerfile) must move together, so they share one
 # multi-ecosystem group and the regular npm entry ignores the package.
+# The Dockerfile stays outside .github/: Dependabot may change files there
+# only for the github-actions ecosystem, so a docker update under .github/
+# is refused when the pull request is created.
+# In #39 the Docker half took a release younger than its cooldown while the npm
+# half did not; the version-match test (scripts/playwright-image.test.mjs) then
+# fails and the image tag is aligned by hand to the npm version.
 multi-ecosystem-groups:
   playwright:
     schedule:
       interval: weekly
       day: monday
       timezone: Europe/Warsaw
+    # CI checks the pull request title as a Conventional Commit.
+    commit-message:
+      prefix: build
+      include: scope
 
 updates:
   - package-ecosystem: npm
@@ -32,10 +43,10 @@ updates:
     ignore:
       - dependency-name: "@playwright/test"
     groups:
-      production-minor-patch:
+      prod:
         dependency-type: production
         update-types: [minor, patch]
-      development-minor-patch:
+      dev:
         dependency-type: development
         update-types: [minor, patch]
   # Workflows pin actions to commit SHAs with the exact release as a comment
@@ -62,7 +73,7 @@ updates:
     cooldown:
       default-days: 7
   - package-ecosystem: docker
-    directory: /.github/playwright
+    directory: /docker/playwright
     patterns: ["*"]
     multi-ecosystem-group: playwright
     cooldown:

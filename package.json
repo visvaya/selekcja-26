@@ -38,15 +38,16 @@
     "format:check": "oxfmt --check",
     "check:text": "node scripts/check-text.mjs",
     "check:conventions": "node scripts/check-conventions.mjs",
+    "check:links": "remark --quiet --frail --no-stdout README.md CONTRIBUTING.md SECURITY.md .github",
     "quality:duplicates": "jscpd .",
     "quality:dead": "cross-env KNIP_DISABLE_RAW_TRANSFER=1 knip",
-    "quality": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm check:text && pnpm check:conventions",
+    "quality": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm check:text && pnpm check:conventions && pnpm check:links",
     "verify": "pnpm quality && pnpm quality:duplicates && pnpm quality:dead && pnpm test:coverage && pnpm build && git diff --check",
     "verify:full": "pnpm verify && pnpm test:e2e",
     "prepare": "node scripts/install-git-hooks.mjs"
   },
   "engines": {
-    "node": ">=24"
+    "node": ">=24.2"
   },
   "packageManager": "pnpm@11.1.2",
   "dependencies": {
@@ -57,7 +58,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "~4.13.0",
-    "@playwright/test": "^1.63.0",
+    "@playwright/test": "^1.65.0",
     "@testing-library/react": "^16.3.3",
     "@types/jsdom": "^30.0.0",
     "@types/node": "^26.6.6",
@@ -70,7 +71,10 @@
     "oxfmt": "0.75.0",
     "oxlint": "1.90.0",
     "oxlint-tsgolint": "7.0.2005",
+    "remark-cli": "12.0.1",
+    "remark-validate-links": "13.1.0",
     "typescript": "^7.0.2",
-    "vite": "^8.3.8"
+    "vite": "^8.3.8",
+    "wrangler": "4.160.1"
   }
 }

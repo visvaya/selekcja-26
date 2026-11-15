@@ -1,0 +1,8 @@
+{
+  "plugins": [
+    [
+      "remark-validate-links",
+      { "repository": "https://github.com/visvaya/selekcja-26" }
+    ]
+  ]
+}

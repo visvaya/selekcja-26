@@ -4,6 +4,10 @@ A browser game about picking Poland's national squad for EURO 2028. The player, 
 
 **[Play in the browser](https://selekcja-26.visvaya.workers.dev)** on a phone or a desktop, no installation needed. Progress is saved on the device. The game builds to a static site served by Cloudflare Workers; every change to `main` is deployed only after the full test gate passes.
 
+## Status
+
+In development and playable at the link above; rules, ratings and screens still change between releases. The current version is shown in the game's top bar and in `package.json`. Contributions: see [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## Gameplay
 
 1. **Briefing.** Choose a formation (4-2-3-1, 3-4-2-1 or 4-3-3) and a selection priority: balance, current form or pure quality. Both change how every candidate is rated.
@@ -31,7 +35,7 @@ Requires Node.js 24+ and pnpm.
 ```sh
 pnpm install --frozen-lockfile
 pnpm dev            # Vite dev server
-pnpm quality        # fast static checks: types, lint, formatting, text and convention rules
+pnpm quality        # fast static checks: types, lint, formatting, text, convention and link rules
 pnpm verify         # quality plus duplication, dead code, tests with coverage and build
 pnpm verify:full    # full gate: verify plus browser journeys and the accessibility scan
 pnpm test:e2e       # browser journeys (first run: pnpm exec playwright install chromium webkit)

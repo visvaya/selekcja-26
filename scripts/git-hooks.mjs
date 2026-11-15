@@ -1,17 +1,26 @@
 // Shared Git hook logic. Invoked by .githooks/*.
 // Usage: node scripts/git-hooks.mjs pre-commit
 //        node scripts/git-hooks.mjs commit-msg <message-file>
+//        node scripts/git-hooks.mjs pr-title <title-file> <author-login>
+// The identity check is opt-in per checkout, so anyone else can still commit:
+//        git config hooks.ownerIdentities "<email> [<email> ...]"
 import { execFileSync, spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 
-// Commits may be authored by the owner under any identity, but never by an AI tool.
-const AI_IDENTITY =
-  /\b(codex|chatgpt|openai|claude|anthropic|copilot|gemini|cursor|devin|aider)\b/i;
-const AI_ATTRIBUTION = [
-  /^co-authored-by:.*\b(codex|chatgpt|openai|claude|anthropic|copilot|gemini|cursor|devin|aider)\b/im,
-  /generated (with|by) .*(codex|chatgpt|openai|claude|anthropic|copilot|gemini|cursor)/i,
-  /^(claude|codex|openai|anthropic)[\w-]*:/im,
+// Co-author, generated-by and session lines are rejected for everyone.
+const ATTRIBUTION_LINES = [
+  /^co-authored-by:/im,
+  /^\W*generated (?:with|by)\s/im,
+  /^[\w-]+-session:/im,
 ];
+const EM_DASH = String.fromCodePoint(0x2014);
+const SCISSORS = " ------------------------ >8 ------------------------";
+const EXCLUDED_FILE_NAMES = new Set([
+  "AGENTS.md",
+  "CLAUDE.md",
+  "CLAUDE.local.md",
+]);
+const EXCLUDED_DIRECTORIES = new Set([".agents", ".claude", ".codex"]);
 const EMOJI = /\p{Emoji_Presentation}/u;
 // One line per rules revision with the golden traces hash; see src/logic/golden-master.test.ts.
 const RULES_REVISIONS_FILE = "src/logic/golden/rules-revisions.txt";
@@ -27,14 +36,91 @@ function git(args) {
   return execFileSync("git", args, { encoding: "utf8" }).trim();
 }
 
-function preCommit() {
-  for (const role of ["GIT_AUTHOR_IDENT", "GIT_COMMITTER_IDENT"]) {
-    const identity = git(["var", role]).replace(/\s+\d+\s+[+-]\d{4}$/, "");
-    if (AI_IDENTITY.test(identity))
-      fail(
-        `${role} is "${identity}". Commits must use the owner's identity, never an AI tool's.`,
-      );
+/**
+ * @param {string} message
+ * @returns {string[]}
+ */
+function messageProblems(message) {
+  return [
+    ...(ATTRIBUTION_LINES.some((pattern) => pattern.test(message))
+      ? [
+          "Remove co-author, generated-by and session lines from the commit message.",
+        ]
+      : []),
+    ...(message.includes(EM_DASH)
+      ? [
+          "Replace the em dash (U+2014) with an en dash (U+2013) or a middle dot (U+00B7).",
+        ]
+      : []),
+    ...(EMOJI.test(message) ? ["Remove emoji from the commit message."] : []),
+  ];
+}
+
+/**
+ * @param {{ role: string, ident: string }[]} identities `git var` output without the timestamp
+ * @param {string[]} ownerEmails empty when the checkout has not opted in
+ * @returns {string[]}
+ */
+export function identityProblems(identities, ownerEmails) {
+  const allowed = ownerEmails.map((email) => email.toLowerCase());
+  return allowed.length === 0
+    ? []
+    : identities
+        .filter(
+          ({ ident }) =>
+            !allowed.includes(
+              /<([^>]*)>/.exec(ident)?.[1]?.toLowerCase() ?? "",
+            ),
+        )
+        .map(
+          ({ role, ident }) =>
+            `${role} is "${ident}"; commit with one of the e-mails in hooks.ownerIdentities.`,
+        );
+}
+
+/**
+ * @param {string[]} staged repository-relative paths with forward slashes
+ * @returns {string[]}
+ */
+export function excludedFiles(staged) {
+  return staged.filter((file) => {
+    const parts = file.split("/");
+    return (
+      EXCLUDED_FILE_NAMES.has(parts.at(-1) ?? "") ||
+      parts.slice(0, -1).some((part) => EXCLUDED_DIRECTORIES.has(part))
+    );
+  });
+}
+
+// Git starts its scissors line with core.commentChar ("#" unless configured).
+function scissorsLine() {
+  try {
+    const commentChar = git(["config", "--get", "core.commentChar"]);
+    return `${commentChar.length === 1 ? commentChar : "#"}${SCISSORS}`;
+  } catch {
+    return `#${SCISSORS}`;
   }
+}
+
+function configuredOwnerEmails() {
+  try {
+    return git(["config", "--get", "hooks.ownerIdentities"])
+      .split(/[\s,]+/)
+      .filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+function preCommit() {
+  const identities = ["GIT_AUTHOR_IDENT", "GIT_COMMITTER_IDENT"].map(
+    (role) => ({
+      role,
+      ident: git(["var", role]).replace(/\s+\d+\s+[+-]\d{4}$/, ""),
+    }),
+  );
+  const identity = identityProblems(identities, configuredOwnerEmails());
+  if (identity.length > 0) fail(identity.join("\n"));
   const whitespace = spawnSync("git", ["diff", "--cached", "--check"], {
     stdio: "inherit",
   });
@@ -48,6 +134,11 @@ function preCommit() {
   ])
     .split("\0")
     .filter(Boolean);
+  const excluded = excludedFiles(staged);
+  if (excluded.length > 0)
+    fail(
+      `These paths are not committed in this repository:\n  ${excluded.join("\n  ")}\nUnstage them with: git restore --staged -- <path>`,
+    );
   if (staged.some((file) => file.startsWith("dist/")))
     fail("dist/ is generated by `pnpm build`; do not commit it here.");
   const revisionsDiff = git([
@@ -81,27 +172,47 @@ function preCommit() {
   if (conventions.status !== 0) fail("Repository conventions are violated.");
 }
 
-function commitMsg(file) {
-  const message = readFileSync(file, "utf8")
+// A pull request title becomes the squash commit on main, so it gets no exemptions.
+function commitMsg(file, { exemptGitSubjects = true, maxLength = 72 } = {}) {
+  // `git commit -v` appends the diff below a scissors line; it is not part of the message.
+  const lines = readFileSync(file, "utf8").split("\n");
+  const scissors = lines.indexOf(scissorsLine());
+  const raw = (scissors < 0 ? lines : lines.slice(0, scissors)).join("\n");
+  const message = raw
     .split("\n")
     .filter((line) => !line.startsWith("#"))
     .join("\n")
     .trim();
+  // Unfiltered: `git commit -m` keeps lines that start with #.
+  const problems = messageProblems(raw);
+  if (problems.length > 0) fail(problems.join("\n"));
   const subject = message.split("\n")[0] ?? "";
-  if (/^(Merge|Revert) /.test(subject) || /^(fixup|squash)! /.test(subject))
+  // Subjects Git writes skip only the format and length rules.
+  if (
+    exemptGitSubjects &&
+    (/^(Merge|Revert) /.test(subject) || /^(fixup|squash)! /.test(subject))
+  )
     return;
   if (!CONVENTIONAL.test(subject))
     fail(
       `Subject "${subject}" is not a Conventional Commit, e.g. "fix(storage): report failed saves".`,
     );
-  if (subject.length > 72)
-    fail(`Subject is ${subject.length} characters; keep it at 72 or fewer.`);
-  if (AI_ATTRIBUTION.some((pattern) => pattern.test(message)))
-    fail("Remove AI authorship or attribution lines from the commit message.");
-  if (EMOJI.test(message)) fail("Remove emoji from the commit message.");
+  if (subject.length > maxLength)
+    fail(
+      `Subject is ${subject.length} characters; keep it at ${maxLength} or fewer.`,
+    );
 }
 
-const [hook, argument] = process.argv.slice(2);
-if (hook === "pre-commit") preCommit();
-else if (hook === "commit-msg" && argument) commitMsg(argument);
-else fail(`Unknown hook invocation: ${process.argv.slice(2).join(" ")}`);
+// Imported by the tests, the module runs nothing.
+if (import.meta.main) {
+  const [hook, argument, author] = process.argv.slice(2);
+  if (hook === "pre-commit") preCommit();
+  else if (hook === "commit-msg" && argument) commitMsg(argument);
+  else if (hook === "pr-title" && argument)
+    // Dependabot titles can exceed 72 characters; whoever merges sets the squash subject.
+    commitMsg(argument, {
+      exemptGitSubjects: false,
+      maxLength: author === "dependabot[bot]" ? Infinity : 72,
+    });
+  else fail(`Unknown hook invocation: ${process.argv.slice(2).join(" ")}`);
+}

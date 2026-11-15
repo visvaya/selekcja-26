@@ -13,6 +13,8 @@ const TOOL_MANDATED_NAMES = new Set([
   "README.md",
   "LICENSE",
   "SECURITY.md",
+  "CONTRIBUTING.md",
+  "pull_request_template.md",
   "_headers",
   "Dockerfile",
 ]);
