@@ -1,4 +1,4 @@
-// The CI jobs run inside the official Playwright image named in .github/playwright/Dockerfile,
+// The CI jobs run inside the official Playwright image named in docker/playwright/Dockerfile,
 // whose browsers must match the @playwright/test version the lockfile installs. Dependabot
 // updates both in one pull request; this test catches a bump that moves only one of them, and a
 // workflow that names an image of its own instead of reading the Dockerfile.
@@ -26,7 +26,7 @@ function lockedPlaywrightVersion() {
 }
 
 test("the Playwright image matches the locked @playwright/test version", () => {
-  const match = read(".github/playwright/Dockerfile").match(IMAGE_LINE);
+  const match = read("docker/playwright/Dockerfile").match(IMAGE_LINE);
 
   assert.ok(match, "no digest-pinned Playwright image in the Dockerfile");
   assert.equal(match[1], lockedPlaywrightVersion());

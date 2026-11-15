@@ -23,7 +23,7 @@ jobs:
     name: verify
     needs: playwright-image
     runs-on: ubuntu-24.04
-    # Browsers and their system libraries come with the image (.github/playwright/Dockerfile), so
+    # Browsers and their system libraries come with the image (docker/playwright/Dockerfile), so
     # no step downloads them from the Ubuntu mirrors.
     container:
       # Digest-pinned: playwright-image.yml rejects any other reference.
