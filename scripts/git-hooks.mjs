@@ -92,14 +92,12 @@ export function excludedFiles(staged) {
   });
 }
 
-// Git starts its scissors line with core.commentChar ("#" unless configured).
+// Git 2.45+ prefers core.commentString; "auto" picks a character per message, treated as "#".
 function scissorsLine() {
-  try {
-    const commentChar = git(["config", "--get", "core.commentChar"]);
-    return `${commentChar.length === 1 ? commentChar : "#"}${SCISSORS}`;
-  } catch {
-    return `#${SCISSORS}`;
-  }
+  const prefix = ["core.commentString", "core.commentChar"]
+    .map((key) => git(["config", "--get", "--default", "", key]))
+    .find((value) => value !== "" && value !== "auto");
+  return `${prefix ?? "#"}${SCISSORS}`;
 }
 
 function configuredOwnerEmails() {

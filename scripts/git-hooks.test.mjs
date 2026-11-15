@@ -9,15 +9,38 @@ import { excludedFiles, identityProblems } from "./git-hooks.mjs";
 const directory = mkdtempSync(join(tmpdir(), "git-hooks-"));
 after(() => rmSync(directory, { recursive: true }));
 
-/** @param {string[]} args @param {string} subject */
-function run(args, subject) {
+// The hook reads Git config; the user's own global and system config stay out of the tests.
+const emptyConfig = join(directory, "gitconfig");
+writeFileSync(emptyConfig, "");
+
+/**
+ * @param {string[]} args
+ * @param {string} subject
+ * @param {Record<string, string>} config Git config entries for the hook process
+ */
+function run(args, subject, config = {}) {
   const file = join(directory, "message.txt");
   writeFileSync(file, `${subject}\n`);
   const [hook, ...rest] = args;
+  const entries = Object.entries(config);
   return spawnSync(
     process.execPath,
     ["scripts/git-hooks.mjs", hook ?? "", file, ...rest],
-    { encoding: "utf8" },
+    {
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        GIT_CONFIG_GLOBAL: emptyConfig,
+        GIT_CONFIG_NOSYSTEM: "1",
+        GIT_CONFIG_COUNT: String(entries.length),
+        ...Object.fromEntries(
+          entries.flatMap(([key, value], index) => [
+            [`GIT_CONFIG_KEY_${index}`, key],
+            [`GIT_CONFIG_VALUE_${index}`, value],
+          ]),
+        ),
+      },
+    },
   ).status;
 }
 
@@ -66,6 +89,25 @@ test("commit-msg rejects attribution lines, em dashes and emoji for everyone", (
   ]) {
     assert.equal(run(["commit-msg"], message), 1, message);
   }
+});
+
+test("the scissors line uses core.commentString, then core.commentChar", () => {
+  const marker = " ------------------------ >8 ------------------------";
+  const diff = "+Generated with Some Tool";
+  assert.equal(
+    run(["commit-msg"], `fix: x\n//${marker}\n${diff}`, {
+      "core.commentString": "//",
+      "core.commentChar": ";",
+    }),
+    0,
+  );
+  assert.equal(
+    run(["commit-msg"], `fix: x\n;${marker}\n${diff}`, {
+      "core.commentChar": ";",
+    }),
+    0,
+  );
+  assert.equal(run(["commit-msg"], `fix: x\n;${marker}\n${diff}`), 1);
 });
 
 test("the identity check applies only with owner identities configured", () => {
