@@ -30,15 +30,21 @@ jobs:
         run: |
           status=0
           check() {
-            local variable=$1 repository=$2 file=$3 pinned latest
+            local variable=$1 repository=$2 file=$3 pinned release latest age_days
             pinned=$(sed -n "s/^ *${variable}: *//p" "$file" | head -n 1)
-            if ! latest=$(gh release view --repo "$repository" --json tagName --jq .tagName); then
+            if ! release=$(gh release view --repo "$repository" --json tagName,publishedAt \
+              --jq '.tagName + " " + .publishedAt'); then
               echo "::error::Could not read the latest release of $repository."
               exit 2
             fi
+            latest=${release%% *}
             latest=${latest#v}
+            age_days=$(( ($(date +%s) - $(date -d "${release#* }" +%s)) / 86400 ))
             if [ "$pinned" = "$latest" ]; then
               echo "$variable $pinned is the latest release."
+            elif [ "$age_days" -lt 3 ]; then
+              # Release-age rule: a release is adopted once it is at least 3 days old.
+              echo "$variable $pinned; $latest is only $age_days day(s) old, so it is not due yet."
             else
               echo "::error file=$file::$variable is '$pinned', the latest release of $repository is $latest; update it and its checksum."
               status=1

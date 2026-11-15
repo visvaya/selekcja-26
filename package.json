@@ -46,7 +46,7 @@
     "prepare": "node scripts/install-git-hooks.mjs"
   },
   "engines": {
-    "node": ">=24"
+    "node": ">=24.2"
   },
   "packageManager": "pnpm@11.1.2",
   "dependencies": {
