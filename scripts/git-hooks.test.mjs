@@ -91,23 +91,23 @@ test("commit-msg rejects attribution lines, em dashes and emoji for everyone", (
   }
 });
 
-test("the scissors line uses core.commentString, then core.commentChar", () => {
+test("the scissors line uses the last core.commentString or core.commentChar", () => {
   const marker = " ------------------------ >8 ------------------------";
   const diff = "+Generated with Some Tool";
+  const commit = (/** @type {string} */ prefix, config = {}) =>
+    run(["commit-msg"], `fix: x\n${prefix}${marker}\n${diff}`, config);
+  // The two keys are aliases: the one set last wins.
   assert.equal(
-    run(["commit-msg"], `fix: x\n//${marker}\n${diff}`, {
-      "core.commentString": "//",
-      "core.commentChar": ";",
-    }),
+    commit(";", { "core.commentString": "//", "core.commentChar": ";" }),
     0,
   );
   assert.equal(
-    run(["commit-msg"], `fix: x\n;${marker}\n${diff}`, {
-      "core.commentChar": ";",
-    }),
+    commit("//", { "core.commentChar": ";", "core.commentString": "//" }),
     0,
   );
-  assert.equal(run(["commit-msg"], `fix: x\n;${marker}\n${diff}`), 1);
+  // A trailing space in the prefix is part of the line.
+  assert.equal(commit("// ", { "core.commentString": "// " }), 0);
+  assert.equal(commit(";"), 1);
 });
 
 test("the identity check applies only with owner identities configured", () => {

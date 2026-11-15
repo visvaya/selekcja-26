@@ -92,12 +92,18 @@ export function excludedFiles(staged) {
   });
 }
 
-// Git 2.45+ prefers core.commentString; "auto" picks a character per message, treated as "#".
+// core.commentString and core.commentChar are aliases (Git 2.45+): the one set last wins.
+// The value is read untrimmed, since a trailing space is part of the prefix; "auto" picks a
+// character per message and is treated as "#".
 function scissorsLine() {
-  const prefix = ["core.commentString", "core.commentChar"]
-    .map((key) => git(["config", "--get", "--default", "", key]))
-    .find((value) => value !== "" && value !== "auto");
-  return `${prefix ?? "#"}${SCISSORS}`;
+  const entries = spawnSync(
+    "git",
+    ["config", "--get-regexp", "^core[.]comment(char|string)$"],
+    { encoding: "utf8" },
+  ).stdout;
+  const last = (entries ?? "").split("\n").filter(Boolean).at(-1);
+  const prefix = last?.slice(last.indexOf(" ") + 1);
+  return `${prefix === undefined || prefix === "auto" ? "#" : prefix}${SCISSORS}`;
 }
 
 function configuredOwnerEmails() {
