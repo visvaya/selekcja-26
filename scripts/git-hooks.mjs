@@ -92,14 +92,18 @@ export function excludedFiles(staged) {
   });
 }
 
-// Git starts its scissors line with core.commentChar ("#" unless configured).
+// core.commentString and core.commentChar are aliases (Git 2.45+): the one set last wins.
+// The value is read untrimmed, since a trailing space is part of the prefix; "auto" picks a
+// character per message and is treated as "#".
 function scissorsLine() {
-  try {
-    const commentChar = git(["config", "--get", "core.commentChar"]);
-    return `${commentChar.length === 1 ? commentChar : "#"}${SCISSORS}`;
-  } catch {
-    return `#${SCISSORS}`;
-  }
+  const entries = spawnSync(
+    "git",
+    ["config", "--get-regexp", "^core[.]comment(char|string)$"],
+    { encoding: "utf8" },
+  ).stdout;
+  const last = (entries ?? "").split("\n").filter(Boolean).at(-1);
+  const prefix = last?.slice(last.indexOf(" ") + 1);
+  return `${prefix === undefined || prefix.toLowerCase() === "auto" ? "#" : prefix}${SCISSORS}`;
 }
 
 function configuredOwnerEmails() {
